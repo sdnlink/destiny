@@ -67,6 +67,15 @@
 ./scripts/cache_daorenjia_texts.py --manifest-only
 ```
 
+全量完整性校验：
+
+```bash
+./scripts/verify_daorenjia_cache.py \
+  --report cache/daorenjia/verification.json
+```
+
+校验会检查目录唯一性、元数据状态、解析器版本、UTF-8、字符数、字节数、SHA-256、分卷编号、文件集合以及仅图片书籍记录。命令退出码为0且报告中 `complete: true` 才表示验收通过。
+
 ## 完成判定
 
 部分书籍只提供图片版，正文接口返回“请看右上图片版”。项目不下载图片，因此这类书籍记录为 `text_unavailable`，不伪造文本。只有 `summary.json` 同时满足以下条件，才能标记可用文本缓存完成：
