@@ -63,7 +63,7 @@ class CorpusSearchClient:
 def _query_terms(module_results):
     candidates = []
     for item in module_results:
-        if item["module"] not in ("zhouyi", "meihua"):
+        if item["module"] not in ("zhouyi", "meihua", "liuyao"):
             continue
         facts = item["result"]["facts"]
         for role, key in (("本卦", "original"), ("变卦", "changed")):
@@ -83,7 +83,7 @@ def _query_terms(module_results):
     return unique[:4]
 
 
-MODULE_NAMES = {"zhouyi": "周易", "meihua": "梅花"}
+MODULE_NAMES = {"zhouyi": "周易", "meihua": "梅花", "liuyao": "六爻"}
 
 
 def _relevance_score(row, term):

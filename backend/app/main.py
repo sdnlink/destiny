@@ -17,7 +17,12 @@ from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
 from app.core.explanation import explain_calculation_set
 from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
+from app.core.iching import time_cast as yi_time_cast
 from app.core.literature import collect_literature_opinions
+from app.core.liuren import number_cast as liuren_number_cast
+from app.core.liuren import time_cast as liuren_time_cast
+from app.core.liuyao import number_cast as liuyao_number_cast
+from app.core.liuyao import time_cast as liuyao_time_cast
 from app.core.meihua import number_cast as meihua_number_cast
 from app.core.meihua import time_cast as meihua_time_cast
 from app.core.registry import load_rule_registry, load_validation_cases
@@ -25,7 +30,7 @@ from app.core.synthesis import synthesize
 from app.core.validation import run_validation_cases
 
 
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.2.0"
 API_TOKEN = os.environ.get("APP_API_TOKEN")
 
 
@@ -48,6 +53,15 @@ class YiNumberRequest(BaseModel):
 class MeihuaNumberRequest(BaseModel):
     upper_number: int
     lower_number: int
+
+
+class LiuyaoNumberRequest(CalendarRequest):
+    lower_number: int
+    upper_number: int
+
+
+class LiurenNumberRequest(CalendarRequest):
+    number: int
 
 
 class CalculationRequest(BaseModel):
@@ -84,6 +98,9 @@ def execute(module, method, payload):
     if module == "zhouyi" and method == "manual":
         request = YiManualRequest(**payload)
         return yi_manual_cast(request.lines)
+    if module == "zhouyi" and method == "time":
+        request = CalendarRequest(**payload)
+        return yi_time_cast(**request.dict())
     if module == "zhouyi" and method == "numbers":
         request = YiNumberRequest(**payload)
         return yi_number_cast(request.lower_number, request.upper_number)
@@ -93,6 +110,23 @@ def execute(module, method, payload):
     if module == "meihua" and method == "numbers":
         request = MeihuaNumberRequest(**payload)
         return meihua_number_cast(request.upper_number, request.lower_number)
+    if module == "liuyao" and method == "time":
+        request = CalendarRequest(**payload)
+        return liuyao_time_cast(**request.dict())
+    if module == "liuyao" and method == "numbers":
+        request = LiuyaoNumberRequest(**payload)
+        values = request.dict()
+        lower_number = values.pop("lower_number")
+        upper_number = values.pop("upper_number")
+        return liuyao_number_cast(lower_number, upper_number, **values)
+    if module == "liuren" and method == "time":
+        request = CalendarRequest(**payload)
+        return liuren_time_cast(**request.dict())
+    if module == "liuren" and method == "numbers":
+        request = LiurenNumberRequest(**payload)
+        values = request.dict()
+        number = values.pop("number")
+        return liuren_number_cast(number, **values)
     raise ValueError(f"unsupported calculation: {module}/{method}")
 
 
@@ -154,7 +188,7 @@ def comparison_envelope(calculations, context=None):
 app = FastAPI(
     title="天机演象MVP计算API",
     version=APP_VERSION,
-    description="确定性历法、周易和梅花易数事实计算。解释规则尚待专家签署。",
+    description="确定性历法、周易、梅花易数、六爻和大六壬事实计算。解释规则尚待专家签署。",
 )
 
 
@@ -176,7 +210,7 @@ def health():
         "status": "ok",
         "service": "tianji-mvp-calculation",
         "version": APP_VERSION,
-        "modules": ["calendar", "zhouyi", "meihua"],
+        "modules": ["calendar", "zhouyi", "meihua", "liuyao", "liuren"],
     }
 
 
@@ -255,6 +289,11 @@ def cast_yi_manual(request: YiManualRequest):
     return {"data": yi_manual_cast(request.lines)}
 
 
+@app.post("/v1/zhouyi/time")
+def cast_yi_time(request: CalendarRequest):
+    return {"data": yi_time_cast(**request.dict())}
+
+
 @app.post("/v1/zhouyi/numbers")
 def cast_yi_numbers(request: YiNumberRequest):
     return {"data": yi_number_cast(request.lower_number, request.upper_number)}
@@ -268,6 +307,31 @@ def cast_meihua_time(request: CalendarRequest):
 @app.post("/v1/meihua/numbers")
 def cast_meihua_numbers(request: MeihuaNumberRequest):
     return {"data": meihua_number_cast(request.upper_number, request.lower_number)}
+
+
+@app.post("/v1/liuyao/time")
+def cast_liuyao_time(request: CalendarRequest):
+    return {"data": liuyao_time_cast(**request.dict())}
+
+
+@app.post("/v1/liuyao/numbers")
+def cast_liuyao_numbers(request: LiuyaoNumberRequest):
+    values = request.dict()
+    lower_number = values.pop("lower_number")
+    upper_number = values.pop("upper_number")
+    return {"data": liuyao_number_cast(lower_number, upper_number, **values)}
+
+
+@app.post("/v1/liuren/time")
+def cast_liuren_time(request: CalendarRequest):
+    return {"data": liuren_time_cast(**request.dict())}
+
+
+@app.post("/v1/liuren/numbers")
+def cast_liuren_numbers(request: LiurenNumberRequest):
+    values = request.dict()
+    number = values.pop("number")
+    return {"data": liuren_number_cast(number, **values)}
 
 
 @app.post("/v1/calculations/evaluate")

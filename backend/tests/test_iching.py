@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.core.iching import derive_hexagrams, hexagram_from_bits, manual_cast, number_cast
+from app.core.iching import derive_hexagrams, hexagram_from_bits, manual_cast, number_cast, time_cast
 
 
 class IChingTests(unittest.TestCase):
@@ -39,6 +39,13 @@ class IChingTests(unittest.TestCase):
             manual_cast([7, 7, 7])
         with self.assertRaises(ValueError):
             manual_cast([7, 7, 7, 7, 7, 5])
+
+    def test_time_cast_is_deterministic(self):
+        payload = {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"}
+        first = time_cast(**payload)
+        second = time_cast(**payload)
+        self.assertEqual(first["facts"], second["facts"])
+        self.assertEqual(first["facts"]["original"]["name"], "履")
 
 
 if __name__ == "__main__":

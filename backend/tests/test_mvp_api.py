@@ -34,6 +34,16 @@ class MvpApiTests(unittest.TestCase):
         })
         self.assertEqual(result["pillars"]["day"], "辛酉")
 
+    def test_dispatches_four_system_time_and_number_methods(self):
+        calendar = {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"}
+        self.assertEqual(execute("zhouyi", "time", calendar)["facts"]["original"]["name"], "履")
+        self.assertEqual(execute("liuyao", "time", calendar)["facts"]["palace"]["name"], "艮")
+        liuyao_numbers = dict(calendar, lower_number=1, upper_number=1)
+        self.assertEqual(execute("liuyao", "numbers", liuyao_numbers)["facts"]["palace"]["name"], "乾")
+        self.assertEqual(execute("liuren", "time", calendar)["facts"]["month_general"]["branch"], "午")
+        liuren_numbers = dict(calendar, number=12)
+        self.assertEqual(execute("liuren", "numbers", liuren_numbers)["facts"]["occupation_time"]["branch"], "亥")
+
     def test_rejects_unknown_calculation(self):
         with self.assertRaises(ValueError):
             execute("unknown", "method", {})

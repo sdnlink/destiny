@@ -2,8 +2,10 @@ MODULE_LABELS = {
     "calendar": "历法",
     "zhouyi": "周易",
     "meihua": "梅花易数",
+    "liuyao": "六爻",
+    "liuren": "大六壬",
 }
-MODULE_ORDER = {"calendar": 0, "zhouyi": 1, "meihua": 2}
+MODULE_ORDER = {"calendar": 0, "zhouyi": 1, "meihua": 2, "liuyao": 3, "liuren": 4}
 
 
 def _calendar_explanation(item):
@@ -87,7 +89,7 @@ def _zhouyi_explanation(item):
                     original["upper_trigram"]["element"],
                     original["lower_trigram"]["element"],
                 ),
-                "rule_ids": ["YI-MANUAL-001" if item["method"] == "manual" else "YI-NUMBER-001"],
+                "rule_ids": [{"manual": "YI-MANUAL-001", "numbers": "YI-NUMBER-001", "time": "YI-TIME-001"}[item["method"]]],
             },
             {
                 "title": "动爻与变卦",
@@ -168,10 +170,99 @@ def _meihua_explanation(item):
     }
 
 
+def _liuyao_explanation(item):
+    result = item["result"]
+    facts = result["facts"]
+    original = facts["original"]
+    changed = facts["changed"]
+    palace = facts["palace"]
+    moving = "、".join(str(value) for value in facts["moving_lines"])
+    void = "、".join(facts["xun"]["empty_branches"])
+    return {
+        "module": "liuyao",
+        "title": "六爻纳甲排盘",
+        "summary": "本卦为{}，属{}宫{}，世爻在{}、应爻在{}；第{}爻动，变卦为{}。".format(
+            original["name"], palace["name"], palace["stage"], palace["host_line"],
+            palace["response_line"], moving, changed["name"],
+        ),
+        "sections": [
+            {
+                "title": "起卦与八宫",
+                "text": "采用{}排盘，本卦{}上{}下，归{}宫{}。".format(
+                    "时间" if item["method"] == "time" else "双数",
+                    original["upper_trigram"]["name"], original["lower_trigram"]["name"],
+                    palace["name"], palace["stage"],
+                ),
+                "rule_ids": ["LY-TIME-001" if item["method"] == "time" else "LY-NUMBER-001", "LY-PALACE-001"],
+            },
+            {
+                "title": "纳甲与六亲",
+                "text": "六爻已按内外卦配置纳干、纳支、五行和六亲；世爻为第{}爻，应爻为第{}爻。".format(
+                    palace["host_line"], palace["response_line"]
+                ),
+                "rule_ids": ["LY-NAJIA-001", "LY-RELATIVE-001"],
+            },
+            {
+                "title": "六神与旬空",
+                "text": "占日为{}，{}，旬空为{}。六神由初爻至上爻顺排。".format(
+                    facts["day_pillar"], facts["xun"]["name"], void
+                ),
+                "rule_ids": ["LY-SPIRIT-001", "CYCLE-XUN-001"],
+            },
+        ],
+        "limitations": list(result.get("warnings", [])),
+    }
+
+
+def _liuren_explanation(item):
+    result = item["result"]
+    facts = result["facts"]
+    month_general = facts["month_general"]
+    transmissions = facts["three_transmissions"]
+    if transmissions["status"] == "completed":
+        transmission_text = "三传为{}，课体路径为{}。".format("、".join(transmissions["transmissions"]), transmissions["lesson_type"])
+    else:
+        transmission_text = "本课进入{}路径，首版未生成三传。".format(transmissions["pending_path"])
+    return {
+        "module": "liuren",
+        "title": "大六壬排盘",
+        "summary": "占日{}，占时{}，{}后以{}将加时。{}".format(
+            facts["day_pillar"], facts["occupation_time"]["branch"],
+            month_general["boundary_term"], month_general["name"], transmission_text,
+        ),
+        "sections": [
+            {
+                "title": "月将与占时",
+                "text": "最近中气为{}，月将{}（{}）；本次占时为{}。".format(
+                    month_general["boundary_term"], month_general["name"], month_general["branch"],
+                    facts["occupation_time"]["branch"],
+                ),
+                "rule_ids": ["LR-MONTH-GENERAL-001", "LR-HOUR-001" if item["method"] == "time" else "LR-NUMBER-001"],
+            },
+            {
+                "title": "天地盘与四课",
+                "text": "月将加临占时后顺布天盘，并由{}日的干寄宫和日支生成四课。".format(facts["day_pillar"]),
+                "rule_ids": ["LR-PLATE-001", "LR-LESSON-001"],
+            },
+            {
+                "title": "三传与天将",
+                "text": transmission_text + " 十二天将按{}贵人起例{}。".format(
+                    "昼" if facts["heavenly_generals"]["period"] == "day" else "夜",
+                    facts["heavenly_generals"]["distribution_direction"],
+                ),
+                "rule_ids": ["LR-TRANSMISSION-001", "LR-GENERAL-001"],
+            },
+        ],
+        "limitations": list(result.get("warnings", [])),
+    }
+
+
 EXPLAINERS = {
     "calendar": _calendar_explanation,
     "zhouyi": _zhouyi_explanation,
     "meihua": _meihua_explanation,
+    "liuyao": _liuyao_explanation,
+    "liuren": _liuren_explanation,
 }
 
 

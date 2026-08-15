@@ -6,7 +6,9 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.core.calendar import calendar_analysis
-from app.core.iching import manual_cast
+from app.core.iching import manual_cast, time_cast as zhouyi_time_cast
+from app.core.liuren import time_cast as liuren_time_cast
+from app.core.liuyao import time_cast as liuyao_time_cast
 from app.core.meihua import time_cast
 from app.core.registry import load_rule_registry, load_validation_cases, unknown_rule_ids
 from app.core.validation import compare_subset, run_validation_cases
@@ -15,7 +17,7 @@ from app.core.validation import compare_subset, run_validation_cases
 class RuleRegistryTests(unittest.TestCase):
     def test_registry_is_valid_and_has_stable_checksum(self):
         registry = load_rule_registry()
-        self.assertEqual(len(registry["rules"]), 14)
+        self.assertEqual(len(registry["rules"]), 29)
         self.assertTrue(registry["checksum"].startswith("sha256:"))
         self.assertEqual(registry["rule_sets"][0]["status"], "draft")
 
@@ -23,7 +25,10 @@ class RuleRegistryTests(unittest.TestCase):
         results = [
             calendar_analysis("2026-08-15T16:00:00", "Asia/Shanghai"),
             manual_cast([9, 7, 7, 7, 7, 7]),
+            zhouyi_time_cast("2026-08-15T16:00:00", "Asia/Shanghai"),
             time_cast("2026-08-15T16:00:00", "Asia/Shanghai"),
+            liuyao_time_cast("2026-08-15T16:00:00", "Asia/Shanghai"),
+            liuren_time_cast("2026-08-15T16:00:00", "Asia/Shanghai"),
         ]
         for result in results:
             self.assertEqual(unknown_rule_ids(result), [])

@@ -62,9 +62,14 @@ APP_API_BIND=0.0.0.0 APP_API_TOKEN='replace-me' ./scripts/run_mvp_api.sh
 | `POST` | `/v1/validation-cases/run` | 执行全部工程案例回归 |
 | `POST` | `/v1/calendar/analyze` | 历法和四柱分析 |
 | `POST` | `/v1/zhouyi/manual` | 手工六爻起卦 |
+| `POST` | `/v1/zhouyi/time` | 周易农历时间自动排盘 |
 | `POST` | `/v1/zhouyi/numbers` | 周易双数起卦 |
 | `POST` | `/v1/meihua/time` | 梅花时间起卦 |
 | `POST` | `/v1/meihua/numbers` | 梅花双数起卦 |
+| `POST` | `/v1/liuyao/time` | 六爻时间自动排盘及纳甲 |
+| `POST` | `/v1/liuyao/numbers` | 六爻双数排盘及纳甲 |
+| `POST` | `/v1/liuren/time` | 大六壬时间自动排盘 |
+| `POST` | `/v1/liuren/numbers` | 大六壬数字占时排盘 |
 | `POST` | `/v1/calculations/evaluate` | 统一单模块计算封装 |
 | `POST` | `/v1/calculations/compare` | 最多8个模块并行计算和综合比较 |
 

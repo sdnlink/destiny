@@ -6,6 +6,7 @@ from .constants import (
     moving_line_number,
     trigram_number,
 )
+from .calendar import calendar_analysis
 
 
 ENGINE_VERSION = "yi-engine-1.0.0"
@@ -132,4 +133,61 @@ def number_cast(lower_number, upper_number):
         "evidence": [],
         "judgements": [],
         "warnings": ["数字起卦采用MVP工程基线；事项断语尚未经过专家签署。"],
+    }
+
+
+def time_cast(local_datetime, timezone, longitude=None, use_true_solar_time=False):
+    calendar = calendar_analysis(local_datetime, timezone, longitude, use_true_solar_time)
+    upper_source = calendar["year_branch"]["number"] + calendar["lunar"]["month"] + calendar["lunar"]["day"]
+    lower_source = upper_source + calendar["time_branch"]["number"]
+    upper_index = trigram_number(upper_source)
+    lower_index = trigram_number(lower_source)
+    moving_line = moving_line_number(lower_source)
+    lines = TRIGRAMS[lower_index]["lines"] + TRIGRAMS[upper_index]["lines"]
+    facts = derive_hexagrams(lines, [moving_line])
+    return {
+        "schema_version": "1.0",
+        "system": "zhouyi",
+        "school": "mvp-engineering-baseline",
+        "engine_version": ENGINE_VERSION,
+        "rule_version": RULE_VERSION,
+        "facts": {
+            "method": "lunar_time",
+            "calendar": {
+                "lunar": calendar["lunar"],
+                "pillars": calendar["pillars"],
+                "year_branch": calendar["year_branch"],
+                "time_branch": calendar["time_branch"],
+            },
+            "upper_source": upper_source,
+            "lower_source": lower_source,
+            "upper_trigram_number": upper_index,
+            "lower_trigram_number": lower_index,
+            "moving_line": moving_line,
+            **facts,
+        },
+        "steps": [
+            {
+                "sequence": 1,
+                "operation": "calendar_to_time_numbers",
+                "inputs": {
+                    "year_branch_number": calendar["year_branch"]["number"],
+                    "lunar_month": calendar["lunar"]["month"],
+                    "lunar_day": calendar["lunar"]["day"],
+                    "time_branch_number": calendar["time_branch"]["number"],
+                },
+                "output": {"upper_source": upper_source, "lower_source": lower_source},
+                "rule_ids": ["YI-TIME-001"],
+            },
+            {
+                "sequence": 2,
+                "operation": "derive_time_hexagrams",
+                "inputs": {"upper_source": upper_source, "lower_source": lower_source},
+                "output": {"upper_trigram": upper_index, "lower_trigram": lower_index, "moving_line": moving_line},
+                "rule_ids": ["YI-TIME-001", "YI-RELATION-001"],
+            },
+        ],
+        "evidence": [],
+        "judgements": [],
+        "warnings": ["周易自动排盘采用农历时间取数工程基线；该起卦法及事项断语尚待专家签署。"],
     }

@@ -9,6 +9,8 @@ from app.core.calendar import calendar_analysis
 from app.core.explanation import explain_calculation_set
 from app.core.iching import manual_cast
 from app.core.meihua import time_cast
+from app.core.liuren import time_cast as liuren_time_cast
+from app.core.liuyao import time_cast as liuyao_time_cast
 
 
 class ExplanationTests(unittest.TestCase):
@@ -55,6 +57,16 @@ class ExplanationTests(unittest.TestCase):
         for module in output["modules"]:
             for section in module["sections"]:
                 self.assertTrue(section["rule_ids"])
+
+    def test_explains_liuyao_and_liuren_facts(self):
+        extended = self.module_results + [
+            {"module": "liuyao", "method": "time", "result": liuyao_time_cast("2026-08-15T16:00:00", "Asia/Shanghai")},
+            {"module": "liuren", "method": "time", "result": liuren_time_cast("2026-08-15T16:00:00", "Asia/Shanghai")},
+        ]
+        output = explain_calculation_set(extended, self.comparison)
+        self.assertEqual(len(output["modules"]), 5)
+        self.assertIn("六爻", output["summary"])
+        self.assertIn("三传为午、辰、寅", output["summary"])
 
 
 if __name__ == "__main__":
