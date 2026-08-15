@@ -73,6 +73,18 @@ START_CLICKHOUSE=1 ./scripts/start_all.sh
 
 计算服务本身不依赖ClickHouse；只有语料服务和分析数据功能需要该数据库。
 
+默认启用书籍观点，并在`8088`语料服务不可用时由`start_all.sh`自动启动。该子进程由启动脚本统一管理，退出主服务时一并关闭。相关参数：
+
+```bash
+# 完全关闭书籍检索
+ENABLE_LITERATURE=0 ./scripts/start_all.sh
+
+# 使用已由外部进程管理的语料服务，不自动启动本地进程
+START_CORPUS_API=0 CORPUS_API_URL=http://127.0.0.1:8088 ./scripts/start_all.sh
+```
+
+若语料服务或ClickHouse不可用，计算仍会继续，`literature.status`返回`unavailable`并给出警告。
+
 启动脚本会在以下情况立即失败并给出提示：
 
 - `.venv/bin/uvicorn`不存在。

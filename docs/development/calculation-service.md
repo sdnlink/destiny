@@ -18,6 +18,7 @@
 - 规则登记、来源引用、规则集合校验和工程案例回归。
 - 对已发布结构化判断进行一致、互补、冲突和无法判断分类。
 - 根据本次计算事实生成可追溯的结果摘要和逐模块详细说明。
+- 按本卦和变卦检索内部书籍语料，返回可定位原文和明确的书籍参考意见。
 
 未实现或未批准：
 
@@ -154,6 +155,38 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 ```
 
 支持`career`、`finance`、`relationship`、`travel`、`study`和`other`六类事项。建议综合事项类别、问题摘要、周易动爻和梅花本卦阶段体用关系，输出行动清单和待核实问题。它只作为研究性决策整理工具，不改变综合引擎的正式判断，也不允许将`polarity`改成有利或不利。
+
+### 3.5 书籍原文与观点
+
+启用文献检索后，响应包含`literature`：
+
+```json
+{
+  "status": "available",
+  "usage_scope": "internal_research",
+  "query_terms": [
+    {"term": "履卦", "hexagram": "履", "role": "梅花本卦"}
+  ],
+  "books": [
+    {
+      "citation_id": "BOOK-001",
+      "title": "道德真经广圣义(杜光庭)",
+      "source_url": "https://www.daorenjia.com/...",
+      "chunk_id": "...",
+      "content_sha256": "...",
+      "excerpt": "君子察其所履……《易》履卦云视履考祥是也。",
+      "book_opinion": "这段文字强调先辨明位置、责任和实际履行……",
+      "application_note": "对应当前事项，可优先核对角色、承诺和实际行动是否一致。",
+      "review_status": "automatic_candidate_unreviewed"
+    }
+  ],
+  "warnings": []
+}
+```
+
+检索词只来自本次计算得到的本卦和变卦，不使用任意问题文本搜索全文。每个不同卦优先保留一本候选书，再按书名、易学语境和明确意见词排序，默认最多3本。原文保留文档、文本块、哈希和来源链接。
+
+`book_opinion`和`application_note`是对命中句及相邻句的确定性主题归纳。若段落只提及卦名而没有完整断语，系统必须明确说明不能直接套用，不得为了给出肯定答案而补写书中没有的内容。
 
 ## 4. 综合分类规则
 

@@ -69,12 +69,15 @@
 - `warnings`：边界、缺失和专家未审核提示。
 - `explanation`：确定性模板对输入、盘面、步骤和关系事实的可读复述，每段保留规则编号。
 - `advisory`：用户显式请求时生成的未审核事项检查清单，与正式判断分离。
+- `literature`：由本卦和变卦受控词检索得到的书籍原文、来源和自动候选观点。
 
 语料检索结果只能作为专家引用候选，不能自动写入 `judgements`。
 
 `explanation`不等同于`judgements`。在解释规则通过专家审核前，它不得把卦象、体用或五行关系转换成事项吉凶、应期、概率和行动建议。
 
 `advisory`允许把事项类别和体用关系组织成待核实的关注点、通用行动清单和风险问题，但必须标记`unreviewed_engineering_template`、保持`polarity: indeterminate`，不得进入正式综合判断或替代医疗、法律、投资和安全等专业意见。
+
+`literature`只作为内部研究引用。自动匹配必须保留原文、文本块、哈希和来源，并标记`automatic_candidate_unreviewed`。词语命中不等于规则适用，文献观点不得自动升级为正式`judgements`。
 
 ## 影响
 
