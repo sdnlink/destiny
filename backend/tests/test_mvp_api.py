@@ -51,6 +51,7 @@ class MvpApiTests(unittest.TestCase):
         self.assertEqual(first["input_hash"], second["input_hash"])
         self.assertEqual(first["comparison"]["comparable_judgement_count"], 0)
         self.assertEqual(len(first["module_results"]), 2)
+        self.assertEqual(first["explanation"]["conclusion"]["status"], "factual_result_only")
 
 
 if __name__ == "__main__":

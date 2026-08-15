@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, conint, conlist
 
 from app.core.calendar import calendar_analysis
 from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
+from app.core.explanation import explain_calculation_set
 from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
 from app.core.meihua import number_cast as meihua_number_cast
@@ -121,12 +122,14 @@ def comparison_envelope(calculations):
         }
         for item, result in zip(normalized, results)
     ]
+    comparison = synthesize(results)
     return {
         "task_id": "compare_{}".format(input_hash[:24]),
         "status": "completed",
         "input_hash": "sha256:" + input_hash,
         "module_results": module_results,
-        "comparison": synthesize(results),
+        "comparison": comparison,
+        "explanation": explain_calculation_set(module_results, comparison),
         "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
     }
 
