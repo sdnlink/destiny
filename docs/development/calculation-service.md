@@ -5,7 +5,7 @@
 
 ## 1. 能力边界
 
-当前服务提供确定性的历法、周易和梅花易数事实计算，以及多模块并列计算和结构化判断比较。计算内核不访问语料库，不调用语言模型，也不根据未经审核的经典文本自动生成吉凶、应期或事项建议。
+当前服务提供确定性的历法、周易和梅花易数事实计算，以及多模块并列计算和结构化判断比较。计算内核不访问语料库，不调用语言模型，也不根据未经审核的经典文本生成正式吉凶和应期。用户显式提供事项类别和问题摘要时，服务可生成标记为未审核的研究性决策检查清单；该清单不进入正式`judgements`。
 
 设置`SERVE_WEB=1`后，服务会在所有API路由之后挂载`frontend/dist`。生产启动脚本负责设置该变量；计算内核本身不依赖前端代码。
 
@@ -88,11 +88,15 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
     "calculations": [
       {"module":"zhouyi","method":"numbers","input":{"lower_number":8,"upper_number":8}},
       {"module":"meihua","method":"time","input":{"local_datetime":"2026-08-15T16:00:00","timezone":"Asia/Shanghai"}}
-    ]
+    ],
+    "context": {
+      "category": "career",
+      "question_summary": "是否接受新的工作机会"
+    }
   }'
 ```
 
-相同计算集合不受字段顺序和模块顺序影响，返回相同`task_id`和`input_hash`。当前任务只在请求期间计算，尚未持久化。
+相同计算集合及相同上下文不受字段顺序和模块顺序影响，返回相同`task_id`和`input_hash`。事项类别或问题摘要变化时任务身份也随之变化。当前任务和问题摘要只在请求期间处理，尚未持久化。
 
 ### 3.3 推演结果与详细说明
 
@@ -124,6 +128,33 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 
 说明由确定性模板直接读取本次盘面和步骤生成，不访问语料，不调用语言模型。每个说明段落保留规则编号。当前`review_status`表示只允许复述事实；在解释规则发布前，不能生成事项吉凶、应期和行动建议。
 
+### 3.4 结合询问事项的暂行建议
+
+提交`context`后，多模块接口同时返回`advisory`：
+
+```json
+{
+  "status": "provisional_research_advice",
+  "review_status": "unreviewed_engineering_template",
+  "context": {
+    "category": "career",
+    "question_summary": "是否接受新的工作机会"
+  },
+  "conclusion": {
+    "headline": "先处理外部约束，再决定推进速度",
+    "polarity": "indeterminate",
+    "confidence_label": "不评估现实概率"
+  },
+  "recommendations": [],
+  "verification_questions": [],
+  "evidence_basis": [],
+  "risk_notes": [],
+  "rule_ids": ["ADV-CONTEXT-001", "ADV-MH-RELATION-001"]
+}
+```
+
+支持`career`、`finance`、`relationship`、`travel`、`study`和`other`六类事项。建议综合事项类别、问题摘要、周易动爻和梅花本卦阶段体用关系，输出行动清单和待核实问题。它只作为研究性决策整理工具，不改变综合引擎的正式判断，也不允许将`polarity`改成有利或不利。
+
 ## 4. 综合分类规则
 
 综合层只处理包含`dimension`、`time_range`、`polarity`和`rule_ids`的结构化`judgements`。所有规则编号必须存在且状态为`published`，否则判断进入`excluded`，不参与综合结果。
@@ -136,7 +167,7 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 - 只有一条判断进入`unpaired`。
 - 包含`indeterminate`进入`indeterminate`。
 
-当前登记的12条规则均为`draft`工程基线，各模块也没有解释性`judgements`，因此正常综合结果是保留模块事实，并提示没有可比较的已发布判断。系统不会把五行关系事实擅自转换为吉凶。
+当前登记的14条规则均为`draft`工程基线，各模块也没有解释性`judgements`，因此正常综合结果是保留模块事实，并提示没有可比较的已发布判断。两个`ADV-*`规则只产生未审核检查清单，不把五行关系转换为吉凶。
 
 ## 5. 规则与案例
 
