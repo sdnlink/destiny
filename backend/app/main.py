@@ -17,6 +17,7 @@ from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
 from app.core.explanation import explain_calculation_set
 from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
+from app.core.literature import collect_literature_opinions
 from app.core.meihua import number_cast as meihua_number_cast
 from app.core.meihua import time_cast as meihua_time_cast
 from app.core.registry import load_rule_registry, load_validation_cases
@@ -145,6 +146,7 @@ def comparison_envelope(calculations, context=None):
         "comparison": comparison,
         "explanation": explain_calculation_set(module_results, comparison),
         "advisory": generate_advisory(module_results, normalized_context),
+        "literature": collect_literature_opinions(module_results),
         "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
     }
 
