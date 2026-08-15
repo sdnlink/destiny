@@ -23,4 +23,11 @@ npm run build
 npm run test:browser
 ```
 
+生产部署不运行Vite服务。`scripts/build_all.sh`使用同源API模式生成`frontend/dist`，随后由FastAPI静态托管：
+
+```bash
+./scripts/build_all.sh
+./scripts/start_all.sh
+```
+
 完整运行说明见`docs/development/web-interface.md`。前端不得直接读取ClickHouse、语料文件或后端规则JSON，所有运行数据通过API获取。

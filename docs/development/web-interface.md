@@ -44,6 +44,15 @@ npm install
 
 默认地址为`http://127.0.0.1:5173`。Vite将`/api`代理到`http://127.0.0.1:8090`，浏览器不会产生跨域请求。可通过`VITE_API_ROOT`在构建时指定其他API根路径。
 
+生产模式使用统一脚本构建，并由FastAPI在`8090`同源托管Web资源：
+
+```bash
+./scripts/build_all.sh
+./scripts/start_all.sh
+```
+
+生产部署参数见[构建、启动与部署](./deployment.md)。
+
 ## 3. 构建与验证
 
 ```bash

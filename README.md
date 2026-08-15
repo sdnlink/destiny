@@ -10,6 +10,7 @@
 - [语料服务说明](./docs/development/corpus-service.md)
 - [MVP计算服务说明](./docs/development/calculation-service.md)
 - [Web推演工作台说明](./docs/development/web-interface.md)
+- [构建、启动与部署说明](./docs/development/deployment.md)
 - [前后端仓库布局决策](./docs/design/decisions/003-frontend-backend-repository-layout.md)
 - [数据导入说明](./docs/data-ingestion.md)
 
@@ -71,6 +72,28 @@ cd ..
 ```
 
 Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在运行。
+
+## 统一构建与部署
+
+统一编译后端、运行测试并构建前端：
+
+```bash
+./scripts/build_all.sh
+```
+
+启动编译后的前后端单端口服务：
+
+```bash
+./scripts/start_all.sh
+```
+
+一键构建并部署：
+
+```bash
+./scripts/deploy.sh
+```
+
+生产模式的Web界面和API均位于`http://127.0.0.1:8090`。完整参数和安全要求见[部署说明](./docs/development/deployment.md)。
 
 验证：
 

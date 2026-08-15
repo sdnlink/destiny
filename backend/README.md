@@ -22,4 +22,11 @@ backend/
 .venv/bin/python -m unittest discover -s backend/tests -v
 ```
 
+统一生产构建和启动：
+
+```bash
+./scripts/build_all.sh
+./scripts/start_all.sh
+```
+
 `backend/app/core/registry.py`会读取根目录`data/`中的共享规则和案例。后端不得反向依赖`frontend/`源码。
