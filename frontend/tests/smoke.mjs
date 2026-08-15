@@ -35,6 +35,8 @@ await desktop.getByRole("heading", { name: "梅花易数" }).waitFor();
 await desktop.getByRole("button", { name: "结论建议" }).click();
 await desktop.getByRole("heading", { name: "事项结论与详细建议" }).waitFor();
 await desktop.getByRole("heading", { name: "建议行动" }).waitFor();
+await desktop.getByRole("heading", { name: "书籍中的明确观点" }).waitFor();
+await desktop.getByRole("link", { name: /查看来源/ }).first().waitFor();
 await desktop.getByText("综合说明", { exact: true }).waitFor();
 await assertNoOverflow(desktop, "desktop result");
 await desktop.screenshot({ path: "/tmp/tianji-result-desktop.png", fullPage: true });

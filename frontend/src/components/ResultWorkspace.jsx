@@ -8,6 +8,7 @@ import {
   Compass,
   FileSearch,
   FileText,
+  ExternalLink,
   GitCompareArrows,
   Info,
   Layers3,
@@ -384,7 +385,7 @@ function ComparisonView({ comparison }) {
   );
 }
 
-function ExplanationView({ explanation, advisory }) {
+function ExplanationView({ explanation, advisory, literature }) {
   const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass };
   return (
     <div className="view-stack explanation-view">
@@ -444,6 +445,43 @@ function ExplanationView({ explanation, advisory }) {
           </section>
         </>
       )}
+
+      <section className="data-band literature-band">
+        <div className="band-heading">
+          <div><span className="band-icon"><BookOpen size={16} /></span><div><h3>书籍中的明确观点</h3><p>根据本卦和变卦检索内部缓存书籍，并保留原文与来源</p></div></div>
+          <span className={`literature-status ${literature?.status || "unavailable"}`}>{literature?.status || "unavailable"}</span>
+        </div>
+        {literature?.books?.length ? (
+          <div className="literature-list">
+            {literature.books.map((book) => (
+              <article className="literature-item" key={book.citation_id}>
+                <header>
+                  <div><span>{book.citation_id}</span><h4>《{book.title}》</h4></div>
+                  <small>{book.calculation_role} · 匹配“{book.matched_term}”</small>
+                </header>
+                <blockquote>{book.excerpt}</blockquote>
+                <div className="book-opinion">
+                  <strong>书中观点</strong>
+                  <p>{book.book_opinion}</p>
+                </div>
+                <div className="book-application">
+                  <strong>当前事项参考</strong>
+                  <p>{book.application_note}</p>
+                </div>
+                <footer>
+                  <span>{book.chunk_id} · hash {book.content_sha256.slice(0, 12)}</span>
+                  <a href={book.source_url} target="_blank" rel="noreferrer">查看来源 <ExternalLink size={13} /></a>
+                </footer>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <Notice tone="neutral" icon={BookOpen}>{literature?.warnings?.[0] || "当前没有找到与卦象直接匹配的书籍片段。"}</Notice>
+        )}
+        {literature?.books?.length > 0 && literature.warnings.map((warning) => (
+          <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>
+        ))}
+      </section>
 
       <section className="explanation-lead">
         <span>计算结果摘要</span>
@@ -552,7 +590,7 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         {activeTab === "zhouyi" && <ZhouyiView result={zhouyi} />}
         {activeTab === "meihua" && <MeihuaView result={meihua} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}
-        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} />}
+        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} literature={result.literature} />}
       </div>
     </main>
   );
