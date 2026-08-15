@@ -5,13 +5,12 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import time
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
 
 
 USER_AGENT = "TianjiYanxiangResearch/1.0 (internal cultural research)"
@@ -84,25 +83,32 @@ class ApiClient:
 
     def request(self, parameters):
         parameters = {**parameters, "format": "json", "formatversion": 2}
-        url = self.api_url + "?" + urlencode(parameters)
         last_error = None
         for attempt in range(self.retries + 1):
             wait = self.delay - (time.monotonic() - self.last_request_at)
             if wait > 0:
                 time.sleep(wait)
-            request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
             try:
                 self.last_request_at = time.monotonic()
-                with urlopen(request, timeout=self.timeout) as response:
-                    return json.loads(response.read().decode("utf-8"))
-            except HTTPError as exc:
-                last_error = exc
-                if exc.code not in (429, 500, 502, 503, 504):
-                    raise
-                retry_after = exc.headers.get("Retry-After")
-                pause = int(retry_after) if retry_after and retry_after.isdigit() else min(60, 2 ** attempt)
-                time.sleep(pause)
-            except (URLError, TimeoutError, ValueError) as exc:
+                command = [
+                    "curl", "--silent", "--show-error", "--location", "--max-time", str(self.timeout),
+                    "--user-agent", USER_AGENT, "--header", "Accept: application/json", "--get",
+                    "--write-out", "\n%{http_code}", self.api_url,
+                ]
+                for key, value in parameters.items():
+                    command.extend(["--data-urlencode", "{}={}".format(key, value)])
+                completed = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+                if completed.returncode:
+                    raise URLError(completed.stderr.decode("utf-8", errors="replace").strip())
+                body, status_line = completed.stdout.rsplit(b"\n", 1)
+                status = int(status_line)
+                if status == 200:
+                    return json.loads(body.decode("utf-8"))
+                if status not in (429, 500, 502, 503, 504):
+                    raise HTTPError(self.api_url, status, "Wikisource API request failed", {}, None)
+                last_error = HTTPError(self.api_url, status, "retryable Wikisource API response", {}, None)
+                time.sleep(min(60, 2 ** attempt))
+            except (URLError, TimeoutError, ValueError, OSError) as exc:
                 last_error = exc
                 time.sleep(min(60, 2 ** attempt))
         raise last_error
