@@ -17,6 +17,7 @@
 - 规范输入哈希、幂等任务编号、多模块并行计算。
 - 规则登记、来源引用、规则集合校验和工程案例回归。
 - 对已发布结构化判断进行一致、互补、冲突和无法判断分类。
+- 根据本次计算事实生成可追溯的结果摘要和逐模块详细说明。
 
 未实现或未批准：
 
@@ -92,6 +93,36 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 ```
 
 相同计算集合不受字段顺序和模块顺序影响，返回相同`task_id`和`input_hash`。当前任务只在请求期间计算，尚未持久化。
+
+### 3.3 推演结果与详细说明
+
+多模块接口返回`explanation`：
+
+```json
+{
+  "generation_method": "deterministic_fact_template",
+  "review_status": "factual_only_pending_expert_rules",
+  "summary": "本次完成历法、周易、梅花易数模块的确定性推演……",
+  "modules": [
+    {
+      "module": "zhouyi",
+      "title": "周易推演结果",
+      "summary": "本卦、动爻和变卦摘要",
+      "sections": [
+        {"title": "本卦结构", "text": "……", "rule_ids": ["YI-MANUAL-001"]}
+      ],
+      "limitations": []
+    }
+  ],
+  "conclusion": {
+    "status": "factual_result_only",
+    "text": "当前没有引用已发布解释规则的结构化判断……"
+  },
+  "limitations": []
+}
+```
+
+说明由确定性模板直接读取本次盘面和步骤生成，不访问语料，不调用语言模型。每个说明段落保留规则编号。当前`review_status`表示只允许复述事实；在解释规则发布前，不能生成事项吉凶、应期和行动建议。
 
 ## 4. 综合分类规则
 
