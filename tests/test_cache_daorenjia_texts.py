@@ -34,6 +34,12 @@ class ParserTests(unittest.TestCase):
     def test_rejects_external_links(self):
         self.assertIsNone(MODULE.same_site_path("https://example.com/daozang18-761"))
 
+    def test_mobile_api_html_uses_same_text_parser(self):
+        parser = MODULE.BookParser()
+        parser.feed('<div id="content4"><p>第一段</p><p>第二段</p></div>')
+        _, text = parser.result()
+        self.assertEqual(text, "第一段\n第二段\n")
+
 
 if __name__ == "__main__":
     unittest.main()

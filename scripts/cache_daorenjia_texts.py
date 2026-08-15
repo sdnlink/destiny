@@ -16,6 +16,7 @@ from urllib.robotparser import RobotFileParser
 
 
 BASE_URL = "https://www.daorenjia.com/"
+MOBILE_API_BASE = "https://m.daorenjia.com/api/"
 USER_AGENT = "TianjiYanxiang-TextCache/0.1"
 BOOK_PATH = re.compile(r"^/?daozang\d+-\d+/?$")
 CATEGORY_PATH = re.compile(r"^/?c\d+/?$")
@@ -219,6 +220,61 @@ def cache_book(book, fetcher, robots, text_dir, metadata_dir, force=False):
         return metadata, "failed"
 
 
+def cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, force=False):
+    text_path = text_dir / f"{book['slug']}.txt"
+    metadata_path = metadata_dir / f"{book['slug']}.json"
+    existing = load_metadata(metadata_path)
+    if not force and existing and existing.get("status") == "ok" and text_path.exists():
+        digest = hashlib.sha256(text_path.read_bytes()).hexdigest()
+        if existing.get("sha256") == digest:
+            return existing, "cached"
+
+    book_id = book["slug"].rsplit("-", 1)[-1]
+    api_url = urljoin(MOBILE_API_BASE, f"neirongapi.php?id={book_id}")
+    try:
+        payload_text, content_type = fetcher.get(api_url)
+        payload = json.loads(payload_text.lstrip("\ufeff\r\n \t"))
+        if str(payload.get("id")) != book_id:
+            raise ValueError("mobile API returned a mismatched book id")
+        title = str(payload.get("title") or "").strip()
+        content_html = payload.get("content")
+        if not title or not isinstance(content_html, str):
+            raise ValueError("mobile API response is missing title or content")
+        parser = BookParser()
+        parser.feed(f'<div id="content4">{content_html}</div>')
+        _, text = parser.result()
+        if len(text.strip()) < 20:
+            raise ValueError("mobile API book text is empty")
+        text_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = text_path.with_suffix(".txt.tmp")
+        temporary.write_text(text, encoding="utf-8")
+        temporary.replace(text_path)
+        metadata = {
+            **book,
+            "title": title,
+            "status": "ok",
+            "characters": len(text),
+            "bytes": text_path.stat().st_size,
+            "sha256": hashlib.sha256(text_path.read_bytes()).hexdigest(),
+            "fetched_at": utc_now(),
+            "fetched_from": api_url,
+            "content_type": content_type,
+            "parser_version": "1.1.0",
+        }
+        write_json(metadata_path, metadata)
+        return metadata, "downloaded"
+    except Exception as exc:
+        metadata = {
+            **book,
+            "status": "failed",
+            "fetched_from": api_url,
+            "error": str(exc),
+            "checked_at": utc_now(),
+        }
+        write_json(metadata_path, metadata)
+        return metadata, "failed"
+
+
 def build_manifest(catalog, metadata_dir, output_path):
     records = []
     for book in catalog:
@@ -240,7 +296,12 @@ def load_catalog(path):
     return value["books"]
 
 
-def load_robots(fetcher, cache_path):
+def load_robots(fetcher, cache_path, prefer_cache=False):
+    if prefer_cache and cache_path.exists():
+        text = cache_path.read_text(encoding="utf-8")
+        robots = RobotFileParser(urljoin(BASE_URL, "robots.txt"))
+        robots.parse(text.splitlines())
+        return robots
     try:
         text, _ = fetcher.get(urljoin(BASE_URL, "robots.txt"))
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -286,6 +347,8 @@ def main():
     parser.add_argument("--reuse-catalog", action="store_true", help="复用现有catalog.json，续传时避免重新扫描分类")
     parser.add_argument("--manifest-only", action="store_true", help="离线重建部分清单和统计，不发送网络请求")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--source", choices=("web", "mobile-api"), default="web",
+                        help="正文来源；主站不可用时可使用其公开移动接口")
     parser.add_argument("--max-consecutive-failures", type=int, default=5,
                         help="连续失败达到该数量时自动暂停")
     args = parser.parse_args()
@@ -303,7 +366,7 @@ def main():
         return
 
     fetcher = Fetcher(args.delay, args.timeout, args.retries)
-    robots = load_robots(fetcher, output / "robots.txt")
+    robots = load_robots(fetcher, output / "robots.txt", prefer_cache=args.source == "mobile-api")
 
     catalog_path = output / "catalog.json"
     if args.reuse_catalog:
@@ -327,7 +390,10 @@ def main():
     consecutive_failures = 0
     try:
         for index, book in enumerate(catalog, 1):
-            _, state = cache_book(book, fetcher, robots, text_dir, metadata_dir, args.force)
+            if args.source == "mobile-api":
+                _, state = cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, args.force)
+            else:
+                _, state = cache_book(book, fetcher, robots, text_dir, metadata_dir, args.force)
             totals[state] += 1
             print(f"{state} {book['slug']} ({index}/{len(catalog)})", flush=True)
             if state == "failed":

@@ -43,6 +43,19 @@
 
 该命令会校验并跳过已经成功缓存的266本，重试失败项并继续剩余书目。不要使用 `--force`，否则会重新下载全部成功文件。
 
+主站不可用但官方移动接口可用时：
+
+```bash
+./scripts/cache_daorenjia_texts.py \
+  --reuse-catalog \
+  --source mobile-api \
+  --delay 1.0 \
+  --timeout 60 \
+  --retries 3
+```
+
+移动站公开前端使用 `m.daorenjia.com/api/neirongapi.php?id=...` 获取书籍正文。采集器仍按原始书籍URL保存来源，并在逐书元数据的 `fetched_from` 中记录实际接口地址。
+
 离线重建状态清单：
 
 ```bash
