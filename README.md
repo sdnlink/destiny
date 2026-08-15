@@ -9,6 +9,7 @@
 - [语料分析报告](./docs/data/corpus-analysis.md)
 - [语料服务说明](./docs/development/corpus-service.md)
 - [MVP计算服务说明](./docs/development/calculation-service.md)
+- [Web推演工作台说明](./docs/development/web-interface.md)
 - [数据导入说明](./docs/data-ingestion.md)
 
 ## 本地启动
@@ -39,11 +40,24 @@ docker-compose up -d clickhouse
 
 计算API默认位于`http://127.0.0.1:8090`，交互文档位于`http://127.0.0.1:8090/docs`。
 
+首次安装并启动Web推演工作台：
+
+```bash
+cd frontend
+npm install
+cd ..
+./scripts/run_web.sh
+```
+
+Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在运行。
+
 验证：
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 ./scripts/run_validation_cases.py
+npm --prefix frontend run build
+npm --prefix frontend run test:browser
 ./scripts/verify_daorenjia_cache.py \
   --report cache/daorenjia/verification.json
 ```
