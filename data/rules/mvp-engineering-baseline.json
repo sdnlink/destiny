@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "registry_id": "mvp-engineering-baseline",
+  "qualification": "engineering_baseline_pending_expert_review",
+  "rule_sets": [
+    {
+      "rule_set_id": "mvp-engineering-baseline",
+      "version": "1.0.0",
+      "system": "multi-system",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "rules": [
+        {"rule_id": "CAL-NORMALIZE-001", "version": "1.0.0"},
+        {"rule_id": "CAL-SOLAR-TIME-001", "version": "1.0.0"},
+        {"rule_id": "CAL-CONVERSION-001", "version": "1.0.0"},
+        {"rule_id": "CAL-PILLARS-001", "version": "1.0.0"},
+        {"rule_id": "YI-MANUAL-001", "version": "1.0.0"},
+        {"rule_id": "YI-RELATION-001", "version": "1.0.0"},
+        {"rule_id": "YI-NUMBER-001", "version": "1.0.0"},
+        {"rule_id": "YI-NUMBER-002", "version": "1.0.0"},
+        {"rule_id": "MH-TIME-001", "version": "1.0.0"},
+        {"rule_id": "MH-NUMBER-001", "version": "1.0.0"},
+        {"rule_id": "MH-BODYUSE-001", "version": "1.0.0"},
+        {"rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0"}
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "CAL-NORMALIZE-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "本地时间标准化", "purpose": "将无偏移本地时间按IANA时区转换为可计算时刻", "preconditions": ["年份在1900至2100之间", "时区名称有效", "时间不处于夏令时歧义或缺失区间"],
+      "inputs": ["local_datetime", "timezone"], "procedure": ["解析ISO-8601本地时间", "按IANA时区定位", "保留本地时间与UTC时间"], "outputs": ["original_local_datetime", "utc_datetime"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["不接受输入自带UTC偏移"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.calendar:parse_local_datetime"
+    },
+    {
+      "rule_id": "CAL-SOLAR-TIME-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "真太阳时修正", "purpose": "在显式启用时记录经度、均时差和夏令时修正", "preconditions": ["启用时必须提供经度"],
+      "inputs": ["local_datetime", "timezone", "longitude", "use_true_solar_time"], "procedure": ["计算标准经线", "计算经度时差", "计算均时差近似值", "扣除夏令时并合并修正"], "outputs": ["effective_local_datetime", "correction"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["均时差使用NOAA风格近似公式", "默认关闭"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.calendar:apply_true_solar_time"
+    },
+    {
+      "rule_id": "CAL-CONVERSION-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "公农历与节气转换", "purpose": "生成农历日期及相邻节气事实", "preconditions": ["时间已标准化"],
+      "inputs": ["effective_local_datetime"], "procedure": ["调用固定版本lunar-python转换", "提取农历与相邻节气"], "outputs": ["lunar", "solar_terms"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#技术决策"], "limitations": ["结果受lunar-python 1.4.8支持范围约束"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.calendar:calendar_analysis"
+    },
+    {
+      "rule_id": "CAL-PILLARS-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "四柱边界工程基线", "purpose": "按立春、节令和子初23时生成四柱", "preconditions": ["历法时间已确定"],
+      "inputs": ["effective_local_datetime"], "procedure": ["立春换年", "节令换月", "23时换日", "计算时柱"], "outputs": ["pillars"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["边界仍待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.calendar:calendar_analysis"
+    },
+    {
+      "rule_id": "YI-MANUAL-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "手工六爻归一化", "purpose": "将初爻至上爻的6/7/8/9转换为阴阳及动爻", "preconditions": ["恰好六个爻值"],
+      "inputs": ["lines"], "procedure": ["6与8映射阴", "7与9映射阳", "6与9标记为动爻"], "outputs": ["binary_lines", "moving_lines"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["不包含多爻辞解释"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:manual_cast"
+    },
+    {
+      "rule_id": "YI-RELATION-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "关联卦派生", "purpose": "由六爻生成本卦、变卦、互卦、错卦和综卦", "preconditions": ["六爻已归一化"],
+      "inputs": ["binary_lines", "moving_lines"], "procedure": ["按上下三爻查六十四卦", "翻转动爻", "按二三四与三四五取互卦", "逐爻取反生成错卦", "倒序生成综卦"], "outputs": ["original", "changed", "mutual", "opposite", "reversed"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["只生成卦象事实"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:derive_hexagrams"
+    },
+    {
+      "rule_id": "YI-NUMBER-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "周易双数取上下卦", "purpose": "第一数取下卦，第二数取上卦", "preconditions": ["输入为整数"],
+      "inputs": ["lower_number", "upper_number"], "procedure": ["分别除以8取余", "余0按8"], "outputs": ["lower_trigram", "upper_trigram"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["属于MVP指定数字起卦法"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:number_cast"
+    },
+    {
+      "rule_id": "YI-NUMBER-002", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "周易双数取动爻", "purpose": "按两数之和确定动爻", "preconditions": ["输入为整数"],
+      "inputs": ["lower_number", "upper_number"], "procedure": ["两数求和", "除以6取余", "余0按6"], "outputs": ["moving_line"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["属于MVP指定数字起卦法"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:number_cast"
+    },
+    {
+      "rule_id": "MH-TIME-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "梅花农历时间起卦", "purpose": "由年支、农历月日和时支确定上下卦及动爻", "preconditions": ["时间和时区有效"],
+      "inputs": ["local_datetime", "timezone"], "procedure": ["年支数加月日取上卦", "再加时支取下卦", "下卦总数除以6取动爻"], "outputs": ["upper_trigram", "lower_trigram", "moving_line"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["闰月按月份绝对值取数", "规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:time_cast"
+    },
+    {
+      "rule_id": "MH-NUMBER-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "梅花双数起卦", "purpose": "第一数取上卦，第二数取下卦并以两数之和取动爻", "preconditions": ["输入为整数"],
+      "inputs": ["upper_number", "lower_number"], "procedure": ["第一数除以8取上卦", "第二数除以8取下卦", "两数之和除以6取动爻"], "outputs": ["upper_trigram", "lower_trigram", "moving_line"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:number_cast"
+    },
+    {
+      "rule_id": "MH-BODYUSE-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "梅花体用位置", "purpose": "按动爻所在三爻卦确定用卦，另一卦为体", "preconditions": ["动爻位置已确定"],
+      "inputs": ["moving_line"], "procedure": ["动爻在1至3则下卦为用", "动爻在4至6则上卦为用", "另一卦为体"], "outputs": ["body_position", "use_position"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["不含旺衰与应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:_cast_from_numbers"
+    },
+    {
+      "rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "梅花体用五行关系", "purpose": "输出体用之间的生克比和关系事实", "preconditions": ["体卦和用卦五行已确定"],
+      "inputs": ["body_element", "use_element"], "procedure": ["比较同五行", "比较五行生关系", "比较五行克关系"], "outputs": ["relation_code", "relation_label"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["关系事实不直接映射吉凶"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:five_element_relation"
+    }
+  ]
+}

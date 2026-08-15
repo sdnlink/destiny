@@ -103,8 +103,10 @@ def calendar_analysis(local_datetime, timezone, longitude=None, use_true_solar_t
     lunar_month = lunar.getMonth()
     time_branch = lunar.getTimeZhi()
 
-    return {
+    result = {
         "schema_version": "1.0",
+        "system": "calendar",
+        "school": "mvp-engineering-baseline",
         "engine_version": ENGINE_VERSION,
         "rule_version": RULE_VERSION,
         "input": {
@@ -157,5 +159,53 @@ def calendar_analysis(local_datetime, timezone, longitude=None, use_true_solar_t
             "current": _jieqi(lunar.getCurrentJieQi()),
             "next": _jieqi(lunar.getNextJieQi()),
         },
+        "steps": [
+            {
+                "sequence": 1,
+                "operation": "normalize_local_datetime",
+                "inputs": {"local_datetime": local_datetime, "timezone": timezone},
+                "output": {
+                    "local_datetime": original.isoformat(),
+                    "utc_datetime": original.astimezone(pytz.UTC).isoformat(),
+                },
+                "rule_ids": ["CAL-NORMALIZE-001"],
+            },
+            {
+                "sequence": 2,
+                "operation": "apply_time_standard",
+                "inputs": {
+                    "use_true_solar_time": use_true_solar_time,
+                    "longitude": longitude,
+                },
+                "output": {
+                    "effective_local_datetime": effective.isoformat(),
+                    "correction": correction,
+                },
+                "rule_ids": ["CAL-SOLAR-TIME-001"],
+            },
+            {
+                "sequence": 3,
+                "operation": "derive_calendar_and_pillars",
+                "inputs": {"effective_local_datetime": effective.isoformat()},
+                "output": {
+                    "lunar": {
+                        "year": lunar.getYear(),
+                        "month": abs(lunar_month),
+                        "day": lunar.getDay(),
+                        "is_leap_month": lunar_month < 0,
+                    },
+                    "pillars": {
+                        "year": year_pillar,
+                        "month": month_pillar,
+                        "day": day_pillar,
+                        "time": time_pillar,
+                    },
+                },
+                "rule_ids": ["CAL-CONVERSION-001", "CAL-PILLARS-001"],
+            },
+        ],
+        "evidence": [],
+        "judgements": [],
         "warnings": [],
     }
+    return result

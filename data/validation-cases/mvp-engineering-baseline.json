@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "case_set_id": "mvp-engineering-baseline",
+  "qualification": "engineering_regression_pending_expert_review",
+  "cases": [
+    {
+      "case_id": "case_cal_0001", "system": "calendar", "school": "mvp-engineering-baseline", "method": "analyze", "title": "2026年已知四柱基线",
+      "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"pillars": {"year": "丙午", "month": "丙申", "day": "辛酉", "time": "丙申"}, "lunar": {"month": 7, "day": 3}},
+      "tags": ["basic", "pillars"], "review_status": "engineering_baseline", "source_refs": ["tests/test_calendar.py"], "reviewers": []
+    },
+    {
+      "case_id": "case_cal_0002", "system": "calendar", "school": "mvp-engineering-baseline", "method": "analyze", "title": "子初23时换日边界前",
+      "input": {"local_datetime": "2026-08-15T22:59:59", "timezone": "Asia/Shanghai"},
+      "expected": {"pillars": {"day": "辛酉", "day_boundary": "子初23:00"}},
+      "tags": ["boundary", "day-boundary"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_cal_0003", "system": "calendar", "school": "mvp-engineering-baseline", "method": "analyze", "title": "子初23时换日边界后",
+      "input": {"local_datetime": "2026-08-15T23:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"pillars": {"day": "壬戌", "day_boundary": "子初23:00"}},
+      "tags": ["boundary", "day-boundary"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_yi_0001", "system": "zhouyi", "school": "mvp-engineering-baseline", "method": "manual", "title": "乾初九变姤",
+      "input": {"lines": [9, 7, 7, 7, 7, 7]},
+      "expected": {"facts": {"original": {"ordinal": 1, "name": "乾"}, "changed": {"ordinal": 44, "name": "姤"}, "moving_lines": [1]}},
+      "tags": ["basic", "manual"], "review_status": "engineering_baseline", "source_refs": ["tests/test_iching.py"], "reviewers": []
+    },
+    {
+      "case_id": "case_yi_0002", "system": "zhouyi", "school": "mvp-engineering-baseline", "method": "numbers", "title": "余零取坤与第六爻",
+      "input": {"lower_number": 8, "upper_number": 16},
+      "expected": {"facts": {"lower_trigram_number": 8, "upper_trigram_number": 8, "moving_lines": [6], "original": {"ordinal": 2}}},
+      "tags": ["boundary", "numbers", "remainder-zero"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_mh_0001", "system": "meihua", "school": "mvp-engineering-baseline", "method": "time", "title": "2026年农历时间起卦基线",
+      "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"original": {"ordinal": 10, "name": "履"}, "changed": {"ordinal": 25, "name": "无妄"}, "moving_line": 2, "body_use": {"body_position": "upper", "use_position": "lower"}}},
+      "tags": ["basic", "time"], "review_status": "engineering_baseline", "source_refs": ["tests/test_meihua.py"], "reviewers": []
+    },
+    {
+      "case_id": "case_mh_0002", "system": "meihua", "school": "mvp-engineering-baseline", "method": "numbers", "title": "梅花双数余零基线",
+      "input": {"upper_number": 8, "lower_number": 16},
+      "expected": {"facts": {"upper_trigram_number": 8, "lower_trigram_number": 8, "moving_line": 6, "original": {"ordinal": 2}}},
+      "tags": ["boundary", "numbers", "remainder-zero"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
+    }
+  ]
+}
