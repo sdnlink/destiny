@@ -233,6 +233,49 @@ def build_manifest(catalog, metadata_dir, output_path):
     return records
 
 
+def load_catalog(path):
+    value = load_metadata(path)
+    if not value or value.get("source") != BASE_URL or not isinstance(value.get("books"), list):
+        raise ValueError(f"invalid catalog: {path}")
+    return value["books"]
+
+
+def load_robots(fetcher, cache_path):
+    try:
+        text, _ = fetcher.get(urljoin(BASE_URL, "robots.txt"))
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(text, encoding="utf-8")
+    except Exception:
+        if not cache_path.exists():
+            raise
+        text = cache_path.read_text(encoding="utf-8")
+        print("using cached robots.txt because the source is unavailable", flush=True)
+    robots = RobotFileParser(urljoin(BASE_URL, "robots.txt"))
+    robots.parse(text.splitlines())
+    return robots
+
+
+def write_summary(records, output, run_totals, interrupted=False):
+    ok_records = [record for record in records if record.get("status") == "ok"]
+    failed_records = [record for record in records if record.get("status") in ("failed", "robots_denied")]
+    pending_records = [record for record in records if record.get("status") == "pending"]
+    summary = {
+        "source": BASE_URL,
+        "updated_at": utc_now(),
+        "book_count": len(records),
+        "cached_books": len(ok_records),
+        "failed_books": len(failed_records),
+        "pending_books": len(pending_records),
+        "characters": sum(record.get("characters", 0) for record in ok_records),
+        "bytes": sum(record.get("bytes", 0) for record in ok_records),
+        "interrupted": interrupted,
+        **run_totals,
+    }
+    write_json(output / "summary.json", summary)
+    print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
+    return summary
+
+
 def main():
     parser = argparse.ArgumentParser(description="缓存道人家书籍正文纯文本")
     parser.add_argument("--output", type=Path, default=Path("cache/daorenjia"))
@@ -240,6 +283,8 @@ def main():
     parser.add_argument("--timeout", type=float, default=60.0)
     parser.add_argument("--retries", type=int, default=3)
     parser.add_argument("--discover-only", action="store_true")
+    parser.add_argument("--reuse-catalog", action="store_true", help="复用现有catalog.json，续传时避免重新扫描分类")
+    parser.add_argument("--manifest-only", action="store_true", help="离线重建部分清单和统计，不发送网络请求")
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     if args.delay < 0.5:
@@ -247,18 +292,26 @@ def main():
 
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    fetcher = Fetcher(args.delay, args.timeout, args.retries)
-    robots = RobotFileParser(urljoin(BASE_URL, "robots.txt"))
-    robots.set_url(urljoin(BASE_URL, "robots.txt"))
-    robots.read()
+    if args.manifest_only:
+        catalog = load_catalog(output / "catalog.json")
+        records = build_manifest(catalog, output / "metadata", output / "manifest.jsonl")
+        write_summary(records, output, {"downloaded": 0, "cached": 0, "failed": 0}, interrupted=True)
+        return
 
-    catalog = discover(fetcher, robots)
-    write_json(output / "catalog.json", {
-        "source": BASE_URL,
-        "discovered_at": utc_now(),
-        "book_count": len(catalog),
-        "books": catalog,
-    })
+    fetcher = Fetcher(args.delay, args.timeout, args.retries)
+    robots = load_robots(fetcher, output / "robots.txt")
+
+    catalog_path = output / "catalog.json"
+    if args.reuse_catalog:
+        catalog = load_catalog(catalog_path)
+    else:
+        catalog = discover(fetcher, robots)
+        write_json(catalog_path, {
+            "source": BASE_URL,
+            "discovered_at": utc_now(),
+            "book_count": len(catalog),
+            "books": catalog,
+        })
     print(f"catalog contains {len(catalog)} books", flush=True)
     if args.discover_only:
         return
@@ -266,26 +319,21 @@ def main():
     text_dir = output / "texts"
     metadata_dir = output / "metadata"
     totals = {"downloaded": 0, "cached": 0, "failed": 0}
-    for index, book in enumerate(catalog, 1):
-        _, state = cache_book(book, fetcher, robots, text_dir, metadata_dir, args.force)
-        totals[state] += 1
-        print(f"{state} {book['slug']} ({index}/{len(catalog)})", flush=True)
+    interrupted = False
+    try:
+        for index, book in enumerate(catalog, 1):
+            _, state = cache_book(book, fetcher, robots, text_dir, metadata_dir, args.force)
+            totals[state] += 1
+            print(f"{state} {book['slug']} ({index}/{len(catalog)})", flush=True)
+    except KeyboardInterrupt:
+        interrupted = True
+        print("cache interrupted; writing partial manifest", flush=True)
 
     records = build_manifest(catalog, metadata_dir, output / "manifest.jsonl")
-    ok_records = [record for record in records if record.get("status") == "ok"]
-    summary = {
-        "source": BASE_URL,
-        "completed_at": utc_now(),
-        "book_count": len(catalog),
-        "cached_books": len(ok_records),
-        "failed_books": len(catalog) - len(ok_records),
-        "characters": sum(record.get("characters", 0) for record in ok_records),
-        "bytes": sum(record.get("bytes", 0) for record in ok_records),
-        **totals,
-    }
-    write_json(output / "summary.json", summary)
-    print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)
-    if summary["failed_books"]:
+    summary = write_summary(records, output, totals, interrupted)
+    if interrupted:
+        raise SystemExit(130)
+    if summary["failed_books"] or summary["pending_books"]:
         raise SystemExit(2)
 
 
