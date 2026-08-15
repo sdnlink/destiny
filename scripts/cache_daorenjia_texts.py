@@ -286,9 +286,13 @@ def main():
     parser.add_argument("--reuse-catalog", action="store_true", help="复用现有catalog.json，续传时避免重新扫描分类")
     parser.add_argument("--manifest-only", action="store_true", help="离线重建部分清单和统计，不发送网络请求")
     parser.add_argument("--force", action="store_true")
+    parser.add_argument("--max-consecutive-failures", type=int, default=5,
+                        help="连续失败达到该数量时自动暂停")
     args = parser.parse_args()
     if args.delay < 0.5:
         parser.error("--delay must be at least 0.5 seconds")
+    if args.max_consecutive_failures < 1:
+        parser.error("--max-consecutive-failures must be at least 1")
 
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -320,11 +324,20 @@ def main():
     metadata_dir = output / "metadata"
     totals = {"downloaded": 0, "cached": 0, "failed": 0}
     interrupted = False
+    consecutive_failures = 0
     try:
         for index, book in enumerate(catalog, 1):
             _, state = cache_book(book, fetcher, robots, text_dir, metadata_dir, args.force)
             totals[state] += 1
             print(f"{state} {book['slug']} ({index}/{len(catalog)})", flush=True)
+            if state == "failed":
+                consecutive_failures += 1
+                if consecutive_failures >= args.max_consecutive_failures:
+                    interrupted = True
+                    print(f"paused after {consecutive_failures} consecutive failures", flush=True)
+                    break
+            elif state == "downloaded":
+                consecutive_failures = 0
     except KeyboardInterrupt:
         interrupted = True
         print("cache interrupted; writing partial manifest", flush=True)
