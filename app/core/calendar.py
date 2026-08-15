@@ -74,8 +74,8 @@ def _jieqi(value):
     return {"name": value.getName(), "datetime": solar.toYmdHms()}
 
 
-def calendar_analysis(local_datetime, timezone_name, longitude=None, use_true_solar_time=False):
-    original = parse_local_datetime(local_datetime, timezone_name)
+def calendar_analysis(local_datetime, timezone, longitude=None, use_true_solar_time=False):
+    original = parse_local_datetime(local_datetime, timezone)
     if use_true_solar_time:
         if longitude is None:
             raise ValueError("longitude is required when true solar time is enabled")
@@ -109,7 +109,7 @@ def calendar_analysis(local_datetime, timezone_name, longitude=None, use_true_so
         "rule_version": RULE_VERSION,
         "input": {
             "local_datetime": local_datetime,
-            "timezone": timezone_name,
+            "timezone": timezone,
             "longitude": longitude,
             "use_true_solar_time": use_true_solar_time,
         },

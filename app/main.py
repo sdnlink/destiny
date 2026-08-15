@@ -1,0 +1,169 @@
+import hashlib
+import json
+import os
+from datetime import datetime, timezone
+from typing import Any, Dict, Optional
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, conint, conlist
+
+from app.core.calendar import calendar_analysis
+from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
+from app.core.iching import manual_cast as yi_manual_cast
+from app.core.iching import number_cast as yi_number_cast
+from app.core.meihua import number_cast as meihua_number_cast
+from app.core.meihua import time_cast as meihua_time_cast
+
+
+APP_VERSION = "0.1.0"
+API_TOKEN = os.environ.get("APP_API_TOKEN")
+
+
+class CalendarRequest(BaseModel):
+    local_datetime: str = Field(..., example="2026-08-15T16:00:00")
+    timezone: str = Field(..., example="Asia/Shanghai")
+    longitude: Optional[float] = Field(None, ge=-180, le=180)
+    use_true_solar_time: bool = False
+
+
+class YiManualRequest(BaseModel):
+    lines: conlist(conint(ge=6, le=9), min_items=6, max_items=6)
+
+
+class YiNumberRequest(BaseModel):
+    lower_number: int
+    upper_number: int
+
+
+class MeihuaNumberRequest(BaseModel):
+    upper_number: int
+    lower_number: int
+
+
+class CalculationRequest(BaseModel):
+    module: str
+    method: str
+    input: Dict[str, Any]
+
+
+def canonical_hash(value):
+    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def execute(module, method, payload):
+    if module == "calendar" and method == "analyze":
+        request = CalendarRequest(**payload)
+        return calendar_analysis(**request.dict())
+    if module == "zhouyi" and method == "manual":
+        request = YiManualRequest(**payload)
+        return yi_manual_cast(request.lines)
+    if module == "zhouyi" and method == "numbers":
+        request = YiNumberRequest(**payload)
+        return yi_number_cast(request.lower_number, request.upper_number)
+    if module == "meihua" and method == "time":
+        request = CalendarRequest(**payload)
+        return meihua_time_cast(**request.dict())
+    if module == "meihua" and method == "numbers":
+        request = MeihuaNumberRequest(**payload)
+        return meihua_number_cast(request.upper_number, request.lower_number)
+    raise ValueError(f"unsupported calculation: {module}/{method}")
+
+
+def calculation_envelope(module, method, payload):
+    normalized = {"module": module, "method": method, "input": payload}
+    input_hash = canonical_hash(normalized)
+    result = execute(module, method, payload)
+    return {
+        "task_id": f"calc_{input_hash[:24]}",
+        "status": "completed",
+        "module": module,
+        "method": method,
+        "input_hash": f"sha256:{input_hash}",
+        "result": result,
+        "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+    }
+
+
+app = FastAPI(
+    title="天机演象MVP计算API",
+    version=APP_VERSION,
+    description="确定性历法、周易和梅花易数事实计算。解释规则尚待专家签署。",
+)
+
+
+@app.middleware("http")
+async def internal_token_middleware(request: Request, call_next):
+    if API_TOKEN and request.headers.get("Authorization") != f"Bearer {API_TOKEN}":
+        return JSONResponse(status_code=401, content={"error": {"code": "UNAUTHORIZED", "message": "valid bearer token required"}})
+    return await call_next(request)
+
+
+@app.exception_handler(ValueError)
+async def value_error_handler(request: Request, exc: ValueError):
+    return JSONResponse(status_code=422, content={"error": {"code": "INVALID_CALCULATION_INPUT", "message": str(exc)}})
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "service": "tianji-mvp-calculation",
+        "version": APP_VERSION,
+        "modules": ["calendar", "zhouyi", "meihua"],
+    }
+
+
+@app.get("/v1/constants/trigrams")
+def trigrams():
+    return {"data": [{"number": number, **value} for number, value in TRIGRAMS.items()]}
+
+
+@app.get("/v1/constants/hexagrams")
+def hexagrams():
+    rows = []
+    seen = set()
+    for upper_index, matrix_row in enumerate(KING_WEN_MATRIX, 1):
+        for lower_index, ordinal in enumerate(matrix_row, 1):
+            if ordinal in seen:
+                continue
+            seen.add(ordinal)
+            rows.append({
+                "ordinal": ordinal,
+                "name": HEXAGRAM_NAMES[ordinal - 1],
+                "symbol": chr(0x4DBF + ordinal),
+                "upper_trigram_number": upper_index,
+                "lower_trigram_number": lower_index,
+            })
+    return {"data": sorted(rows, key=lambda row: row["ordinal"])}
+
+
+@app.post("/v1/calendar/analyze")
+def analyze_calendar(request: CalendarRequest):
+    return {"data": calendar_analysis(**request.dict())}
+
+
+@app.post("/v1/zhouyi/manual")
+def cast_yi_manual(request: YiManualRequest):
+    return {"data": yi_manual_cast(request.lines)}
+
+
+@app.post("/v1/zhouyi/numbers")
+def cast_yi_numbers(request: YiNumberRequest):
+    return {"data": yi_number_cast(request.lower_number, request.upper_number)}
+
+
+@app.post("/v1/meihua/time")
+def cast_meihua_time(request: CalendarRequest):
+    return {"data": meihua_time_cast(**request.dict())}
+
+
+@app.post("/v1/meihua/numbers")
+def cast_meihua_numbers(request: MeihuaNumberRequest):
+    return {"data": meihua_number_cast(request.upper_number, request.lower_number)}
+
+
+@app.post("/v1/calculations/evaluate")
+def evaluate_calculation(request: CalculationRequest):
+    return {"data": calculation_envelope(request.module, request.method, request.input)}
