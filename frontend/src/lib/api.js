@@ -33,9 +33,9 @@ export function analyzeCalendar(payload) {
   });
 }
 
-export function compareCalculations(calculations) {
+export function compareCalculations(calculations, context) {
   return request("/v1/calculations/compare", {
     method: "POST",
-    body: JSON.stringify({ calculations }),
+    body: JSON.stringify({ calculations, context }),
   });
 }

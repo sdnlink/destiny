@@ -187,7 +187,10 @@ export default function App() {
     setLoading(true);
     setError("");
     try {
-      const response = await compareCalculations(buildCalculations(form));
+      const response = await compareCalculations(buildCalculations(form), {
+        category: form.category,
+        question_summary: form.question,
+      });
       setResult(response);
       setResultContext({ scene: form.scene, category: form.category, question: form.question });
       setActiveTab("overview");

@@ -21,7 +21,7 @@ const TABS = [
   { id: "zhouyi", label: "周易", icon: BookOpen },
   { id: "meihua", label: "梅花易数", icon: Compass },
   { id: "comparison", label: "对照分析", icon: GitCompareArrows },
-  { id: "explanation", label: "详细说明", icon: FileText },
+  { id: "explanation", label: "结论建议", icon: FileText },
 ];
 
 const PILLAR_LABELS = { year: "年柱", month: "月柱", day: "日柱", time: "时柱" };
@@ -189,6 +189,21 @@ function Overview({ result, context, calendar, zhouyi, meihua, onTab }) {
           </button>
         )}
       </section>
+
+      {result.advisory && (
+        <section className="advisory-overview">
+          <div className="advisory-overview-head">
+            <div><span>结合所问事项</span><strong>{result.advisory.conclusion.headline}</strong></div>
+            <button className="text-button" onClick={() => onTab("explanation")}>查看详细建议 <ArrowRight size={14} /></button>
+          </div>
+          <p>{result.advisory.conclusion.text}</p>
+          <div className="advisory-quick-actions">
+            {result.advisory.recommendations.slice(0, 2).map((recommendation) => (
+              <div key={recommendation.priority}><b>{recommendation.priority}</b><span>{recommendation.title}</span></div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="data-band result-explanation-summary">
         <div className="band-heading">
@@ -369,17 +384,69 @@ function ComparisonView({ comparison }) {
   );
 }
 
-function ExplanationView({ explanation }) {
+function ExplanationView({ explanation, advisory }) {
   const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass };
   return (
     <div className="view-stack explanation-view">
       <section className="view-heading">
-        <div><span className="section-kicker">DETAILED EXPLANATION</span><h2>推演结果与详细说明</h2><p>按历法、盘面、动爻、体用和规则依据逐项说明本次计算。</p></div>
+        <div><span className="section-kicker">CONCLUSION & ADVICE</span><h2>事项结论与详细建议</h2><p>结合所问事情、盘面关系和事项检查清单，给出可核实的下一步建议。</p></div>
         <span className="version-badge">{explanation.generation_method}</span>
       </section>
 
+      {advisory && (
+        <>
+          <section className="advisory-lead">
+            <div className="advisory-status"><span>{advisory.context.category_label}</span><small>{advisory.review_status}</small></div>
+            <p className="advisory-question">“{advisory.context.question_summary}”</p>
+            <h3>{advisory.conclusion.headline}</h3>
+            <p className="advisory-conclusion">{advisory.conclusion.text}</p>
+            <div className="advisory-confidence"><Info size={15} /><span>{advisory.conclusion.confidence_label} · 倾向：暂不判定</span></div>
+          </section>
+
+          <section className="data-band recommendations-band">
+            <div className="band-heading">
+              <div><span className="band-icon"><CheckCircle2 size={16} /></span><div><h3>建议行动</h3><p>按优先级执行，并用实际反馈校正后续决策</p></div></div>
+            </div>
+            <div className="recommendation-list">
+              {advisory.recommendations.map((recommendation) => (
+                <div className="recommendation-row" key={recommendation.priority}>
+                  <span>{recommendation.priority}</span>
+                  <div>
+                    <strong>{recommendation.title}</strong>
+                    <p>{recommendation.detail}</p>
+                    <small>依据：{recommendation.basis}</small>
+                    <div className="explanation-rules">{recommendation.rule_ids.map((rule) => <code key={rule}>{rule}</code>)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="advisory-support-grid">
+            <div className="data-band verification-band">
+              <div className="band-heading"><div><span className="band-icon"><FileSearch size={16} /></span><div><h3>需要核实</h3><p>作出决定前回答</p></div></div></div>
+              <ol>{advisory.verification_questions.map((question) => <li key={question}>{question}</li>)}</ol>
+            </div>
+            <div className="data-band basis-band">
+              <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>推演依据</h3><p>本次建议引用的结构事实</p></div></div></div>
+              {advisory.evidence_basis.length ? advisory.evidence_basis.map((basis) => (
+                <div className="advisory-basis-row" key={`${basis.module}-${basis.fact}`}>
+                  <strong>{basis.module === "zhouyi" ? "周易" : "梅花"}</strong><span>{basis.fact}</span>
+                  <code>{basis.rule_ids.join(" · ")}</code>
+                </div>
+              )) : <p className="empty-inline">当前没有可用于建议的模块关系事实。</p>}
+            </div>
+          </section>
+
+          <section className="advisory-risk-band">
+            <div><CircleAlert size={18} /><strong>决策边界</strong></div>
+            <ul>{advisory.risk_notes.map((note) => <li key={note}>{note}</li>)}</ul>
+          </section>
+        </>
+      )}
+
       <section className="explanation-lead">
-        <span>结果摘要</span>
+        <span>计算结果摘要</span>
         <p>{explanation.summary}</p>
       </section>
 
@@ -485,7 +552,7 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         {activeTab === "zhouyi" && <ZhouyiView result={zhouyi} />}
         {activeTab === "meihua" && <MeihuaView result={meihua} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}
-        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} />}
+        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} />}
       </div>
     </main>
   );

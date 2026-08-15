@@ -117,10 +117,11 @@ export default function InputPanel({
               <input
                 value={form.question}
                 onChange={(event) => update("question", event.target.value)}
-                placeholder="仅用于本次会话标记"
-                maxLength={80}
+                placeholder="例如：是否接受新的工作机会"
+                maxLength={200}
                 required
               />
+              <small className="field-hint">用于生成事项建议，不进入排盘公式且不持久化</small>
             </label>
           </div>
         </section>
