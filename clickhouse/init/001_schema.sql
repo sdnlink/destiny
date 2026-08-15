@@ -269,3 +269,70 @@ CREATE TABLE IF NOT EXISTS destiny.fengshui_assessments
 )
 ENGINE = ReplacingMergeTree(calculated_at)
 ORDER BY (tenant_id, assessment_id);
+
+CREATE TABLE IF NOT EXISTS destiny.corpus_documents
+(
+    run_id String,
+    document_id String,
+    source_id LowCardinality(String),
+    title String,
+    category_id LowCardinality(String),
+    category_name LowCardinality(String),
+    source_url String,
+    fetched_from String,
+    cache_status LowCardinality(String),
+    usage_scope LowCardinality(String),
+    parser_version String,
+    content_sha256 FixedString(64),
+    character_count UInt64,
+    byte_count UInt64,
+    subcontent_count UInt32,
+    available_subcontent_count UInt32,
+    unavailable_subcontent_ids Array(String),
+    fetched_at Nullable(DateTime),
+    ingested_at DateTime
+)
+ENGINE = ReplacingMergeTree(ingested_at)
+ORDER BY (run_id, document_id);
+
+CREATE TABLE IF NOT EXISTS destiny.corpus_chunks
+(
+    run_id String,
+    chunk_id String,
+    document_id String,
+    source_id LowCardinality(String),
+    title String,
+    category_id LowCardinality(String),
+    chunk_index UInt32,
+    char_start UInt64,
+    char_end UInt64,
+    character_count UInt32,
+    content String,
+    content_sha256 FixedString(64),
+    document_sha256 FixedString(64),
+    usage_scope LowCardinality(String),
+    ingested_at DateTime,
+    INDEX content_ngram content TYPE ngrambf_v1(3, 256, 2, 0) GRANULARITY 1
+)
+ENGINE = ReplacingMergeTree(ingested_at)
+ORDER BY (run_id, document_id, chunk_index);
+
+CREATE TABLE IF NOT EXISTS destiny.corpus_ingestion_runs
+(
+    run_id String,
+    source_id LowCardinality(String),
+    corpus_sha256 FixedString(64),
+    document_count UInt32,
+    chunk_count UInt64,
+    character_count UInt64,
+    byte_count UInt64,
+    unavailable_document_count UInt32,
+    unavailable_subcontent_count UInt32,
+    chunk_target_size UInt32,
+    chunk_max_size UInt32,
+    builder_version String,
+    status LowCardinality(String),
+    created_at DateTime
+)
+ENGINE = ReplacingMergeTree(created_at)
+ORDER BY run_id;
