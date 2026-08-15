@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 RULE_REGISTRY_PATH = PROJECT_ROOT / "data" / "rules" / "mvp-engineering-baseline.json"
 VALIDATION_CASES_PATH = PROJECT_ROOT / "data" / "validation-cases" / "mvp-engineering-baseline.json"
 

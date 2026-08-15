@@ -11,6 +11,6 @@ if [[ "$bind" != "127.0.0.1" && "$bind" != "localhost" && "$bind" != "::1" && -z
 fi
 
 exec "$project_dir/.venv/bin/uvicorn" app.main:app \
-  --app-dir "$project_dir" \
+  --app-dir "$project_dir/backend" \
   --host "$bind" \
   --port "$port"

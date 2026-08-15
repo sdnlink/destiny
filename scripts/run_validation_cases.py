@@ -6,11 +6,12 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+BACKEND_ROOT = PROJECT_ROOT / "backend"
 VENV_PYTHON = PROJECT_ROOT / ".venv" / "bin" / "python"
 if VENV_PYTHON.exists() and Path(sys.prefix).resolve() != VENV_PYTHON.parent.parent.resolve():
     os.execv(str(VENV_PYTHON), [str(VENV_PYTHON)] + sys.argv)
 
-sys.path.insert(0, str(PROJECT_ROOT))
+sys.path.insert(0, str(BACKEND_ROOT))
 
 from app.core.validation import run_validation_cases
 

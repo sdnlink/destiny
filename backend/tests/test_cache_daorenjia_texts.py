@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "cache_daorenjia_texts.py"
+MODULE_PATH = Path(__file__).resolve().parents[2] / "scripts" / "cache_daorenjia_texts.py"
 SPEC = importlib.util.spec_from_file_location("cache_daorenjia_texts", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)

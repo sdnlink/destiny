@@ -7,7 +7,7 @@
       "case_id": "case_cal_0001", "system": "calendar", "school": "mvp-engineering-baseline", "method": "analyze", "title": "2026年已知四柱基线",
       "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
       "expected": {"pillars": {"year": "丙午", "month": "丙申", "day": "辛酉", "time": "丙申"}, "lunar": {"month": 7, "day": 3}},
-      "tags": ["basic", "pillars"], "review_status": "engineering_baseline", "source_refs": ["tests/test_calendar.py"], "reviewers": []
+      "tags": ["basic", "pillars"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_calendar.py"], "reviewers": []
     },
     {
       "case_id": "case_cal_0002", "system": "calendar", "school": "mvp-engineering-baseline", "method": "analyze", "title": "子初23时换日边界前",
@@ -25,7 +25,7 @@
       "case_id": "case_yi_0001", "system": "zhouyi", "school": "mvp-engineering-baseline", "method": "manual", "title": "乾初九变姤",
       "input": {"lines": [9, 7, 7, 7, 7, 7]},
       "expected": {"facts": {"original": {"ordinal": 1, "name": "乾"}, "changed": {"ordinal": 44, "name": "姤"}, "moving_lines": [1]}},
-      "tags": ["basic", "manual"], "review_status": "engineering_baseline", "source_refs": ["tests/test_iching.py"], "reviewers": []
+      "tags": ["basic", "manual"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_iching.py"], "reviewers": []
     },
     {
       "case_id": "case_yi_0002", "system": "zhouyi", "school": "mvp-engineering-baseline", "method": "numbers", "title": "余零取坤与第六爻",
@@ -37,7 +37,7 @@
       "case_id": "case_mh_0001", "system": "meihua", "school": "mvp-engineering-baseline", "method": "time", "title": "2026年农历时间起卦基线",
       "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
       "expected": {"facts": {"original": {"ordinal": 10, "name": "履"}, "changed": {"ordinal": 25, "name": "无妄"}, "moving_line": 2, "body_use": {"body_position": "upper", "use_position": "lower"}}},
-      "tags": ["basic", "time"], "review_status": "engineering_baseline", "source_refs": ["tests/test_meihua.py"], "reviewers": []
+      "tags": ["basic", "time"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_meihua.py"], "reviewers": []
     },
     {
       "case_id": "case_mh_0002", "system": "meihua", "school": "mvp-engineering-baseline", "method": "numbers", "title": "梅花双数余零基线",

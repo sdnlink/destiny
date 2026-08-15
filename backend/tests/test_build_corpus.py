@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "build_corpus.py"
+MODULE_PATH = Path(__file__).resolve().parents[2] / "scripts" / "build_corpus.py"
 SPEC = importlib.util.spec_from_file_location("build_corpus", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)

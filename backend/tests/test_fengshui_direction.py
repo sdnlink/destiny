@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "fengshui_direction.py"
+MODULE_PATH = Path(__file__).resolve().parents[2] / "scripts" / "fengshui_direction.py"
 SPEC = importlib.util.spec_from_file_location("fengshui_direction", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
