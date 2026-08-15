@@ -7,6 +7,7 @@ import {
   Clock3,
   Compass,
   FileSearch,
+  FileText,
   GitCompareArrows,
   Info,
   Layers3,
@@ -20,6 +21,7 @@ const TABS = [
   { id: "zhouyi", label: "周易", icon: BookOpen },
   { id: "meihua", label: "梅花易数", icon: Compass },
   { id: "comparison", label: "对照分析", icon: GitCompareArrows },
+  { id: "explanation", label: "详细说明", icon: FileText },
 ];
 
 const PILLAR_LABELS = { year: "年柱", month: "月柱", day: "日柱", time: "时柱" };
@@ -188,6 +190,23 @@ function Overview({ result, context, calendar, zhouyi, meihua, onTab }) {
         )}
       </section>
 
+      <section className="data-band result-explanation-summary">
+        <div className="band-heading">
+          <div><span className="band-icon"><FileText size={16} /></span><div><h3>推演结果</h3><p>确定性模板说明 · {result.explanation.review_status}</p></div></div>
+          <button className="text-button" onClick={() => onTab("explanation")}>详细说明 <ArrowRight size={14} /></button>
+        </div>
+        <p className="result-summary-text">{result.explanation.summary}</p>
+        <div className="module-summary-list">
+          {result.explanation.modules.filter((module) => module.module !== "calendar").map((module) => (
+            <div key={module.module}>
+              <strong>{module.title}</strong>
+              <span>{module.summary}</span>
+            </div>
+          ))}
+        </div>
+        <Notice tone="neutral" icon={ShieldCheck}>{result.explanation.conclusion.text}</Notice>
+      </section>
+
       <section className="data-band">
         <div className="band-heading">
           <div><span className="band-icon"><GitCompareArrows size={16} /></span><div><h3>对照分析</h3><p>只比较引用已发布规则的结构化判断</p></div></div>
@@ -350,6 +369,67 @@ function ComparisonView({ comparison }) {
   );
 }
 
+function ExplanationView({ explanation }) {
+  const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass };
+  return (
+    <div className="view-stack explanation-view">
+      <section className="view-heading">
+        <div><span className="section-kicker">DETAILED EXPLANATION</span><h2>推演结果与详细说明</h2><p>按历法、盘面、动爻、体用和规则依据逐项说明本次计算。</p></div>
+        <span className="version-badge">{explanation.generation_method}</span>
+      </section>
+
+      <section className="explanation-lead">
+        <span>结果摘要</span>
+        <p>{explanation.summary}</p>
+      </section>
+
+      {explanation.modules.map((module) => {
+        const Icon = icons[module.module] || FileText;
+        return (
+          <section className="data-band explanation-module" key={module.module}>
+            <div className="band-heading">
+              <div><span className="band-icon"><Icon size={16} /></span><div><h3>{module.title}</h3><p>{module.summary}</p></div></div>
+            </div>
+            <div className="explanation-sections">
+              {module.sections.map((section, index) => (
+                <div className="explanation-row" key={section.title}>
+                  <span className="explanation-index">{index + 1}</span>
+                  <div>
+                    <strong>{section.title}</strong>
+                    <p>{section.text}</p>
+                    <div className="explanation-rules">{section.rule_ids.map((rule) => <code key={rule}>{rule}</code>)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {module.limitations.map((limitation) => (
+              <Notice tone="warning" icon={CircleAlert} key={limitation}>{limitation}</Notice>
+            ))}
+          </section>
+        );
+      })}
+
+      <section className="data-band conclusion-band">
+        <div className="band-heading">
+          <div><span className="band-icon"><GitCompareArrows size={16} /></span><div><h3>{explanation.conclusion.title}</h3><p>{explanation.conclusion.status}</p></div></div>
+        </div>
+        <p>{explanation.conclusion.text}</p>
+        <div className="comparison-counts">
+          <DataState label="一致" value={explanation.conclusion.counts.consistent} />
+          <DataState label="互补" value={explanation.conclusion.counts.complementary} />
+          <DataState label="冲突" value={explanation.conclusion.counts.conflicts} />
+          <DataState label="排除" value={explanation.conclusion.counts.excluded} />
+        </div>
+      </section>
+
+      <section className="limitations-band">
+        <div><ShieldCheck size={18} /><strong>说明边界</strong></div>
+        <ul>{explanation.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
+      </section>
+    </div>
+  );
+}
+
 function MissingModule({ name }) {
   return (
     <div className="empty-view">
@@ -394,7 +474,7 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
       </header>
       <nav className="result-tabs" aria-label="结果视图">
         {TABS.map(({ id, label, icon: Icon }) => (
-          <button key={id} className={activeTab === id ? "active" : ""} onClick={() => setActiveTab(id)}>
+          <button key={id} aria-label={label} className={activeTab === id ? "active" : ""} onClick={() => setActiveTab(id)}>
             <Icon size={16} /><span>{label}</span>
           </button>
         ))}
@@ -405,6 +485,7 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         {activeTab === "zhouyi" && <ZhouyiView result={zhouyi} />}
         {activeTab === "meihua" && <MeihuaView result={meihua} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}
+        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} />}
       </div>
     </main>
   );

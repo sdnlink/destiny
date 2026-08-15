@@ -32,12 +32,16 @@ await desktop.getByRole("button", { name: "周易" }).last().click();
 await desktop.getByRole("heading", { name: "周易卦盘" }).waitFor();
 await desktop.getByRole("button", { name: "梅花易数" }).click();
 await desktop.getByRole("heading", { name: "梅花易数" }).waitFor();
+await desktop.getByRole("button", { name: "详细说明" }).click();
+await desktop.getByRole("heading", { name: "推演结果与详细说明" }).waitFor();
+await desktop.getByText("综合说明", { exact: true }).waitFor();
 await assertNoOverflow(desktop, "desktop result");
 await desktop.screenshot({ path: "/tmp/tianji-result-desktop.png", fullPage: true });
 
 await desktop.getByTitle("规则目录").click();
-await desktop.getByRole("dialog", { name: "规则目录" }).waitFor();
-await desktop.getByText("CAL-NORMALIZE-001", { exact: true }).waitFor();
+const rulesDialog = desktop.getByRole("dialog", { name: "规则目录" });
+await rulesDialog.waitFor();
+await rulesDialog.getByText("CAL-NORMALIZE-001", { exact: true }).waitFor();
 await desktop.getByRole("button", { name: "关闭规则目录" }).click();
 
 const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
@@ -45,8 +49,10 @@ await mobile.goto(baseUrl, { waitUntil: "networkidle" });
 await assertNoOverflow(mobile, "mobile input");
 await mobile.getByRole("button", { name: /开始推演/ }).click();
 await mobile.getByText(/^compare_[a-f0-9]+$/).waitFor({ timeout: 15000 });
-await mobile.getByRole("button", { name: "周易" }).click();
+await mobile.getByRole("button", { name: "周易", exact: true }).click();
 await mobile.getByRole("heading", { name: "周易卦盘" }).waitFor();
+await mobile.getByRole("button", { name: "详细说明", exact: true }).click();
+await mobile.getByRole("heading", { name: "推演结果与详细说明" }).waitFor();
 await assertNoOverflow(mobile, "mobile result");
 await mobile.screenshot({ path: "/tmp/tianji-result-mobile.png", fullPage: true });
 
