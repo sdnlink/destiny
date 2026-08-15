@@ -38,6 +38,16 @@
 
 ## 续传命令
 
+持续运行直到完成：
+
+```bash
+./scripts/complete_daorenjia_cache.sh
+```
+
+来源连续失败时脚本默认冷却60秒再续传，可以通过 `CACHE_RETRY_COOLDOWN` 调整冷却时间，但不应降低请求间隔或使用高并发。
+
+单次断点续传：
+
 ```bash
 ./scripts/cache_daorenjia_texts.py \
   --reuse-catalog \
