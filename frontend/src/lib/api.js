@@ -1,4 +1,5 @@
-const API_ROOT = import.meta.env.VITE_API_ROOT || "/api";
+const configuredApiRoot = import.meta.env.VITE_API_ROOT;
+const API_ROOT = configuredApiRoot === undefined ? "/api" : configuredApiRoot;
 
 async function request(path, options = {}) {
   const response = await fetch(`${API_ROOT}${path}`, {

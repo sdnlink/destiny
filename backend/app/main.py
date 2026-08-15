@@ -3,10 +3,12 @@ import json
 import os
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, conint, conlist
 
 from app.core.calendar import calendar_analysis
@@ -256,3 +258,11 @@ def evaluate_calculation(request: CalculationRequest):
 @app.post("/v1/calculations/compare")
 def compare_calculations(request: ComparisonRequest):
     return {"data": comparison_envelope(request.calculations)}
+
+
+if os.environ.get("SERVE_WEB") == "1":
+    default_web_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+    web_dist = Path(os.environ.get("WEB_DIST_DIR", str(default_web_dist))).resolve()
+    if not (web_dist / "index.html").is_file():
+        raise RuntimeError("compiled web assets are missing: {}".format(web_dist))
+    app.mount("/", StaticFiles(directory=str(web_dist), html=True), name="web")
