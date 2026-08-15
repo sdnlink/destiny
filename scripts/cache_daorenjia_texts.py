@@ -395,6 +395,8 @@ def main():
                         help="正文来源；主站不可用时可使用其公开移动接口")
     parser.add_argument("--max-consecutive-failures", type=int, default=5,
                         help="连续失败达到该数量时自动暂停")
+    parser.add_argument("--incomplete-only", action="store_true",
+                        help="仅处理未达到当前解析器版本的书籍和失败项")
     args = parser.parse_args()
     if args.delay < 0.5:
         parser.error("--delay must be at least 0.5 seconds")
@@ -429,17 +431,30 @@ def main():
 
     text_dir = output / "texts"
     metadata_dir = output / "metadata"
+    work_catalog = catalog
+    if args.incomplete_only and args.source == "mobile-api":
+        work_catalog = []
+        for book in catalog:
+            metadata = load_metadata(metadata_dir / f"{book['slug']}.json")
+            complete = (
+                metadata
+                and metadata.get("parser_version") == MOBILE_PARSER_VERSION
+                and metadata.get("status") in ("ok", "text_unavailable")
+            )
+            if not complete:
+                work_catalog.append(book)
+        print(f"incomplete catalog contains {len(work_catalog)} books", flush=True)
     totals = {"downloaded": 0, "cached": 0, "failed": 0}
     interrupted = False
     consecutive_failures = 0
     try:
-        for index, book in enumerate(catalog, 1):
+        for index, book in enumerate(work_catalog, 1):
             if args.source == "mobile-api":
                 _, state = cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, args.force)
             else:
                 _, state = cache_book(book, fetcher, robots, text_dir, metadata_dir, args.force)
             totals[state] += 1
-            print(f"{state} {book['slug']} ({index}/{len(catalog)})", flush=True)
+            print(f"{state} {book['slug']} ({index}/{len(work_catalog)})", flush=True)
             if state == "failed":
                 consecutive_failures += 1
                 if consecutive_failures >= args.max_consecutive_failures:

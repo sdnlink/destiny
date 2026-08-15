@@ -13,6 +13,7 @@ while true; do
     --output "$project_dir/cache/daorenjia" \
     --reuse-catalog \
     --source mobile-api \
+    --incomplete-only \
     --delay 1.0 \
     --timeout 60 \
     --retries 3; then
