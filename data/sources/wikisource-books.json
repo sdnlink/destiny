@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "source_id": "zh-wikisource-open",
+  "source_name": "中文维基文库",
+  "api_url": "https://zh.wikisource.org/w/api.php",
+  "expected_license_url": "https://creativecommons.org/licenses/by-sa/4.0/deed.zh",
+  "usage_scope": "open_licensed_research",
+  "books": [
+    {"title": "周易", "domain": "zhouyi"},
+    {"title": "易傳", "domain": "zhouyi"},
+    {"title": "周易正義", "domain": "zhouyi"},
+    {"title": "子夏易傳", "domain": "zhouyi"},
+    {"title": "皇極經世", "domain": "xiangshu"},
+    {"title": "梅花易數", "domain": "meihua"},
+    {"title": "增刪卜易", "domain": "liuyao"},
+    {"title": "卜筮正宗（河潞武子龄校本）", "domain": "liuyao"},
+    {"title": "火珠林", "domain": "liuyao"},
+    {"title": "六壬大全", "domain": "liuren"},
+    {"title": "六壬指南", "domain": "liuren"},
+    {"title": "宅經", "domain": "yangzhai"},
+    {"title": "葬書", "domain": "kanyu"},
+    {"title": "撼龍經", "domain": "kanyu"},
+    {"title": "青囊經", "domain": "kanyu"},
+    {"title": "地理辨正", "domain": "kanyu"},
+    {"title": "欽定古今圖書集成/博物彙編/藝術典/堪輿部", "domain": "kanyu"}
+  ]
+}
