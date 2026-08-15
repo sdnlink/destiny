@@ -14,6 +14,7 @@
 已采用的局部技术决策：
 
 - [ADR-001：内部语料基础设施](./decisions/001-corpus-foundation.md)
+- [ADR-002：MVP计算与规则工程基线](./decisions/002-mvp-engineering-baseline.md)
 
 ## 文档优先级
 
