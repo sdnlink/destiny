@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
-from cache_wikisource_texts import VisibleTextParser, combine_pages, normalize_text, title_slug
+from cache_wikisource_texts import VisibleTextParser, _resolved_page, combine_pages, normalize_text, title_slug
 
 
 class WikisourceCacheTests(unittest.TestCase):
@@ -29,6 +29,13 @@ class WikisourceCacheTests(unittest.TestCase):
         text, accepted = combine_pages(pages)
         self.assertNotIn("书/重复", text)
         self.assertEqual([item["page_id"] for item in accepted], [1, 3])
+
+    def test_resolves_api_redirect_titles(self):
+        query = {
+            "redirects": [{"from": "周易/序卦", "to": "易傳/序卦"}],
+            "pages": [{"title": "易傳/序卦", "pageid": 8}],
+        }
+        self.assertEqual(_resolved_page(query, "周易/序卦")["pageid"], 8)
 
 
 if __name__ == "__main__":

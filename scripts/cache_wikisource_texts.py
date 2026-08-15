@@ -126,7 +126,8 @@ def discover_pages(client, root_title):
     while True:
         payload = client.request({
             "action": "query", "list": "allpages", "apnamespace": 0,
-            "apprefix": root_title + "/", "aplimit": "max", **continuation,
+            "apprefix": root_title + "/", "aplimit": "max", "apfilterredir": "nonredirects",
+            **continuation,
         })
         pages.extend(item["title"] for item in payload["query"]["allpages"])
         if "continue" not in payload:
@@ -149,17 +150,62 @@ def _page_record(page, text, extraction_method):
     }
 
 
-def fetch_pages(client, titles, batch_size=20):
+def _cached_page(cache_dir, title):
+    if cache_dir is None:
+        return None
+    path = cache_dir / (title_slug(title) + ".json")
+    if not path.exists():
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if value.get("requested_title") != title or value.get("parser_version") != PARSER_VERSION:
+        return None
+    return {key: item for key, item in value.items() if key not in ("requested_title", "parser_version")}
+
+
+def _save_cached_page(cache_dir, requested_title, page):
+    if cache_dir is None:
+        return
+    write_json(cache_dir / (title_slug(requested_title) + ".json"), {
+        "requested_title": requested_title, "parser_version": PARSER_VERSION, **page,
+    })
+
+
+def _resolved_page(query, requested_title):
+    aliases = {}
+    for item in query.get("normalized", []):
+        aliases[item["from"]] = item["to"]
+    for item in query.get("redirects", []):
+        aliases[item["from"]] = item["to"]
+    resolved = requested_title
+    seen = set()
+    while resolved in aliases and resolved not in seen:
+        seen.add(resolved)
+        resolved = aliases[resolved]
+    return next((page for page in query["pages"] if page.get("title") == resolved), None)
+
+
+def fetch_pages(client, titles, batch_size=20, cache_dir=None):
     result = []
-    for start in range(0, len(titles), batch_size):
-        batch = titles[start:start + batch_size]
+    pending = []
+    cached_by_title = {}
+    for title in titles:
+        cached = _cached_page(cache_dir, title)
+        if cached is None:
+            pending.append(title)
+        else:
+            cached_by_title[title] = cached
+    fetched_by_title = {}
+    for start in range(0, len(pending), batch_size):
+        batch = pending[start:start + batch_size]
         payload = client.request({
             "action": "query", "prop": "extracts|info|revisions", "titles": "|".join(batch),
             "explaintext": 1, "inprop": "url", "rvprop": "ids|timestamp", "redirects": 1,
         })
-        pages_by_title = {page["title"]: page for page in payload["query"]["pages"]}
         for title in batch:
-            page = pages_by_title.get(title)
+            page = _resolved_page(payload["query"], title)
             if page is None or page.get("missing"):
                 raise ValueError("page is missing: {}".format(title))
             text = normalize_text(page.get("extract", ""))
@@ -170,7 +216,11 @@ def fetch_pages(client, titles, batch_size=20):
                 parser.feed(parsed["parse"]["text"])
                 text = parser.text()
                 extraction_method = "rendered-html-visible-text"
-            result.append(_page_record(page, text, extraction_method))
+            record = _page_record(page, text, extraction_method)
+            fetched_by_title[title] = record
+            _save_cached_page(cache_dir, title, record)
+    for title in titles:
+        result.append(cached_by_title.get(title) or fetched_by_title[title])
     return result
 
 
@@ -229,7 +279,7 @@ def cache(manifest_path, output_dir, delay, timeout, retries):
         try:
             subpages = discover_pages(client, book["title"])
             titles = subpages or [book["title"]]
-            pages = fetch_pages(client, titles)
+            pages = fetch_pages(client, titles, cache_dir=output_dir / "pages")
             text, accepted_pages = combine_pages(pages)
             if len(text.strip()) < 20:
                 raise ValueError("no usable plain text returned")
