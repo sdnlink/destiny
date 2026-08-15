@@ -1,0 +1,65 @@
+[
+  {
+    "source_id": "canonical-traditional-constants-v1",
+    "name": "传统历法与易学基础常量（人工复核种子）",
+    "category": "canonical_seed",
+    "url": "local://scripts/generate_seed.py",
+    "license": "project-generated",
+    "access_status": "available",
+    "notes": "五行、干支、八卦、六十四卦、二十四节气与六十甲子；需领域专家二次复核"
+  },
+  {
+    "source_id": "ctext-public-domain",
+    "name": "Chinese Text Project",
+    "category": "classical_text",
+    "url": "https://ctext.org/",
+    "license": "per-source-review-required",
+    "access_status": "pending_license_review",
+    "notes": "仅在确认具体文本版本、接口条款与转载许可后导入"
+  },
+  {
+    "source_id": "wikisource-zh",
+    "name": "中文维基文库",
+    "category": "classical_text",
+    "url": "https://zh.wikisource.org/",
+    "license": "CC BY-SA 4.0; per-page public-domain status",
+    "access_status": "network_unavailable",
+    "notes": "当前环境无法访问；恢复网络后按页面版权状态和署名要求下载"
+  },
+  {
+    "source_id": "nasa-jpl-de440",
+    "name": "NASA/JPL DE440 Ephemeris",
+    "category": "astronomy",
+    "url": "https://ssd.jpl.nasa.gov/planets/eph_export.html",
+    "license": "US government public data; verify notices",
+    "access_status": "pending_download",
+    "notes": "用于高精度节气与太阳位置计算，不直接存储推演结论"
+  },
+  {
+    "source_id": "natural-earth",
+    "name": "Natural Earth",
+    "category": "geospatial",
+    "url": "https://www.naturalearthdata.com/",
+    "license": "public domain",
+    "access_status": "pending_download",
+    "notes": "适合全球基础行政区和自然地理，不包含室内或现场堪舆信息"
+  },
+  {
+    "source_id": "openstreetmap",
+    "name": "OpenStreetMap",
+    "category": "geospatial",
+    "url": "https://www.openstreetmap.org/",
+    "license": "ODbL 1.0",
+    "access_status": "pending_region_selection",
+    "notes": "导入前必须确定区域范围并保留 ODbL 署名及衍生数据库义务"
+  },
+  {
+    "source_id": "user-local-daozang-pdf",
+    "name": "用户工作区内道藏 PDF",
+    "category": "classical_text",
+    "url": "local://数据/",
+    "license": "unknown",
+    "access_status": "blocked_license_unknown",
+    "notes": "文件名含非官方电子书来源标识，未确认授权前禁止解析和入库"
+  }
+]

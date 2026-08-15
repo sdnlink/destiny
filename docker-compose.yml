@@ -1,0 +1,24 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.7
+    container_name: destiny-clickhouse
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: destiny
+      CLICKHOUSE_USER: destiny
+      CLICKHOUSE_PASSWORD: destiny_local
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    ports:
+      - "18123:8123"
+      - "19000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./clickhouse/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+
+volumes:
+  clickhouse_data:

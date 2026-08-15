@@ -1,0 +1,61 @@
+# 天机演象数据建设与导入
+
+## 当前入库范围
+
+首批可验证数据包含五行、十天干、十二地支、八卦、六十四卦、二十四节气、六十甲子，以及全部数据源的许可与获取状态。
+
+规则定义、古籍段落、专家案例、地理要素和用户输入已建立独立表，但在获得可靠来源、授权或真实业务数据前保持为空。项目不会用自动生成内容冒充专家规则和验证案例。
+
+## 启动与导入
+
+```bash
+docker-compose up -d clickhouse
+./scripts/load_clickhouse.sh
+```
+
+HTTP 接口为 `http://localhost:18123`，Native TCP 接口为 `localhost:19000`，本地默认数据库为 `destiny`。使用非默认端口是为了避免影响主机上已有的 ClickHouse。开发凭据记录在 `docker-compose.yml`，部署到共享或生产环境前必须通过环境变量或密钥系统替换。
+
+## 数据分层
+
+| 层次 | ClickHouse 表 | 状态 |
+| --- | --- | --- |
+| 来源与许可 | `data_sources` | 已导入 |
+| 基础常量 | `five_elements`、`heavenly_stems`、`earthly_branches` | 已导入 |
+| 象数基础 | `trigrams`、`hexagrams`、`solar_terms`、`sexagenary_cycle` | 已导入 |
+| 风水方位 | `fengshui_mountains`、`luoshu_palaces` | 已导入 |
+| 房屋数据 | `fengshui_properties`、`floorplan_features` | 待应用接入 |
+| 风水分析 | `fengshui_assessments` | 待流派规则审核后接入 |
+| 流派规则 | `rule_definitions` | 待专家整理和审核 |
+| 古籍知识 | `knowledge_passages` | 待逐本确认版本与许可 |
+| 标准案例 | `validation_cases` | 待专家标注 |
+| GIS 数据 | `geo_features` | 待确定区域和数据许可 |
+| 用户数据 | `user_inputs` | 待应用接入；必须加密后写入 |
+
+## 来源原则
+
+- 每条规则、文献、案例和地理记录必须绑定 `source_id`。
+- 不把不同流派的规则覆盖为一个“标准答案”，以 `school` 和 `version` 并存。
+- 古籍原文需要记录具体版本、篇章、版权状态和导入时间。
+- OpenStreetMap 数据受 ODbL 约束，必须确定区域并满足署名和衍生数据库义务。
+- 工作区现有 PDF 的授权状态未知，目前不解析、不复制、不入库。
+- 大语言模型生成的解释不能作为基础规则或标准案例。
+
+## 后续数据入口
+
+1. 确定古籍版本与授权后，将文本切分为篇章节并写入 `knowledge_passages`。
+2. 由领域专家按统一 JSON 模板整理规则，审核后写入 `rule_definitions`。
+3. 收集边界案例和专家确认输出，写入 `validation_cases`。
+4. 确定首个服务区域后，下载合规的行政区、道路、水系和高程数据，转换为 WKT 后写入 `geo_features`。
+5. 接入高精度星历算法后，新增逐年节气时刻表；当前 `solar_terms` 仅存术语与太阳黄经常量。
+
+## 风水坐向计算
+
+坐向计算以正北为0度、顺时针递增。磁罗盘读数可以通过磁偏角换算为真北方位：
+
+```bash
+./scripts/fengshui_direction.py 183.2 --declination -2.1
+```
+
+输出包括真北向首角度、坐山角度、二十四山、后天八卦、五行、距分界线角度和临界提醒。系统采用左闭右开的15度区间，例如子山为 `[352.5°, 7.5°)`，恰好 `7.5°` 归入癸山。
+
+测量误差、设备校准和建筑立面不规则都会影响坐向。结果距边界不足1度时，计算器返回 `boundary_warning: true`，业务界面应要求复测，不应直接进入后续断法。
