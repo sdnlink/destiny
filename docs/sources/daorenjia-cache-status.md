@@ -1,7 +1,7 @@
 # 道人家文本缓存状态
 
 > 最近更新：2026-08-15 13:42（Asia/Shanghai）  
-> 状态：来源连接中断，等待恢复后续传
+> 状态：正在通过官方移动接口补充多卷书籍正文
 
 ## 当前进度
 
@@ -64,10 +64,10 @@
 
 ## 完成判定
 
-只有 `summary.json` 同时满足以下条件，才能标记全量缓存完成：
+部分书籍只提供图片版，正文接口返回“请看右上图片版”。项目不下载图片，因此这类书籍记录为 `text_unavailable`，不伪造文本。只有 `summary.json` 同时满足以下条件，才能标记可用文本缓存完成：
 
 ```text
-cached_books = 1524
+cached_books + text_unavailable_books = 1524
 failed_books = 0
 pending_books = 0
 interrupted = false

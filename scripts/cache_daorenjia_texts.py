@@ -20,6 +20,8 @@ MOBILE_API_BASE = "https://m.daorenjia.com/api/"
 USER_AGENT = "TianjiYanxiang-TextCache/0.1"
 BOOK_PATH = re.compile(r"^/?daozang\d+-\d+/?$")
 CATEGORY_PATH = re.compile(r"^/?c\d+/?$")
+SUBCONTENT_PATH = re.compile(r"^/?daoz(\d+)-(\d+)-(\d+)/?$")
+MOBILE_PARSER_VERSION = "1.2.0"
 
 
 class LinkParser(HTMLParser):
@@ -224,7 +226,8 @@ def cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, force=Fals
     text_path = text_dir / f"{book['slug']}.txt"
     metadata_path = metadata_dir / f"{book['slug']}.json"
     existing = load_metadata(metadata_path)
-    if not force and existing and existing.get("status") == "ok" and text_path.exists():
+    if (not force and existing and existing.get("status") in ("ok", "text_unavailable")
+            and existing.get("parser_version") == MOBILE_PARSER_VERSION and text_path.exists()):
         digest = hashlib.sha256(text_path.read_bytes()).hexdigest()
         if existing.get("sha256") == digest:
             return existing, "cached"
@@ -240,11 +243,47 @@ def cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, force=Fals
         content_html = payload.get("content")
         if not title or not isinstance(content_html, str):
             raise ValueError("mobile API response is missing title or content")
+        subcontents = []
+        seen_subcontent_ids = set()
+        for href in parse_links(content_html):
+            path = same_site_path(href)
+            match = SUBCONTENT_PATH.match(path or "")
+            if not match:
+                continue
+            nid, parent_id, subcontent_id = match.groups()
+            if parent_id != book_id or subcontent_id in seen_subcontent_ids:
+                continue
+            seen_subcontent_ids.add(subcontent_id)
+            subcontents.append((nid, parent_id, subcontent_id))
+
         parser = BookParser()
         parser.feed(f'<div id="content4">{content_html}</div>')
-        _, text = parser.result()
-        if len(text.strip()) < 20:
-            raise ValueError("mobile API book text is empty")
+        _, main_text = parser.result()
+        text_parts = [main_text]
+        for nid, parent_id, subcontent_id in subcontents:
+            chapter_url = urljoin(
+                MOBILE_API_BASE,
+                f"apiscontent.php?nid={nid}&tid={parent_id}&id={subcontent_id}",
+            )
+            chapter_payload_text, _ = fetcher.get(chapter_url)
+            chapter_payload = json.loads(chapter_payload_text.lstrip("\ufeff\r\n \t"))
+            if not isinstance(chapter_payload, list) or len(chapter_payload) < 2:
+                raise ValueError(f"invalid subcontent response: {subcontent_id}")
+            chapter_data = chapter_payload[1]
+            chapter_html = chapter_data.get("sc") if isinstance(chapter_data, dict) else None
+            if not isinstance(chapter_html, str):
+                raise ValueError(f"subcontent text missing: {subcontent_id}")
+            chapter_parser = BookParser()
+            chapter_parser.feed(f'<div id="content4">{chapter_html}</div>')
+            _, chapter_text = chapter_parser.result()
+            if len(chapter_text.strip()) < 5:
+                raise ValueError(f"subcontent text empty: {subcontent_id}")
+            text_parts.append(chapter_text)
+
+        text = "\n".join(part.strip() for part in text_parts if part.strip()) + "\n"
+        status = "ok"
+        if not subcontents and len(text.strip()) < 20:
+            status = "text_unavailable"
         text_path.parent.mkdir(parents=True, exist_ok=True)
         temporary = text_path.with_suffix(".txt.tmp")
         temporary.write_text(text, encoding="utf-8")
@@ -252,14 +291,17 @@ def cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, force=Fals
         metadata = {
             **book,
             "title": title,
-            "status": "ok",
+            "status": status,
             "characters": len(text),
             "bytes": text_path.stat().st_size,
             "sha256": hashlib.sha256(text_path.read_bytes()).hexdigest(),
             "fetched_at": utc_now(),
             "fetched_from": api_url,
+            "subcontent_ids": [item[2] for item in subcontents],
+            "subcontent_count": len(subcontents),
+            "subcontent_api": urljoin(MOBILE_API_BASE, "apiscontent.php"),
             "content_type": content_type,
-            "parser_version": "1.1.0",
+            "parser_version": MOBILE_PARSER_VERSION,
         }
         write_json(metadata_path, metadata)
         return metadata, "downloaded"
@@ -318,6 +360,7 @@ def load_robots(fetcher, cache_path, prefer_cache=False):
 
 def write_summary(records, output, run_totals, interrupted=False):
     ok_records = [record for record in records if record.get("status") == "ok"]
+    unavailable_records = [record for record in records if record.get("status") == "text_unavailable"]
     failed_records = [record for record in records if record.get("status") in ("failed", "robots_denied")]
     pending_records = [record for record in records if record.get("status") == "pending"]
     summary = {
@@ -325,10 +368,11 @@ def write_summary(records, output, run_totals, interrupted=False):
         "updated_at": utc_now(),
         "book_count": len(records),
         "cached_books": len(ok_records),
+        "text_unavailable_books": len(unavailable_records),
         "failed_books": len(failed_records),
         "pending_books": len(pending_records),
-        "characters": sum(record.get("characters", 0) for record in ok_records),
-        "bytes": sum(record.get("bytes", 0) for record in ok_records),
+        "characters": sum(record.get("characters", 0) for record in ok_records + unavailable_records),
+        "bytes": sum(record.get("bytes", 0) for record in ok_records + unavailable_records),
         "interrupted": interrupted,
         **run_totals,
     }

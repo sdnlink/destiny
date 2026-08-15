@@ -40,6 +40,15 @@ class ParserTests(unittest.TestCase):
         _, text = parser.result()
         self.assertEqual(text, "第一段\n第二段\n")
 
+    def test_discovers_subcontent_links(self):
+        links = MODULE.parse_links(
+            '<a href="/daoz24-1179-2934">卷一</a>'
+            '<a href="/daoz24-1179-2935">卷二</a>'
+        )
+        matches = [MODULE.SUBCONTENT_PATH.match(MODULE.same_site_path(link)) for link in links]
+        self.assertEqual(matches[0].groups(), ("24", "1179", "2934"))
+        self.assertEqual(matches[1].groups(), ("24", "1179", "2935"))
+
 
 if __name__ == "__main__":
     unittest.main()
