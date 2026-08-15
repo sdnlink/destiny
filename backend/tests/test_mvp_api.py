@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import CalculationRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from app.main import AdvisoryContext, CalculationRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
 
 
 class MvpApiTests(unittest.TestCase):
@@ -52,6 +52,20 @@ class MvpApiTests(unittest.TestCase):
         self.assertEqual(first["comparison"]["comparable_judgement_count"], 0)
         self.assertEqual(len(first["module_results"]), 2)
         self.assertEqual(first["explanation"]["conclusion"]["status"], "factual_result_only")
+
+    def test_context_generates_advice_and_changes_task_identity(self):
+        calculation = CalculationRequest(
+            module="meihua", method="numbers", input={"upper_number": 1, "lower_number": 2}
+        )
+        career = comparison_envelope([calculation], AdvisoryContext(
+            category="career", question_summary="是否接受新的工作机会"
+        ))
+        finance = comparison_envelope([calculation], AdvisoryContext(
+            category="finance", question_summary="是否增加投入"
+        ))
+        self.assertNotEqual(career["task_id"], finance["task_id"])
+        self.assertEqual(career["advisory"]["context"]["category"], "career")
+        self.assertIn("工作机会", career["advisory"]["conclusion"]["text"])
 
 
 if __name__ == "__main__":

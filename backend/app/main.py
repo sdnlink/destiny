@@ -9,8 +9,9 @@ from typing import Any, Dict, Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, conint, conlist
+from pydantic import BaseModel, Field, conint, conlist, constr, validator
 
+from app.core.advisory import CATEGORY_PROFILES, generate_advisory
 from app.core.calendar import calendar_analysis
 from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
 from app.core.explanation import explain_calculation_set
@@ -54,8 +55,20 @@ class CalculationRequest(BaseModel):
     input: Dict[str, Any]
 
 
+class AdvisoryContext(BaseModel):
+    category: str
+    question_summary: constr(strip_whitespace=True, min_length=1, max_length=200)
+
+    @validator("category")
+    def category_is_supported(cls, value):
+        if value not in CATEGORY_PROFILES:
+            raise ValueError("unsupported category")
+        return value
+
+
 class ComparisonRequest(BaseModel):
     calculations: conlist(CalculationRequest, min_items=1, max_items=8)
+    context: Optional[AdvisoryContext] = None
 
 
 def canonical_hash(value):
@@ -97,7 +110,7 @@ def calculation_envelope(module, method, payload):
     }
 
 
-def comparison_envelope(calculations):
+def comparison_envelope(calculations, context=None):
     normalized = [
         calculation.dict() if isinstance(calculation, CalculationRequest) else calculation
         for calculation in calculations
@@ -106,7 +119,8 @@ def comparison_envelope(calculations):
         normalized,
         key=lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
     )
-    input_hash = canonical_hash({"calculations": normalized})
+    normalized_context = context.dict() if isinstance(context, AdvisoryContext) else context
+    input_hash = canonical_hash({"calculations": normalized, "context": normalized_context})
     with ThreadPoolExecutor(max_workers=len(normalized)) as executor:
         futures = [
             executor.submit(execute, item["module"], item["method"], item["input"])
@@ -130,6 +144,7 @@ def comparison_envelope(calculations):
         "module_results": module_results,
         "comparison": comparison,
         "explanation": explain_calculation_set(module_results, comparison),
+        "advisory": generate_advisory(module_results, normalized_context),
         "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
     }
 
@@ -260,7 +275,7 @@ def evaluate_calculation(request: CalculationRequest):
 
 @app.post("/v1/calculations/compare")
 def compare_calculations(request: ComparisonRequest):
-    return {"data": comparison_envelope(request.calculations)}
+    return {"data": comparison_envelope(request.calculations, request.context)}
 
 
 if os.environ.get("SERVE_WEB") == "1":

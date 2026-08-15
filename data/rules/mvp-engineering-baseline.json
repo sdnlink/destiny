@@ -21,7 +21,9 @@
         {"rule_id": "MH-TIME-001", "version": "1.0.0"},
         {"rule_id": "MH-NUMBER-001", "version": "1.0.0"},
         {"rule_id": "MH-BODYUSE-001", "version": "1.0.0"},
-        {"rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0"}
+        {"rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0"},
+        {"rule_id": "ADV-CONTEXT-001", "version": "1.0.0"},
+        {"rule_id": "ADV-MH-RELATION-001", "version": "1.0.0"}
       ]
     }
   ],
@@ -97,6 +99,18 @@
       "title": "梅花体用五行关系", "purpose": "输出体用之间的生克比和关系事实", "preconditions": ["体卦和用卦五行已确定"],
       "inputs": ["body_element", "use_element"], "procedure": ["比较同五行", "比较五行生关系", "比较五行克关系"], "outputs": ["relation_code", "relation_label"],
       "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["关系事实不直接映射吉凶"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:five_element_relation"
+    },
+    {
+      "rule_id": "ADV-CONTEXT-001", "version": "1.0.0", "system": "advisory", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "事项分类决策检查清单", "purpose": "根据用户明确选择的事项类别生成可核实、可执行的通用决策检查清单", "preconditions": ["用户明确提供事项类别和问题摘要"],
+      "inputs": ["category", "question_summary"], "procedure": ["选择对应事项模板", "生成目标、资源、风险和验证建议", "附加核实问题和高影响事项限制"], "outputs": ["recommendations", "verification_questions", "risk_notes"],
+      "source_refs": ["docs/design/product-design.md#步骤一选择场景", "docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["未经过专家签署", "不构成现实概率或专业意见", "不得写入正式judgements"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.advisory:generate_advisory"
+    },
+    {
+      "rule_id": "ADV-MH-RELATION-001", "version": "1.0.0", "system": "advisory", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "梅花体用关系关注点映射", "purpose": "将已计算的体用五行关系映射为待核实的决策关注点", "preconditions": ["梅花体用关系事实已生成", "用户请求研究性事项建议"],
+      "inputs": ["relation_code", "category", "question_summary"], "procedure": ["读取本卦阶段体用关系", "映射为资源、约束、投入或协同关注点", "生成验证行动"], "outputs": ["focus", "rationale", "recommendation"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["映射仅为未审核研究模板", "不映射吉凶", "不生成应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.advisory:generate_advisory"
     }
   ]
 }
