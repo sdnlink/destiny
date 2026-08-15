@@ -1,6 +1,6 @@
 # 天机演象
 
-天机演象是传统术数数字化研究与辅助分析项目。当前已完成项目设计、基础常量、道人家内部学习语料、ClickHouse导入和本地只读检索服务；周易、梅花易数、六壬和风水推演规则仍按专家审核与标准案例逐项开发。
+天机演象是传统术数数字化研究与辅助分析项目。当前已完成项目设计、基础常量、道人家内部学习语料与ClickHouse检索，以及历法、周易、梅花易数的确定性MVP计算内核。解释规则仍须按来源、版本和专家案例逐项审核；六壬和专业风水规则尚未进入实现。
 
 ## 文档入口
 
@@ -8,6 +8,7 @@
 - [设计文档索引](./docs/design/README.md)
 - [语料分析报告](./docs/data/corpus-analysis.md)
 - [语料服务说明](./docs/development/corpus-service.md)
+- [MVP计算服务说明](./docs/development/calculation-service.md)
 - [数据导入说明](./docs/data-ingestion.md)
 
 ## 本地启动
@@ -30,10 +31,19 @@ docker-compose up -d clickhouse
 ./app/corpus_api.py --port 8088
 ```
 
+启动MVP计算API：
+
+```bash
+./scripts/run_mvp_api.sh
+```
+
+计算API默认位于`http://127.0.0.1:8090`，交互文档位于`http://127.0.0.1:8090/docs`。
+
 验证：
 
 ```bash
-python3 -m unittest discover -s tests -v
+.venv/bin/python -m unittest discover -s tests -v
+./scripts/run_validation_cases.py
 ./scripts/verify_daorenjia_cache.py \
   --report cache/daorenjia/verification.json
 ```
@@ -46,5 +56,12 @@ python3 -m unittest discover -s tests -v
 - 字符：32,360,859。
 - 语料哈希：`7e654ac9338c6ed2f88bff5498266320b8aff46a32e475ea3b7c0c8b3bb47755`。
 - 使用范围：`internal_research`。
+
+## 当前计算基线
+
+- 12条可追溯工程规则，状态均为`draft`，待专家审核。
+- 7个工程回归案例，当前全部通过，不代表专家签署案例。
+- 历法、周易和梅花共13个健康、常量、规则、案例及计算接口。
+- 多模块综合只比较引用已发布规则的结构化判断，不生成自动吉凶总分。
 
 语料不得未经许可对外再发布，也不能直接替代经过专家审核的术数规则和标准案例。
