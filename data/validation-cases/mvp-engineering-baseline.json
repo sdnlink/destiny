@@ -44,6 +44,42 @@
       "input": {"upper_number": 8, "lower_number": 16},
       "expected": {"facts": {"upper_trigram_number": 8, "lower_trigram_number": 8, "moving_line": 6, "original": {"ordinal": 2}}},
       "tags": ["boundary", "numbers", "remainder-zero"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_yi_0003", "system": "zhouyi", "school": "mvp-engineering-baseline", "method": "time", "title": "周易自动时间排盘基线",
+      "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"method": "lunar_time", "original": {"ordinal": 10, "name": "履"}, "changed": {"ordinal": 25, "name": "无妄"}, "moving_lines": [2]}},
+      "tags": ["basic", "time", "automatic"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_ly_0001", "system": "liuyao", "school": "mvp-engineering-baseline", "method": "time", "title": "六爻时间纳甲排盘基线",
+      "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"original": {"name": "履"}, "palace": {"name": "艮", "stage": "五世", "host_line": 5, "response_line": 2}, "day_pillar": "辛酉", "xun": {"empty_branches": ["子", "丑"]}}},
+      "tags": ["basic", "time", "najia"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_liuyao.py"], "reviewers": []
+    },
+    {
+      "case_id": "case_ly_0002", "system": "liuyao", "school": "mvp-engineering-baseline", "method": "numbers", "title": "六爻乾宫纳甲数字排盘",
+      "input": {"lower_number": 1, "upper_number": 1, "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"original": {"name": "乾"}, "palace": {"name": "乾", "stage": "本宫", "host_line": 6, "response_line": 3}}},
+      "tags": ["basic", "numbers", "eight-palace"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_liuyao.py"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0001", "system": "liuren", "school": "mvp-engineering-baseline", "method": "time", "title": "大六壬克法三传基线",
+      "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"day_pillar": "辛酉", "occupation_time": {"branch": "申"}, "month_general": {"branch": "午", "name": "胜光", "boundary_term": "大暑"}, "three_transmissions": {"status": "completed", "lesson_type": "克", "transmissions": ["午", "辰", "寅"]}}},
+      "tags": ["basic", "time", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_liuren.py"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0002", "system": "liuren", "school": "mvp-engineering-baseline", "method": "numbers", "title": "大六壬数字占时余零基线",
+      "input": {"number": 12, "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"actual_time_branch": "申", "occupation_time": {"branch": "亥", "number": 12, "input_number": 12}}},
+      "tags": ["boundary", "numbers", "remainder-zero"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_liuren.py"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0003", "system": "liuren", "school": "mvp-engineering-baseline", "method": "time", "title": "大六壬未覆盖发传路径不得猜测",
+      "input": {"local_datetime": "2026-01-15T08:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"three_transmissions": {"status": "unsupported_rule_path", "transmissions": [], "pending_path": "遥克、昴星或特殊课式"}}},
+      "tags": ["coverage-boundary", "no-fabrication", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#三传覆盖边界"], "reviewers": []
     }
   ]
 }

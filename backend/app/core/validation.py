@@ -1,6 +1,11 @@
 from app.core.calendar import calendar_analysis
 from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
+from app.core.iching import time_cast as yi_time_cast
+from app.core.liuren import number_cast as liuren_number_cast
+from app.core.liuren import time_cast as liuren_time_cast
+from app.core.liuyao import number_cast as liuyao_number_cast
+from app.core.liuyao import time_cast as liuyao_time_cast
 from app.core.meihua import number_cast as meihua_number_cast
 from app.core.meihua import time_cast as meihua_time_cast
 from app.core.registry import load_rule_registry, load_validation_cases, unknown_rule_ids
@@ -16,10 +21,25 @@ def execute_validation_case(case):
         return yi_manual_cast(payload["lines"])
     if system == "zhouyi" and method == "numbers":
         return yi_number_cast(payload["lower_number"], payload["upper_number"])
+    if system == "zhouyi" and method == "time":
+        return yi_time_cast(**payload)
     if system == "meihua" and method == "time":
         return meihua_time_cast(**payload)
     if system == "meihua" and method == "numbers":
         return meihua_number_cast(payload["upper_number"], payload["lower_number"])
+    if system == "liuyao" and method == "time":
+        return liuyao_time_cast(**payload)
+    if system == "liuyao" and method == "numbers":
+        values = dict(payload)
+        lower_number = values.pop("lower_number")
+        upper_number = values.pop("upper_number")
+        return liuyao_number_cast(lower_number, upper_number, **values)
+    if system == "liuren" and method == "time":
+        return liuren_time_cast(**payload)
+    if system == "liuren" and method == "numbers":
+        values = dict(payload)
+        number = values.pop("number")
+        return liuren_number_cast(number, **values)
     raise ValueError("unsupported validation case: {}/{}".format(system, method))
 
 

@@ -35,7 +35,7 @@ class RuleRegistryTests(unittest.TestCase):
 
     def test_validation_case_document_is_explicitly_unreviewed(self):
         document = load_validation_cases()
-        self.assertEqual(len(document["cases"]), 7)
+        self.assertEqual(len(document["cases"]), 13)
         self.assertIn("pending_expert_review", document["qualification"])
         self.assertTrue(all(not case["reviewers"] for case in document["cases"]))
 
