@@ -5,17 +5,21 @@ import {
   ChevronRight,
   CircleAlert,
   Compass,
+  Grid3X3,
   Layers3,
   LoaderCircle,
   LocateFixed,
   Play,
   RotateCcw,
+  Workflow,
 } from "lucide-react";
 
 const SCENES = [
   { id: "combined", label: "综合推演", icon: Layers3 },
   { id: "zhouyi", label: "周易", icon: BookOpen },
   { id: "meihua", label: "梅花", icon: Compass },
+  { id: "liuyao", label: "六爻", icon: Grid3X3 },
+  { id: "liuren", label: "六壬", icon: Workflow },
 ];
 
 const LINE_OPTIONS = [
@@ -68,8 +72,10 @@ export default function InputPanel({
     lines[index] = value;
     update("lines", lines);
   };
-  const showZhouyi = form.scene !== "meihua";
-  const showMeihua = form.scene !== "zhouyi";
+  const showZhouyi = form.scene === "combined" || form.scene === "zhouyi";
+  const showMeihua = form.scene === "combined" || form.scene === "meihua";
+  const showLiuyao = form.scene === "combined" || form.scene === "liuyao";
+  const showLiuren = form.scene === "combined" || form.scene === "liuren";
 
   return (
     <aside className="input-panel" aria-label="推演输入">
@@ -205,10 +211,16 @@ export default function InputPanel({
           <section className="form-section">
             <div className="section-title"><BookOpen size={16} /><span>周易参数</span></div>
             <div className="segmented method-switch" role="radiogroup" aria-label="周易起卦方式">
-              <button type="button" className={form.yiMethod === "manual" ? "active" : ""} onClick={() => update("yiMethod", "manual")}>手工六爻</button>
-              <button type="button" className={form.yiMethod === "numbers" ? "active" : ""} onClick={() => update("yiMethod", "numbers")}>双数起卦</button>
+              <button type="button" className={form.yiMethod === "time" ? "active" : ""} onClick={() => update("yiMethod", "time")}>自动排盘</button>
+              <button type="button" className={form.yiMethod === "numbers" ? "active" : ""} onClick={() => update("yiMethod", "numbers")}>数字排盘</button>
+              <button type="button" className={form.yiMethod === "manual" ? "active" : ""} onClick={() => update("yiMethod", "manual")}>手工排盘</button>
             </div>
-            {form.yiMethod === "manual" ? (
+            {form.yiMethod === "time" ? (
+              <div className="method-note">
+                <CalendarClock size={16} />
+                <p>采用上方时间，按年支、农历月日及时支自动生成卦盘。</p>
+              </div>
+            ) : form.yiMethod === "manual" ? (
               <div className="line-inputs">
                 {[...form.lines].reverse().map((value, reversedIndex) => {
                   const index = 5 - reversedIndex;
@@ -250,8 +262,8 @@ export default function InputPanel({
           <section className="form-section">
             <div className="section-title"><Compass size={16} /><span>梅花参数</span></div>
             <div className="segmented method-switch" role="radiogroup" aria-label="梅花起卦方式">
-              <button type="button" className={form.meihuaMethod === "time" ? "active" : ""} onClick={() => update("meihuaMethod", "time")}>时间起卦</button>
-              <button type="button" className={form.meihuaMethod === "numbers" ? "active" : ""} onClick={() => update("meihuaMethod", "numbers")}>双数起卦</button>
+              <button type="button" className={form.meihuaMethod === "time" ? "active" : ""} onClick={() => update("meihuaMethod", "time")}>自动排盘</button>
+              <button type="button" className={form.meihuaMethod === "numbers" ? "active" : ""} onClick={() => update("meihuaMethod", "numbers")}>数字排盘</button>
             </div>
             {form.meihuaMethod === "time" ? (
               <div className="method-note">
@@ -271,11 +283,58 @@ export default function InputPanel({
           </section>
         )}
 
+        {showLiuyao && (
+          <section className="form-section">
+            <div className="section-title"><Grid3X3 size={16} /><span>六爻参数</span></div>
+            <div className="segmented method-switch" role="radiogroup" aria-label="六爻排盘方式">
+              <button type="button" className={form.liuyaoMethod === "time" ? "active" : ""} onClick={() => update("liuyaoMethod", "time")}>自动排盘</button>
+              <button type="button" className={form.liuyaoMethod === "numbers" ? "active" : ""} onClick={() => update("liuyaoMethod", "numbers")}>数字排盘</button>
+            </div>
+            {form.liuyaoMethod === "time" ? (
+              <div className="method-note">
+                <CalendarClock size={16} />
+                <p>按时间取卦，并自动生成八宫、世应、纳甲、六亲、六神与旬空。</p>
+              </div>
+            ) : (
+              <NumberPair
+                firstLabel="下卦数"
+                secondLabel="上卦数"
+                first={form.lyLower}
+                second={form.lyUpper}
+                onFirst={(value) => update("lyLower", value)}
+                onSecond={(value) => update("lyUpper", value)}
+              />
+            )}
+          </section>
+        )}
+
+        {showLiuren && (
+          <section className="form-section">
+            <div className="section-title"><Workflow size={16} /><span>大六壬参数</span></div>
+            <div className="segmented method-switch" role="radiogroup" aria-label="大六壬排盘方式">
+              <button type="button" className={form.liurenMethod === "time" ? "active" : ""} onClick={() => update("liurenMethod", "time")}>自动排盘</button>
+              <button type="button" className={form.liurenMethod === "numbers" ? "active" : ""} onClick={() => update("liurenMethod", "numbers")}>数字排盘</button>
+            </div>
+            {form.liurenMethod === "time" ? (
+              <div className="method-note">
+                <CalendarClock size={16} />
+                <p>采用实际时支为占时，排月将、天地盘、四课、三传和十二天将。</p>
+              </div>
+            ) : (
+              <label>
+                <FieldLabel>占时数</FieldLabel>
+                <input type="number" value={form.lrNumber} onChange={(event) => update("lrNumber", event.target.value)} required />
+                <small className="field-hint">除以12取余映射子至亥，仅替换占时，不修改历法日柱</small>
+              </label>
+            )}
+          </section>
+        )}
+
         {error && <div className="form-error" role="alert"><CircleAlert size={17} /><span>{error}</span></div>}
 
         <div className="submit-bar">
           <div className="submit-meta">
-            <span>{form.scene === "combined" ? "3 个计算模块" : "2 个计算模块"}</span>
+            <span>{form.scene === "combined" ? "5 个计算模块" : "2 个计算模块"}</span>
             <small>工程基线 · 无自动吉凶评分</small>
           </div>
           <button className="primary-button" type="submit" disabled={loading}>

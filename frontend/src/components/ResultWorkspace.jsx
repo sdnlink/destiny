@@ -10,10 +10,12 @@ import {
   FileText,
   ExternalLink,
   GitCompareArrows,
+  Grid3X3,
   Info,
   Layers3,
   ListTree,
   ShieldCheck,
+  Workflow,
 } from "lucide-react";
 
 const TABS = [
@@ -21,6 +23,8 @@ const TABS = [
   { id: "calendar", label: "输入与历法", icon: CalendarDays },
   { id: "zhouyi", label: "周易", icon: BookOpen },
   { id: "meihua", label: "梅花易数", icon: Compass },
+  { id: "liuyao", label: "六爻", icon: Grid3X3 },
+  { id: "liuren", label: "大六壬", icon: Workflow },
   { id: "comparison", label: "对照分析", icon: GitCompareArrows },
   { id: "explanation", label: "结论建议", icon: FileText },
 ];
@@ -34,6 +38,7 @@ const CATEGORY_LABELS = {
   study: "学业",
   other: "其他",
 };
+const SCENE_LABELS = { combined: "综合推演", zhouyi: "周易", meihua: "梅花易数", liuyao: "六爻", liuren: "大六壬" };
 
 function findModule(result, module) {
   return result?.module_results?.find((item) => item.module === module)?.result;
@@ -145,13 +150,13 @@ function Evidence({ items = [] }) {
   );
 }
 
-function Overview({ result, context, calendar, zhouyi, meihua, onTab }) {
+function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, onTab }) {
   const comparison = result.comparison;
   return (
     <div className="view-stack">
       <section className="summary-band">
         <div className="summary-copy">
-          <span className="eyebrow">{CATEGORY_LABELS[context.category]} · {context.scene === "combined" ? "综合推演" : context.scene === "zhouyi" ? "周易" : "梅花易数"}</span>
+          <span className="eyebrow">{CATEGORY_LABELS[context.category]} · {SCENE_LABELS[context.scene]}</span>
           <h2>{context.question}</h2>
           <p>本次输出保留盘面事实与计算依据。当前解释规则尚未发布，不生成自动吉凶评分。</p>
         </div>
@@ -187,6 +192,28 @@ function Overview({ result, context, calendar, zhouyi, meihua, onTab }) {
               <div><strong>{meihua.facts.original.symbol} {meihua.facts.original.name}</strong><span>{meihua.evidence[0]?.label}</span></div>
             </div>
             <p>体 {meihua.facts.body_use.body_trigram.name} · 用 {meihua.facts.body_use.use_trigram.name}</p>
+          </button>
+        )}
+
+        {liuyao && (
+          <button className="overview-section" onClick={() => onTab("liuyao")}>
+            <div className="overview-head"><span><Grid3X3 size={16} />六爻纳甲</span><ArrowRight size={15} /></div>
+            <div className="overview-hexagram">
+              <HexagramLines lines={liuyao.facts.original.lines} moving={liuyao.facts.moving_lines} />
+              <div><strong>{liuyao.facts.original.symbol} {liuyao.facts.original.name}</strong><span>{liuyao.facts.palace.name}宫 · {liuyao.facts.palace.stage}</span></div>
+            </div>
+            <p>世 {liuyao.facts.palace.host_line} · 应 {liuyao.facts.palace.response_line} · 空 {liuyao.facts.xun.empty_branches.join("、")}</p>
+          </button>
+        )}
+
+        {liuren && (
+          <button className="overview-section" onClick={() => onTab("liuren")}>
+            <div className="overview-head"><span><Workflow size={16} />大六壬</span><ArrowRight size={15} /></div>
+            <div className="liuren-overview-core">
+              <strong>{liuren.facts.month_general.name}将</strong>
+              <span>{liuren.facts.month_general.branch}加临{liuren.facts.occupation_time.branch}时</span>
+            </div>
+            <p>{liuren.facts.three_transmissions.status === "completed" ? `三传 ${liuren.facts.three_transmissions.transmissions.join(" · ")}` : `待补 ${liuren.facts.three_transmissions.pending_path}`}</p>
           </button>
         )}
       </section>
@@ -351,6 +378,91 @@ function MeihuaView({ result }) {
   );
 }
 
+function LiuyaoView({ result }) {
+  if (!result) return <MissingModule name="六爻" />;
+  const { facts } = result;
+  return (
+    <div className="view-stack">
+      <section className="view-heading">
+        <div><span className="section-kicker">LIU YAO NA JIA</span><h2>六爻纳甲盘</h2><p>卦象、八宫世应、纳甲六亲、六神与旬空按爻位对齐。</p></div>
+        <span className="version-badge">{result.rule_version}</span>
+      </section>
+      <section className="hexagram-primary-grid">
+        <HexagramTile title="本卦" hexagram={facts.original} moving={facts.moving_lines} featured />
+        <div className="change-arrow"><ArrowRight size={22} /><span>第 {facts.moving_lines.join("、")} 爻动</span></div>
+        <HexagramTile title="变卦" hexagram={facts.changed} featured />
+      </section>
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><Grid3X3 size={16} /></span><div><h3>{facts.palace.name}宫 · {facts.palace.stage}</h3><p>世爻 {facts.palace.host_line} · 应爻 {facts.palace.response_line} · {facts.xun.name}空 {facts.xun.empty_branches.join("、")}</p></div></div></div>
+        <div className="liuyao-table-wrap">
+          <table className="liuyao-table">
+            <thead><tr><th>爻位</th><th>六神</th><th>六亲</th><th>纳甲</th><th>五行</th><th>世应</th><th>状态</th></tr></thead>
+            <tbody>{[...facts.line_chart].reverse().map((line) => (
+              <tr key={line.position} className={line.is_moving ? "moving-line" : ""}>
+                <td>{line.position === 6 ? "上爻" : line.position === 1 ? "初爻" : `${line.position}爻`}</td>
+                <td>{line.six_spirit}</td><td>{line.six_relative}</td><td>{line.najia_stem}{line.najia_branch}</td><td>{line.element}</td>
+                <td>{line.roles.join("、") || "—"}</td><td>{line.is_moving ? "动" : "静"}{line.is_void ? " · 空" : ""}</td>
+              </tr>
+            ))}</tbody>
+          </table>
+        </div>
+      </section>
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <Steps steps={result.steps} />
+      </section>
+      {result.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
+    </div>
+  );
+}
+
+function LiurenView({ result }) {
+  if (!result) return <MissingModule name="大六壬" />;
+  const { facts } = result;
+  const transmission = facts.three_transmissions;
+  return (
+    <div className="view-stack">
+      <section className="view-heading">
+        <div><span className="section-kicker">DA LIU REN</span><h2>大六壬盘</h2><p>月将、占时、天地盘、四课、三传、天将与旬空分层展示。</p></div>
+        <span className="version-badge">{result.rule_version}</span>
+      </section>
+      <section className="liuren-facts-band">
+        <DataState label="占日" value={facts.day_pillar} />
+        <DataState label="占时" value={facts.occupation_time.branch} />
+        <DataState label="月将" value={`${facts.month_general.name} · ${facts.month_general.branch}`} />
+        <DataState label="旬空" value={facts.xun.empty_branches.join("、")} />
+      </section>
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><Workflow size={16} /></span><div><h3>天地盘与十二天将</h3><p>{facts.month_general.boundary_term}后月将 · {facts.heavenly_generals.distribution_direction}</p></div></div></div>
+        <div className="liuren-plate-wrap">
+          <div className="liuren-plate-row row-label"><b>地盘</b>{facts.earth_plate.map((branch) => <span key={branch}>{branch}</span>)}</div>
+          <div className="liuren-plate-row"><b>天盘</b>{facts.earth_plate.map((branch) => <strong key={branch}>{facts.heaven_plate[branch]}</strong>)}</div>
+          <div className="liuren-plate-row generals"><b>天将</b>{facts.earth_plate.map((branch) => <span key={branch}>{facts.heavenly_generals.by_ground[branch]}</span>)}</div>
+        </div>
+      </section>
+      <section className="liuren-detail-grid">
+        <div className="data-band">
+          <div className="band-heading"><div><span className="band-icon"><Grid3X3 size={16} /></span><div><h3>四课</h3><p>下神 → 上神</p></div></div></div>
+          <div className="four-lessons">{facts.four_lessons.map((lesson) => (
+            <div key={lesson.sequence}><span>第{lesson.sequence}课</span><strong>{lesson.lower} → {lesson.upper}</strong><small>{lesson.relation === "none" ? "无直接克" : lesson.relation === "lower_controls_upper" ? "下克上" : "上克下"}</small></div>
+          ))}</div>
+        </div>
+        <div className="data-band">
+          <div className="band-heading"><div><span className="band-icon"><Workflow size={16} /></span><div><h3>三传</h3><p>{transmission.status === "completed" ? `${transmission.lesson_type}路径` : "规则路径未覆盖"}</p></div></div></div>
+          {transmission.status === "completed" ? (
+            <div className="transmission-row">{["初传", "中传", "末传"].map((label, index) => <div key={label}><span>{label}</span><strong>{transmission.transmissions[index]}</strong></div>)}</div>
+          ) : <Notice tone="warning" icon={CircleAlert}>待实现课体：{transmission.pending_path}。系统未生成猜测值。</Notice>}
+        </div>
+      </section>
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <Steps steps={result.steps} />
+      </section>
+      {result.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
+    </div>
+  );
+}
+
 function ComparisonView({ comparison }) {
   const categories = [
     ["consistent", "一致", "同维度、同时间范围内倾向相同"],
@@ -386,7 +498,7 @@ function ComparisonView({ comparison }) {
 }
 
 function ExplanationView({ explanation, advisory, literature }) {
-  const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass };
+  const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass, liuyao: Grid3X3, liuren: Workflow };
   return (
     <div className="view-stack explanation-view">
       <section className="view-heading">
@@ -568,6 +680,8 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
   const calendar = findModule(result, "calendar");
   const zhouyi = findModule(result, "zhouyi");
   const meihua = findModule(result, "meihua");
+  const liuyao = findModule(result, "liuyao");
+  const liuren = findModule(result, "liuren");
   return (
     <main className="result-workspace">
       <header className="result-header">
@@ -585,10 +699,12 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         ))}
       </nav>
       <div className="result-content">
-        {activeTab === "overview" && <Overview result={result} context={context} calendar={calendar} zhouyi={zhouyi} meihua={meihua} onTab={setActiveTab} />}
+        {activeTab === "overview" && <Overview result={result} context={context} calendar={calendar} zhouyi={zhouyi} meihua={meihua} liuyao={liuyao} liuren={liuren} onTab={setActiveTab} />}
         {activeTab === "calendar" && <CalendarView calendar={calendar} />}
         {activeTab === "zhouyi" && <ZhouyiView result={zhouyi} />}
         {activeTab === "meihua" && <MeihuaView result={meihua} />}
+        {activeTab === "liuyao" && <LiuyaoView result={liuyao} />}
+        {activeTab === "liuren" && <LiurenView result={liuren} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}
         {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} literature={result.literature} />}
       </div>

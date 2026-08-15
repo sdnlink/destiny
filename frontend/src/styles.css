@@ -2350,6 +2350,164 @@ select:focus {
   font-size: 10px;
 }
 
+.liuren-overview-core {
+  min-height: 102px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #eef1ed;
+}
+
+.liuren-overview-core strong {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 22px;
+}
+
+.liuren-overview-core span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.liuyao-table-wrap,
+.liuren-plate-wrap {
+  overflow-x: auto;
+}
+
+.liuyao-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.liuyao-table th,
+.liuyao-table td {
+  height: 42px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.liuyao-table th {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.liuyao-table tr.moving-line td {
+  background: #f5eee8;
+  color: var(--vermilion-dark);
+  font-weight: 650;
+}
+
+.liuren-facts-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+}
+
+.liuren-facts-band .data-state {
+  min-height: 76px;
+  justify-content: center;
+  padding: 12px 18px;
+  border-right: 1px solid var(--line);
+}
+
+.liuren-facts-band .data-state:last-child {
+  border-right: 0;
+}
+
+.liuren-plate-wrap {
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.liuren-plate-row {
+  min-width: 850px;
+  display: grid;
+  grid-template-columns: 58px repeat(12, minmax(58px, 1fr));
+  gap: 1px;
+  background: var(--line);
+}
+
+.liuren-plate-row > * {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  font-size: 12px;
+}
+
+.liuren-plate-row > b {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.liuren-plate-row > strong {
+  color: var(--vermilion-dark);
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 16px;
+}
+
+.liuren-plate-row.generals span {
+  color: #3f655c;
+  font-size: 10px;
+}
+
+.liuren-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 14px;
+}
+
+.four-lessons,
+.transmission-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.four-lessons > div,
+.transmission-row > div {
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-right: 1px solid var(--line);
+}
+
+.four-lessons > div:last-child,
+.transmission-row > div:last-child {
+  border-right: 0;
+}
+
+.four-lessons span,
+.transmission-row span,
+.four-lessons small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.four-lessons strong,
+.transmission-row strong {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 17px;
+}
+
+.transmission-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 @media (max-width: 1180px) {
   .app-navigation {
     width: 68px;
@@ -2390,6 +2548,10 @@ select:focus {
   }
 
   .related-hexagrams {
+    grid-template-columns: 1fr;
+  }
+
+  .liuren-detail-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -2512,6 +2674,18 @@ select:focus {
     grid-template-columns: 1fr;
   }
 
+  .liuren-facts-band {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .liuren-facts-band .data-state:nth-child(2) {
+    border-right: 0;
+  }
+
+  .liuren-facts-band .data-state:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+
   .advisory-support-grid {
     grid-template-columns: 1fr;
   }
@@ -2552,6 +2726,18 @@ select:focus {
 
   .body-use-band {
     grid-template-columns: 1fr 76px 1fr;
+  }
+
+  .four-lessons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .four-lessons > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .four-lessons > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
   }
 
   .rules-table th:first-child { width: 115px; }

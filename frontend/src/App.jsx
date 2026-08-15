@@ -37,6 +37,11 @@ function initialForm() {
     meihuaMethod: "time",
     mhUpper: "8",
     mhLower: "8",
+    liuyaoMethod: "time",
+    lyLower: "8",
+    lyUpper: "8",
+    liurenMethod: "time",
+    lrNumber: "8",
   };
 }
 
@@ -53,9 +58,11 @@ function calendarPayload(form) {
 function buildCalculations(form) {
   const calendar = calendarPayload(form);
   const calculations = [{ module: "calendar", method: "analyze", input: calendar }];
-  if (form.scene !== "meihua") {
+  if (form.scene === "combined" || form.scene === "zhouyi") {
     calculations.push(
-      form.yiMethod === "manual"
+      form.yiMethod === "time"
+        ? { module: "zhouyi", method: "time", input: calendar }
+        : form.yiMethod === "manual"
         ? { module: "zhouyi", method: "manual", input: { lines: form.lines } }
         : {
             module: "zhouyi",
@@ -64,7 +71,7 @@ function buildCalculations(form) {
           },
     );
   }
-  if (form.scene !== "zhouyi") {
+  if (form.scene === "combined" || form.scene === "meihua") {
     calculations.push(
       form.meihuaMethod === "time"
         ? { module: "meihua", method: "time", input: calendar }
@@ -73,6 +80,24 @@ function buildCalculations(form) {
             method: "numbers",
             input: { upper_number: Number(form.mhUpper), lower_number: Number(form.mhLower) },
           },
+    );
+  }
+  if (form.scene === "combined" || form.scene === "liuyao") {
+    calculations.push(
+      form.liuyaoMethod === "time"
+        ? { module: "liuyao", method: "time", input: calendar }
+        : {
+            module: "liuyao",
+            method: "numbers",
+            input: { ...calendar, lower_number: Number(form.lyLower), upper_number: Number(form.lyUpper) },
+          },
+    );
+  }
+  if (form.scene === "combined" || form.scene === "liuren") {
+    calculations.push(
+      form.liurenMethod === "time"
+        ? { module: "liuren", method: "time", input: calendar }
+        : { module: "liuren", method: "numbers", input: { ...calendar, number: Number(form.lrNumber) } },
     );
   }
   return calculations;
@@ -122,7 +147,7 @@ function RulesDrawer({ open, onClose, rules, loading }) {
         </header>
         <div className="drawer-notice"><ShieldCheck size={16} /><span>当前规则均为工程草稿，尚未经过专家签署。</span></div>
         <div className="segmented drawer-filter">
-          {[["all", "全部"], ["calendar", "历法"], ["zhouyi", "周易"], ["meihua", "梅花"]].map(([id, label]) => (
+          {[["all", "全部"], ["calendar", "历法"], ["zhouyi", "周易"], ["meihua", "梅花"], ["liuyao", "六爻"], ["liuren", "六壬"]].map(([id, label]) => (
             <button key={id} className={system === id ? "active" : ""} onClick={() => setSystem(id)}>{label}</button>
           ))}
         </div>
