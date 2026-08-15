@@ -135,22 +135,7 @@ def discover_pages(client, root_title):
     return [title for title in pages if not title.endswith("/全覽")]
 
 
-def fetch_page(client, title):
-    payload = client.request({
-        "action": "query", "prop": "extracts|info|revisions", "titles": title,
-        "explaintext": 1, "inprop": "url", "rvprop": "ids|timestamp", "redirects": 1,
-    })
-    page = payload["query"]["pages"][0]
-    if page.get("missing"):
-        raise ValueError("page is missing: {}".format(title))
-    text = normalize_text(page.get("extract", ""))
-    extraction_method = "text-extracts"
-    if len(text.strip()) < 20:
-        parsed = client.request({"action": "parse", "page": page["title"], "prop": "text"})
-        parser = VisibleTextParser()
-        parser.feed(parsed["parse"]["text"])
-        text = parser.text()
-        extraction_method = "rendered-html-visible-text"
+def _page_record(page, text, extraction_method):
     revision = (page.get("revisions") or [{}])[0]
     return {
         "page_id": page["pageid"],
@@ -162,6 +147,36 @@ def fetch_page(client, title):
         "extraction_method": extraction_method,
         "text": text,
     }
+
+
+def fetch_pages(client, titles, batch_size=20):
+    result = []
+    for start in range(0, len(titles), batch_size):
+        batch = titles[start:start + batch_size]
+        payload = client.request({
+            "action": "query", "prop": "extracts|info|revisions", "titles": "|".join(batch),
+            "explaintext": 1, "inprop": "url", "rvprop": "ids|timestamp", "redirects": 1,
+        })
+        pages_by_title = {page["title"]: page for page in payload["query"]["pages"]}
+        for title in batch:
+            page = pages_by_title.get(title)
+            if page is None or page.get("missing"):
+                raise ValueError("page is missing: {}".format(title))
+            text = normalize_text(page.get("extract", ""))
+            extraction_method = "text-extracts"
+            if len(text.strip()) < 20:
+                parsed = client.request({"action": "parse", "page": page["title"], "prop": "text"})
+                parser = VisibleTextParser()
+                parser.feed(parsed["parse"]["text"])
+                text = parser.text()
+                extraction_method = "rendered-html-visible-text"
+            result.append(_page_record(page, text, extraction_method))
+    return result
+
+
+def fetch_page(client, title):
+    """Compatibility helper for callers that need a single page."""
+    return fetch_pages(client, [title])[0]
 
 
 def combine_pages(pages):
@@ -214,7 +229,7 @@ def cache(manifest_path, output_dir, delay, timeout, retries):
         try:
             subpages = discover_pages(client, book["title"])
             titles = subpages or [book["title"]]
-            pages = [fetch_page(client, title) for title in titles]
+            pages = fetch_pages(client, titles)
             text, accepted_pages = combine_pages(pages)
             if len(text.strip()) < 20:
                 raise ValueError("no usable plain text returned")
@@ -283,4 +298,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
