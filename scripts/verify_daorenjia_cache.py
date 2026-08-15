@@ -49,6 +49,7 @@ def verify(cache_dir):
         "characters": 0,
         "bytes": 0,
         "subcontents": 0,
+        "unavailable_subcontents": 0,
     }
     unavailable = []
     seen_subcontents = set()
@@ -98,6 +99,12 @@ def verify(cache_dir):
             errors.append(f"{slug}: duplicate subcontent ids")
         if metadata.get("subcontent_count") != len(subcontent_ids):
             errors.append(f"{slug}: subcontent count mismatch")
+        unavailable_subcontent_ids = metadata.get("unavailable_subcontent_ids") or []
+        if not set(unavailable_subcontent_ids).issubset(set(subcontent_ids)):
+            errors.append(f"{slug}: unavailable subcontent is not in discovered subcontents")
+        expected_available_count = len(subcontent_ids) - len(unavailable_subcontent_ids)
+        if metadata.get("available_subcontent_count", expected_available_count) != expected_available_count:
+            errors.append(f"{slug}: available subcontent count mismatch")
         for subcontent_id in subcontent_ids:
             key = (slug, str(subcontent_id))
             if key in seen_subcontents:
@@ -117,6 +124,7 @@ def verify(cache_dir):
         totals["characters"] += len(text)
         totals["bytes"] += len(raw)
         totals["subcontents"] += len(subcontent_ids)
+        totals["unavailable_subcontents"] += len(unavailable_subcontent_ids)
 
     metadata_slugs = {path.stem for path in metadata_dir.glob("*.json")}
     text_slugs = {path.stem for path in text_dir.glob("*.txt")}

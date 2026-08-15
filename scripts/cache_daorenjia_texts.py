@@ -260,6 +260,7 @@ def cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, force=Fals
         parser.feed(f'<div id="content4">{content_html}</div>')
         _, main_text = parser.result()
         text_parts = [main_text]
+        unavailable_subcontent_ids = []
         for nid, parent_id, subcontent_id in subcontents:
             chapter_url = urljoin(
                 MOBILE_API_BASE,
@@ -277,7 +278,8 @@ def cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, force=Fals
             chapter_parser.feed(f'<div id="content4">{chapter_html}</div>')
             _, chapter_text = chapter_parser.result()
             if len(chapter_text.strip()) < 5:
-                raise ValueError(f"subcontent text empty: {subcontent_id}")
+                unavailable_subcontent_ids.append(subcontent_id)
+                continue
             text_parts.append(chapter_text)
 
         text = "\n".join(part.strip() for part in text_parts if part.strip()) + "\n"
@@ -299,6 +301,8 @@ def cache_book_from_mobile_api(book, fetcher, text_dir, metadata_dir, force=Fals
             "fetched_from": api_url,
             "subcontent_ids": [item[2] for item in subcontents],
             "subcontent_count": len(subcontents),
+            "available_subcontent_count": len(subcontents) - len(unavailable_subcontent_ids),
+            "unavailable_subcontent_ids": unavailable_subcontent_ids,
             "subcontent_api": urljoin(MOBILE_API_BASE, "apiscontent.php"),
             "content_type": content_type,
             "parser_version": MOBILE_PARSER_VERSION,
