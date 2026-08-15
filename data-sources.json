@@ -54,6 +54,15 @@
     "notes": "导入前必须确定区域范围并保留 ODbL 署名及衍生数据库义务"
   },
   {
+    "source_id": "daorenjia-reference",
+    "name": "道人家",
+    "category": "classical_text",
+    "url": "https://www.daorenjia.com/",
+    "license": "no-explicit-reuse-license-found",
+    "access_status": "metadata_only_pending_written_permission",
+    "notes": "robots.txt仅限制/build/、/piwik/、/web/，但不构成版权许可；站点说明部分文本来自其他网站、图片来自《中华道藏》电子版。可用于人工检索、书目发现和校勘参考，全文或图片缓存、再发布及商业使用须取得权利人书面授权"
+  },
+  {
     "source_id": "user-local-daozang-pdf",
     "name": "用户工作区内道藏 PDF",
     "category": "classical_text",
