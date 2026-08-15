@@ -1,6 +1,7 @@
 import hashlib
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
@@ -14,6 +15,9 @@ from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
 from app.core.meihua import number_cast as meihua_number_cast
 from app.core.meihua import time_cast as meihua_time_cast
+from app.core.registry import load_rule_registry, load_validation_cases
+from app.core.synthesis import synthesize
+from app.core.validation import run_validation_cases
 
 
 APP_VERSION = "0.1.0"
@@ -45,6 +49,10 @@ class CalculationRequest(BaseModel):
     module: str
     method: str
     input: Dict[str, Any]
+
+
+class ComparisonRequest(BaseModel):
+    calculations: conlist(CalculationRequest, min_items=1, max_items=8)
 
 
 def canonical_hash(value):
@@ -82,6 +90,41 @@ def calculation_envelope(module, method, payload):
         "method": method,
         "input_hash": f"sha256:{input_hash}",
         "result": result,
+        "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+    }
+
+
+def comparison_envelope(calculations):
+    normalized = [
+        calculation.dict() if isinstance(calculation, CalculationRequest) else calculation
+        for calculation in calculations
+    ]
+    normalized = sorted(
+        normalized,
+        key=lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+    )
+    input_hash = canonical_hash({"calculations": normalized})
+    with ThreadPoolExecutor(max_workers=len(normalized)) as executor:
+        futures = [
+            executor.submit(execute, item["module"], item["method"], item["input"])
+            for item in normalized
+        ]
+        results = [future.result() for future in futures]
+    module_results = [
+        {
+            "module": item["module"],
+            "method": item["method"],
+            "input_hash": "sha256:" + canonical_hash(item["input"]),
+            "result": result,
+        }
+        for item, result in zip(normalized, results)
+    ]
+    return {
+        "task_id": "compare_{}".format(input_hash[:24]),
+        "status": "completed",
+        "input_hash": "sha256:" + input_hash,
+        "module_results": module_results,
+        "comparison": synthesize(results),
         "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
     }
 
@@ -139,6 +182,47 @@ def hexagrams():
     return {"data": sorted(rows, key=lambda row: row["ordinal"])}
 
 
+@app.get("/v1/rules")
+def rules(system: Optional[str] = None, status: Optional[str] = None):
+    registry = load_rule_registry()
+    rows = registry["rules"]
+    if system:
+        rows = [rule for rule in rows if rule["system"] == system]
+    if status:
+        rows = [rule for rule in rows if rule["status"] == status]
+    return {
+        "data": rows,
+        "meta": {
+            "registry_id": registry["registry_id"],
+            "qualification": registry["qualification"],
+            "checksum": registry["checksum"],
+            "count": len(rows),
+        },
+    }
+
+
+@app.get("/v1/validation-cases")
+def validation_cases(system: Optional[str] = None):
+    document = load_validation_cases()
+    rows = document["cases"]
+    if system:
+        rows = [case for case in rows if case["system"] == system]
+    return {
+        "data": rows,
+        "meta": {
+            "case_set_id": document["case_set_id"],
+            "qualification": document["qualification"],
+            "checksum": document["checksum"],
+            "count": len(rows),
+        },
+    }
+
+
+@app.post("/v1/validation-cases/run")
+def run_cases():
+    return {"data": run_validation_cases()}
+
+
 @app.post("/v1/calendar/analyze")
 def analyze_calendar(request: CalendarRequest):
     return {"data": calendar_analysis(**request.dict())}
@@ -167,3 +251,8 @@ def cast_meihua_numbers(request: MeihuaNumberRequest):
 @app.post("/v1/calculations/evaluate")
 def evaluate_calculation(request: CalculationRequest):
     return {"data": calculation_envelope(request.module, request.method, request.input)}
+
+
+@app.post("/v1/calculations/compare")
+def compare_calculations(request: ComparisonRequest):
+    return {"data": comparison_envelope(request.calculations)}

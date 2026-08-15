@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import calculation_envelope, canonical_hash, execute
+from app.main import CalculationRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
 
 
 class MvpApiTests(unittest.TestCase):
@@ -37,6 +37,20 @@ class MvpApiTests(unittest.TestCase):
     def test_rejects_unknown_calculation(self):
         with self.assertRaises(ValueError):
             execute("unknown", "method", {})
+
+    def test_comparison_task_is_order_independent(self):
+        first_request = CalculationRequest(
+            module="zhouyi", method="numbers", input={"lower_number": 8, "upper_number": 8}
+        )
+        second_request = CalculationRequest(
+            module="meihua", method="numbers", input={"upper_number": 8, "lower_number": 8}
+        )
+        first = comparison_envelope([first_request, second_request])
+        second = comparison_envelope([second_request, first_request])
+        self.assertEqual(first["task_id"], second["task_id"])
+        self.assertEqual(first["input_hash"], second["input_hash"])
+        self.assertEqual(first["comparison"]["comparable_judgement_count"], 0)
+        self.assertEqual(len(first["module_results"]), 2)
 
 
 if __name__ == "__main__":
