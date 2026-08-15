@@ -23,7 +23,7 @@
 ## 3. 启动服务
 
 ```bash
-./app/corpus_api.py --port 8088
+./scripts/run_corpus_api.sh --port 8088
 ```
 
 默认只监听 `127.0.0.1`。如果绑定到非回环地址，必须设置访问令牌：
@@ -31,7 +31,7 @@
 ```bash
 CORPUS_API_TOKEN='replace-with-secret' \
 CORPUS_API_BIND='0.0.0.0' \
-./app/corpus_api.py
+./scripts/run_corpus_api.sh
 ```
 
 请求使用：

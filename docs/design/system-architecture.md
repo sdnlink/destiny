@@ -430,8 +430,8 @@ MVP规划假设：
 
 ## 17. 技术决策待确认
 
-- 后端语言及框架。
-- 前端框架和组件系统。
+后端已采用Python/FastAPI，前端已采用React/Vite，仓库边界见ADR-003。以下事项仍待确认：
+
 - PostgreSQL、ClickHouse和Redis的托管方式。
 - 任务队列选择。
 - 身份认证自建或外部服务。

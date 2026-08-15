@@ -10,9 +10,30 @@
 - [语料服务说明](./docs/development/corpus-service.md)
 - [MVP计算服务说明](./docs/development/calculation-service.md)
 - [Web推演工作台说明](./docs/development/web-interface.md)
+- [前后端仓库布局决策](./docs/design/decisions/003-frontend-backend-repository-layout.md)
 - [数据导入说明](./docs/data-ingestion.md)
 
+## 仓库结构
+
+```text
+backend/       Python、FastAPI、计算内核和后端测试
+frontend/      React、Vite、Web界面和浏览器测试
+clickhouse/    ClickHouse数据库结构
+data/          前后端共享规则、案例和生成数据
+scripts/       根级启动、采集和数据装载脚本
+docs/          项目计划、设计决策和运行手册
+```
+
+前端只通过HTTP API访问后端。框架代码和依赖分别保存在`frontend/`与`backend/`，共享基础设施不归属任一界面框架。
+
 ## 本地启动
+
+首次安装后端依赖：
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r backend/requirements.txt
+```
 
 启动ClickHouse：
 
@@ -29,7 +50,7 @@ docker-compose up -d clickhouse
 启动内部只读语料API：
 
 ```bash
-./app/corpus_api.py --port 8088
+./scripts/run_corpus_api.sh --port 8088
 ```
 
 启动MVP计算API：
@@ -54,7 +75,7 @@ Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在
 验证：
 
 ```bash
-.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m unittest discover -s backend/tests -v
 ./scripts/run_validation_cases.py
 npm --prefix frontend run build
 npm --prefix frontend run test:browser

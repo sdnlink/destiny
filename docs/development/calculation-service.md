@@ -122,8 +122,8 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 ## 6. 验证
 
 ```bash
-.venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python -m compileall -q app tests
+.venv/bin/python -m unittest discover -s backend/tests -v
+.venv/bin/python -m compileall -q backend/app backend/tests
 ./scripts/run_validation_cases.py
 ```
 

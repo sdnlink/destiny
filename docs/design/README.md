@@ -15,6 +15,7 @@
 
 - [ADR-001：内部语料基础设施](./decisions/001-corpus-foundation.md)
 - [ADR-002：MVP计算与规则工程基线](./decisions/002-mvp-engineering-baseline.md)
+- [ADR-003：前后端仓库布局](./decisions/003-frontend-backend-repository-layout.md)
 
 ## 文档优先级
 
