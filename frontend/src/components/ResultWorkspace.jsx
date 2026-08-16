@@ -503,7 +503,7 @@ function ComparisonView({ comparison }) {
   );
 }
 
-function ExplanationView({ explanation, advisory, literature, imagery, yuanHui }) {
+function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, interpretation }) {
   const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass, liuyao: Grid3X3, liuren: Workflow };
   return (
     <div className="view-stack explanation-view">
@@ -562,6 +562,46 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui }
             <ul>{advisory.risk_notes.map((note) => <li key={note}>{note}</li>)}</ul>
           </section>
         </>
+      )}
+
+      {interpretation && (
+        <section className="data-band correspondence-band">
+          <div className="band-heading">
+            <div><span className="band-icon"><FileSearch size={16} /></span><div><h3>推演对应解释</h3><p>{interpretation.review_status}</p></div></div>
+            <span className="draft-state">解释候选</span>
+          </div>
+          <div className="correspondence-lead">
+            <strong>{interpretation.headline}</strong>
+            <p>{interpretation.summary}</p>
+          </div>
+          <div className="correspondence-list">
+            {interpretation.modules.map((item, index) => (
+              <article key={item.module}>
+                <span className="explanation-index">{index + 1}</span>
+                <div>
+                  <h4>{item.title}</h4>
+                  <dl>
+                    <div><dt>盘面事实</dt><dd>{item.chart_fact}</dd></div>
+                    <div><dt>对应解释</dt><dd>{item.correspondence}</dd></div>
+                    <div><dt>现实核实</dt><dd>{item.verification}</dd></div>
+                  </dl>
+                  <div className="explanation-rules">{item.rule_ids.map((rule) => <code key={rule}>{rule}</code>)}</div>
+                </div>
+              </article>
+            ))}
+          </div>
+          {interpretation.cross_layer.map((item) => (
+            <div className="correspondence-cross" key={item.title}>
+              <strong>{item.title}</strong><p>{item.text}</p>
+              <div className="explanation-rules">{item.rule_ids.map((rule) => <code key={rule}>{rule}</code>)}</div>
+            </div>
+          ))}
+          <div className="correspondence-checks">
+            <strong>本次优先核实</strong>
+            <ol>{interpretation.verification_points.map((point) => <li key={point}>{point}</li>)}</ol>
+          </div>
+          {interpretation.limitations.map((limitation) => <Notice tone="warning" icon={CircleAlert} key={limitation}>{limitation}</Notice>)}
+        </section>
       )}
 
       {yuanHui && (
@@ -765,7 +805,7 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         {activeTab === "liuyao" && <LiuyaoView result={liuyao} />}
         {activeTab === "liuren" && <LiurenView result={liuren} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}
-        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} literature={result.literature} imagery={result.imagery} yuanHui={result.yuan_hui_yun_shi} />}
+        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} literature={result.literature} imagery={result.imagery} yuanHui={result.yuan_hui_yun_shi} interpretation={result.interpretation} />}
       </div>
     </main>
   );
