@@ -7,6 +7,7 @@
 - [详细项目计划](./docs/detailed-project-plan.md)
 - [设计文档索引](./docs/design/README.md)
 - [语料分析报告](./docs/data/corpus-analysis.md)
+- [多来源术数知识库分析](./docs/data/multi-source-corpus-analysis.md)
 - [语料服务说明](./docs/development/corpus-service.md)
 - [MVP计算服务说明](./docs/development/calculation-service.md)
 - [Web推演工作台说明](./docs/development/web-interface.md)
@@ -112,7 +113,9 @@ npm --prefix frontend run test:browser
 - 可用正文：1,522本。
 - 无损文本块：26,681。
 - 字符：32,360,859。
-- 语料哈希：`7e654ac9338c6ed2f88bff5498266320b8aff46a32e475ea3b7c0c8b3bb47755`。
+- 道人家语料哈希：`7e654ac9338c6ed2f88bff5498266320b8aff46a32e475ea3b7c0c8b3bb47755`。
+- Wikisource开放语料哈希：`6b14084be64ffbc3c9f103b414d4361939f538590e713d1bb02e4c98347d2400`。
+- ClickHouse当前共1,541个文档、27,595个文本块、33,466,721字符。
 - 使用范围：`internal_research`。
 
 ## 当前计算基线
