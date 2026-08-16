@@ -15,7 +15,7 @@ from urllib.request import Request, urlopen
 
 
 DOCUMENT_ID_PATTERN = re.compile(r"^[a-z0-9-]+$")
-USAGE_SCOPE = "internal_research"
+USAGE_SCOPE = "source_specific_policy"
 
 
 class ApiError(Exception):
@@ -188,7 +188,8 @@ class CorpusRepository:
             SELECT
               c.chunk_id, c.document_id, c.title, c.category_id, c.chunk_index,
               c.char_start, c.char_end, c.content, c.content_sha256,
-              d.source_url, d.cache_status, d.source_id, d.usage_scope,
+              d.source_url, d.cache_status, d.source_id AS source_id,
+              d.usage_scope AS usage_scope,
               d.license_name, d.license_url, d.attribution_url
             FROM destiny.corpus_chunks AS c
             INNER JOIN destiny.corpus_documents AS d
