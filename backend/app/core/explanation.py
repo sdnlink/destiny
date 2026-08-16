@@ -91,7 +91,8 @@ def _zhouyi_explanation(item):
                 ),
                 "rule_ids": [{
                     "auto": "YI-AUTO-COIN-001", "manual": "YI-MANUAL-001",
-                    "numbers": "YI-NUMBER-001", "time": "YI-TIME-001",
+                    "numbers": "YI-NUMBER-001", "three_numbers": "YI-3NUM-MAPPING-001",
+                    "time": "YI-TIME-001",
                 }[item["method"]]],
             },
             {

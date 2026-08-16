@@ -21,6 +21,7 @@
 - [ADR-006：个体化自动起卦协议](./decisions/006-personalized-auto-casting.md)
 - [ADR-007：术数领域边界与公共卦象核心](./decisions/007-domain-boundaries-and-hexagram-core.md)
 - [ADR-008：统一历法引擎第二阶段基线](./decisions/008-calendar-engine-phase-two.md)
+- [ADR-009：周易三数数字起卦第三阶段基线](./decisions/009-zhouyi-three-number-phase-three.md)
 
 ## 文档优先级
 

@@ -13,7 +13,7 @@
 
 - 显式IANA时区、公农历、节气、四柱和可选真太阳时。
 - 结构化干支、月建、立春生肖、旬空，以及节气绝对时刻的本地时区和UTC表示。
-- 周易手工六爻、双数起卦及本卦、变卦、互卦、错卦、综卦。
+- 周易手工六爻、兼容双数起卦、版本化三数起卦及本卦、变卦、互卦、错卦、综卦。
 - 梅花农历时间起卦、双数起卦、体用和五行关系事实。
 - 周易、梅花、六爻和六壬个体自动排盘；各模块使用独立派生域并支持凭证重放。
 - 规范输入哈希、幂等任务编号、多模块并行计算。
@@ -69,6 +69,7 @@ APP_API_BIND=0.0.0.0 APP_API_TOKEN='replace-me' ./scripts/run_mvp_api.sh
 | `POST` | `/v1/zhouyi/auto` | 周易个体三枚铜钱自动起卦 |
 | `POST` | `/v1/zhouyi/time` | 周易传统农历时间起卦 |
 | `POST` | `/v1/zhouyi/numbers` | 周易双数起卦 |
+| `POST` | `/v1/zhouyi/three-numbers` | 周易三数独立取上卦、下卦和动爻 |
 | `POST` | `/v1/meihua/auto` | 梅花时间结构加个体数起卦 |
 | `POST` | `/v1/meihua/time` | 梅花传统时间起卦 |
 | `POST` | `/v1/meihua/numbers` | 梅花双数起卦 |
@@ -82,6 +83,16 @@ APP_API_BIND=0.0.0.0 APP_API_TOKEN='replace-me' ./scripts/run_mvp_api.sh
 | `POST` | `/v1/calculations/compare` | 最多8个模块并行计算和综合比较 |
 
 OpenAPI文档位于`/docs`，机器契约位于`/openapi.json`。
+
+周易三数示例：
+
+```bash
+curl -X POST http://127.0.0.1:8090/v1/zhouyi/three-numbers \
+  -H 'Content-Type: application/json' \
+  -d '{"numbers":[23,47,5],"mapping_version":"earlier-heaven-number-v1"}'
+```
+
+三数法中第一数取上卦、第二数取下卦、第三数独立取动爻。旧`/v1/zhouyi/numbers`是第一数下卦、第二数上卦、两数之和取动爻的兼容规则，二者不可混用。
 
 个体自动接口除历法参数外必须提交16至128位ASCII `cast_nonce`。同一凭证、时间和规则版本可复算；新起卦应生成新的128位随机凭证。服务只在结果中返回`cast_nonce_hash`，不回传原始凭证。有限卦象空间中不同用户可能自然得到相同本卦，系统以完整爻值、动爻、时间、事项上下文和派生过程区分任务，不强制制造不同卦象。
 

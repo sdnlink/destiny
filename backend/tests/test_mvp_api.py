@@ -4,11 +4,16 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
 from pydantic import ValidationError
 
 
 class MvpApiTests(unittest.TestCase):
+    def test_three_number_api_requires_exactly_three_strict_non_negative_integers(self):
+        for numbers in ([1, 2], [1, 2, 3, 4], [1, True, 3], [1, -2, 3]):
+            with self.subTest(numbers=numbers), self.assertRaises(ValidationError):
+                YiThreeNumberRequest(numbers=numbers)
+
     def test_auto_request_rejects_unsafe_nonce(self):
         with self.assertRaises(ValidationError):
             AutoCastRequest(
@@ -52,6 +57,16 @@ class MvpApiTests(unittest.TestCase):
         self.assertEqual(execute("liuren", "time", calendar)["facts"]["month_general"]["branch"], "午")
         liuren_numbers = dict(calendar, number=12)
         self.assertEqual(execute("liuren", "numbers", liuren_numbers)["facts"]["occupation_time"]["branch"], "亥")
+
+    def test_dispatches_zhouyi_three_number_method(self):
+        payload = {"numbers": [23, 47, 5], "mapping_version": "earlier-heaven-number-v1"}
+        result = execute("zhouyi", "three_numbers", payload)
+        self.assertEqual(result["facts"]["original"]["name"], "艮")
+        self.assertEqual(result["facts"]["changed"]["name"], "渐")
+        explained = comparison_envelope([
+            CalculationRequest(module="zhouyi", method="three_numbers", input=payload),
+        ])
+        self.assertIn("YI-3NUM-MAPPING-001", explained["explanation"]["modules"][0]["sections"][0]["rule_ids"])
 
     def test_dispatches_four_personalized_auto_methods(self):
         payload = {

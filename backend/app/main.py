@@ -18,6 +18,7 @@ from app.core.explanation import explain_calculation_set
 from app.zhouyi import auto_cast as yi_auto_cast
 from app.zhouyi import manual_cast as yi_manual_cast
 from app.zhouyi import number_cast as yi_number_cast
+from app.zhouyi import three_number_cast as yi_three_number_cast
 from app.zhouyi import time_cast as yi_time_cast
 from app.core.interpretation import explain_correspondences
 from app.core.literature import collect_literature_opinions
@@ -62,6 +63,11 @@ class YiManualRequest(BaseModel):
 class YiNumberRequest(BaseModel):
     lower_number: int
     upper_number: int
+
+
+class YiThreeNumberRequest(BaseModel):
+    numbers: conlist(conint(strict=True, ge=0), min_items=3, max_items=3)
+    mapping_version: constr(strip_whitespace=True, min_length=1, max_length=80) = "earlier-heaven-number-v1"
 
 
 class MeihuaNumberRequest(BaseModel):
@@ -121,6 +127,9 @@ def execute(module, method, payload):
     if module == "zhouyi" and method == "numbers":
         request = YiNumberRequest(**payload)
         return yi_number_cast(request.lower_number, request.upper_number)
+    if module == "zhouyi" and method == "three_numbers":
+        request = YiThreeNumberRequest(**payload)
+        return yi_three_number_cast(*request.numbers, mapping_version=request.mapping_version)
     if module == "meihua" and method == "time":
         request = CalendarRequest(**payload)
         return meihua_time_cast(**request.dict())
@@ -333,6 +342,11 @@ def cast_yi_time(request: CalendarRequest):
 @app.post("/v1/zhouyi/numbers")
 def cast_yi_numbers(request: YiNumberRequest):
     return {"data": yi_number_cast(request.lower_number, request.upper_number)}
+
+
+@app.post("/v1/zhouyi/three-numbers")
+def cast_yi_three_numbers(request: YiThreeNumberRequest):
+    return {"data": yi_three_number_cast(*request.numbers, mapping_version=request.mapping_version)}
 
 
 @app.post("/v1/meihua/time")

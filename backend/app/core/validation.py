@@ -2,6 +2,7 @@ from app.calendar import calendar_analysis
 from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
 from app.core.iching import time_cast as yi_time_cast
+from app.zhouyi import three_number_cast as yi_three_number_cast
 from app.core.liuren import number_cast as liuren_number_cast
 from app.core.liuren import time_cast as liuren_time_cast
 from app.core.liuyao import number_cast as liuyao_number_cast
@@ -21,6 +22,8 @@ def execute_validation_case(case):
         return yi_manual_cast(payload["lines"])
     if system == "zhouyi" and method == "numbers":
         return yi_number_cast(payload["lower_number"], payload["upper_number"])
+    if system == "zhouyi" and method == "three_numbers":
+        return yi_three_number_cast(*payload["numbers"], mapping_version=payload.get("mapping_version", "earlier-heaven-number-v1"))
     if system == "zhouyi" and method == "time":
         return yi_time_cast(**payload)
     if system == "meihua" and method == "time":

@@ -21,6 +21,9 @@
         {"rule_id": "YI-RELATION-001", "version": "1.0.0"},
         {"rule_id": "YI-NUMBER-001", "version": "1.0.0"},
         {"rule_id": "YI-NUMBER-002", "version": "1.0.0"},
+        {"rule_id": "YI-3NUM-INPUT-001", "version": "1.0.0"},
+        {"rule_id": "YI-3NUM-MAPPING-001", "version": "1.0.0"},
+        {"rule_id": "YI-3NUM-MOVING-001", "version": "1.0.0"},
         {"rule_id": "YI-TIME-001", "version": "1.0.0"},
         {"rule_id": "YI-AUTO-COIN-001", "version": "1.0.0"},
         {"rule_id": "MH-TIME-001", "version": "1.0.0"},
@@ -146,6 +149,24 @@
       "title": "周易双数取动爻", "purpose": "按两数之和确定动爻", "preconditions": ["输入为整数"],
       "inputs": ["lower_number", "upper_number"], "procedure": ["两数求和", "除以6取余", "余0按6"], "outputs": ["moving_line"],
       "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["属于MVP指定数字起卦法"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:number_cast"
+    },
+    {
+      "rule_id": "YI-3NUM-INPUT-001", "version": "1.0.0", "system": "zhouyi", "school": "three-number-engineering-baseline", "status": "draft",
+      "title": "周易三数角色归一化", "purpose": "将三个非负整数分别固定为上卦、下卦和动爻输入", "preconditions": ["恰好三个非负整数"],
+      "inputs": ["numbers", "mapping_version"], "procedure": ["校验数量和整数类型", "第一数标记为上卦", "第二数标记为下卦", "第三数标记为动爻"], "outputs": ["normalized_input", "roles"],
+      "source_refs": ["docs/design/decisions/009-zhouyi-three-number-phase-three.md"], "limitations": ["负数不进入当前规则", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.zhouyi.models:ThreeNumberInput"
+    },
+    {
+      "rule_id": "YI-3NUM-MAPPING-001", "version": "1.0.0", "system": "zhouyi", "school": "three-number-engineering-baseline", "status": "draft",
+      "title": "周易三数八卦映射", "purpose": "按版本化八卦数字表分别确定上下卦", "preconditions": ["三数角色已归一化", "映射版本存在"],
+      "inputs": ["number1", "number2", "mapping_version"], "procedure": ["分别除以8取余", "余0归8", "按配置读取乾1兑2离3震4巽5坎6艮7坤8"], "outputs": ["upper_trigram", "lower_trigram", "mapping"],
+      "source_refs": ["docs/design/decisions/009-zhouyi-three-number-phase-three.md"], "limitations": ["当前仅发布一个待审核映射版本"], "owner": "unassigned", "reviewers": [], "implementation": "app.zhouyi.config.hexagram_mapping:TrigramNumberMapping"
+    },
+    {
+      "rule_id": "YI-3NUM-MOVING-001", "version": "1.0.0", "system": "zhouyi", "school": "three-number-engineering-baseline", "status": "draft",
+      "title": "周易第三数取动爻", "purpose": "由第三个数字独立确定动爻", "preconditions": ["第三数为非负整数"],
+      "inputs": ["number3"], "procedure": ["除以6取余", "余0归6"], "outputs": ["moving_line"],
+      "source_refs": ["docs/design/decisions/009-zhouyi-three-number-phase-three.md"], "limitations": ["不使用前两数之和", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.zhouyi.engine:three_number_cast"
     },
     {
       "rule_id": "YI-TIME-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",

@@ -34,6 +34,12 @@
       "tags": ["boundary", "numbers", "remainder-zero"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
     },
     {
+      "case_id": "case_yi_0004", "system": "zhouyi", "school": "three-number-engineering-baseline", "method": "three_numbers", "title": "三数独立取上下卦与动爻",
+      "input": {"numbers": [23, 47, 5], "mapping_version": "earlier-heaven-number-v1"},
+      "expected": {"rule_version": "zhouyi-three-number-v1.0.0", "facts": {"method": "three_numbers", "upper_trigram": {"name": "艮"}, "lower_trigram": {"name": "艮"}, "moving_line": 5, "original": {"ordinal": 52, "name": "艮"}, "changed": {"ordinal": 53, "name": "渐"}}},
+      "tags": ["basic", "three-numbers", "independent-moving-line"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/009-zhouyi-three-number-phase-three.md"], "reviewers": []
+    },
+    {
       "case_id": "case_mh_0001", "system": "meihua", "school": "mvp-engineering-baseline", "method": "time", "title": "2026年农历时间起卦基线",
       "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
       "expected": {"facts": {"original": {"ordinal": 10, "name": "履"}, "changed": {"ordinal": 25, "name": "无妄"}, "moving_line": 2, "body_use": {"body_position": "upper", "use_position": "lower"}}},

@@ -59,3 +59,15 @@ def test_calendar_domain_does_not_import_legacy_core_modules():
             if isinstance(node, ast.ImportFrom) and node.module
         }
         assert not any(module == "app.core" or module.startswith("app.core.") for module in modules), path.name
+
+
+def test_zhouyi_domain_does_not_import_other_divination_systems():
+    forbidden = ("app.meihua", "app.liuyao", "app.daliuren")
+    for path in (APP_ROOT / "zhouyi").rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        modules = {
+            node.module
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom) and node.module
+        }
+        assert not any(module == prefix or module.startswith(prefix + ".") for module in modules for prefix in forbidden), path.name
