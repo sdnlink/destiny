@@ -2508,6 +2508,142 @@ select:focus {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.yuanhui-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.yuanhui-grid > div {
+  min-height: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 12px 16px;
+  border-right: 1px solid var(--line);
+}
+
+.yuanhui-grid > div:last-child {
+  border-right: 0;
+}
+
+.yuanhui-grid span,
+.yuanhui-grid small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.yuanhui-grid strong {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 17px;
+}
+
+.yuanhui-meta {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.yuanhui-meta code,
+.yuanhui-evidence code,
+.imagery-row code {
+  color: #39766d;
+  font-size: 9px;
+}
+
+.yuanhui-evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.yuanhui-evidence > div {
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.yuanhui-evidence > div:nth-child(odd) {
+  padding-right: 14px;
+}
+
+.yuanhui-evidence > div:nth-child(even) {
+  padding-left: 14px;
+  border-left: 1px solid var(--line);
+}
+
+.yuanhui-evidence strong,
+.yuanhui-evidence span {
+  font-size: 10px;
+}
+
+.imagery-list {
+  border-top: 1px solid var(--line);
+}
+
+.imagery-row {
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.imagery-symbol {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  background: #f2f0e9;
+}
+
+.imagery-symbol strong {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 18px;
+}
+
+.imagery-symbol span,
+.imagery-role {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.imagery-row p {
+  margin: 5px 0 0;
+  color: #4c5550;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.relative-summary {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.relative-summary strong {
+  color: var(--ink);
+}
+
 @media (max-width: 1180px) {
   .app-navigation {
     width: 68px;
@@ -2732,6 +2868,28 @@ select:focus {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .yuanhui-grid,
+  .yuanhui-evidence {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .yuanhui-grid > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .yuanhui-grid > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .yuanhui-evidence > div,
+  .yuanhui-evidence > div:nth-child(odd),
+  .yuanhui-evidence > div:nth-child(even) {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 9px 8px;
+    border-left: 0;
+  }
+
   .four-lessons > div:nth-child(2) {
     border-right: 0;
   }
@@ -2880,6 +3038,45 @@ select:focus {
   .book-application {
     grid-template-columns: 1fr;
     gap: 5px;
+  }
+
+  .yuanhui-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .yuanhui-grid > div,
+  .yuanhui-grid > div:nth-child(2) {
+    min-height: 74px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .yuanhui-meta,
+  .relative-summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 0;
+  }
+
+  .imagery-row {
+    grid-template-columns: 48px minmax(0, 1fr);
+    padding: 9px 0;
+  }
+
+  .imagery-row > code {
+    grid-column: 2;
+  }
+
+  .yuanhui-band .band-heading,
+  .imagery-band .band-heading {
+    flex-direction: column;
+  }
+
+  .yuanhui-band .version-badge,
+  .imagery-band .version-badge {
+    width: 100%;
+    max-width: 100%;
   }
 
   .explanation-lead {

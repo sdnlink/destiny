@@ -39,6 +39,12 @@ const CATEGORY_LABELS = {
   other: "其他",
 };
 const SCENE_LABELS = { combined: "综合推演", zhouyi: "周易", meihua: "梅花易数", liuyao: "六爻", liuren: "大六壬" };
+const IMAGERY_MODULE_LABELS = { zhouyi: "周易", meihua: "梅花", liuyao: "六爻", liuren: "六壬" };
+const IMAGERY_STAGE_LABELS = { original: "本盘", changed: "变盘" };
+const IMAGERY_ROLE_LABELS = {
+  upper_trigram: "上卦", lower_trigram: "下卦", body: "体卦", use: "用卦", changed_use: "变卦之用",
+  palace: "卦宫", month_general: "月将", initial_transmission: "初传", middle_transmission: "中传", final_transmission: "末传",
+};
 
 function findModule(result, module) {
   return result?.module_results?.find((item) => item.module === module)?.result;
@@ -497,7 +503,7 @@ function ComparisonView({ comparison }) {
   );
 }
 
-function ExplanationView({ explanation, advisory, literature }) {
+function ExplanationView({ explanation, advisory, literature, imagery, yuanHui }) {
   const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass, liuyao: Grid3X3, liuren: Workflow };
   return (
     <div className="view-stack explanation-view">
@@ -556,6 +562,59 @@ function ExplanationView({ explanation, advisory, literature }) {
             <ul>{advisory.risk_notes.map((note) => <li key={note}>{note}</li>)}</ul>
           </section>
         </>
+      )}
+
+      {yuanHui && (
+        <section className="data-band yuanhui-band">
+          <div className="band-heading">
+            <div><span className="band-icon"><Clock3 size={16} /></span><div><h3>元会运世</h3><p>{yuanHui.status}</p></div></div>
+            <span className="version-badge">{yuanHui.rule_version}</span>
+          </div>
+          <div className="yuanhui-grid">
+            {[["元", yuanHui.facts.yuan], ["会", yuanHui.facts.hui], ["运", yuanHui.facts.yun], ["世", yuanHui.facts.shi]].map(([label, period]) => (
+              <div key={label}>
+                <span>{label}</span><strong>{period.label}{label === "会" ? ` · ${period.branch}${period.element}` : ""}</strong>
+                <small>{period.start_year} 至 {period.end_year}</small>
+              </div>
+            ))}
+          </div>
+          <div className="yuanhui-meta">
+            <span>世内第 {yuanHui.facts.shi.year_in_shi} 年</span>
+            <span>纪元：{yuanHui.facts.epoch.label}</span>
+            <code>YHYS-CYCLE-001</code>
+          </div>
+          <div className="yuanhui-evidence">
+            {yuanHui.evidence.map((item) => (
+              <div key={item.evidence_id}><strong>{item.module} · {item.role}</strong><span>{item.label}</span><code>{item.rule_ids.join(" · ")}</code></div>
+            ))}
+          </div>
+          {yuanHui.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
+        </section>
+      )}
+
+      {imagery && (
+        <section className="data-band imagery-band">
+          <div className="band-heading">
+            <div><span className="band-icon"><Layers3 size={16} /></span><div><h3>类象关联</h3><p>{imagery.context.priority_dimensions.join(" · ")} · {imagery.status}</p></div></div>
+            <span className="version-badge">{imagery.rule_version}</span>
+          </div>
+          <div className="imagery-list">
+            {imagery.candidates.map((candidate) => (
+              <div className="imagery-row" key={candidate.candidate_id}>
+                <div className="imagery-symbol"><strong>{candidate.symbol}</strong><span>{candidate.element}</span></div>
+                <div>
+                  <span className="imagery-role">{IMAGERY_MODULE_LABELS[candidate.module]} · {IMAGERY_STAGE_LABELS[candidate.stage]} · {IMAGERY_ROLE_LABELS[candidate.role]}</span>
+                  <p>{Object.entries(candidate.selected_imagery).map(([dimension, values]) => `${dimension}：${values.join("、")}`).join("；")}</p>
+                </div>
+                <code>{candidate.rule_ids.join(" · ")}</code>
+              </div>
+            ))}
+          </div>
+          {Object.keys(imagery.liuyao_relative_summary).length > 0 && (
+            <div className="relative-summary"><strong>六爻六亲分布</strong><span>{Object.entries(imagery.liuyao_relative_summary).map(([name, count]) => `${name} ${count}`).join(" · ")}</span></div>
+          )}
+          {imagery.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
+        </section>
       )}
 
       <section className="data-band literature-band">
@@ -706,7 +765,7 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         {activeTab === "liuyao" && <LiuyaoView result={liuyao} />}
         {activeTab === "liuren" && <LiurenView result={liuren} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}
-        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} literature={result.literature} />}
+        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} literature={result.literature} imagery={result.imagery} yuanHui={result.yuan_hui_yun_shi} />}
       </div>
     </main>
   );
