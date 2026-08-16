@@ -245,12 +245,11 @@ def _liuren_explanation(item):
         transmission_text = "三传为{}，课体路径为{}。".format("、".join(transmissions["transmissions"]), transmissions["lesson_type"])
     else:
         transmission_text = "本课进入{}路径，首版未生成三传。".format(transmissions["pending_path"])
-    transmission_rule = (
-        "LR-REMOTE-001" if transmissions["lesson_type"] == "遥克" else
-        "LR-STAR-001" if transmissions["lesson_type"] == "昴星" else
-        "LR-COVERAGE-001" if transmissions["status"] != "completed" else
-        "LR-TRANSMISSION-001"
-    )
+    transmission_rule = {
+        "涉害": "LR-SHEHAI-001", "遥克": "LR-REMOTE-001", "昴星": "LR-STAR-001",
+        "别责": "LR-BIEZE-001", "八专": "LR-BAZHUAN-001", "伏吟": "LR-FUYIN-001",
+        "返吟": "LR-FANYIN-001",
+    }.get(transmissions["lesson_type"], "LR-COVERAGE-001" if transmissions["status"] != "completed" else "LR-TRANSMISSION-001")
     hour_rules = {"auto": "LR-AUTO-REPORT-001", "time": "LR-HOUR-001", "numbers": "LR-NUMBER-001"}
     return {
         "module": "liuren",

@@ -9,8 +9,9 @@ from app.common.ganzhi import (
 
 from .models import OccupationNumberInput, PlateInput
 from .rules import (
-    HEAVENLY_GENERALS, MONTH_GENERALS, NOBLE_BRANCHES, STEM_LODGES,
-    TRANSMISSION_COVERAGE,
+    BRANCH_CLASHES, BRANCH_PUNISHMENTS, HEAVENLY_GENERALS, JI_BRANCHES,
+    LODGED_STEMS_BY_BRANCH, MENG_BRANCHES, MONTH_GENERALS, NOBLE_BRANCHES,
+    STEM_COMBINATIONS, STEM_LODGES, TRANSMISSION_COVERAGE, ZHONG_BRANCHES,
 )
 
 
@@ -71,11 +72,13 @@ def _four_lessons(day_pillar, plate):
     ]
 
 
-def _unique_candidates(lessons, relation):
+def _candidate_lessons(lessons, relation):
     result = []
+    seen = set()
     for lesson in lessons:
-        if lesson["relation"] == relation and lesson["upper"] not in result:
-            result.append(lesson["upper"])
+        if lesson["relation"] == relation and lesson["upper"] not in seen:
+            seen.add(lesson["upper"])
+            result.append(lesson)
     return result
 
 
@@ -104,6 +107,83 @@ def _completed_transmissions(initial, plate, lesson_type, source_path, candidate
     }
 
 
+def _path_between(start, destination):
+    start_index = EARTHLY_BRANCHES.index(start)
+    distance_to_destination = (EARTHLY_BRANCHES.index(destination) - start_index) % 12 or 12
+    return [
+        EARTHLY_BRANCHES[(start_index + distance) % 12]
+        for distance in range(1, distance_to_destination)
+    ]
+
+
+def _shehai_depth(lesson):
+    lower_ground = STEM_LODGES.get(lesson["lower"], lesson["lower"])
+    upper = lesson["upper"]
+    upper_element = BRANCH_ELEMENTS[upper]
+    encounters = []
+    for ground in _path_between(lower_ground, upper):
+        local_symbols = (ground,) + LODGED_STEMS_BY_BRANCH[ground]
+        for symbol in local_symbols:
+            local_element = STEM_ELEMENTS.get(symbol, BRANCH_ELEMENTS.get(symbol))
+            is_harm = (
+                FIVE_ELEMENTS_CONTROLS[local_element] == upper_element
+                if lesson["relation"] == "lower_controls_upper"
+                else FIVE_ELEMENTS_CONTROLS[upper_element] == local_element
+            )
+            if is_harm:
+                encounters.append({"ground": ground, "symbol": symbol, "element": local_element})
+    return {
+        "upper": upper, "lesson_sequence": lesson["sequence"], "lower_ground": lower_ground,
+        "depth": len(encounters), "encounters": encounters,
+    }
+
+
+def _season_rank(branch):
+    if branch in MENG_BRANCHES:
+        return 0
+    if branch in ZHONG_BRANCHES:
+        return 1
+    if branch in JI_BRANCHES:
+        return 2
+    raise ValueError("unknown branch season position")
+
+
+def _shehai_transmissions(day_pillar, plate, candidate_lessons, source_path):
+    depths = [_shehai_depth(lesson) for lesson in candidate_lessons]
+    deepest = max(item["depth"] for item in depths)
+    finalists = [item for item in depths if item["depth"] == deepest]
+    trace = [
+        "{}比用仍有多候选，逐一归本家计算涉害深度：{}".format(
+            source_path, {item["upper"]: item["depth"] for item in depths}
+        )
+    ]
+    subtype = "涉害"
+    if len(finalists) > 1:
+        best_rank = min(_season_rank(item["lower_ground"]) for item in finalists)
+        finalists = [item for item in finalists if _season_rank(item["lower_ground"]) == best_rank]
+        subtype = "见机" if best_rank == 0 else "察微"
+        trace.append("深度相同，按孟仲季取当前地盘层级{}".format(finalists[0]["lower_ground"]))
+    if len(finalists) > 1:
+        preferred = (1, 2) if polarity(day_pillar[0]) == "阳" else (3, 4)
+        preferred_finalists = [item for item in finalists if item["lesson_sequence"] in preferred]
+        if preferred_finalists:
+            finalists = preferred_finalists
+        subtype = "缀瑕"
+        trace.append("深度和孟仲季复等，{}日取{}课先见".format(
+            "刚" if polarity(day_pillar[0]) == "阳" else "柔", "日" if preferred == (1, 2) else "辰"
+        ))
+    selected = min(finalists, key=lambda item: item["lesson_sequence"])
+    trace.append("取{}课上神{}为初传，涉害{}重".format(
+        selected["lesson_sequence"], selected["upper"], selected["depth"]
+    ))
+    result = _completed_transmissions(
+        selected["upper"], plate, "涉害", subtype,
+        [item["upper"] for item in depths], trace,
+    )
+    result["candidate_depths"] = depths
+    return result
+
+
 def _unsupported(path, candidates, trace, reason):
     return {
         "status": "pending_rule_selection", "lesson_type": path, "source_path": path,
@@ -113,24 +193,22 @@ def _unsupported(path, candidates, trace, reason):
 
 
 def _direct_transmissions(day_pillar, plate, lessons):
-    candidates = _unique_candidates(lessons, "lower_controls_upper")
+    candidates = _candidate_lessons(lessons, "lower_controls_upper")
     source_path = "贼克" if candidates else None
     if not candidates:
-        candidates = _unique_candidates(lessons, "upper_controls_lower")
+        candidates = _candidate_lessons(lessons, "upper_controls_lower")
         source_path = "克" if candidates else None
     if not candidates:
         return None
-    trace = ["检查四课上下克，{}候选为{}".format(source_path, candidates)]
+    candidate_branches = [lesson["upper"] for lesson in candidates]
+    trace = ["检查四课上下克，{}候选为{}".format(source_path, candidate_branches)]
     if len(candidates) == 1:
-        return _completed_transmissions(candidates[0], plate, source_path, source_path, candidates, trace)
-    selected = _select_by_day_polarity(candidates, day_pillar[0])
+        return _completed_transmissions(candidate_branches[0], plate, source_path, source_path, candidate_branches, trace)
+    selected = _select_by_day_polarity(candidate_branches, day_pillar[0])
     if selected is not None:
         trace.append("多课有克，取与日干阴阳相同的{}为比用".format(selected))
-        return _completed_transmissions(selected, plate, "比用", source_path, candidates, trace)
-    return _unsupported(
-        "涉害", candidates, trace + ["比用后仍有多个候选，进入涉害"],
-        "涉害深浅、孟仲季及复等规则尚未完成标准案例签署",
-    )
+        return _completed_transmissions(selected, plate, "比用", source_path, candidate_branches, trace)
+    return _shehai_transmissions(day_pillar, plate, candidates, source_path)
 
 
 def _remote_transmissions(day_pillar, plate, lessons):
@@ -185,25 +263,128 @@ def _plate_offset(plate):
     return (EARTHLY_BRANCHES.index(plate["子"]) - EARTHLY_BRANCHES.index("子")) % 12
 
 
+def _branch_shift(branch, distance):
+    return EARTHLY_BRANCHES[(EARTHLY_BRANCHES.index(branch) + distance) % 12]
+
+
+def _bieze_transmissions(day_pillar, plate, lessons):
+    stem, branch = day_pillar
+    day_upper = lessons[0]["upper"]
+    if polarity(stem) == "阳":
+        combined_stem = STEM_COMBINATIONS[stem]
+        combined_lodge = STEM_LODGES[combined_stem]
+        initial = plate[combined_lodge]
+        source_path = "刚日干合"
+        trace = ["三课无克无遥，刚日{}与{}合，取寄宫{}上神{}为初传".format(
+            stem, combined_stem, combined_lodge, initial
+        )]
+    else:
+        initial = _branch_shift(branch, 4)
+        source_path = "柔日支前三合"
+        trace = ["三课无克无遥，柔日支{}取前三合{}为初传".format(branch, initial)]
+    trace.append("别责中末传均取日上神{}".format(day_upper))
+    return {
+        "status": "completed", "lesson_type": "别责", "source_path": source_path,
+        "candidates": [initial], "transmissions": [initial, day_upper, day_upper], "trace": trace,
+    }
+
+
+def _bazhuan_transmissions(day_pillar, lessons):
+    day_upper = lessons[0]["upper"]
+    if polarity(day_pillar[0]) == "阳":
+        source = day_upper
+        initial = _branch_shift(source, 2)
+        source_path = "阳日顺数三位"
+    else:
+        source = lessons[3]["upper"]
+        initial = _branch_shift(source, -2)
+        source_path = "阴日逆数三位"
+    return {
+        "status": "completed", "lesson_type": "八专", "source_path": source_path,
+        "candidates": [initial], "transmissions": [initial, day_upper, day_upper],
+        "trace": ["八专无克，{}从{}连本位数至{}为初传".format(source_path, source, initial),
+                  "八专中末传均取日上神{}".format(day_upper)],
+    }
+
+
+def _fuyin_transmissions(day_pillar, plate, lessons):
+    stem, branch = day_pillar
+    candidates = _candidate_lessons(lessons, "lower_controls_upper")
+    source_path = "伏吟有克"
+    if not candidates:
+        candidates = _candidate_lessons(lessons, "upper_controls_lower")
+    if candidates:
+        candidate_branches = [lesson["upper"] for lesson in candidates]
+        initial = candidate_branches[0] if len(candidates) == 1 else _select_by_day_polarity(candidate_branches, stem)
+        if initial is None:
+            selected = _shehai_transmissions(day_pillar, plate, candidates, "伏吟有克")
+            initial = selected["transmissions"][0]
+        origin = "day" if next(lesson for lesson in candidates if lesson["upper"] == initial)["sequence"] <= 2 else "branch"
+    elif polarity(stem) == "阳":
+        initial = lessons[0]["upper"]
+        origin = "day"
+        source_path = "自任"
+    else:
+        initial = branch
+        origin = "branch"
+        source_path = "自信"
+
+    if BRANCH_PUNISHMENTS[initial] == initial:
+        middle = branch if origin == "day" else lessons[0]["upper"]
+        trace = ["{}取{}为初传；初传自刑，改取{}为中传".format(source_path, initial, middle)]
+        subtype = "杜传"
+    else:
+        middle = BRANCH_PUNISHMENTS[initial]
+        trace = ["{}取{}为初传，所刑{}为中传".format(source_path, initial, middle)]
+        subtype = source_path
+    next_punishment = BRANCH_PUNISHMENTS[middle]
+    if next_punishment in (initial, middle):
+        final = BRANCH_CLASHES[middle]
+        trace.append("中传刑神重复，取中传所冲{}为末传".format(final))
+        subtype = "杜传"
+    else:
+        final = next_punishment
+        trace.append("取中传所刑{}为末传".format(final))
+    return {
+        "status": "completed", "lesson_type": "伏吟", "source_path": subtype,
+        "candidates": [initial], "transmissions": [initial, middle, final], "trace": trace,
+    }
+
+
+def _fanyin_transmissions(day_pillar, plate, lessons):
+    branch = day_pillar[1]
+    diagonal = _branch_shift(branch, 4)
+    initial = plate[diagonal]
+    middle = lessons[2]["upper"]
+    final = lessons[0]["upper"]
+    return {
+        "status": "completed", "lesson_type": "返吟", "source_path": "井栏射",
+        "candidates": [initial], "transmissions": [initial, middle, final],
+        "trace": ["返吟无克，日支{}斜射{}上神{}为初传".format(branch, diagonal, initial),
+                  "井栏射取辰上神{}为中传、日上神{}为末传".format(middle, final)],
+    }
+
+
 def _three_transmissions(day_pillar, plate, lessons):
+    offset = _plate_offset(plate)
+    if offset == 0:
+        return _fuyin_transmissions(day_pillar, plate, lessons)
+
     direct = _direct_transmissions(day_pillar, plate, lessons)
     if direct is not None:
         return direct
 
-    offset = _plate_offset(plate)
     lesson_count = _unique_lesson_count(lessons)
-    if offset == 0:
-        return _unsupported("伏吟", [], ["天地盘同位且四课无上下克，进入伏吟"], "伏吟刑、冲递传规则待标准案例签署")
     if offset == 6:
-        return _unsupported("返吟", [], ["天地盘相冲且四课无上下克，进入返吟井栏"], "返吟井栏规则待六日标准案例签署")
+        return _fanyin_transmissions(day_pillar, plate, lessons)
     if lesson_count == 2:
-        return _unsupported("八专", [], ["四课去重后仅二课且无上下克，进入八专"], "八专顺逆三位规则待标准案例签署")
+        return _bazhuan_transmissions(day_pillar, lessons)
 
     remote = _remote_transmissions(day_pillar, plate, lessons)
     if remote is not None:
         return remote
     if lesson_count == 3:
-        return _unsupported("别责", [], ["四课去重后三课且无克无遥，进入别责"], "别责刚日干合、柔日支前三合规则待标准案例签署")
+        return _bieze_transmissions(day_pillar, plate, lessons)
     return _star_transmissions(day_pillar, plate, lessons)
 
 
@@ -224,6 +405,14 @@ def _heavenly_generals(day_stem, plate, hour, day_period):
 
 def _coverage_report():
     return [dict(item) for item in TRANSMISSION_COVERAGE]
+
+
+def _transmission_rule_id(transmissions):
+    return {
+        "涉害": "LR-SHEHAI-001", "遥克": "LR-REMOTE-001", "昴星": "LR-STAR-001",
+        "别责": "LR-BIEZE-001", "八专": "LR-BAZHUAN-001", "伏吟": "LR-FUYIN-001",
+        "返吟": "LR-FANYIN-001",
+    }.get(transmissions["lesson_type"], "LR-COVERAGE-001" if transmissions["status"] != "completed" else "LR-TRANSMISSION-001")
 
 
 def _cast(local_datetime, timezone, occupation_branch=None, occupation_number=None,
@@ -290,10 +479,7 @@ def _cast(local_datetime, timezone, occupation_branch=None, occupation_number=No
             {"sequence": 3, "operation": "derive_three_transmissions",
              "inputs": {"four_lessons": lessons, "day_pillar": day_pillar, "plate_offset": _plate_offset(plate)},
              "output": transmissions,
-             "rule_ids": (["LR-REMOTE-001"] if transmissions["lesson_type"] == "遥克" else
-                          ["LR-STAR-001"] if transmissions["lesson_type"] == "昴星" else
-                          ["LR-COVERAGE-001"] if transmissions["status"] != "completed" else
-                          ["LR-TRANSMISSION-001"])},
+             "rule_ids": [_transmission_rule_id(transmissions)]},
             {"sequence": 4, "operation": "derive_generals_void_and_coverage",
              "inputs": {"day_pillar": day_pillar, "civil_hour": hour},
              "output": {"heavenly_generals": generals, "xun": xun, "coverage": _coverage_report()},

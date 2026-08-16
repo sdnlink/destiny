@@ -37,7 +37,7 @@ def test_rule_configuration_is_read_only_and_lists_every_required_path():
     paths = {item["path"]: item["status"] for item in TRANSMISSION_COVERAGE}
     assert set(paths) == {"贼克", "克", "比用", "涉害", "遥克", "昴星", "别责", "八专", "伏吟", "返吟"}
     assert paths["遥克"] == "implemented_engineering_baseline"
-    assert paths["涉害"] == "pending_rule_selection"
+    assert all(status == "implemented_engineering_baseline" for status in paths.values())
 
 
 def test_existing_direct_control_case_remains_replayable():
@@ -69,21 +69,21 @@ def test_star_method_uses_yin_day_downward_rule():
 
 
 @pytest.mark.parametrize(
-    "expected_path,local_datetime,number",
+    "expected_path,local_datetime,number,expected_source,expected_transmissions",
     (
-        ("涉害", "2026-01-01T12:00:00", 6),
-        ("别责", "2026-01-23T12:00:00", 3),
-        ("八专", "2026-02-02T12:00:00", 2),
-        ("伏吟", "2026-01-02T12:00:00", 2),
-        ("返吟", "2026-01-03T12:00:00", 8),
+        ("涉害", "2026-01-01T12:00:00", 6, "见机", ["未", "卯", "亥"]),
+        ("别责", "2026-01-23T12:00:00", 3, "柔日支前三合", ["丑", "巳", "巳"]),
+        ("八专", "2026-02-02T12:00:00", 2, "阴日逆数三位", ["卯", "午", "午"]),
+        ("伏吟", "2026-01-02T12:00:00", 2, "自任", ["巳", "申", "寅"]),
+        ("返吟", "2026-01-03T12:00:00", 8, "井栏射", ["亥", "未", "丑"]),
     ),
 )
-def test_unsigned_special_paths_are_identified_without_fabricated_transmissions(expected_path, local_datetime, number):
+def test_special_paths_have_replayable_transmissions(expected_path, local_datetime, number, expected_source, expected_transmissions):
     transmissions = number_cast(number, local_datetime, TZ)["facts"]["three_transmissions"]
-    assert transmissions["status"] == "pending_rule_selection"
-    assert transmissions["pending_path"] == expected_path
-    assert transmissions["transmissions"] == []
-    assert transmissions["reason"]
+    assert transmissions["status"] == "completed"
+    assert transmissions["lesson_type"] == expected_path
+    assert transmissions["source_path"] == expected_source
+    assert transmissions["transmissions"] == expected_transmissions
 
 
 def test_result_contains_versions_normalized_input_trace_and_rule_steps():

@@ -53,6 +53,11 @@
         {"rule_id": "LR-REMOTE-001", "version": "1.0.0"},
         {"rule_id": "LR-STAR-001", "version": "1.0.0"},
         {"rule_id": "LR-COVERAGE-001", "version": "1.0.0"},
+        {"rule_id": "LR-SHEHAI-001", "version": "1.0.0"},
+        {"rule_id": "LR-BIEZE-001", "version": "1.0.0"},
+        {"rule_id": "LR-BAZHUAN-001", "version": "1.0.0"},
+        {"rule_id": "LR-FUYIN-001", "version": "1.0.0"},
+        {"rule_id": "LR-FANYIN-001", "version": "1.0.0"},
         {"rule_id": "LR-GENERAL-001", "version": "1.0.0"},
         {"rule_id": "XIANG-TRIGRAM-001", "version": "1.0.0"},
         {"rule_id": "XIANG-BRANCH-001", "version": "1.0.0"},
@@ -321,9 +326,39 @@
     },
     {
       "rule_id": "LR-COVERAGE-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬发传覆盖矩阵", "purpose": "逐类报告发传路径实现状态并禁止未签署路径生成三传", "preconditions": ["四课和天地盘已确定"],
-      "inputs": ["day_pillar", "four_lessons", "heaven_plate"], "procedure": ["识别十种结果路径", "读取路径覆盖状态", "未签署路径返回pending_rule_selection和空三传"], "outputs": ["transmission_coverage", "pending_path", "reason"],
-      "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["涉害、别责、八专、伏吟、返吟尚未实现发传值"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_three_transmissions"
+      "title": "大六壬发传覆盖矩阵", "purpose": "逐类报告发传路径的规则版本和实现状态", "preconditions": ["四课和天地盘已确定"],
+      "inputs": ["day_pillar", "four_lessons", "heaven_plate"], "procedure": ["识别十种结果路径", "读取各路径规则编号和状态", "输出完整覆盖矩阵"], "outputs": ["transmission_coverage"],
+      "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["全部路径仍为待专家签署的工程基线"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_coverage_report"
+    },
+    {
+      "rule_id": "LR-SHEHAI-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
+      "title": "大六壬涉害发传", "purpose": "比用后仍有多个候选时按归本家沿途克位深浅确定初传", "preconditions": ["贼克或克候选经比用仍不唯一"],
+      "inputs": ["day_pillar", "candidate_lessons", "heaven_plate"], "procedure": ["从候选上神当前地盘位置前行至本宫前", "按上下克方向累计地支和寄干克位", "取涉害最深者", "深度相同按孟仲季，再复等取刚日日课或柔日辰课先见"], "outputs": ["candidate_depths", "source_path", "three_transmissions", "trace"],
+      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00174", "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00176", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["孟仲季和复等采用《六壬大全》订讹口径"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_shehai_transmissions"
+    },
+    {
+      "rule_id": "LR-BIEZE-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
+      "title": "大六壬别责发传", "purpose": "三课无克无遥时按刚柔日分别取初传", "preconditions": ["四课去重为三课", "无上下克和遥克"],
+      "inputs": ["day_pillar", "four_lessons", "heaven_plate"], "procedure": ["刚日取干合之干寄宫上神", "柔日取日支前三合", "中末传均取日上神"], "outputs": ["source_path", "three_transmissions", "trace"],
+      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00180", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["柔日按原文直接取支前三合，不取该支上神"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_bieze_transmissions"
+    },
+    {
+      "rule_id": "LR-BAZHUAN-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
+      "title": "大六壬八专发传", "purpose": "干支同位两课无克时按阴阳日顺逆三位发传", "preconditions": ["四课去重为两课", "无上下克"],
+      "inputs": ["day_pillar", "four_lessons"], "procedure": ["阳日从日阳神连本位顺数三位", "阴日从辰阴神连本位逆数三位", "中末传均取日上神"], "outputs": ["source_path", "three_transmissions", "trace"],
+      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00181", "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00182", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["论克不论遥，存在上下克时仍按基础克法"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_bazhuan_transmissions"
+    },
+    {
+      "rule_id": "LR-FUYIN-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
+      "title": "大六壬伏吟发传", "purpose": "天地盘同位时按有克、自任、自信及杜传规则生成三传", "preconditions": ["天地盘同位"],
+      "inputs": ["day_pillar", "four_lessons"], "procedure": ["有克按克取初传", "无克刚日取日上神、柔日取日支", "按刑递取中末", "遇自刑或刑神重复时按日辰与冲神处理"], "outputs": ["source_path", "three_transmissions", "trace"],
+      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00182", "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00184", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["刑序采用《六壬大全》订讹口径"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_fuyin_transmissions"
+    },
+    {
+      "rule_id": "LR-FANYIN-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
+      "title": "大六壬返吟井栏射", "purpose": "天地盘相冲且无上下克时按井栏射生成三传", "preconditions": ["天地盘偏移六位", "四课无上下克"],
+      "inputs": ["day_pillar", "four_lessons", "heaven_plate"], "procedure": ["日支斜射前三合位置上神为初传", "辰上神为中传", "日上神为末传"], "outputs": ["source_path", "three_transmissions", "trace"],
+      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00185", "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00186", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["井栏射只发生于丁己辛丑未六日；有克仍按基础克法"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_fanyin_transmissions"
     },
     {
       "rule_id": "LR-GENERAL-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",

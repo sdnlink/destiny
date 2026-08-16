@@ -112,10 +112,34 @@
       "tags": ["remote-control", "haoshi", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
     },
     {
-      "case_id": "case_lr_0005", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "numbers", "title": "大六壬涉害未签署不得猜测",
+      "case_id": "case_lr_0005", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "numbers", "title": "大六壬涉害见机基线",
       "input": {"number": 6, "local_datetime": "2026-01-01T12:00:00", "timezone": "Asia/Shanghai"},
-      "expected": {"facts": {"three_transmissions": {"status": "pending_rule_selection", "pending_path": "涉害", "transmissions": []}}},
-      "tags": ["coverage-boundary", "shehai", "no-fabrication"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
+      "expected": {"facts": {"three_transmissions": {"status": "completed", "lesson_type": "涉害", "source_path": "见机", "transmissions": ["未", "卯", "亥"]}}},
+      "tags": ["shehai", "jianji", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0006", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "numbers", "title": "大六壬别责柔日基线",
+      "input": {"number": 3, "local_datetime": "2026-01-23T12:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"three_transmissions": {"status": "completed", "lesson_type": "别责", "source_path": "柔日支前三合", "transmissions": ["丑", "巳", "巳"]}}},
+      "tags": ["bieze", "yin-day", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0007", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "numbers", "title": "大六壬八专阴日基线",
+      "input": {"number": 2, "local_datetime": "2026-02-02T12:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"three_transmissions": {"status": "completed", "lesson_type": "八专", "source_path": "阴日逆数三位", "transmissions": ["卯", "午", "午"]}}},
+      "tags": ["bazhuan", "yin-day", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0008", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "numbers", "title": "大六壬伏吟自任基线",
+      "input": {"number": 2, "local_datetime": "2026-01-02T12:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"three_transmissions": {"status": "completed", "lesson_type": "伏吟", "source_path": "自任", "transmissions": ["巳", "申", "寅"]}}},
+      "tags": ["fuyin", "ziren", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0009", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "numbers", "title": "大六壬返吟井栏射基线",
+      "input": {"number": 8, "local_datetime": "2026-01-03T12:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"three_transmissions": {"status": "completed", "lesson_type": "返吟", "source_path": "井栏射", "transmissions": ["亥", "未", "丑"]}}},
+      "tags": ["fanyin", "well-railing", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
     }
   ]
 }

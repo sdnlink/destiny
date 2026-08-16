@@ -21,15 +21,40 @@ NOBLE_BRANCHES = MappingProxyType({
 
 HEAVENLY_GENERALS = ("贵人", "螣蛇", "朱雀", "六合", "勾陈", "青龙", "天空", "白虎", "太常", "玄武", "太阴", "天后")
 
+STEM_COMBINATIONS = MappingProxyType({
+    "甲": "己", "己": "甲", "乙": "庚", "庚": "乙", "丙": "辛",
+    "辛": "丙", "丁": "壬", "壬": "丁", "戊": "癸", "癸": "戊",
+})
+
+BRANCH_CLASHES = MappingProxyType({
+    "子": "午", "午": "子", "丑": "未", "未": "丑", "寅": "申", "申": "寅",
+    "卯": "酉", "酉": "卯", "辰": "戌", "戌": "辰", "巳": "亥", "亥": "巳",
+})
+
+BRANCH_PUNISHMENTS = MappingProxyType({
+    "子": "卯", "卯": "子", "寅": "巳", "巳": "申", "申": "寅",
+    "丑": "戌", "戌": "未", "未": "丑", "辰": "辰", "午": "午",
+    "酉": "酉", "亥": "亥",
+})
+
+LODGED_STEMS_BY_BRANCH = MappingProxyType({
+    branch: tuple(stem for stem, lodge in STEM_LODGES.items() if lodge == branch)
+    for branch in ("子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥")
+})
+
+MENG_BRANCHES = ("寅", "巳", "申", "亥")
+ZHONG_BRANCHES = ("子", "卯", "午", "酉")
+JI_BRANCHES = ("丑", "辰", "未", "戌")
+
 TRANSMISSION_COVERAGE = tuple(MappingProxyType(item) for item in (
     {"path": "贼克", "status": "implemented_engineering_baseline", "rule_id": "LR-TRANSMISSION-001"},
     {"path": "克", "status": "implemented_engineering_baseline", "rule_id": "LR-TRANSMISSION-001"},
     {"path": "比用", "status": "implemented_engineering_baseline", "rule_id": "LR-TRANSMISSION-001"},
-    {"path": "涉害", "status": "pending_rule_selection", "rule_id": "LR-COVERAGE-001"},
+    {"path": "涉害", "status": "implemented_engineering_baseline", "rule_id": "LR-SHEHAI-001"},
     {"path": "遥克", "status": "implemented_engineering_baseline", "rule_id": "LR-REMOTE-001"},
     {"path": "昴星", "status": "implemented_engineering_baseline", "rule_id": "LR-STAR-001"},
-    {"path": "别责", "status": "pending_rule_selection", "rule_id": "LR-COVERAGE-001"},
-    {"path": "八专", "status": "pending_rule_selection", "rule_id": "LR-COVERAGE-001"},
-    {"path": "伏吟", "status": "pending_rule_selection", "rule_id": "LR-COVERAGE-001"},
-    {"path": "返吟", "status": "pending_rule_selection", "rule_id": "LR-COVERAGE-001"},
+    {"path": "别责", "status": "implemented_engineering_baseline", "rule_id": "LR-BIEZE-001"},
+    {"path": "八专", "status": "implemented_engineering_baseline", "rule_id": "LR-BAZHUAN-001"},
+    {"path": "伏吟", "status": "implemented_engineering_baseline", "rule_id": "LR-FUYIN-001"},
+    {"path": "返吟", "status": "implemented_engineering_baseline", "rule_id": "LR-FANYIN-001"},
 ))
