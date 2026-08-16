@@ -100,10 +100,22 @@
       "tags": ["boundary", "numbers", "remainder-zero"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_liuren.py"], "reviewers": []
     },
     {
-      "case_id": "case_lr_0003", "system": "liuren", "school": "mvp-engineering-baseline", "method": "time", "title": "大六壬未覆盖发传路径不得猜测",
+      "case_id": "case_lr_0003", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "time", "title": "大六壬昴星阴日俯视基线",
       "input": {"local_datetime": "2026-01-15T08:00:00", "timezone": "Asia/Shanghai"},
-      "expected": {"facts": {"three_transmissions": {"status": "unsupported_rule_path", "transmissions": [], "pending_path": "遥克、昴星或特殊课式"}}},
-      "tags": ["coverage-boundary", "no-fabrication", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#三传覆盖边界"], "reviewers": []
+      "expected": {"facts": {"day_pillar": "己丑", "three_transmissions": {"status": "completed", "lesson_type": "昴星", "source_path": "阴日俯视", "transmissions": ["子", "辰", "戌"]}}},
+      "tags": ["star", "yin-day", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0004", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "numbers", "title": "大六壬遥克蒿矢基线",
+      "input": {"number": 4, "local_datetime": "2026-01-01T12:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"day_pillar": "乙亥", "occupation_time": {"branch": "卯"}, "three_transmissions": {"status": "completed", "lesson_type": "遥克", "source_path": "蒿矢", "transmissions": ["酉", "未", "巳"]}}},
+      "tags": ["remote-control", "haoshi", "transmissions"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_lr_0005", "system": "liuren", "school": "daliuren-engineering-baseline", "method": "numbers", "title": "大六壬涉害未签署不得猜测",
+      "input": {"number": 6, "local_datetime": "2026-01-01T12:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"three_transmissions": {"status": "pending_rule_selection", "pending_path": "涉害", "transmissions": []}}},
+      "tags": ["coverage-boundary", "shehai", "no-fabrication"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "reviewers": []
     }
   ]
 }

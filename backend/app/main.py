@@ -99,7 +99,7 @@ class LiuyaoCoinRequest(CalendarRequest):
 
 
 class LiurenNumberRequest(CalendarRequest):
-    number: int
+    number: conint(strict=True)
 
 
 class CalculationRequest(BaseModel):

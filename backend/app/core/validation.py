@@ -3,8 +3,8 @@ from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
 from app.core.iching import time_cast as yi_time_cast
 from app.zhouyi import three_number_cast as yi_three_number_cast
-from app.core.liuren import number_cast as liuren_number_cast
-from app.core.liuren import time_cast as liuren_time_cast
+from app.daliuren import number_cast as liuren_number_cast
+from app.daliuren import time_cast as liuren_time_cast
 from app.core.liuyao import number_cast as liuyao_number_cast
 from app.core.liuyao import time_cast as liuyao_time_cast
 from app.liuyao import coin_cast as liuyao_coin_cast

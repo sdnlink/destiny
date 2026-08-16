@@ -11,7 +11,7 @@ SYSTEM_FILES = {
     "zhouyi": APP_ROOT / "core" / "iching.py",
     "liuyao": APP_ROOT / "core" / "liuyao.py",
     "meihua": APP_ROOT / "core" / "meihua.py",
-    "daliuren": APP_ROOT / "core" / "liuren.py",
+    "daliuren": APP_ROOT / "daliuren" / "engine.py",
 }
 
 
@@ -84,6 +84,14 @@ def test_meihua_domain_only_depends_on_calendar_and_common_domains():
 def test_liuyao_domain_only_depends_on_calendar_and_common_domains():
     forbidden = ("app.zhouyi", "app.meihua", "app.daliuren", "app.core")
     for path in (APP_ROOT / "liuyao").rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        modules = {node.module for node in ast.walk(tree) if isinstance(node, ast.ImportFrom) and node.module}
+        assert not any(module == prefix or module.startswith(prefix + ".") for module in modules for prefix in forbidden), path.name
+
+
+def test_daliuren_domain_only_depends_on_calendar_and_common_domains():
+    forbidden = ("app.zhouyi", "app.meihua", "app.liuyao", "app.core")
+    for path in (APP_ROOT / "daliuren").rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         modules = {node.module for node in ast.walk(tree) if isinstance(node, ast.ImportFrom) and node.module}
         assert not any(module == prefix or module.startswith(prefix + ".") for module in modules for prefix in forbidden), path.name

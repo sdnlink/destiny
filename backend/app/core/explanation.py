@@ -245,6 +245,12 @@ def _liuren_explanation(item):
         transmission_text = "三传为{}，课体路径为{}。".format("、".join(transmissions["transmissions"]), transmissions["lesson_type"])
     else:
         transmission_text = "本课进入{}路径，首版未生成三传。".format(transmissions["pending_path"])
+    transmission_rule = (
+        "LR-REMOTE-001" if transmissions["lesson_type"] == "遥克" else
+        "LR-STAR-001" if transmissions["lesson_type"] == "昴星" else
+        "LR-COVERAGE-001" if transmissions["status"] != "completed" else
+        "LR-TRANSMISSION-001"
+    )
     hour_rules = {"auto": "LR-AUTO-REPORT-001", "time": "LR-HOUR-001", "numbers": "LR-NUMBER-001"}
     return {
         "module": "liuren",
@@ -273,7 +279,7 @@ def _liuren_explanation(item):
                     "昼" if facts["heavenly_generals"]["period"] == "day" else "夜",
                     facts["heavenly_generals"]["distribution_direction"],
                 ),
-                "rule_ids": ["LR-TRANSMISSION-001", "LR-GENERAL-001"],
+                "rule_ids": [transmission_rule, "LR-GENERAL-001"],
             },
         ],
         "limitations": list(result.get("warnings", [])),

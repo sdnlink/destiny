@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, LiuyaoCoinRequest, LiuyaoLineRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, LiurenNumberRequest, LiuyaoCoinRequest, LiuyaoLineRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
 from pydantic import ValidationError
 
 
@@ -29,6 +29,12 @@ class MvpApiTests(unittest.TestCase):
                 "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai",
             })
 
+    def test_daliuren_number_api_requires_a_strict_integer(self):
+        for number in (True, 4.0, "4"):
+            with self.subTest(number=number), self.assertRaises(ValidationError):
+                LiurenNumberRequest(number=number, **{
+                    "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai",
+                })
     def test_auto_request_rejects_unsafe_nonce(self):
         with self.assertRaises(ValidationError):
             AutoCastRequest(

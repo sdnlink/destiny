@@ -117,6 +117,12 @@ def _liuren(result, imagery):
     else:
         progression = "本课进入{}，首版没有可审核的三传，因此不作过程对应。".format(transmissions["pending_path"])
         verification = "补充该课体的专家规则和标准案例后再解释过程，不使用猜测三传。"
+    transmission_rule = (
+        "LR-REMOTE-001" if transmissions["lesson_type"] == "遥克" else
+        "LR-STAR-001" if transmissions["lesson_type"] == "昴星" else
+        "LR-COVERAGE-001" if transmissions["status"] != "completed" else
+        "LR-TRANSMISSION-001"
+    )
     images = "；".join("{}：{}".format(row["symbol"], row["text"]) for row in imagery_rows)
     return {
         "module": "liuren", "title": "大六壬：环境、起因与过程链",
@@ -124,7 +130,7 @@ def _liuren(result, imagery):
         "correspondence": "月将和天地盘用于观察占时环境，三传在规则覆盖时用于拆分过程层次。{} 类象候选：{}。".format(progression, images or "暂无"),
         "verification": verification,
         "evidence_refs": [row["candidate_id"] for row in imagery_rows],
-        "rule_ids": ["INTERP-CORRESPONDENCE-001", "LR-PLATE-001", "LR-TRANSMISSION-001", "XIANG-BRANCH-001"],
+        "rule_ids": ["INTERP-CORRESPONDENCE-001", "LR-PLATE-001", transmission_rule, "XIANG-BRANCH-001"],
     }
 
 
@@ -162,4 +168,3 @@ def explain_correspondences(module_results, context, imagery=None, yuan_hui=None
         "rule_ids": ["INTERP-CORRESPONDENCE-001", "INTERP-INTEGRATE-001"],
         "limitations": ["对应解释用于组织核实方向，不表示类象已经与现实对象一一确认。", "未经专家签署，不从对应关系生成吉凶、应期或成功概率。"],
     }
-

@@ -50,6 +50,9 @@
         {"rule_id": "LR-PLATE-001", "version": "1.0.0"},
         {"rule_id": "LR-LESSON-001", "version": "1.0.0"},
         {"rule_id": "LR-TRANSMISSION-001", "version": "1.0.0"},
+        {"rule_id": "LR-REMOTE-001", "version": "1.0.0"},
+        {"rule_id": "LR-STAR-001", "version": "1.0.0"},
+        {"rule_id": "LR-COVERAGE-001", "version": "1.0.0"},
         {"rule_id": "LR-GENERAL-001", "version": "1.0.0"},
         {"rule_id": "XIANG-TRIGRAM-001", "version": "1.0.0"},
         {"rule_id": "XIANG-BRANCH-001", "version": "1.0.0"},
@@ -86,7 +89,7 @@
       "rule_id": "LR-AUTO-REPORT-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "六壬个体报数自动排盘", "purpose": "由独立起卦凭证派生报数并确定占时", "preconditions": ["起卦凭证格式有效", "历法输入有效"],
       "inputs": ["cast_nonce", "calendar"], "procedure": ["使用六壬专属域派生1至12报数", "将报数映射占时", "保留实际时支并排盘"], "outputs": ["report_number", "occupation_time", "cast_nonce_hash"],
-      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["报数派生属于工程基线待专家签署", "十二占时之间自然重复"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:auto_cast"
+      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["报数派生属于工程基线待专家签署", "十二占时之间自然重复"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:auto_cast"
     },
     {
       "rule_id": "CAL-NORMALIZE-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
@@ -272,43 +275,61 @@
       "rule_id": "LR-MONTH-GENERAL-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "大六壬中气月将", "purpose": "按最近中气确定月将", "preconditions": ["历法时间有效"],
       "inputs": ["effective_local_datetime"], "procedure": ["定位最近中气", "映射十二月将"], "outputs": ["month_general"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-3"], "limitations": ["交节边界待标准案例复核"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:_month_general"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-3"], "limitations": ["交节边界待标准案例复核"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_month_general"
     },
     {
       "rule_id": "LR-HOUR-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "大六壬时间占时", "purpose": "自动排盘采用历法时支作为占时", "preconditions": ["时间和时区有效"],
       "inputs": ["time_branch"], "procedure": ["读取历法时支"], "outputs": ["occupation_branch"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-3"], "limitations": ["不包含活时选取"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:time_cast"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-3"], "limitations": ["不包含活时选取"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:time_cast"
     },
     {
       "rule_id": "LR-NUMBER-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "大六壬数字占时", "purpose": "将整数映射为子至亥占时", "preconditions": ["输入为整数"],
       "inputs": ["number"], "procedure": ["整数除以12取余", "余0按亥"], "outputs": ["occupation_branch"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#数字排盘-3"], "limitations": ["数字只替换占时，不修改历法日柱"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:number_cast"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#数字排盘-3"], "limitations": ["数字只替换占时，不修改历法日柱"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:number_cast"
     },
     {
       "rule_id": "LR-PLATE-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "月将加时天地盘", "purpose": "将月将加临占时并顺布天盘", "preconditions": ["月将和占时已确定"],
       "inputs": ["month_general", "occupation_branch"], "procedure": ["月将加临占时", "十二支顺布"], "outputs": ["earth_plate", "heaven_plate"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:_heaven_plate"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_heaven_plate"
     },
     {
       "rule_id": "LR-LESSON-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "日干寄宫四课", "purpose": "由日干支与天盘生成四课", "preconditions": ["天地盘和日柱已确定"],
       "inputs": ["day_pillar", "heaven_plate"], "procedure": ["日干寄宫取干阳神", "递取干阴神", "取支阳神和支阴神"], "outputs": ["four_lessons"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["寄宫规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:_four_lessons"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["寄宫规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_four_lessons"
     },
     {
       "rule_id": "LR-TRANSMISSION-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "大六壬基础发传", "purpose": "在覆盖路径内由四课生成三传", "preconditions": ["四课已确定"],
       "inputs": ["day_pillar", "heaven_plate", "four_lessons"], "procedure": ["依次检查贼克和克", "多候选时检查比用", "初传确定后递取中末传"], "outputs": ["three_transmissions", "coverage_status"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#三传覆盖边界"], "limitations": ["只覆盖唯一贼克、克和比用", "其他路径显式返回未覆盖"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:_three_transmissions"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#三传覆盖边界"], "limitations": ["只覆盖唯一贼克、克和比用", "其他路径由独立规则或覆盖状态处理"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_direct_transmissions"
+    },
+    {
+      "rule_id": "LR-REMOTE-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
+      "title": "大六壬遥克发传", "purpose": "四课无上下克时按神遥克日、日遥克神顺序确定初传", "preconditions": ["四课无上下克", "非伏吟返吟八专"],
+      "inputs": ["day_stem", "four_lessons", "heaven_plate"], "procedure": ["先查上神克日干为蒿矢", "无则查日干克上神为弹射", "多候选时取与日干阴阳相同者", "由初传上神递取中末传"], "outputs": ["lesson_type", "source_path", "three_transmissions", "trace"],
+      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00000", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["多个候选经比用仍不唯一时不猜测"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_remote_transmissions"
+    },
+    {
+      "rule_id": "LR-STAR-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
+      "title": "大六壬昴星发传", "purpose": "四课无上下克、无遥克且四课俱全时按阴阳日昴星法取三传", "preconditions": ["四课无上下克", "无遥克", "四课俱全"],
+      "inputs": ["day_stem", "four_lessons", "heaven_plate"], "procedure": ["阳日仰视地盘酉上神，阴日俯视天盘酉所临地盘", "刚日先辰后日，柔日先日后辰"], "outputs": ["lesson_type", "source_path", "three_transmissions", "trace"],
+      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00000", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["工程案例待双专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_star_transmissions"
+    },
+    {
+      "rule_id": "LR-COVERAGE-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
+      "title": "大六壬发传覆盖矩阵", "purpose": "逐类报告发传路径实现状态并禁止未签署路径生成三传", "preconditions": ["四课和天地盘已确定"],
+      "inputs": ["day_pillar", "four_lessons", "heaven_plate"], "procedure": ["识别十种结果路径", "读取路径覆盖状态", "未签署路径返回pending_rule_selection和空三传"], "outputs": ["transmission_coverage", "pending_path", "reason"],
+      "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["涉害、别责、八专、伏吟、返吟尚未实现发传值"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_three_transmissions"
     },
     {
       "rule_id": "LR-GENERAL-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "昼夜贵人十二天将", "purpose": "按日干昼夜贵人起例布十二天将", "preconditions": ["日干、当地小时和天地盘已确定"],
       "inputs": ["day_stem", "civil_hour", "heaven_plate"], "procedure": ["6至18时按昼贵其余按夜贵", "定位贵人临地盘", "按临地方位顺逆布将"], "outputs": ["heavenly_generals"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["昼夜按民用小时划分的工程基线", "贵人起例待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:_heavenly_generals"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["昼夜按民用小时划分的工程基线", "贵人起例待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_heavenly_generals"
     },
     {
       "rule_id": "XIANG-TRIGRAM-001", "version": "1.0.0", "system": "imagery", "school": "mvp-engineering-baseline", "status": "draft",
