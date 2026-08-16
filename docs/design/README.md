@@ -23,6 +23,7 @@
 - [ADR-008：统一历法引擎第二阶段基线](./decisions/008-calendar-engine-phase-two.md)
 - [ADR-009：周易三数数字起卦第三阶段基线](./decisions/009-zhouyi-three-number-phase-three.md)
 - [ADR-010：梅花易数独立领域第四阶段基线](./decisions/010-meihua-domain-phase-four.md)
+- [ADR-011：六爻独立领域第五阶段基线](./decisions/011-liuyao-domain-phase-five.md)
 
 ## 文档优先级
 

@@ -192,8 +192,14 @@ def _liuyao_explanation(item):
     palace = facts["palace"]
     moving = "、".join(str(value) for value in facts["moving_lines"])
     void = "、".join(facts["xun"]["empty_branches"])
-    method_labels = {"auto": "个体三枚铜钱", "time": "传统时间", "numbers": "双数"}
-    method_rules = {"auto": "LY-AUTO-COIN-001", "time": "LY-TIME-001", "numbers": "LY-NUMBER-001"}
+    method_labels = {
+        "auto": "个体三枚铜钱", "time": "传统时间", "numbers": "双数",
+        "lines": "六爻值", "coins": "六次三枚硬币",
+    }
+    method_rules = {
+        "auto": "LY-AUTO-COIN-001", "time": "LY-TIME-001", "numbers": "LY-NUMBER-001",
+        "lines": "LY-LINES-001", "coins": "LY-COINS-001",
+    }
     return {
         "module": "liuyao",
         "title": "六爻纳甲排盘",

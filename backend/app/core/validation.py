@@ -7,6 +7,8 @@ from app.core.liuren import number_cast as liuren_number_cast
 from app.core.liuren import time_cast as liuren_time_cast
 from app.core.liuyao import number_cast as liuyao_number_cast
 from app.core.liuyao import time_cast as liuyao_time_cast
+from app.liuyao import coin_cast as liuyao_coin_cast
+from app.liuyao import line_cast as liuyao_line_cast
 from app.core.meihua import number_cast as meihua_number_cast
 from app.core.meihua import time_cast as meihua_time_cast
 from app.meihua import three_number_cast as meihua_three_number_cast
@@ -40,6 +42,14 @@ def execute_validation_case(case):
         lower_number = values.pop("lower_number")
         upper_number = values.pop("upper_number")
         return liuyao_number_cast(lower_number, upper_number, **values)
+    if system == "liuyao" and method == "lines":
+        values = dict(payload)
+        lines = values.pop("lines")
+        return liuyao_line_cast(lines, **values)
+    if system == "liuyao" and method == "coins":
+        values = dict(payload)
+        coins = values.pop("coins")
+        return liuyao_coin_cast(coins, **values)
     if system == "liuren" and method == "time":
         return liuren_time_cast(**payload)
     if system == "liuren" and method == "numbers":

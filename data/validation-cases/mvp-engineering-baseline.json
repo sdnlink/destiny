@@ -76,6 +76,18 @@
       "tags": ["basic", "numbers", "eight-palace"], "review_status": "engineering_baseline", "source_refs": ["backend/tests/test_liuyao.py"], "reviewers": []
     },
     {
+      "case_id": "case_ly_0003", "system": "liuyao", "school": "mvp-engineering-baseline", "method": "lines", "title": "六爻值录入乾卦初爻动",
+      "input": {"lines": [9, 7, 7, 7, 7, 7], "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"input_lines": [9, 7, 7, 7, 7, 7], "original": {"name": "乾"}, "moving_lines": [1], "changed": {"name": "姤"}, "palace": {"name": "乾", "stage": "本宫", "host_line": 6, "response_line": 3}, "hidden_flying_spirits": {"status": "pending_rule_selection", "hidden_spirits": [], "flying_spirits": []}}},
+      "tags": ["basic", "six-lines", "moving-line", "no-fabrication"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/011-liuyao-domain-phase-five.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_ly_0004", "system": "liuyao", "school": "mvp-engineering-baseline", "method": "coins", "title": "六次三枚硬币乾卦初爻动",
+      "input": {"coins": [[3, 3, 3], [3, 2, 2], [3, 2, 2], [3, 2, 2], [3, 2, 2], [3, 2, 2]], "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+      "expected": {"facts": {"input_lines": [9, 7, 7, 7, 7, 7], "original": {"name": "乾"}, "moving_lines": [1], "changed": {"name": "姤"}, "palace": {"name": "乾", "stage": "本宫", "host_line": 6, "response_line": 3}, "hidden_flying_spirits": {"status": "pending_rule_selection", "hidden_spirits": [], "flying_spirits": []}}},
+      "tags": ["basic", "three-coins", "moving-line", "no-fabrication"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/011-liuyao-domain-phase-five.md"], "reviewers": []
+    },
+    {
       "case_id": "case_lr_0001", "system": "liuren", "school": "mvp-engineering-baseline", "method": "time", "title": "大六壬克法三传基线",
       "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
       "expected": {"facts": {"day_pillar": "辛酉", "occupation_time": {"branch": "申"}, "month_general": {"branch": "午", "name": "胜光", "boundary_term": "大暑"}, "three_transmissions": {"status": "completed", "lesson_type": "克", "transmissions": ["午", "辰", "寅"]}}},

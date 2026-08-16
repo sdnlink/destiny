@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, LiuyaoCoinRequest, LiuyaoLineRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
 from pydantic import ValidationError
 
 
@@ -18,6 +18,16 @@ class MvpApiTests(unittest.TestCase):
         for numbers in ([1, 2], [1, 2, 3, 4], [1, True, 3], [1, 2.0, 3]):
             with self.subTest(numbers=numbers), self.assertRaises(ValidationError):
                 MeihuaThreeNumberRequest(numbers=numbers)
+
+    def test_liuyao_manual_api_models_are_strict(self):
+        with self.assertRaises(ValidationError):
+            LiuyaoLineRequest(lines=[7, 7, 7, 7, 7, True], **{
+                "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai",
+            })
+        with self.assertRaises(ValidationError):
+            LiuyaoCoinRequest(coins=[[3, 2, 2]] * 5, **{
+                "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai",
+            })
 
     def test_auto_request_rejects_unsafe_nonce(self):
         with self.assertRaises(ValidationError):
@@ -82,6 +92,17 @@ class MvpApiTests(unittest.TestCase):
             CalculationRequest(module="meihua", method="three_numbers", input=payload),
         ])
         self.assertIn("MH-THREE-NUMBER-001", explained["explanation"]["modules"][0]["sections"][0]["rule_ids"])
+
+    def test_dispatches_liuyao_lines_and_coin_methods(self):
+        calendar = {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"}
+        lines = execute("liuyao", "lines", dict(calendar, lines=[9, 7, 7, 7, 7, 7]))
+        coins = execute("liuyao", "coins", dict(calendar, coins=[[3, 3, 3]] + [[3, 2, 2]] * 5))
+        self.assertEqual(lines["facts"]["changed"]["name"], "姤")
+        self.assertEqual(coins["facts"]["input_lines"], [9, 7, 7, 7, 7, 7])
+        explained = comparison_envelope([
+            CalculationRequest(module="liuyao", method="coins", input=dict(calendar, coins=[[3, 2, 2]] * 6)),
+        ])
+        self.assertIn("LY-COINS-001", explained["explanation"]["modules"][0]["sections"][0]["rule_ids"])
 
     def test_dispatches_four_personalized_auto_methods(self):
         payload = {

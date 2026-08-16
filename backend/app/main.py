@@ -28,6 +28,8 @@ from app.daliuren import number_cast as liuren_number_cast
 from app.daliuren import time_cast as liuren_time_cast
 from app.liuyao import auto_cast as liuyao_auto_cast
 from app.liuyao import number_cast as liuyao_number_cast
+from app.liuyao import coin_cast as liuyao_coin_cast
+from app.liuyao import line_cast as liuyao_line_cast
 from app.liuyao import time_cast as liuyao_time_cast
 from app.meihua import auto_cast as meihua_auto_cast
 from app.meihua import number_cast as meihua_number_cast
@@ -83,6 +85,17 @@ class MeihuaThreeNumberRequest(BaseModel):
 class LiuyaoNumberRequest(CalendarRequest):
     lower_number: int
     upper_number: int
+
+
+class LiuyaoLineRequest(CalendarRequest):
+    lines: conlist(conint(strict=True, ge=6, le=9), min_items=6, max_items=6)
+
+
+CoinRound = conlist(conint(strict=True, ge=2, le=3), min_items=3, max_items=3)
+
+
+class LiuyaoCoinRequest(CalendarRequest):
+    coins: conlist(CoinRound, min_items=6, max_items=6)
 
 
 class LiurenNumberRequest(CalendarRequest):
@@ -159,6 +172,16 @@ def execute(module, method, payload):
         lower_number = values.pop("lower_number")
         upper_number = values.pop("upper_number")
         return liuyao_number_cast(lower_number, upper_number, **values)
+    if module == "liuyao" and method == "lines":
+        request = LiuyaoLineRequest(**payload)
+        values = request.dict()
+        lines = values.pop("lines")
+        return liuyao_line_cast(lines, **values)
+    if module == "liuyao" and method == "coins":
+        request = LiuyaoCoinRequest(**payload)
+        values = request.dict()
+        coins = values.pop("coins")
+        return liuyao_coin_cast(coins, **values)
     if module == "liuren" and method == "time":
         request = CalendarRequest(**payload)
         return liuren_time_cast(**request.dict())
@@ -393,6 +416,20 @@ def cast_liuyao_numbers(request: LiuyaoNumberRequest):
     lower_number = values.pop("lower_number")
     upper_number = values.pop("upper_number")
     return {"data": liuyao_number_cast(lower_number, upper_number, **values)}
+
+
+@app.post("/v1/liuyao/lines")
+def cast_liuyao_lines(request: LiuyaoLineRequest):
+    values = request.dict()
+    lines = values.pop("lines")
+    return {"data": liuyao_line_cast(lines, **values)}
+
+
+@app.post("/v1/liuyao/coins")
+def cast_liuyao_coins(request: LiuyaoCoinRequest):
+    values = request.dict()
+    coins = values.pop("coins")
+    return {"data": liuyao_coin_cast(coins, **values)}
 
 
 @app.post("/v1/liuren/time")

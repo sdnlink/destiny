@@ -33,6 +33,8 @@
         {"rule_id": "MH-BODYUSE-001", "version": "1.0.0"},
         {"rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0"},
         {"rule_id": "CYCLE-XUN-001", "version": "1.0.0"},
+        {"rule_id": "LY-LINES-001", "version": "1.0.0"},
+        {"rule_id": "LY-COINS-001", "version": "1.0.0"},
         {"rule_id": "LY-TIME-001", "version": "1.0.0"},
         {"rule_id": "LY-AUTO-COIN-001", "version": "1.0.0"},
         {"rule_id": "LY-NUMBER-001", "version": "1.0.0"},
@@ -40,6 +42,7 @@
         {"rule_id": "LY-NAJIA-001", "version": "1.0.0"},
         {"rule_id": "LY-RELATIVE-001", "version": "1.0.0"},
         {"rule_id": "LY-SPIRIT-001", "version": "1.0.0"},
+        {"rule_id": "LY-HIDDEN-FLYING-COVERAGE-001", "version": "1.0.0"},
         {"rule_id": "LR-MONTH-GENERAL-001", "version": "1.0.0"},
         {"rule_id": "LR-HOUR-001", "version": "1.0.0"},
         {"rule_id": "LR-NUMBER-001", "version": "1.0.0"},
@@ -77,7 +80,7 @@
       "rule_id": "LY-AUTO-COIN-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "六爻个体三枚铜钱自动排盘", "purpose": "按独立起卦凭证派生六爻后排八宫纳甲", "preconditions": ["起卦凭证格式有效", "历法输入有效"],
       "inputs": ["cast_nonce", "calendar"], "procedure": ["使用六爻专属域派生六次三枚铜钱", "识别动爻", "排八宫纳甲等盘面"], "outputs": ["coin_rounds", "input_lines", "line_chart"],
-      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["确定性工程实现待专家签署", "有限卦象空间允许自然撞卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuyao:auto_cast"
+      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["确定性工程实现待专家签署", "有限卦象空间允许自然撞卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:auto_cast"
     },
     {
       "rule_id": "LR-AUTO-REPORT-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
@@ -212,40 +215,58 @@
       "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#统一输入与输出"], "limitations": ["待标准案例复核"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.cyclical:xun_info"
     },
     {
+      "rule_id": "LY-LINES-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "六爻值录入", "purpose": "按自下而上顺序将六个6/7/8/9爻值转换为本卦和动爻", "preconditions": ["必须恰有六个爻值", "每个爻值只能是6、7、8或9"],
+      "inputs": ["lines"], "procedure": ["按初爻至上爻读取六值", "6和8映射为阴爻，7和9映射为阳爻", "6和9标记为动爻"], "outputs": ["input_lines", "original", "moving_lines", "changed"],
+      "source_refs": ["docs/design/decisions/011-liuyao-domain-phase-five.md"], "limitations": ["不替代蓍草或铜钱的实际起卦过程"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:line_cast"
+    },
+    {
+      "rule_id": "LY-COINS-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "六次三枚硬币录入", "purpose": "将六轮三枚硬币值求和为六个爻值", "preconditions": ["必须恰有六轮", "每轮必须恰有三枚", "每枚只允许2或3"],
+      "inputs": ["coins"], "procedure": ["按初爻至上爻读取六轮", "每轮三枚值求和得到6至9", "按六爻值规则生成卦象"], "outputs": ["coin_rounds", "input_lines", "original", "moving_lines", "changed"],
+      "source_refs": ["docs/design/decisions/011-liuyao-domain-phase-five.md"], "limitations": ["2和3是确定性输入编码，不判断实体硬币正反面"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:coin_cast"
+    },
+    {
       "rule_id": "LY-TIME-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "六爻时间自动起卦", "purpose": "由农历时间取数生成六爻卦象", "preconditions": ["时间和时区有效"],
       "inputs": ["local_datetime", "timezone"], "procedure": ["农历时间取上下卦", "总数取单一动爻"], "outputs": ["original", "changed", "moving_line"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-2"], "limitations": ["工程指定起卦入口", "不替代手工摇卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuyao:time_cast"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-2"], "limitations": ["工程指定起卦入口", "不替代手工摇卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:time_cast"
     },
     {
       "rule_id": "LY-NUMBER-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "六爻双数起卦", "purpose": "由两个整数生成六爻卦象", "preconditions": ["输入为整数"],
       "inputs": ["lower_number", "upper_number"], "procedure": ["分别除以8取上下卦", "两数之和除以6取动爻"], "outputs": ["original", "changed", "moving_line"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#数字排盘-2"], "limitations": ["工程指定数字起卦法"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuyao:number_cast"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#数字排盘-2"], "limitations": ["工程指定数字起卦法"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:number_cast"
     },
     {
       "rule_id": "LY-PALACE-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "京房八宫世应", "purpose": "确定卦宫、游归魂阶段及世应爻", "preconditions": ["本卦六爻已确定"],
       "inputs": ["original_lines"], "procedure": ["按八纯卦变爻序列匹配八宫", "按宫序确定世应"], "outputs": ["palace", "host_line", "response_line"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["京房八宫工程基线待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuyao:_palace_index"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["京房八宫工程基线待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.rules:PALACE_BY_LINES"
     },
     {
       "rule_id": "LY-NAJIA-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "八卦纳甲纳支", "purpose": "为本卦六爻配置纳干和纳支", "preconditions": ["上下卦已确定"],
       "inputs": ["lower_trigram", "upper_trigram"], "procedure": ["下卦取内卦纳甲", "上卦取外卦纳甲"], "outputs": ["najia_stem", "najia_branch"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["变卦纳甲扩展未输出"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuyao:_decorate"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["变卦纳甲扩展未输出"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:_decorate"
     },
     {
       "rule_id": "LY-RELATIVE-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "六爻六亲", "purpose": "按宫五行与爻支五行关系确定六亲", "preconditions": ["卦宫和纳支已确定"],
       "inputs": ["palace_element", "branch_element"], "procedure": ["比较五行生克比和", "映射父母兄弟子孙妻财官鬼"], "outputs": ["six_relative"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["不含用神取用和旺衰"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuyao:_six_relative"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["不含用神取用和旺衰"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:_six_relative"
     },
     {
       "rule_id": "LY-SPIRIT-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "六爻日干起六神", "purpose": "按占日天干从初爻顺排六神", "preconditions": ["日干有效"],
       "inputs": ["day_stem"], "procedure": ["按日干确定初爻六神", "初爻至上爻顺排"], "outputs": ["six_spirits"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["只输出盘面事实"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuyao:_decorate"
+      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["只输出盘面事实"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:_decorate"
+    },
+    {
+      "rule_id": "LY-HIDDEN-FLYING-COVERAGE-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "伏神飞神规则覆盖声明", "purpose": "显式报告伏神飞神规则是否完成签署，避免在规则未定时生成推测值", "preconditions": ["六爻盘面已生成"],
+      "inputs": ["palace", "line_relatives"], "procedure": ["检查已签署规则版本和标准案例", "未签署时返回pending_rule_selection", "伏神和飞神数组保持为空"], "outputs": ["status", "hidden_spirits", "flying_spirits", "reason"],
+      "source_refs": ["docs/design/decisions/011-liuyao-domain-phase-five.md"], "limitations": ["当前仅报告覆盖状态，不执行伏神飞神排法"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:_result"
     },
     {
       "rule_id": "LR-MONTH-GENERAL-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
