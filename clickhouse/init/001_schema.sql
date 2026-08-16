@@ -290,10 +290,19 @@ CREATE TABLE IF NOT EXISTS destiny.corpus_documents
     available_subcontent_count UInt32,
     unavailable_subcontent_ids Array(String),
     fetched_at Nullable(DateTime),
-    ingested_at DateTime
+    ingested_at DateTime,
+    license_name String DEFAULT '',
+    license_url String DEFAULT '',
+    attribution_url String DEFAULT '',
+    language LowCardinality(String) DEFAULT 'zh'
 )
 ENGINE = ReplacingMergeTree(ingested_at)
 ORDER BY (run_id, document_id);
+
+ALTER TABLE destiny.corpus_documents ADD COLUMN IF NOT EXISTS license_name String DEFAULT '';
+ALTER TABLE destiny.corpus_documents ADD COLUMN IF NOT EXISTS license_url String DEFAULT '';
+ALTER TABLE destiny.corpus_documents ADD COLUMN IF NOT EXISTS attribution_url String DEFAULT '';
+ALTER TABLE destiny.corpus_documents ADD COLUMN IF NOT EXISTS language LowCardinality(String) DEFAULT 'zh';
 
 CREATE TABLE IF NOT EXISTS destiny.corpus_chunks
 (

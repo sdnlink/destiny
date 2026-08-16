@@ -138,7 +138,8 @@ class CorpusRepository:
             SELECT
               document_id, title, category_id, category_name, cache_status,
               character_count, byte_count, subcontent_count,
-              available_subcontent_count, unavailable_subcontent_ids, source_url
+              available_subcontent_count, unavailable_subcontent_ids, source_url,
+              source_id, usage_scope, license_name, license_url, attribution_url, language
             FROM destiny.corpus_documents
             WHERE {where}
             ORDER BY category_id, document_id
@@ -153,6 +154,7 @@ class CorpusRepository:
               fetched_from, cache_status, usage_scope, parser_version, content_sha256,
               character_count, byte_count, subcontent_count, available_subcontent_count,
               unavailable_subcontent_ids, fetched_at, ingested_at
+              , license_name, license_url, attribution_url, language
             FROM destiny.corpus_documents
             WHERE document_id = {document_id:String}
             LIMIT 1 FORMAT JSON
@@ -186,7 +188,8 @@ class CorpusRepository:
             SELECT
               c.chunk_id, c.document_id, c.title, c.category_id, c.chunk_index,
               c.char_start, c.char_end, c.content, c.content_sha256,
-              d.source_url, d.cache_status
+              d.source_url, d.cache_status, d.source_id, d.usage_scope,
+              d.license_name, d.license_url, d.attribution_url
             FROM destiny.corpus_chunks AS c
             INNER JOIN destiny.corpus_documents AS d
               ON c.run_id = d.run_id AND c.document_id = d.document_id

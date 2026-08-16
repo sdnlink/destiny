@@ -6,8 +6,10 @@ clickhouse_url="${CLICKHOUSE_URL:-http://localhost:18123}"
 clickhouse_user="${CLICKHOUSE_USER:-destiny}"
 clickhouse_password="${CLICKHOUSE_PASSWORD:-destiny_local}"
 generated_dir="$project_dir/data/generated/corpus"
+open_generated_dir="$project_dir/data/generated/wikisource-corpus"
 
 "$project_dir/scripts/build_corpus.py"
+"$project_dir/scripts/build_wikisource_corpus.py"
 
 for attempt in $(seq 1 30); do
   if curl --silent --fail --user "$clickhouse_user:$clickhouse_password" "$clickhouse_url/ping" >/dev/null; then
@@ -33,20 +35,26 @@ for table in corpus_chunks corpus_documents corpus_ingestion_runs; do
     --data-binary "TRUNCATE TABLE destiny.$table" "$clickhouse_url/"
 done
 
-curl --silent --show-error --fail --user "$clickhouse_user:$clickhouse_password" \
-  --data-binary @"$generated_dir/corpus_documents.jsonl" \
-  "$clickhouse_url/?query=INSERT%20INTO%20destiny.corpus_documents%20FORMAT%20JSONEachRow"
+for corpus_dir in "$generated_dir" "$open_generated_dir"; do
+  curl --silent --show-error --fail --user "$clickhouse_user:$clickhouse_password" \
+    --data-binary @"$corpus_dir/corpus_documents.jsonl" \
+    "$clickhouse_url/?query=INSERT%20INTO%20destiny.corpus_documents%20FORMAT%20JSONEachRow"
+done
 echo "loaded corpus_documents"
 
-curl --silent --show-error --fail --user "$clickhouse_user:$clickhouse_password" \
-  --data-binary @"$generated_dir/corpus_chunks.jsonl" \
-  "$clickhouse_url/?query=INSERT%20INTO%20destiny.corpus_chunks%20FORMAT%20JSONEachRow"
+for corpus_dir in "$generated_dir" "$open_generated_dir"; do
+  curl --silent --show-error --fail --user "$clickhouse_user:$clickhouse_password" \
+    --data-binary @"$corpus_dir/corpus_chunks.jsonl" \
+    "$clickhouse_url/?query=INSERT%20INTO%20destiny.corpus_chunks%20FORMAT%20JSONEachRow"
+done
 echo "loaded corpus_chunks"
 
-jq -c '.status = "loaded"' "$generated_dir/corpus_ingestion_runs.jsonl" | \
-  curl --silent --show-error --fail --user "$clickhouse_user:$clickhouse_password" \
-    --data-binary @- \
-    "$clickhouse_url/?query=INSERT%20INTO%20destiny.corpus_ingestion_runs%20FORMAT%20JSONEachRow"
+for corpus_dir in "$generated_dir" "$open_generated_dir"; do
+  jq -c '.status = "loaded"' "$corpus_dir/corpus_ingestion_runs.jsonl" | \
+    curl --silent --show-error --fail --user "$clickhouse_user:$clickhouse_password" \
+      --data-binary @- \
+      "$clickhouse_url/?query=INSERT%20INTO%20destiny.corpus_ingestion_runs%20FORMAT%20JSONEachRow"
+done
 echo "loaded corpus_ingestion_runs"
 
 validation_query="
@@ -64,9 +72,9 @@ result="$(curl --silent --show-error --fail --user "$clickhouse_user:$clickhouse
   --get --data-urlencode "query=$validation_query" "$clickhouse_url/")"
 echo "$result" | jq .
 
-expected_documents="$(jq -r '.documents' "$generated_dir/corpus_analysis.json")"
-expected_chunks="$(jq -r '.chunks' "$generated_dir/corpus_analysis.json")"
-expected_characters="$(jq -r '.characters' "$generated_dir/corpus_analysis.json")"
+expected_documents="$(( $(jq -r '.documents' "$generated_dir/corpus_analysis.json") + $(jq -r '.documents' "$open_generated_dir/corpus_analysis.json") ))"
+expected_chunks="$(( $(jq -r '.chunks' "$generated_dir/corpus_analysis.json") + $(jq -r '.chunks' "$open_generated_dir/corpus_analysis.json") ))"
+expected_characters="$(( $(jq -r '.characters' "$generated_dir/corpus_analysis.json") + $(jq -r '.characters' "$open_generated_dir/corpus_analysis.json") ))"
 actual_documents="$(echo "$result" | jq -r '.documents')"
 actual_chunks="$(echo "$result" | jq -r '.chunks')"
 document_characters="$(echo "$result" | jq -r '.document_characters')"
