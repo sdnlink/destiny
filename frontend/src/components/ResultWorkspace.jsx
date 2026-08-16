@@ -41,6 +41,15 @@ const CATEGORY_LABELS = {
 const SCENE_LABELS = { combined: "综合推演", zhouyi: "周易", meihua: "梅花易数", liuyao: "六爻", liuren: "大六壬" };
 const IMAGERY_MODULE_LABELS = { zhouyi: "周易", meihua: "梅花", liuyao: "六爻", liuren: "六壬" };
 const IMAGERY_STAGE_LABELS = { original: "本盘", changed: "变盘" };
+const CAST_METHOD_LABELS = {
+  personalized_three_coin: "个体三枚铜钱",
+  personalized_lunar_time: "个体时间取数",
+  personalized_report_number: "个体报数",
+  lunar_time: "传统时间",
+  time: "传统时间",
+  number_hour: "数字排盘",
+  two_numbers: "数字排盘",
+};
 const IMAGERY_ROLE_LABELS = {
   upper_trigram: "上卦", lower_trigram: "下卦", body: "体卦", use: "用卦", changed_use: "变卦之用",
   palace: "卦宫", month_general: "月将", initial_transmission: "初传", middle_transmission: "中传", final_transmission: "末传",
@@ -56,6 +65,24 @@ function DataState({ label, value, mono = false }) {
       <span>{label}</span>
       <strong className={mono ? "mono" : ""}>{value ?? "—"}</strong>
     </div>
+  );
+}
+
+function CastingIdentity({ facts }) {
+  if (!facts.method) return null;
+  const derived = facts.input_lines
+    ? facts.input_lines.join(" · ")
+    : facts.personal_number
+    ? `个体数 ${facts.personal_number}`
+    : facts.report_number
+    ? `报数 ${facts.report_number}`
+    : "—";
+  return (
+    <section className="liuren-facts-band">
+      <DataState label="起卦方式" value={CAST_METHOD_LABELS[facts.method] || facts.method} />
+      <DataState label="派生结果" value={derived} mono />
+      <DataState label="凭证哈希" value={facts.cast_nonce_hash?.slice(7, 19) || "—"} mono />
+    </section>
   );
 }
 
@@ -328,6 +355,7 @@ function ZhouyiView({ result }) {
         <div className="change-arrow"><ArrowRight size={22} /><span>{facts.moving_lines.length ? `第 ${facts.moving_lines.join("、")} 爻动` : "无动爻"}</span></div>
         <HexagramTile title="变卦" hexagram={facts.changed} featured />
       </section>
+      <CastingIdentity facts={facts} />
       <section className="data-band">
         <div className="band-heading"><div><span className="band-icon"><Layers3 size={16} /></span><div><h3>关联卦</h3><p>互卦、错卦与综卦仅作为结构事实展示</p></div></div></div>
         <div className="related-hexagrams">
@@ -360,6 +388,7 @@ function MeihuaView({ result }) {
         <div className="change-arrow"><ArrowRight size={22} /><span>第 {facts.moving_line} 爻动</span></div>
         <HexagramTile title="变卦" hexagram={facts.changed} featured />
       </section>
+      <CastingIdentity facts={facts} />
       <section className="body-use-band">
         <div className="body-use-item body">
           <span>体卦</span><strong>{bodyUse.body_trigram.symbol} {bodyUse.body_trigram.name}</strong><p>{bodyUse.body_trigram.element} · {bodyUse.body_position === "upper" ? "上卦" : "下卦"}</p>
@@ -398,6 +427,7 @@ function LiuyaoView({ result }) {
         <div className="change-arrow"><ArrowRight size={22} /><span>第 {facts.moving_lines.join("、")} 爻动</span></div>
         <HexagramTile title="变卦" hexagram={facts.changed} featured />
       </section>
+      <CastingIdentity facts={facts} />
       <section className="data-band">
         <div className="band-heading"><div><span className="band-icon"><Grid3X3 size={16} /></span><div><h3>{facts.palace.name}宫 · {facts.palace.stage}</h3><p>世爻 {facts.palace.host_line} · 应爻 {facts.palace.response_line} · {facts.xun.name}空 {facts.xun.empty_branches.join("、")}</p></div></div></div>
         <div className="liuyao-table-wrap">
@@ -438,6 +468,7 @@ function LiurenView({ result }) {
         <DataState label="月将" value={`${facts.month_general.name} · ${facts.month_general.branch}`} />
         <DataState label="旬空" value={facts.xun.empty_branches.join("、")} />
       </section>
+      <CastingIdentity facts={facts} />
       <section className="data-band">
         <div className="band-heading"><div><span className="band-icon"><Workflow size={16} /></span><div><h3>天地盘与十二天将</h3><p>{facts.month_general.boundary_term}后月将 · {facts.heavenly_generals.distribution_direction}</p></div></div></div>
         <div className="liuren-plate-wrap">

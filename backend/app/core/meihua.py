@@ -7,6 +7,7 @@ from .constants import (
     trigram_number,
 )
 from .iching import derive_hexagrams
+from .casting import derive_integer, nonce_hash
 
 
 ENGINE_VERSION = "meihua-engine-1.0.0"
@@ -186,3 +187,36 @@ def time_cast(local_datetime, timezone, longitude=None, use_true_solar_time=Fals
     if calendar["lunar"]["is_leap_month"]:
         result["warnings"].append("当前日期位于闰月，MVP基线按月份绝对值取数。")
     return result
+
+
+def auto_cast(cast_nonce, local_datetime, timezone, longitude=None, use_true_solar_time=False):
+    calendar = calendar_analysis(local_datetime, timezone, longitude, use_true_solar_time)
+    year_number = calendar["year_branch"]["number"]
+    lunar_month = calendar["lunar"]["month"]
+    lunar_day = calendar["lunar"]["day"]
+    hour_number = calendar["time_branch"]["number"]
+    personal_number = derive_integer("meihua-personal-number-v1", cast_nonce, 1, 1, 64)
+    upper_source = year_number + lunar_month + lunar_day + personal_number
+    lower_source = upper_source + hour_number
+    return _cast_from_numbers(
+        upper_source,
+        lower_source,
+        lower_source,
+        {
+            "method": "personalized_lunar_time",
+            "cast_nonce_hash": nonce_hash(cast_nonce),
+            "personal_number": personal_number,
+            "calendar": calendar,
+            "source_numbers": {
+                "year_branch": year_number, "lunar_month": lunar_month, "lunar_day": lunar_day,
+                "personal_number": personal_number, "hour_branch": hour_number,
+                "upper_sum": upper_source, "lower_sum": lower_source,
+            },
+        },
+        [{
+            "sequence": 1, "operation": "personalize_lunar_time_numbers",
+            "inputs": {"cast_nonce_hash": nonce_hash(cast_nonce), "domain": "meihua-personal-number-v1"},
+            "output": {"personal_number": personal_number, "upper_sum": upper_source, "lower_sum": lower_source, "moving_line": moving_line_number(lower_source)},
+            "rule_ids": ["MH-AUTO-PERSONAL-001"],
+        }],
+    )

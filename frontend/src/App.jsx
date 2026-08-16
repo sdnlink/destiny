@@ -21,6 +21,13 @@ function localDateTimeValue(date = new Date()) {
   return local.toISOString().slice(0, 16);
 }
 
+function newCastNonce() {
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID().replaceAll("-", "");
+  const bytes = new Uint8Array(16);
+  globalThis.crypto.getRandomValues(bytes);
+  return Array.from(bytes, (value) => value.toString(16).padStart(2, "0")).join("");
+}
+
 function initialForm() {
   return {
     scene: "combined",
@@ -30,17 +37,18 @@ function initialForm() {
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Shanghai",
     trueSolar: false,
     longitude: "",
-    yiMethod: "manual",
+    castNonce: newCastNonce(),
+    yiMethod: "auto",
     lines: [7, 8, 7, 8, 7, 8],
     yiLower: "8",
     yiUpper: "8",
-    meihuaMethod: "time",
+    meihuaMethod: "auto",
     mhUpper: "8",
     mhLower: "8",
-    liuyaoMethod: "time",
+    liuyaoMethod: "auto",
     lyLower: "8",
     lyUpper: "8",
-    liurenMethod: "time",
+    liurenMethod: "auto",
     lrNumber: "8",
   };
 }
@@ -57,10 +65,13 @@ function calendarPayload(form) {
 
 function buildCalculations(form) {
   const calendar = calendarPayload(form);
+  const auto = { ...calendar, cast_nonce: form.castNonce };
   const calculations = [{ module: "calendar", method: "analyze", input: calendar }];
   if (form.scene === "combined" || form.scene === "zhouyi") {
     calculations.push(
-      form.yiMethod === "time"
+      form.yiMethod === "auto"
+        ? { module: "zhouyi", method: "auto", input: auto }
+        : form.yiMethod === "time"
         ? { module: "zhouyi", method: "time", input: calendar }
         : form.yiMethod === "manual"
         ? { module: "zhouyi", method: "manual", input: { lines: form.lines } }
@@ -73,7 +84,9 @@ function buildCalculations(form) {
   }
   if (form.scene === "combined" || form.scene === "meihua") {
     calculations.push(
-      form.meihuaMethod === "time"
+      form.meihuaMethod === "auto"
+        ? { module: "meihua", method: "auto", input: auto }
+        : form.meihuaMethod === "time"
         ? { module: "meihua", method: "time", input: calendar }
         : {
             module: "meihua",
@@ -84,7 +97,9 @@ function buildCalculations(form) {
   }
   if (form.scene === "combined" || form.scene === "liuyao") {
     calculations.push(
-      form.liuyaoMethod === "time"
+      form.liuyaoMethod === "auto"
+        ? { module: "liuyao", method: "auto", input: auto }
+        : form.liuyaoMethod === "time"
         ? { module: "liuyao", method: "time", input: calendar }
         : {
             module: "liuyao",
@@ -95,7 +110,9 @@ function buildCalculations(form) {
   }
   if (form.scene === "combined" || form.scene === "liuren") {
     calculations.push(
-      form.liurenMethod === "time"
+      form.liurenMethod === "auto"
+        ? { module: "liuren", method: "auto", input: auto }
+        : form.liurenMethod === "time"
         ? { module: "liuren", method: "time", input: calendar }
         : { module: "liuren", method: "numbers", input: { ...calendar, number: Number(form.lrNumber) } },
     );
@@ -240,6 +257,14 @@ export default function App() {
     setActiveTab("overview");
   };
 
+  const handleRecast = () => {
+    setForm((current) => ({ ...current, castNonce: newCastNonce() }));
+    setResult(null);
+    setResultContext(null);
+    setError("");
+    setActiveTab("overview");
+  };
+
   const openRules = async () => {
     setRulesOpen(true);
     if (rules.length) return;
@@ -269,6 +294,7 @@ export default function App() {
           onSubmit={handleSubmit}
           onPreview={handlePreview}
           onReset={handleReset}
+          onRecast={handleRecast}
           loading={loading}
           previewLoading={previewLoading}
           preview={preview}

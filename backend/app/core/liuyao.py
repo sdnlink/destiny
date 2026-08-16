@@ -1,4 +1,5 @@
 from .calendar import calendar_analysis
+from .casting import derive_coin_lines, nonce_hash
 from .constants import (
     EARTHLY_BRANCHES,
     FIVE_ELEMENTS_CONTROLS,
@@ -201,5 +202,22 @@ def time_cast(local_datetime, timezone, longitude=None, use_true_solar_time=Fals
             "inputs": {"calendar": calendar["input"]},
             "output": {"upper_trigram": upper_index, "lower_trigram": lower_index, "moving_line": moving_line},
             "rule_ids": ["LY-TIME-001"],
+        },
+    )
+
+
+def auto_cast(cast_nonce, local_datetime, timezone, longitude=None, use_true_solar_time=False):
+    calendar = calendar_analysis(local_datetime, timezone, longitude, use_true_solar_time)
+    line_values, coin_rounds = derive_coin_lines("liuyao-auto-coins-v1", cast_nonce)
+    bits = tuple(1 if value in (7, 9) else 0 for value in line_values)
+    moving_lines = [index for index, value in enumerate(line_values, 1) if value in (6, 9)]
+    return _result(
+        derive_hexagrams(bits, moving_lines), calendar, "personalized_three_coin",
+        {"cast_nonce_hash": nonce_hash(cast_nonce), "input_lines": line_values, "coin_rounds": coin_rounds},
+        {
+            "sequence": 1, "operation": "derive_personalized_three_coin_lines",
+            "inputs": {"cast_nonce_hash": nonce_hash(cast_nonce), "domain": "liuyao-auto-coins-v1"},
+            "output": {"coin_rounds": coin_rounds, "line_values": line_values, "moving_lines": moving_lines},
+            "rule_ids": ["LY-AUTO-COIN-001"],
         },
     )

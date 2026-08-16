@@ -89,7 +89,10 @@ def _zhouyi_explanation(item):
                     original["upper_trigram"]["element"],
                     original["lower_trigram"]["element"],
                 ),
-                "rule_ids": [{"manual": "YI-MANUAL-001", "numbers": "YI-NUMBER-001", "time": "YI-TIME-001"}[item["method"]]],
+                "rule_ids": [{
+                    "auto": "YI-AUTO-COIN-001", "manual": "YI-MANUAL-001",
+                    "numbers": "YI-NUMBER-001", "time": "YI-TIME-001",
+                }[item["method"]]],
             },
             {
                 "title": "动爻与变卦",
@@ -117,12 +120,16 @@ def _meihua_explanation(item):
     changed = facts["changed"]
     body_use = facts["body_use"]
     method = facts["method"]
-    if method == "lunar_time":
+    if method in ("lunar_time", "personalized_lunar_time"):
         source = facts["source_numbers"]
         method_text = "按年支数{}、农历月{}、农历日{}及时支数{}取数。".format(
             source["year_branch"], source["lunar_month"], source["lunar_day"], source["hour_branch"]
         )
-        method_rules = ["MH-TIME-001"]
+        if method == "personalized_lunar_time":
+            method_text += " 本次加入凭证派生个体数{}。".format(facts["personal_number"])
+            method_rules = ["MH-AUTO-PERSONAL-001"]
+        else:
+            method_rules = ["MH-TIME-001"]
     else:
         source = facts["input_numbers"]
         method_text = "按输入的上卦数{}和下卦数{}取卦。".format(source["upper"], source["lower"])
@@ -178,6 +185,8 @@ def _liuyao_explanation(item):
     palace = facts["palace"]
     moving = "、".join(str(value) for value in facts["moving_lines"])
     void = "、".join(facts["xun"]["empty_branches"])
+    method_labels = {"auto": "个体三枚铜钱", "time": "传统时间", "numbers": "双数"}
+    method_rules = {"auto": "LY-AUTO-COIN-001", "time": "LY-TIME-001", "numbers": "LY-NUMBER-001"}
     return {
         "module": "liuyao",
         "title": "六爻纳甲排盘",
@@ -189,11 +198,11 @@ def _liuyao_explanation(item):
             {
                 "title": "起卦与八宫",
                 "text": "采用{}排盘，本卦{}上{}下，归{}宫{}。".format(
-                    "时间" if item["method"] == "time" else "双数",
+                    method_labels[item["method"]],
                     original["upper_trigram"]["name"], original["lower_trigram"]["name"],
                     palace["name"], palace["stage"],
                 ),
-                "rule_ids": ["LY-TIME-001" if item["method"] == "time" else "LY-NUMBER-001", "LY-PALACE-001"],
+                "rule_ids": [method_rules[item["method"]], "LY-PALACE-001"],
             },
             {
                 "title": "纳甲与六亲",
@@ -223,6 +232,7 @@ def _liuren_explanation(item):
         transmission_text = "三传为{}，课体路径为{}。".format("、".join(transmissions["transmissions"]), transmissions["lesson_type"])
     else:
         transmission_text = "本课进入{}路径，首版未生成三传。".format(transmissions["pending_path"])
+    hour_rules = {"auto": "LR-AUTO-REPORT-001", "time": "LR-HOUR-001", "numbers": "LR-NUMBER-001"}
     return {
         "module": "liuren",
         "title": "大六壬排盘",
@@ -237,7 +247,7 @@ def _liuren_explanation(item):
                     month_general["boundary_term"], month_general["name"], month_general["branch"],
                     facts["occupation_time"]["branch"],
                 ),
-                "rule_ids": ["LR-MONTH-GENERAL-001", "LR-HOUR-001" if item["method"] == "time" else "LR-NUMBER-001"],
+                "rule_ids": ["LR-MONTH-GENERAL-001", hour_rules[item["method"]]],
             },
             {
                 "title": "天地盘与四课",

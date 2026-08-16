@@ -19,12 +19,15 @@
         {"rule_id": "YI-NUMBER-001", "version": "1.0.0"},
         {"rule_id": "YI-NUMBER-002", "version": "1.0.0"},
         {"rule_id": "YI-TIME-001", "version": "1.0.0"},
+        {"rule_id": "YI-AUTO-COIN-001", "version": "1.0.0"},
         {"rule_id": "MH-TIME-001", "version": "1.0.0"},
+        {"rule_id": "MH-AUTO-PERSONAL-001", "version": "1.0.0"},
         {"rule_id": "MH-NUMBER-001", "version": "1.0.0"},
         {"rule_id": "MH-BODYUSE-001", "version": "1.0.0"},
         {"rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0"},
         {"rule_id": "CYCLE-XUN-001", "version": "1.0.0"},
         {"rule_id": "LY-TIME-001", "version": "1.0.0"},
+        {"rule_id": "LY-AUTO-COIN-001", "version": "1.0.0"},
         {"rule_id": "LY-NUMBER-001", "version": "1.0.0"},
         {"rule_id": "LY-PALACE-001", "version": "1.0.0"},
         {"rule_id": "LY-NAJIA-001", "version": "1.0.0"},
@@ -33,6 +36,7 @@
         {"rule_id": "LR-MONTH-GENERAL-001", "version": "1.0.0"},
         {"rule_id": "LR-HOUR-001", "version": "1.0.0"},
         {"rule_id": "LR-NUMBER-001", "version": "1.0.0"},
+        {"rule_id": "LR-AUTO-REPORT-001", "version": "1.0.0"},
         {"rule_id": "LR-PLATE-001", "version": "1.0.0"},
         {"rule_id": "LR-LESSON-001", "version": "1.0.0"},
         {"rule_id": "LR-TRANSMISSION-001", "version": "1.0.0"},
@@ -50,6 +54,30 @@
     }
   ],
   "rules": [
+    {
+      "rule_id": "YI-AUTO-COIN-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "个体三枚铜钱自动起卦", "purpose": "按独立起卦凭证可复算地派生六次三枚铜钱结果", "preconditions": ["起卦凭证格式有效"],
+      "inputs": ["cast_nonce"], "procedure": ["按模块域和轮次计算SHA-256", "将每枚铜钱映射为2或3", "自下而上形成六爻"], "outputs": ["coin_rounds", "input_lines", "cast_nonce_hash"],
+      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["确定性工程实现待专家签署", "有限卦象空间允许自然撞卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:auto_cast"
+    },
+    {
+      "rule_id": "MH-AUTO-PERSONAL-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "梅花时间法个体加数", "purpose": "在传统年月日時取数中加入独立个体数", "preconditions": ["历法输入有效", "起卦凭证格式有效"],
+      "inputs": ["calendar", "cast_nonce"], "procedure": ["由凭证派生1至64个体数", "年月日与个体数取上卦", "再加时数取下卦和动爻"], "outputs": ["personal_number", "original", "moving_line"],
+      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["个体加数属于工程基线待专家签署", "有限卦象空间允许自然撞卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:auto_cast"
+    },
+    {
+      "rule_id": "LY-AUTO-COIN-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "六爻个体三枚铜钱自动排盘", "purpose": "按独立起卦凭证派生六爻后排八宫纳甲", "preconditions": ["起卦凭证格式有效", "历法输入有效"],
+      "inputs": ["cast_nonce", "calendar"], "procedure": ["使用六爻专属域派生六次三枚铜钱", "识别动爻", "排八宫纳甲等盘面"], "outputs": ["coin_rounds", "input_lines", "line_chart"],
+      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["确定性工程实现待专家签署", "有限卦象空间允许自然撞卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuyao:auto_cast"
+    },
+    {
+      "rule_id": "LR-AUTO-REPORT-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "六壬个体报数自动排盘", "purpose": "由独立起卦凭证派生报数并确定占时", "preconditions": ["起卦凭证格式有效", "历法输入有效"],
+      "inputs": ["cast_nonce", "calendar"], "procedure": ["使用六壬专属域派生1至12报数", "将报数映射占时", "保留实际时支并排盘"], "outputs": ["report_number", "occupation_time", "cast_nonce_hash"],
+      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["报数派生属于工程基线待专家签署", "十二占时之间自然重复"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:auto_cast"
+    },
     {
       "rule_id": "CAL-NORMALIZE-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "本地时间标准化", "purpose": "将无偏移本地时间按IANA时区转换为可计算时刻", "preconditions": ["年份在1900至2100之间", "时区名称有效", "时间不处于夏令时歧义或缺失区间"],

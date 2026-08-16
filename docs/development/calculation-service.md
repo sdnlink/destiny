@@ -14,6 +14,7 @@
 - 显式IANA时区、公农历、节气、四柱和可选真太阳时。
 - 周易手工六爻、双数起卦及本卦、变卦、互卦、错卦、综卦。
 - 梅花农历时间起卦、双数起卦、体用和五行关系事实。
+- 周易、梅花、六爻和六壬个体自动排盘；各模块使用独立派生域并支持凭证重放。
 - 规范输入哈希、幂等任务编号、多模块并行计算。
 - 规则登记、来源引用、规则集合校验和工程案例回归。
 - 对已发布结构化判断进行一致、互补、冲突和无法判断分类。
@@ -64,18 +65,24 @@ APP_API_BIND=0.0.0.0 APP_API_TOKEN='replace-me' ./scripts/run_mvp_api.sh
 | `POST` | `/v1/validation-cases/run` | 执行全部工程案例回归 |
 | `POST` | `/v1/calendar/analyze` | 历法和四柱分析 |
 | `POST` | `/v1/zhouyi/manual` | 手工六爻起卦 |
-| `POST` | `/v1/zhouyi/time` | 周易农历时间自动排盘 |
+| `POST` | `/v1/zhouyi/auto` | 周易个体三枚铜钱自动起卦 |
+| `POST` | `/v1/zhouyi/time` | 周易传统农历时间起卦 |
 | `POST` | `/v1/zhouyi/numbers` | 周易双数起卦 |
-| `POST` | `/v1/meihua/time` | 梅花时间起卦 |
+| `POST` | `/v1/meihua/auto` | 梅花时间结构加个体数起卦 |
+| `POST` | `/v1/meihua/time` | 梅花传统时间起卦 |
 | `POST` | `/v1/meihua/numbers` | 梅花双数起卦 |
-| `POST` | `/v1/liuyao/time` | 六爻时间自动排盘及纳甲 |
+| `POST` | `/v1/liuyao/auto` | 六爻个体三枚铜钱自动排盘及纳甲 |
+| `POST` | `/v1/liuyao/time` | 六爻传统时间排盘及纳甲 |
 | `POST` | `/v1/liuyao/numbers` | 六爻双数排盘及纳甲 |
-| `POST` | `/v1/liuren/time` | 大六壬时间自动排盘 |
+| `POST` | `/v1/liuren/auto` | 大六壬个体报数自动排盘 |
+| `POST` | `/v1/liuren/time` | 大六壬传统时间排盘 |
 | `POST` | `/v1/liuren/numbers` | 大六壬数字占时排盘 |
 | `POST` | `/v1/calculations/evaluate` | 统一单模块计算封装 |
 | `POST` | `/v1/calculations/compare` | 最多8个模块并行计算和综合比较 |
 
 OpenAPI文档位于`/docs`，机器契约位于`/openapi.json`。
+
+个体自动接口除历法参数外必须提交16至128位ASCII `cast_nonce`。同一凭证、时间和规则版本可复算；新起卦应生成新的128位随机凭证。服务只在结果中返回`cast_nonce_hash`，不回传原始凭证。有限卦象空间中不同用户可能自然得到相同本卦，系统以完整爻值、动爻、时间、事项上下文和派生过程区分任务，不强制制造不同卦象。
 
 ### 3.1 历法示例
 

@@ -4,10 +4,19 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import AdvisoryContext, CalculationRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from pydantic import ValidationError
 
 
 class MvpApiTests(unittest.TestCase):
+    def test_auto_request_rejects_unsafe_nonce(self):
+        with self.assertRaises(ValidationError):
+            AutoCastRequest(
+                cast_nonce="contains spaces 123",
+                local_datetime="2026-08-15T16:00:00",
+                timezone="Asia/Shanghai",
+            )
+
     def test_hash_is_stable_across_dictionary_order(self):
         first = canonical_hash({"b": 2, "a": 1})
         second = canonical_hash({"a": 1, "b": 2})
@@ -43,6 +52,37 @@ class MvpApiTests(unittest.TestCase):
         self.assertEqual(execute("liuren", "time", calendar)["facts"]["month_general"]["branch"], "午")
         liuren_numbers = dict(calendar, number=12)
         self.assertEqual(execute("liuren", "numbers", liuren_numbers)["facts"]["occupation_time"]["branch"], "亥")
+
+    def test_dispatches_four_personalized_auto_methods(self):
+        payload = {
+            "cast_nonce": "person-0000000000000001",
+            "local_datetime": "2026-08-15T16:00:00",
+            "timezone": "Asia/Shanghai",
+        }
+        expected = {
+            "zhouyi": "personalized_three_coin",
+            "meihua": "personalized_lunar_time",
+            "liuyao": "personalized_three_coin",
+            "liuren": "personalized_report_number",
+        }
+        for module, method in expected.items():
+            with self.subTest(module=module):
+                result = execute(module, "auto", payload)
+                self.assertEqual(result["facts"]["method"], method)
+                self.assertTrue(result["facts"]["cast_nonce_hash"].startswith("sha256:"))
+
+    def test_comparison_explains_personalized_auto_methods(self):
+        payload = {
+            "cast_nonce": "person-0000000000000001",
+            "local_datetime": "2026-08-15T16:00:00",
+            "timezone": "Asia/Shanghai",
+        }
+        calculations = [CalculationRequest(module=module, method="auto", input=payload) for module in (
+            "zhouyi", "meihua", "liuyao", "liuren",
+        )]
+        output = comparison_envelope(calculations)
+        self.assertEqual(len(output["explanation"]["modules"]), 4)
+        self.assertIn("YI-AUTO-COIN-001", output["explanation"]["modules"][0]["sections"][0]["rule_ids"])
 
     def test_rejects_unknown_calculation(self):
         with self.assertRaises(ValueError):

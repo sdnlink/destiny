@@ -10,6 +10,7 @@ import {
   LoaderCircle,
   LocateFixed,
   Play,
+  RefreshCw,
   RotateCcw,
   Workflow,
 } from "lucide-react";
@@ -61,6 +62,7 @@ export default function InputPanel({
   onSubmit,
   onPreview,
   onReset,
+  onRecast,
   loading,
   previewLoading,
   preview,
@@ -84,9 +86,15 @@ export default function InputPanel({
           <p className="section-kicker">新建推演</p>
           <h1>推演参数</h1>
         </div>
-        <button className="icon-button" type="button" onClick={onReset} title="重置全部输入" aria-label="重置全部输入">
-          <RotateCcw size={17} />
-        </button>
+        <div className="panel-heading-actions">
+          <span className="cast-token" title="本次起卦凭证">凭证 {form.castNonce.slice(0, 8)}</span>
+          <button className="icon-button" type="button" onClick={onRecast} title="重新起卦" aria-label="重新起卦">
+            <RefreshCw size={17} />
+          </button>
+          <button className="icon-button" type="button" onClick={onReset} title="重置全部输入" aria-label="重置全部输入">
+            <RotateCcw size={17} />
+          </button>
+        </div>
       </div>
 
       <form onSubmit={onSubmit}>
@@ -211,11 +219,17 @@ export default function InputPanel({
           <section className="form-section">
             <div className="section-title"><BookOpen size={16} /><span>周易参数</span></div>
             <div className="segmented method-switch" role="radiogroup" aria-label="周易起卦方式">
-              <button type="button" className={form.yiMethod === "time" ? "active" : ""} onClick={() => update("yiMethod", "time")}>自动排盘</button>
+              <button type="button" className={form.yiMethod === "auto" ? "active" : ""} onClick={() => update("yiMethod", "auto")}>个体自动</button>
+              <button type="button" className={form.yiMethod === "time" ? "active" : ""} onClick={() => update("yiMethod", "time")}>传统时间</button>
               <button type="button" className={form.yiMethod === "numbers" ? "active" : ""} onClick={() => update("yiMethod", "numbers")}>数字排盘</button>
               <button type="button" className={form.yiMethod === "manual" ? "active" : ""} onClick={() => update("yiMethod", "manual")}>手工排盘</button>
             </div>
-            {form.yiMethod === "time" ? (
+            {form.yiMethod === "auto" ? (
+              <div className="method-note">
+                <RefreshCw size={16} />
+                <p>按本次独立凭证模拟六次三枚铜钱，结果可复算。</p>
+              </div>
+            ) : form.yiMethod === "time" ? (
               <div className="method-note">
                 <CalendarClock size={16} />
                 <p>采用上方时间，按年支、农历月日及时支自动生成卦盘。</p>
@@ -262,10 +276,16 @@ export default function InputPanel({
           <section className="form-section">
             <div className="section-title"><Compass size={16} /><span>梅花参数</span></div>
             <div className="segmented method-switch" role="radiogroup" aria-label="梅花起卦方式">
-              <button type="button" className={form.meihuaMethod === "time" ? "active" : ""} onClick={() => update("meihuaMethod", "time")}>自动排盘</button>
+              <button type="button" className={form.meihuaMethod === "auto" ? "active" : ""} onClick={() => update("meihuaMethod", "auto")}>个体自动</button>
+              <button type="button" className={form.meihuaMethod === "time" ? "active" : ""} onClick={() => update("meihuaMethod", "time")}>传统时间</button>
               <button type="button" className={form.meihuaMethod === "numbers" ? "active" : ""} onClick={() => update("meihuaMethod", "numbers")}>数字排盘</button>
             </div>
-            {form.meihuaMethod === "time" ? (
+            {form.meihuaMethod === "auto" ? (
+              <div className="method-note">
+                <RefreshCw size={16} />
+                <p>年月日時取数加入本次独立个体数，保留传统时间结构。</p>
+              </div>
+            ) : form.meihuaMethod === "time" ? (
               <div className="method-note">
                 <CalendarClock size={16} />
                 <p>采用上方已确认时间，按年支、农历月日及时支取数。</p>
@@ -287,10 +307,16 @@ export default function InputPanel({
           <section className="form-section">
             <div className="section-title"><Grid3X3 size={16} /><span>六爻参数</span></div>
             <div className="segmented method-switch" role="radiogroup" aria-label="六爻排盘方式">
-              <button type="button" className={form.liuyaoMethod === "time" ? "active" : ""} onClick={() => update("liuyaoMethod", "time")}>自动排盘</button>
+              <button type="button" className={form.liuyaoMethod === "auto" ? "active" : ""} onClick={() => update("liuyaoMethod", "auto")}>个体自动</button>
+              <button type="button" className={form.liuyaoMethod === "time" ? "active" : ""} onClick={() => update("liuyaoMethod", "time")}>传统时间</button>
               <button type="button" className={form.liuyaoMethod === "numbers" ? "active" : ""} onClick={() => update("liuyaoMethod", "numbers")}>数字排盘</button>
             </div>
-            {form.liuyaoMethod === "time" ? (
+            {form.liuyaoMethod === "auto" ? (
+              <div className="method-note">
+                <RefreshCw size={16} />
+                <p>按本次独立凭证生成六次铜钱结果，再排八宫、纳甲和六亲。</p>
+              </div>
+            ) : form.liuyaoMethod === "time" ? (
               <div className="method-note">
                 <CalendarClock size={16} />
                 <p>按时间取卦，并自动生成八宫、世应、纳甲、六亲、六神与旬空。</p>
@@ -312,10 +338,16 @@ export default function InputPanel({
           <section className="form-section">
             <div className="section-title"><Workflow size={16} /><span>大六壬参数</span></div>
             <div className="segmented method-switch" role="radiogroup" aria-label="大六壬排盘方式">
-              <button type="button" className={form.liurenMethod === "time" ? "active" : ""} onClick={() => update("liurenMethod", "time")}>自动排盘</button>
+              <button type="button" className={form.liurenMethod === "auto" ? "active" : ""} onClick={() => update("liurenMethod", "auto")}>个体自动</button>
+              <button type="button" className={form.liurenMethod === "time" ? "active" : ""} onClick={() => update("liurenMethod", "time")}>传统时间</button>
               <button type="button" className={form.liurenMethod === "numbers" ? "active" : ""} onClick={() => update("liurenMethod", "numbers")}>数字排盘</button>
             </div>
-            {form.liurenMethod === "time" ? (
+            {form.liurenMethod === "auto" ? (
+              <div className="method-note">
+                <RefreshCw size={16} />
+                <p>由本次独立凭证生成报数决定占时，同时保留实际时支。</p>
+              </div>
+            ) : form.liurenMethod === "time" ? (
               <div className="method-note">
                 <CalendarClock size={16} />
                 <p>采用实际时支为占时，排月将、天地盘、四课、三传和十二天将。</p>

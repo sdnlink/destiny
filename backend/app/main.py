@@ -15,16 +15,20 @@ from app.core.advisory import CATEGORY_PROFILES, generate_advisory
 from app.core.calendar import calendar_analysis
 from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
 from app.core.explanation import explain_calculation_set
+from app.core.iching import auto_cast as yi_auto_cast
 from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
 from app.core.iching import time_cast as yi_time_cast
 from app.core.interpretation import explain_correspondences
 from app.core.literature import collect_literature_opinions
 from app.core.imagery import collect_imagery
+from app.core.liuren import auto_cast as liuren_auto_cast
 from app.core.liuren import number_cast as liuren_number_cast
 from app.core.liuren import time_cast as liuren_time_cast
+from app.core.liuyao import auto_cast as liuyao_auto_cast
 from app.core.liuyao import number_cast as liuyao_number_cast
 from app.core.liuyao import time_cast as liuyao_time_cast
+from app.core.meihua import auto_cast as meihua_auto_cast
 from app.core.meihua import number_cast as meihua_number_cast
 from app.core.meihua import time_cast as meihua_time_cast
 from app.core.registry import load_rule_registry, load_validation_cases
@@ -42,6 +46,13 @@ class CalendarRequest(BaseModel):
     timezone: str = Field(..., example="Asia/Shanghai")
     longitude: Optional[float] = Field(None, ge=-180, le=180)
     use_true_solar_time: bool = False
+
+
+class AutoCastRequest(CalendarRequest):
+    cast_nonce: constr(
+        strip_whitespace=True, min_length=16, max_length=128,
+        regex=r"^[A-Za-z0-9_-]+$",
+    )
 
 
 class YiManualRequest(BaseModel):
@@ -101,6 +112,9 @@ def execute(module, method, payload):
     if module == "zhouyi" and method == "manual":
         request = YiManualRequest(**payload)
         return yi_manual_cast(request.lines)
+    if module == "zhouyi" and method == "auto":
+        request = AutoCastRequest(**payload)
+        return yi_auto_cast(**request.dict())
     if module == "zhouyi" and method == "time":
         request = CalendarRequest(**payload)
         return yi_time_cast(**request.dict())
@@ -110,12 +124,18 @@ def execute(module, method, payload):
     if module == "meihua" and method == "time":
         request = CalendarRequest(**payload)
         return meihua_time_cast(**request.dict())
+    if module == "meihua" and method == "auto":
+        request = AutoCastRequest(**payload)
+        return meihua_auto_cast(**request.dict())
     if module == "meihua" and method == "numbers":
         request = MeihuaNumberRequest(**payload)
         return meihua_number_cast(request.upper_number, request.lower_number)
     if module == "liuyao" and method == "time":
         request = CalendarRequest(**payload)
         return liuyao_time_cast(**request.dict())
+    if module == "liuyao" and method == "auto":
+        request = AutoCastRequest(**payload)
+        return liuyao_auto_cast(**request.dict())
     if module == "liuyao" and method == "numbers":
         request = LiuyaoNumberRequest(**payload)
         values = request.dict()
@@ -125,6 +145,9 @@ def execute(module, method, payload):
     if module == "liuren" and method == "time":
         request = CalendarRequest(**payload)
         return liuren_time_cast(**request.dict())
+    if module == "liuren" and method == "auto":
+        request = AutoCastRequest(**payload)
+        return liuren_auto_cast(**request.dict())
     if module == "liuren" and method == "numbers":
         request = LiurenNumberRequest(**payload)
         values = request.dict()
@@ -297,6 +320,11 @@ def cast_yi_manual(request: YiManualRequest):
     return {"data": yi_manual_cast(request.lines)}
 
 
+@app.post("/v1/zhouyi/auto")
+def cast_yi_auto(request: AutoCastRequest):
+    return {"data": yi_auto_cast(**request.dict())}
+
+
 @app.post("/v1/zhouyi/time")
 def cast_yi_time(request: CalendarRequest):
     return {"data": yi_time_cast(**request.dict())}
@@ -312,6 +340,11 @@ def cast_meihua_time(request: CalendarRequest):
     return {"data": meihua_time_cast(**request.dict())}
 
 
+@app.post("/v1/meihua/auto")
+def cast_meihua_auto(request: AutoCastRequest):
+    return {"data": meihua_auto_cast(**request.dict())}
+
+
 @app.post("/v1/meihua/numbers")
 def cast_meihua_numbers(request: MeihuaNumberRequest):
     return {"data": meihua_number_cast(request.upper_number, request.lower_number)}
@@ -320,6 +353,11 @@ def cast_meihua_numbers(request: MeihuaNumberRequest):
 @app.post("/v1/liuyao/time")
 def cast_liuyao_time(request: CalendarRequest):
     return {"data": liuyao_time_cast(**request.dict())}
+
+
+@app.post("/v1/liuyao/auto")
+def cast_liuyao_auto(request: AutoCastRequest):
+    return {"data": liuyao_auto_cast(**request.dict())}
 
 
 @app.post("/v1/liuyao/numbers")
@@ -333,6 +371,11 @@ def cast_liuyao_numbers(request: LiuyaoNumberRequest):
 @app.post("/v1/liuren/time")
 def cast_liuren_time(request: CalendarRequest):
     return {"data": liuren_time_cast(**request.dict())}
+
+
+@app.post("/v1/liuren/auto")
+def cast_liuren_auto(request: AutoCastRequest):
+    return {"data": liuren_auto_cast(**request.dict())}
 
 
 @app.post("/v1/liuren/numbers")

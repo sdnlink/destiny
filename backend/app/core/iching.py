@@ -7,6 +7,7 @@ from .constants import (
     trigram_number,
 )
 from .calendar import calendar_analysis
+from .casting import derive_coin_lines, nonce_hash
 
 
 ENGINE_VERSION = "yi-engine-1.0.0"
@@ -191,3 +192,33 @@ def time_cast(local_datetime, timezone, longitude=None, use_true_solar_time=Fals
         "judgements": [],
         "warnings": ["周易自动排盘采用农历时间取数工程基线；该起卦法及事项断语尚待专家签署。"],
     }
+
+
+def auto_cast(cast_nonce, local_datetime, timezone, longitude=None, use_true_solar_time=False):
+    calendar = calendar_analysis(local_datetime, timezone, longitude, use_true_solar_time)
+    line_values, coin_rounds = derive_coin_lines("zhouyi-auto-coins-v1", cast_nonce)
+    result = manual_cast(line_values)
+    result["engine_version"] = ENGINE_VERSION
+    result["rule_version"] = RULE_VERSION
+    result["facts"].update({
+        "method": "personalized_three_coin",
+        "cast_nonce_hash": nonce_hash(cast_nonce),
+        "coin_rounds": coin_rounds,
+        "calendar": {"pillars": calendar["pillars"], "effective_local_datetime": calendar["time"]["effective_local_datetime"]},
+    })
+    result["steps"] = [
+        {
+            "sequence": 1, "operation": "derive_personalized_three_coin_lines",
+            "inputs": {"cast_nonce_hash": nonce_hash(cast_nonce), "domain": "zhouyi-auto-coins-v1"},
+            "output": {"coin_rounds": coin_rounds, "line_values": line_values},
+            "rule_ids": ["YI-AUTO-COIN-001"],
+        },
+        {
+            "sequence": 2, "operation": "derive_related_hexagrams",
+            "inputs": {"line_values": line_values},
+            "output": {"original": result["facts"]["original"]["ordinal"], "changed": result["facts"]["changed"]["ordinal"], "moving_lines": result["facts"]["moving_lines"]},
+            "rule_ids": ["YI-MANUAL-001", "YI-RELATION-001"],
+        },
+    ]
+    result["warnings"] = ["个体自动排盘采用可复算三枚铜钱工程法；自然撞卦仍可能发生，事项断语尚待专家签署。"]
+    return result

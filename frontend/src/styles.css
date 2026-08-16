@@ -265,6 +265,19 @@ summary:focus-visible {
   font-size: 21px;
 }
 
+.panel-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cast-token {
+  color: var(--ink-muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
 .section-kicker,
 .eyebrow {
   margin: 0;

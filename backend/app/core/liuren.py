@@ -1,6 +1,7 @@
 from lunar_python import Solar
 
 from .calendar import calendar_analysis
+from .casting import derive_integer, nonce_hash
 from .constants import EARTHLY_BRANCHES, FIVE_ELEMENTS_CONTROLS
 from .cyclical import BRANCH_ELEMENTS, STEM_ELEMENTS, polarity, xun_info
 
@@ -226,3 +227,19 @@ def number_cast(number, local_datetime, timezone, longitude=None, use_true_solar
         local_datetime, timezone, occupation_branch=branch, occupation_number=source,
         longitude=longitude, use_true_solar_time=use_true_solar_time,
     )
+
+
+def auto_cast(cast_nonce, local_datetime, timezone, longitude=None, use_true_solar_time=False):
+    report_number = derive_integer("liuren-report-number-v1", cast_nonce, 1, 1, 12)
+    result = number_cast(report_number, local_datetime, timezone, longitude, use_true_solar_time)
+    result["facts"]["method"] = "personalized_report_number"
+    result["facts"]["cast_nonce_hash"] = nonce_hash(cast_nonce)
+    result["facts"]["report_number"] = report_number
+    result["steps"][0] = {
+        "sequence": 1, "operation": "derive_personalized_occupation_number",
+        "inputs": {"cast_nonce_hash": nonce_hash(cast_nonce), "domain": "liuren-report-number-v1"},
+        "output": {"report_number": report_number, "occupation_branch": result["facts"]["occupation_time"]["branch"]},
+        "rule_ids": ["LR-AUTO-REPORT-001", "LR-NUMBER-001"],
+    }
+    result["warnings"].insert(0, "个体自动排盘采用凭证派生报数确定占时；实际时支仍保留在盘面中。")
+    return result
