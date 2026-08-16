@@ -37,6 +37,11 @@
         {"rule_id": "LR-LESSON-001", "version": "1.0.0"},
         {"rule_id": "LR-TRANSMISSION-001", "version": "1.0.0"},
         {"rule_id": "LR-GENERAL-001", "version": "1.0.0"},
+        {"rule_id": "XIANG-TRIGRAM-001", "version": "1.0.0"},
+        {"rule_id": "XIANG-BRANCH-001", "version": "1.0.0"},
+        {"rule_id": "XIANG-CONTEXT-001", "version": "1.0.0"},
+        {"rule_id": "YHYS-CYCLE-001", "version": "1.0.0"},
+        {"rule_id": "YHYS-RELATION-001", "version": "1.0.0"},
         {"rule_id": "ADV-CONTEXT-001", "version": "1.0.0"},
         {"rule_id": "ADV-MH-RELATION-001", "version": "1.0.0"}
       ]
@@ -204,6 +209,36 @@
       "title": "昼夜贵人十二天将", "purpose": "按日干昼夜贵人起例布十二天将", "preconditions": ["日干、当地小时和天地盘已确定"],
       "inputs": ["day_stem", "civil_hour", "heaven_plate"], "procedure": ["6至18时按昼贵其余按夜贵", "定位贵人临地盘", "按临地方位顺逆布将"], "outputs": ["heavenly_generals"],
       "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["昼夜按民用小时划分的工程基线", "贵人起例待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.liuren:_heavenly_generals"
+    },
+    {
+      "rule_id": "XIANG-TRIGRAM-001", "version": "1.0.0", "system": "imagery", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "八卦基础类象", "purpose": "按盘面角色提供八卦自然、人物、事物和行为等类象候选", "preconditions": ["盘面包含有效八卦"],
+      "inputs": ["trigram", "module", "role"], "procedure": ["读取版本化八卦类象表", "保留盘面模块和角色"], "outputs": ["imagery_candidates"],
+      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#类象层"], "limitations": ["类象待专家逐项签署", "不自动指认现实对象"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.imagery:TRIGRAM_IMAGERY"
+    },
+    {
+      "rule_id": "XIANG-BRANCH-001", "version": "1.0.0", "system": "imagery", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "十二地支基础类象", "purpose": "为六壬月将和三传提供地支类象候选", "preconditions": ["盘面包含有效地支"],
+      "inputs": ["earthly_branch", "module", "role"], "procedure": ["读取地支方位时令和事物类象", "保留月将或三传角色"], "outputs": ["imagery_candidates"],
+      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#类象层"], "limitations": ["首版不含完整神煞和天将类象"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.imagery:BRANCH_IMAGERY"
+    },
+    {
+      "rule_id": "XIANG-CONTEXT-001", "version": "1.0.0", "system": "imagery", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "事项类象维度筛选", "purpose": "按用户明确选择的事项类别排序类象维度", "preconditions": ["事项类别受支持"],
+      "inputs": ["category", "imagery_candidates"], "procedure": ["选择事项优先维度", "保留完整类象和筛选结果"], "outputs": ["priority_dimensions", "selected_imagery"],
+      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#事项筛选"], "limitations": ["问题全文不进入排盘公式", "筛选不表示现实对应已确认"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.imagery:collect_imagery"
+    },
+    {
+      "rule_id": "YHYS-CYCLE-001", "version": "1.0.0", "system": "yuanhui", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "元会运世周期定位", "purpose": "按暂定纪元和周期单位定位公历年", "preconditions": ["历法模块提供公历年"],
+      "inputs": ["solar_year", "epoch"], "procedure": ["按129600年取元", "按10800年取会", "按360年取运", "按30年取世"], "outputs": ["yuan", "hui", "yun", "shi", "year_in_shi"],
+      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#元会运世层", "https://zh.wikisource.org/wiki/皇極經世"], "limitations": ["公元前67017年纪元待专家签署", "只计算到公历年"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.yuanhui:cycle_position"
+    },
+    {
+      "rule_id": "YHYS-RELATION-001", "version": "1.0.0", "system": "yuanhui", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "会支五行与盘面关系", "purpose": "比较当前会支五行与盘面结构五行", "preconditions": ["会支和盘面五行已确定"],
+      "inputs": ["hui_element", "chart_elements"], "procedure": ["逐项比较同类、生和克关系", "保留模块与盘面角色"], "outputs": ["relation_evidence"],
+      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#与盘面关系"], "limitations": ["关系不映射个人吉凶", "不生成应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.yuanhui:analyze_yuan_hui_yun_shi"
     },
     {
       "rule_id": "ADV-CONTEXT-001", "version": "1.0.0", "system": "advisory", "school": "mvp-engineering-baseline", "status": "draft",

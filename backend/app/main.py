@@ -19,6 +19,7 @@ from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
 from app.core.iching import time_cast as yi_time_cast
 from app.core.literature import collect_literature_opinions
+from app.core.imagery import collect_imagery
 from app.core.liuren import number_cast as liuren_number_cast
 from app.core.liuren import time_cast as liuren_time_cast
 from app.core.liuyao import number_cast as liuyao_number_cast
@@ -28,6 +29,7 @@ from app.core.meihua import time_cast as meihua_time_cast
 from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
 from app.core.validation import run_validation_cases
+from app.core.yuanhui import analyze_yuan_hui_yun_shi
 
 
 APP_VERSION = "0.2.0"
@@ -181,6 +183,8 @@ def comparison_envelope(calculations, context=None):
         "explanation": explain_calculation_set(module_results, comparison),
         "advisory": generate_advisory(module_results, normalized_context),
         "literature": collect_literature_opinions(module_results),
+        "imagery": collect_imagery(module_results, normalized_context),
+        "yuan_hui_yun_shi": analyze_yuan_hui_yun_shi(module_results),
         "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
     }
 

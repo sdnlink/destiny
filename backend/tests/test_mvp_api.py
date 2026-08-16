@@ -76,6 +76,16 @@ class MvpApiTests(unittest.TestCase):
         self.assertNotEqual(career["task_id"], finance["task_id"])
         self.assertEqual(career["advisory"]["context"]["category"], "career")
         self.assertIn("工作机会", career["advisory"]["conclusion"]["text"])
+        self.assertEqual(career["imagery"]["context"]["category"], "career")
+        self.assertIsNone(career["yuan_hui_yun_shi"])
+
+    def test_comparison_attaches_yuanhui_when_calendar_is_present(self):
+        calculation = CalculationRequest(
+            module="calendar", method="analyze",
+            input={"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
+        )
+        output = comparison_envelope([calculation])
+        self.assertEqual(output["yuan_hui_yun_shi"]["facts"]["hui"]["branch"], "午")
 
 
 if __name__ == "__main__":
