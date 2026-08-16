@@ -42,6 +42,8 @@
         {"rule_id": "XIANG-CONTEXT-001", "version": "1.0.0"},
         {"rule_id": "YHYS-CYCLE-001", "version": "1.0.0"},
         {"rule_id": "YHYS-RELATION-001", "version": "1.0.0"},
+        {"rule_id": "INTERP-CORRESPONDENCE-001", "version": "1.0.0"},
+        {"rule_id": "INTERP-INTEGRATE-001", "version": "1.0.0"},
         {"rule_id": "ADV-CONTEXT-001", "version": "1.0.0"},
         {"rule_id": "ADV-MH-RELATION-001", "version": "1.0.0"}
       ]
@@ -239,6 +241,18 @@
       "title": "会支五行与盘面关系", "purpose": "比较当前会支五行与盘面结构五行", "preconditions": ["会支和盘面五行已确定"],
       "inputs": ["hui_element", "chart_elements"], "procedure": ["逐项比较同类、生和克关系", "保留模块与盘面角色"], "outputs": ["relation_evidence"],
       "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#与盘面关系"], "limitations": ["关系不映射个人吉凶", "不生成应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.yuanhui:analyze_yuan_hui_yun_shi"
+    },
+    {
+      "rule_id": "INTERP-CORRESPONDENCE-001", "version": "1.0.0", "system": "interpretation", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "盘面事实对应解释", "purpose": "把各模块盘面角色和类象转换为当前事项的待核实解释", "preconditions": ["盘面事实已完成", "用户提供事项类别和问题摘要"],
+      "inputs": ["module_results", "context", "imagery"], "procedure": ["分模块读取盘面角色", "关联事项优先类象", "生成事实、对应和核实点"], "outputs": ["module_interpretations", "verification_points"],
+      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#输出边界"], "limitations": ["解释模板待专家签署", "不把类象强制对应现实对象", "不生成吉凶和应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.interpretation:explain_correspondences"
+    },
+    {
+      "rule_id": "INTERP-INTEGRATE-001", "version": "1.0.0", "system": "interpretation", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "跨层解释整合", "purpose": "在不覆盖独立盘面的前提下并列模块解释和宏观时间背景", "preconditions": ["模块对应解释已生成"],
+      "inputs": ["module_interpretations", "yuan_hui_yun_shi"], "procedure": ["保留模块独立解释", "附加元会运世背景", "汇总现实核实点"], "outputs": ["summary", "cross_layer", "limitations"],
+      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#接口与展示"], "limitations": ["不进行自动加权", "宏观周期不决定个人事项"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.interpretation:explain_correspondences"
     },
     {
       "rule_id": "ADV-CONTEXT-001", "version": "1.0.0", "system": "advisory", "school": "mvp-engineering-baseline", "status": "draft",

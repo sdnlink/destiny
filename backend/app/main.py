@@ -18,6 +18,7 @@ from app.core.explanation import explain_calculation_set
 from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
 from app.core.iching import time_cast as yi_time_cast
+from app.core.interpretation import explain_correspondences
 from app.core.literature import collect_literature_opinions
 from app.core.imagery import collect_imagery
 from app.core.liuren import number_cast as liuren_number_cast
@@ -174,6 +175,8 @@ def comparison_envelope(calculations, context=None):
         for item, result in zip(normalized, results)
     ]
     comparison = synthesize(results)
+    imagery = collect_imagery(module_results, normalized_context)
+    yuan_hui = analyze_yuan_hui_yun_shi(module_results)
     return {
         "task_id": "compare_{}".format(input_hash[:24]),
         "status": "completed",
@@ -183,8 +186,9 @@ def comparison_envelope(calculations, context=None):
         "explanation": explain_calculation_set(module_results, comparison),
         "advisory": generate_advisory(module_results, normalized_context),
         "literature": collect_literature_opinions(module_results),
-        "imagery": collect_imagery(module_results, normalized_context),
-        "yuan_hui_yun_shi": analyze_yuan_hui_yun_shi(module_results),
+        "imagery": imagery,
+        "yuan_hui_yun_shi": yuan_hui,
+        "interpretation": explain_correspondences(module_results, normalized_context, imagery, yuan_hui),
         "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
     }
 

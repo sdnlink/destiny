@@ -17,7 +17,7 @@ from app.core.validation import compare_subset, run_validation_cases
 class RuleRegistryTests(unittest.TestCase):
     def test_registry_is_valid_and_has_stable_checksum(self):
         registry = load_rule_registry()
-        self.assertEqual(len(registry["rules"]), 34)
+        self.assertEqual(len(registry["rules"]), 36)
         self.assertTrue(registry["checksum"].startswith("sha256:"))
         self.assertEqual(registry["rule_sets"][0]["status"], "draft")
 
