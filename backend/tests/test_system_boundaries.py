@@ -71,3 +71,11 @@ def test_zhouyi_domain_does_not_import_other_divination_systems():
             if isinstance(node, ast.ImportFrom) and node.module
         }
         assert not any(module == prefix or module.startswith(prefix + ".") for module in modules for prefix in forbidden), path.name
+
+
+def test_meihua_domain_only_depends_on_calendar_and_common_domains():
+    forbidden = ("app.zhouyi", "app.liuyao", "app.daliuren", "app.core")
+    for path in (APP_ROOT / "meihua").rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        modules = {node.module for node in ast.walk(tree) if isinstance(node, ast.ImportFrom) and node.module}
+        assert not any(module == prefix or module.startswith(prefix + ".") for module in modules for prefix in forbidden), path.name

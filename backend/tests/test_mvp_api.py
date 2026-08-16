@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
 from pydantic import ValidationError
 
 
@@ -13,6 +13,11 @@ class MvpApiTests(unittest.TestCase):
         for numbers in ([1, 2], [1, 2, 3, 4], [1, True, 3], [1, -2, 3]):
             with self.subTest(numbers=numbers), self.assertRaises(ValidationError):
                 YiThreeNumberRequest(numbers=numbers)
+
+    def test_meihua_three_number_api_requires_three_strict_integers(self):
+        for numbers in ([1, 2], [1, 2, 3, 4], [1, True, 3], [1, 2.0, 3]):
+            with self.subTest(numbers=numbers), self.assertRaises(ValidationError):
+                MeihuaThreeNumberRequest(numbers=numbers)
 
     def test_auto_request_rejects_unsafe_nonce(self):
         with self.assertRaises(ValidationError):
@@ -67,6 +72,16 @@ class MvpApiTests(unittest.TestCase):
             CalculationRequest(module="zhouyi", method="three_numbers", input=payload),
         ])
         self.assertIn("YI-3NUM-MAPPING-001", explained["explanation"]["modules"][0]["sections"][0]["rule_ids"])
+
+    def test_dispatches_meihua_three_number_method(self):
+        payload = {"numbers": [25, 38, 5]}
+        result = execute("meihua", "three_numbers", payload)
+        self.assertEqual(result["facts"]["original"]["name"], "讼")
+        self.assertEqual(result["facts"]["changed"]["name"], "未济")
+        explained = comparison_envelope([
+            CalculationRequest(module="meihua", method="three_numbers", input=payload),
+        ])
+        self.assertIn("MH-THREE-NUMBER-001", explained["explanation"]["modules"][0]["sections"][0]["rule_ids"])
 
     def test_dispatches_four_personalized_auto_methods(self):
         payload = {

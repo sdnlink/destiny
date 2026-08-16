@@ -31,6 +31,7 @@ from app.liuyao import number_cast as liuyao_number_cast
 from app.liuyao import time_cast as liuyao_time_cast
 from app.meihua import auto_cast as meihua_auto_cast
 from app.meihua import number_cast as meihua_number_cast
+from app.meihua import three_number_cast as meihua_three_number_cast
 from app.meihua import time_cast as meihua_time_cast
 from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
@@ -73,6 +74,10 @@ class YiThreeNumberRequest(BaseModel):
 class MeihuaNumberRequest(BaseModel):
     upper_number: int
     lower_number: int
+
+
+class MeihuaThreeNumberRequest(BaseModel):
+    numbers: conlist(conint(strict=True), min_items=3, max_items=3)
 
 
 class LiuyaoNumberRequest(CalendarRequest):
@@ -139,6 +144,9 @@ def execute(module, method, payload):
     if module == "meihua" and method == "numbers":
         request = MeihuaNumberRequest(**payload)
         return meihua_number_cast(request.upper_number, request.lower_number)
+    if module == "meihua" and method == "three_numbers":
+        request = MeihuaThreeNumberRequest(**payload)
+        return meihua_three_number_cast(*request.numbers)
     if module == "liuyao" and method == "time":
         request = CalendarRequest(**payload)
         return liuyao_time_cast(**request.dict())
@@ -362,6 +370,11 @@ def cast_meihua_auto(request: AutoCastRequest):
 @app.post("/v1/meihua/numbers")
 def cast_meihua_numbers(request: MeihuaNumberRequest):
     return {"data": meihua_number_cast(request.upper_number, request.lower_number)}
+
+
+@app.post("/v1/meihua/three-numbers")
+def cast_meihua_three_numbers(request: MeihuaThreeNumberRequest):
+    return {"data": meihua_three_number_cast(*request.numbers)}
 
 
 @app.post("/v1/liuyao/time")

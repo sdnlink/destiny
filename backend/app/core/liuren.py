@@ -2,8 +2,9 @@ from lunar_python import Solar
 
 from app.calendar import calendar_analysis
 from app.common.ganzhi import BRANCH_ELEMENTS, STEM_ELEMENTS, polarity, xun_info
-from .casting import derive_integer, nonce_hash
-from .constants import EARTHLY_BRANCHES, FIVE_ELEMENTS_CONTROLS
+from app.common.casting import derive_integer, nonce_hash
+from app.common.five_elements import FIVE_ELEMENTS_CONTROLS
+from .constants import EARTHLY_BRANCHES
 
 
 ENGINE_VERSION = "liuren-engine-1.0.0+lunar-python-1.4.8"

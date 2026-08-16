@@ -1,5 +1,6 @@
 from app.common.hexagrams import HEXAGRAM_NAMES, KING_WEN_MATRIX
 from app.common.ganzhi import EARTHLY_BRANCHES, EARTHLY_BRANCH_NUMBER
+from app.common.five_elements import FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES
 from app.common.trigrams import TRIGRAM_CATALOG, trigram_to_bits
 
 
@@ -18,9 +19,6 @@ TRIGRAMS = {
 
 TRIGRAM_BY_LINES = {value["lines"]: {"number": key, **value} for key, value in TRIGRAMS.items()}
 TRIGRAM_BY_NAME = {value["name"]: {"number": key, **value} for key, value in TRIGRAMS.items()}
-
-FIVE_ELEMENTS_GENERATES = {"木": "火", "火": "土", "土": "金", "金": "水", "水": "木"}
-FIVE_ELEMENTS_CONTROLS = {"木": "土", "土": "水", "水": "火", "火": "金", "金": "木"}
 
 def trigram_number(value):
     remainder = int(value) % 8

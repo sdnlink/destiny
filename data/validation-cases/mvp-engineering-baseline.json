@@ -52,6 +52,12 @@
       "tags": ["boundary", "numbers", "remainder-zero"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
     },
     {
+      "case_id": "case_mh_0003", "system": "meihua", "school": "meihua-three-number-baseline", "method": "three_numbers", "title": "梅花三数独立动爻与体用",
+      "input": {"numbers": [25, 38, 5]},
+      "expected": {"rule_version": "meihua-three-number-v1.0.0", "facts": {"method": "three_numbers", "upper_trigram": {"name": "乾"}, "lower_trigram": {"name": "坎"}, "moving_line": 5, "original": {"name": "讼"}, "mutual": {"name": "家人"}, "changed": {"name": "未济"}, "body_use": {"body_position": "lower", "use_position": "upper"}}},
+      "tags": ["basic", "three-numbers", "body-use"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/010-meihua-domain-phase-four.md"], "reviewers": []
+    },
+    {
       "case_id": "case_yi_0003", "system": "zhouyi", "school": "mvp-engineering-baseline", "method": "time", "title": "周易自动时间排盘基线",
       "input": {"local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai"},
       "expected": {"facts": {"method": "lunar_time", "original": {"ordinal": 10, "name": "履"}, "changed": {"ordinal": 25, "name": "无妄"}, "moving_lines": [2]}},

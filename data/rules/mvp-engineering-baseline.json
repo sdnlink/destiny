@@ -29,6 +29,7 @@
         {"rule_id": "MH-TIME-001", "version": "1.0.0"},
         {"rule_id": "MH-AUTO-PERSONAL-001", "version": "1.0.0"},
         {"rule_id": "MH-NUMBER-001", "version": "1.0.0"},
+        {"rule_id": "MH-THREE-NUMBER-001", "version": "1.0.0"},
         {"rule_id": "MH-BODYUSE-001", "version": "1.0.0"},
         {"rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0"},
         {"rule_id": "CYCLE-XUN-001", "version": "1.0.0"},
@@ -178,25 +179,31 @@
       "rule_id": "MH-TIME-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "梅花农历时间起卦", "purpose": "由年支、农历月日和时支确定上下卦及动爻", "preconditions": ["时间和时区有效"],
       "inputs": ["local_datetime", "timezone"], "procedure": ["年支数加月日取上卦", "再加时支取下卦", "下卦总数除以6取动爻"], "outputs": ["upper_trigram", "lower_trigram", "moving_line"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["闰月按月份绝对值取数", "规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:time_cast"
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["闰月按月份绝对值取数", "规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:time_cast"
     },
     {
       "rule_id": "MH-NUMBER-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "梅花双数起卦", "purpose": "第一数取上卦，第二数取下卦并以两数之和取动爻", "preconditions": ["输入为整数"],
       "inputs": ["upper_number", "lower_number"], "procedure": ["第一数除以8取上卦", "第二数除以8取下卦", "两数之和除以6取动爻"], "outputs": ["upper_trigram", "lower_trigram", "moving_line"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:number_cast"
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:number_cast"
+    },
+    {
+      "rule_id": "MH-THREE-NUMBER-001", "version": "1.0.0", "system": "meihua", "school": "meihua-three-number-baseline", "status": "draft",
+      "title": "梅花三数独立起卦", "purpose": "分别以三个整数确定上卦、下卦和动爻", "preconditions": ["恰好三个整数"],
+      "inputs": ["upper_number", "lower_number", "moving_number"], "procedure": ["第一数除以8取上卦且余0归8", "第二数除以8取下卦且余0归8", "第三数除以6取动爻且余0归6"], "outputs": ["upper_trigram", "lower_trigram", "moving_line"],
+      "source_refs": ["docs/design/decisions/010-meihua-domain-phase-four.md"], "limitations": ["允许有符号整数以兼容既有数字输入口径", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:three_number_cast"
     },
     {
       "rule_id": "MH-BODYUSE-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "梅花体用位置", "purpose": "按动爻所在三爻卦确定用卦，另一卦为体", "preconditions": ["动爻位置已确定"],
       "inputs": ["moving_line"], "procedure": ["动爻在1至3则下卦为用", "动爻在4至6则上卦为用", "另一卦为体"], "outputs": ["body_position", "use_position"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["不含旺衰与应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:_cast_from_numbers"
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["不含旺衰与应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:_cast_from_sources"
     },
     {
       "rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "梅花体用五行关系", "purpose": "输出体用之间的生克比和关系事实", "preconditions": ["体卦和用卦五行已确定"],
       "inputs": ["body_element", "use_element"], "procedure": ["比较同五行", "比较五行生关系", "比较五行克关系"], "outputs": ["relation_code", "relation_label"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["关系事实不直接映射吉凶"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:five_element_relation"
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["关系事实不直接映射吉凶"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:five_element_relation"
     },
     {
       "rule_id": "CYCLE-XUN-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",

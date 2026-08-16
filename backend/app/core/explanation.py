@@ -131,6 +131,12 @@ def _meihua_explanation(item):
             method_rules = ["MH-AUTO-PERSONAL-001"]
         else:
             method_rules = ["MH-TIME-001"]
+    elif method == "three_numbers":
+        source = facts["input_numbers"]
+        method_text = "按输入的上卦数{}、下卦数{}和独立动爻数{}取卦。".format(
+            source["upper"], source["lower"], source["moving"]
+        )
+        method_rules = ["MH-THREE-NUMBER-001"]
     else:
         source = facts["input_numbers"]
         method_text = "按输入的上卦数{}和下卦数{}取卦。".format(source["upper"], source["lower"])

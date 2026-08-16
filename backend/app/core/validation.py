@@ -9,6 +9,7 @@ from app.core.liuyao import number_cast as liuyao_number_cast
 from app.core.liuyao import time_cast as liuyao_time_cast
 from app.core.meihua import number_cast as meihua_number_cast
 from app.core.meihua import time_cast as meihua_time_cast
+from app.meihua import three_number_cast as meihua_three_number_cast
 from app.core.registry import load_rule_registry, load_validation_cases, unknown_rule_ids
 
 
@@ -30,6 +31,8 @@ def execute_validation_case(case):
         return meihua_time_cast(**payload)
     if system == "meihua" and method == "numbers":
         return meihua_number_cast(payload["upper_number"], payload["lower_number"])
+    if system == "meihua" and method == "three_numbers":
+        return meihua_three_number_cast(*payload["numbers"])
     if system == "liuyao" and method == "time":
         return liuyao_time_cast(**payload)
     if system == "liuyao" and method == "numbers":

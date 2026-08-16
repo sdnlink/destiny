@@ -1,4 +1,6 @@
-from .constants import EARTHLY_BRANCHES, FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES
+from app.common.five_elements import FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES
+
+from .constants import EARTHLY_BRANCHES
 from app.common.ganzhi import BRANCH_ELEMENTS
 
 

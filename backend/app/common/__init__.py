@@ -12,6 +12,7 @@ from .hexagrams import (
     hexagram_to_bits,
 )
 from .ganzhi import EARTHLY_BRANCHES, HEAVENLY_STEMS, pillar_details, sexagenary_index, xun_info
+from .five_elements import FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES
 from .models import Hexagram, Line, LinePolarity, Trigram
 from .trigrams import get_trigram_by_bits, get_trigram_by_number, trigram_to_bits
 
@@ -21,6 +22,8 @@ __all__ = (
     "Hexagram",
     "EARTHLY_BRANCHES",
     "HEAVENLY_STEMS",
+    "FIVE_ELEMENTS_CONTROLS",
+    "FIVE_ELEMENTS_GENERATES",
     "Line",
     "LinePolarity",
     "Trigram",
