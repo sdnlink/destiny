@@ -1,4 +1,6 @@
-from .calendar import calendar_analysis
+from app.common.serialization import derive_hexagram_facts
+from app.calendar import calendar_analysis
+
 from .constants import (
     FIVE_ELEMENTS_CONTROLS,
     FIVE_ELEMENTS_GENERATES,
@@ -6,7 +8,6 @@ from .constants import (
     moving_line_number,
     trigram_number,
 )
-from .iching import derive_hexagrams
 from .casting import derive_integer, nonce_hash
 
 
@@ -35,7 +36,7 @@ def _cast_from_numbers(upper_source, lower_source, moving_source, input_facts, s
     upper = TRIGRAMS[upper_number]
     lower = TRIGRAMS[lower_number]
     lines = lower["lines"] + upper["lines"]
-    hexagrams = derive_hexagrams(lines, [moving_line])
+    hexagrams = derive_hexagram_facts(lines, [moving_line])
 
     use_position = "lower" if moving_line <= 3 else "upper"
     body_position = "upper" if use_position == "lower" else "lower"

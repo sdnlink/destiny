@@ -1,12 +1,8 @@
-from .constants import (
-    HEXAGRAM_NAMES,
-    KING_WEN_MATRIX,
-    TRIGRAM_BY_LINES,
-    TRIGRAMS,
-    moving_line_number,
-    trigram_number,
-)
-from .calendar import calendar_analysis
+from app.common.hexagrams import get_hexagram_by_lines
+from app.common.serialization import derive_hexagram_facts, hexagram_to_dict
+from app.calendar import calendar_analysis
+
+from .constants import TRIGRAMS, moving_line_number, trigram_number
 from .casting import derive_coin_lines, nonce_hash
 
 
@@ -23,45 +19,12 @@ def _line_bits(line_values):
     return tuple(1 if value in (7, 9) else 0 for value in line_values)
 
 
-def _trigram(lines):
-    try:
-        return TRIGRAM_BY_LINES[tuple(lines)]
-    except KeyError:
-        raise ValueError("trigram lines must contain exactly three binary values")
-
-
 def hexagram_from_bits(lines):
-    if len(lines) != 6 or any(value not in (0, 1) for value in lines):
-        raise ValueError("hexagram lines must contain six binary values from first to top")
-    lower = _trigram(lines[:3])
-    upper = _trigram(lines[3:])
-    ordinal = KING_WEN_MATRIX[upper["number"] - 1][lower["number"] - 1]
-    return {
-        "ordinal": ordinal,
-        "name": HEXAGRAM_NAMES[ordinal - 1],
-        "symbol": chr(0x4DBF + ordinal),
-        "lines": list(lines),
-        "lower_trigram": lower,
-        "upper_trigram": upper,
-    }
+    return hexagram_to_dict(get_hexagram_by_lines(lines))
 
 
 def derive_hexagrams(lines, moving_lines):
-    moving_set = set(moving_lines)
-    if any(index < 1 or index > 6 for index in moving_set):
-        raise ValueError("moving line positions must be between 1 and 6")
-    changed = tuple(1 - value if index in moving_set else value for index, value in enumerate(lines, 1))
-    mutual = (lines[1], lines[2], lines[3], lines[2], lines[3], lines[4])
-    opposite = tuple(1 - value for value in lines)
-    reversed_lines = tuple(reversed(lines))
-    return {
-        "original": hexagram_from_bits(tuple(lines)),
-        "changed": hexagram_from_bits(changed),
-        "mutual": hexagram_from_bits(mutual),
-        "opposite": hexagram_from_bits(opposite),
-        "reversed": hexagram_from_bits(reversed_lines),
-        "moving_lines": sorted(moving_set),
-    }
+    return derive_hexagram_facts(lines, moving_lines)
 
 
 def manual_cast(line_values):

@@ -12,25 +12,25 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, conint, conlist, constr, validator
 
 from app.core.advisory import CATEGORY_PROFILES, generate_advisory
-from app.core.calendar import calendar_analysis
+from app.calendar import calendar_analysis
 from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
 from app.core.explanation import explain_calculation_set
-from app.core.iching import auto_cast as yi_auto_cast
-from app.core.iching import manual_cast as yi_manual_cast
-from app.core.iching import number_cast as yi_number_cast
-from app.core.iching import time_cast as yi_time_cast
+from app.zhouyi import auto_cast as yi_auto_cast
+from app.zhouyi import manual_cast as yi_manual_cast
+from app.zhouyi import number_cast as yi_number_cast
+from app.zhouyi import time_cast as yi_time_cast
 from app.core.interpretation import explain_correspondences
 from app.core.literature import collect_literature_opinions
 from app.core.imagery import collect_imagery
-from app.core.liuren import auto_cast as liuren_auto_cast
-from app.core.liuren import number_cast as liuren_number_cast
-from app.core.liuren import time_cast as liuren_time_cast
-from app.core.liuyao import auto_cast as liuyao_auto_cast
-from app.core.liuyao import number_cast as liuyao_number_cast
-from app.core.liuyao import time_cast as liuyao_time_cast
-from app.core.meihua import auto_cast as meihua_auto_cast
-from app.core.meihua import number_cast as meihua_number_cast
-from app.core.meihua import time_cast as meihua_time_cast
+from app.daliuren import auto_cast as liuren_auto_cast
+from app.daliuren import number_cast as liuren_number_cast
+from app.daliuren import time_cast as liuren_time_cast
+from app.liuyao import auto_cast as liuyao_auto_cast
+from app.liuyao import number_cast as liuyao_number_cast
+from app.liuyao import time_cast as liuyao_time_cast
+from app.meihua import auto_cast as meihua_auto_cast
+from app.meihua import number_cast as meihua_number_cast
+from app.meihua import time_cast as meihua_time_cast
 from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
 from app.core.validation import run_validation_cases

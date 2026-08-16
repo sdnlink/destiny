@@ -3,4 +3,5 @@ set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-exec "$project_dir/.venv/bin/python" "$project_dir/backend/app/corpus_api.py" "$@"
+cd "$project_dir/backend"
+exec "$project_dir/.venv/bin/python" -m app.corpus_api "$@"

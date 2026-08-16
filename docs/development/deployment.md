@@ -23,12 +23,12 @@
 
 默认依次执行：
 
-1. 检查`python3`和`npm`。
+1. 检查Python 3.11+和`npm`。
 2. 不存在时创建根目录`.venv`。
-3. 从`backend/requirements.txt`安装固定版本Python依赖。
+3. 从`backend/requirements.txt`和`backend/requirements-dev.txt`安装固定版本Python依赖。
 4. 使用`npm ci`按锁文件安装前端依赖。
 5. 编译`backend/app`和`backend/tests`中的Python文件。
-6. 运行全部后端测试。
+6. 使用pytest运行全部后端测试。
 7. 以同源API模式构建React前端到`frontend/dist`。
 8. 检查`frontend/dist/index.html`存在。
 

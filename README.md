@@ -18,7 +18,7 @@
 ## 仓库结构
 
 ```text
-backend/       Python、FastAPI、计算内核和后端测试
+backend/       Python 3.11+、FastAPI、领域计算内核和pytest测试
 frontend/      React、Vite、Web界面和浏览器测试
 clickhouse/    ClickHouse数据库结构
 data/          前后端共享规则、案例和生成数据
@@ -33,8 +33,9 @@ docs/          项目计划、设计决策和运行手册
 首次安装后端依赖：
 
 ```bash
-python3 -m venv .venv
+python3.11 -m venv .venv
 .venv/bin/pip install -r backend/requirements.txt
+.venv/bin/pip install -r backend/requirements-dev.txt
 ```
 
 启动ClickHouse：
@@ -99,7 +100,7 @@ Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在
 验证：
 
 ```bash
-.venv/bin/python -m unittest discover -s backend/tests -v
+.venv/bin/python -m pytest backend/tests
 ./scripts/run_validation_cases.py
 npm --prefix frontend run build
 npm --prefix frontend run test:browser

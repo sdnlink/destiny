@@ -25,6 +25,7 @@ fi
 if [[ "$install_dependencies" == "1" ]]; then
   echo "[build] installing backend dependencies"
   "$venv_dir/bin/pip" install -r "$project_dir/backend/requirements.txt"
+  "$venv_dir/bin/pip" install -r "$project_dir/backend/requirements-dev.txt"
 
   echo "[build] installing frontend dependencies"
   npm --prefix "$frontend_dir" ci
@@ -38,7 +39,7 @@ echo "[build] compiling backend Python sources"
 
 if [[ "$run_tests" == "1" ]]; then
   echo "[build] running backend tests"
-  "$venv_dir/bin/python" -m unittest discover -s "$project_dir/backend/tests" -v
+  "$venv_dir/bin/python" -m pytest "$project_dir/backend/tests"
 fi
 
 echo "[build] building same-origin frontend assets"
