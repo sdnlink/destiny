@@ -18,6 +18,7 @@
 - [ADR-003：前后端仓库布局](./decisions/003-frontend-backend-repository-layout.md)
 - [ADR-004：四体系自动排盘与数字排盘工程基线](./decisions/004-four-system-casting-baseline.md)
 - [ADR-005：类象与元会运世工程基线](./decisions/005-imagery-and-yuanhui-baseline.md)
+- [ADR-006：个体化自动起卦协议](./decisions/006-personalized-auto-casting.md)
 
 ## 文档优先级
 
