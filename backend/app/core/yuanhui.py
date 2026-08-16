@@ -1,5 +1,5 @@
 from .constants import EARTHLY_BRANCHES, FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES
-from .cyclical import BRANCH_ELEMENTS
+from app.common.ganzhi import BRANCH_ELEMENTS
 
 
 ENGINE_VERSION = "yuanhui-engine-1.0.0"
@@ -101,4 +101,3 @@ def analyze_yuan_hui_yun_shi(module_results):
         ],
         "warnings": ["元会运世纪元采用待专家审核的工程基线，当前只计算到公历年粒度。", "宏观周期五行关系不直接表示个人吉凶、事件概率或应期。"],
     }
-

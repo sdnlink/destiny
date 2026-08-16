@@ -1,4 +1,4 @@
-from app.core.calendar import calendar_analysis
+from app.calendar import calendar_analysis
 from app.core.iching import manual_cast as yi_manual_cast
 from app.core.iching import number_cast as yi_number_cast
 from app.core.iching import time_cast as yi_time_cast

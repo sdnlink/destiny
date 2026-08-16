@@ -20,6 +20,7 @@
 - [ADR-005：类象与元会运世工程基线](./decisions/005-imagery-and-yuanhui-baseline.md)
 - [ADR-006：个体化自动起卦协议](./decisions/006-personalized-auto-casting.md)
 - [ADR-007：术数领域边界与公共卦象核心](./decisions/007-domain-boundaries-and-hexagram-core.md)
+- [ADR-008：统一历法引擎第二阶段基线](./decisions/008-calendar-engine-phase-two.md)
 
 ## 文档优先级
 

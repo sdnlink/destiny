@@ -81,4 +81,4 @@ common ────────┼──> zhouyi / liuyao / meihua / daliuren
 
 ## 6. 运行时
 
-`backend/pyproject.toml`声明Python 3.11+和pytest。当前代码暂时保持Python 3.7语法兼容，仅用于现有服务平滑迁移；正式开发、CI和新部署必须切换到Python 3.11+。运行时升级完成后再删除旧环境兼容说明。
+`backend/pyproject.toml`声明Python 3.11+和pytest。当前代码暂时保持Python 3.7语法兼容，仅用于现有服务平滑迁移；正式开发、CI和新部署必须切换到Python 3.11+。历法领域的第二阶段迁移见ADR-008。

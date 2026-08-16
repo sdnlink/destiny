@@ -1,5 +1,5 @@
-"""Public boundary for the Chinese calendar engine."""
+"""Public boundary for the deterministic Chinese calendar engine."""
 
-from .engine import calendar_analysis
+from .engine import CalendarEngine, CalendarInput, calendar_analysis
 
-__all__ = ("calendar_analysis",)
+__all__ = ("CalendarEngine", "CalendarInput", "calendar_analysis")

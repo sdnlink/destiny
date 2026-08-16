@@ -48,3 +48,14 @@ def test_corpus_api_module_does_not_shadow_standard_library_calendar():
         text=True,
     )
     assert completed.returncode == 0
+
+
+def test_calendar_domain_does_not_import_legacy_core_modules():
+    for path in (APP_ROOT / "calendar").glob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        modules = {
+            node.module
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom) and node.module
+        }
+        assert not any(module == "app.core" or module.startswith("app.core.") for module in modules), path.name

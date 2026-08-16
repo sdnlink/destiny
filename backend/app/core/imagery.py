@@ -1,6 +1,6 @@
 from collections import Counter
 
-from .cyclical import BRANCH_ELEMENTS
+from app.common.ganzhi import BRANCH_ELEMENTS
 from .constants import TRIGRAM_BY_NAME
 
 

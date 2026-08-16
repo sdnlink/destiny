@@ -1,5 +1,6 @@
 from app.common.serialization import derive_hexagram_facts
 from app.calendar import calendar_analysis
+from app.common.ganzhi import BRANCH_ELEMENTS, xun_info
 
 from .casting import derive_coin_lines, nonce_hash
 from .constants import (
@@ -10,7 +11,6 @@ from .constants import (
     moving_line_number,
     trigram_number,
 )
-from .cyclical import BRANCH_ELEMENTS, xun_info
 
 
 ENGINE_VERSION = "liuyao-engine-1.0.0"

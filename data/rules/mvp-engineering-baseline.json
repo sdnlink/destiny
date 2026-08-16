@@ -14,6 +14,9 @@
         {"rule_id": "CAL-SOLAR-TIME-001", "version": "1.0.0"},
         {"rule_id": "CAL-CONVERSION-001", "version": "1.0.0"},
         {"rule_id": "CAL-PILLARS-001", "version": "1.0.0"},
+        {"rule_id": "CAL-TERM-TZ-001", "version": "1.0.0"},
+        {"rule_id": "CAL-TERM-001", "version": "1.0.0"},
+        {"rule_id": "CAL-CYCLE-001", "version": "1.0.0"},
         {"rule_id": "YI-MANUAL-001", "version": "1.0.0"},
         {"rule_id": "YI-RELATION-001", "version": "1.0.0"},
         {"rule_id": "YI-NUMBER-001", "version": "1.0.0"},
@@ -82,25 +85,43 @@
       "rule_id": "CAL-NORMALIZE-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "本地时间标准化", "purpose": "将无偏移本地时间按IANA时区转换为可计算时刻", "preconditions": ["年份在1900至2100之间", "时区名称有效", "时间不处于夏令时歧义或缺失区间"],
       "inputs": ["local_datetime", "timezone"], "procedure": ["解析ISO-8601本地时间", "按IANA时区定位", "保留本地时间与UTC时间"], "outputs": ["original_local_datetime", "utc_datetime"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["不接受输入自带UTC偏移"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.calendar:parse_local_datetime"
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["不接受输入自带UTC偏移"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.timezone:parse_local_datetime"
     },
     {
       "rule_id": "CAL-SOLAR-TIME-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "真太阳时修正", "purpose": "在显式启用时记录经度、均时差和夏令时修正", "preconditions": ["启用时必须提供经度"],
       "inputs": ["local_datetime", "timezone", "longitude", "use_true_solar_time"], "procedure": ["计算标准经线", "计算经度时差", "计算均时差近似值", "扣除夏令时并合并修正"], "outputs": ["effective_local_datetime", "correction"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["均时差使用NOAA风格近似公式", "默认关闭"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.calendar:apply_true_solar_time"
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["均时差使用NOAA风格近似公式", "默认关闭"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.timezone:apply_true_solar_time"
     },
     {
       "rule_id": "CAL-CONVERSION-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "公农历与节气转换", "purpose": "生成农历日期及相邻节气事实", "preconditions": ["时间已标准化"],
       "inputs": ["effective_local_datetime"], "procedure": ["调用固定版本lunar-python转换", "提取农历与相邻节气"], "outputs": ["lunar", "solar_terms"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#技术决策"], "limitations": ["结果受lunar-python 1.4.8支持范围约束"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.calendar:calendar_analysis"
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#技术决策"], "limitations": ["结果受lunar-python 1.4.8支持范围约束"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.engine:CalendarEngine.calculate"
     },
     {
       "rule_id": "CAL-PILLARS-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
       "title": "四柱边界工程基线", "purpose": "按立春、节令和子初23时生成四柱", "preconditions": ["历法时间已确定"],
       "inputs": ["effective_local_datetime"], "procedure": ["立春换年", "节令换月", "23时换日", "计算时柱"], "outputs": ["pillars"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["边界仍待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.calendar:calendar_analysis"
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["边界仍待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.engine:CalendarEngine.calculate"
+    },
+    {
+      "rule_id": "CAL-TERM-TZ-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "节气绝对时刻时区转换", "purpose": "将东八区节气参考时刻转换为输入IANA时区的同一绝对时刻", "preconditions": ["有效时区和有效时间"],
+      "inputs": ["effective_local_datetime", "timezone"], "procedure": ["转换为Asia/Shanghai参考时刻", "读取节气参考时间", "转换为用户时区和UTC"], "outputs": ["solar_term_reference_datetime", "local_datetime", "utc_datetime"],
+      "source_refs": ["docs/design/decisions/008-calendar-engine-phase-two.md"], "limitations": ["节气数据受lunar-python 1.4.8约束", "天文算法实现待独立交叉验证"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.solar_terms:serialize_jieqi"
+    },
+    {
+      "rule_id": "CAL-TERM-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "二十四节气与月令边界", "purpose": "输出相邻节气及当前月建所依据的前后节令", "preconditions": ["节气参考时刻已确定"],
+      "inputs": ["reference_datetime"], "procedure": ["读取前一当前下一节气", "读取前一和下一节令", "保留秒级时间"], "outputs": ["solar_terms", "month_boundary_terms"],
+      "source_refs": ["docs/design/decisions/008-calendar-engine-phase-two.md"], "limitations": ["秒级指输出粒度，不代表未经验证的天文误差范围"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.solar_terms:solar_term_context"
+    },
+    {
+      "rule_id": "CAL-CYCLE-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "月建生肖与旬空结构化", "purpose": "由四柱生成月建、立春生肖、日旬和旬空事实", "preconditions": ["四柱已确定"],
+      "inputs": ["year_pillar", "month_pillar", "day_pillar"], "procedure": ["月柱地支作为月建", "年柱地支映射生肖", "日柱定位六十甲子和旬空"], "outputs": ["month_branch", "zodiac", "xun", "xun_kong"],
+      "source_refs": ["docs/design/decisions/008-calendar-engine-phase-two.md"], "limitations": ["生肖边界采用立春工程基线", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.engine:CalendarEngine.calculate"
     },
     {
       "rule_id": "YI-MANUAL-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
