@@ -12,10 +12,11 @@ SYSTEM_FILES = {
     "liuyao": APP_ROOT / "core" / "liuyao.py",
     "meihua": APP_ROOT / "core" / "meihua.py",
     "daliuren": APP_ROOT / "daliuren" / "engine.py",
+    "fengshui": APP_ROOT / "fengshui" / "engine.py",
 }
 
 
-@pytest.mark.parametrize("package", ("calendar", "common", "zhouyi", "liuyao", "meihua", "daliuren"))
+@pytest.mark.parametrize("package", ("calendar", "common", "zhouyi", "liuyao", "meihua", "daliuren", "fengshui"))
 def test_required_domain_package_exists(package):
     assert (APP_ROOT / package / "__init__.py").is_file()
 
@@ -92,6 +93,14 @@ def test_liuyao_domain_only_depends_on_calendar_and_common_domains():
 def test_daliuren_domain_only_depends_on_calendar_and_common_domains():
     forbidden = ("app.zhouyi", "app.meihua", "app.liuyao", "app.core")
     for path in (APP_ROOT / "daliuren").rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        modules = {node.module for node in ast.walk(tree) if isinstance(node, ast.ImportFrom) and node.module}
+        assert not any(module == prefix or module.startswith(prefix + ".") for module in modules for prefix in forbidden), path.name
+
+
+def test_fengshui_domain_does_not_depend_on_other_domains():
+    forbidden = ("app.calendar", "app.zhouyi", "app.meihua", "app.liuyao", "app.daliuren", "app.core")
+    for path in (APP_ROOT / "fengshui").rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         modules = {node.module for node in ast.walk(tree) if isinstance(node, ast.ImportFrom) and node.module}
         assert not any(module == prefix or module.startswith(prefix + ".") for module in modules for prefix in forbidden), path.name

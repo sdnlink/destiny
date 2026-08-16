@@ -4,8 +4,9 @@ MODULE_LABELS = {
     "meihua": "梅花易数",
     "liuyao": "六爻",
     "liuren": "大六壬",
+    "fengshui": "阳宅方位",
 }
-MODULE_ORDER = {"calendar": 0, "zhouyi": 1, "meihua": 2, "liuyao": 3, "liuren": 4}
+MODULE_ORDER = {"calendar": 0, "zhouyi": 1, "meihua": 2, "liuyao": 3, "liuren": 4, "fengshui": 5}
 
 
 def _calendar_explanation(item):
@@ -285,12 +286,59 @@ def _liuren_explanation(item):
     }
 
 
+def _fengshui_explanation(item):
+    result = item["result"]
+    facts = result["facts"]
+    facing = facts["facing"]
+    sitting = facts["sitting"]
+    facing_names = "、".join(value["name"] for value in facing["candidate_mountains"])
+    sitting_names = "、".join(value["name"] for value in sitting["candidate_mountains"])
+    return {
+        "module": "fengshui",
+        "title": "阳宅坐向测量",
+        "summary": "真北向首{:.1f}°为{}向，坐山{:.1f}°为{}坐；测量分类{}。".format(
+            facts["true_facing_degree"], facing["mountain"]["name"],
+            facts["true_sitting_degree"], sitting["mountain"]["name"],
+            "稳定" if facts["classification_stable"] else "跨越分界",
+        ),
+        "sections": [
+            {
+                "title": "真北修正",
+                "text": "输入基准为{}，应用磁偏角{:.2f}°后，真北向首为{:.2f}°。".format(
+                    result["normalized_input"]["input_reference"],
+                    result["normalized_input"]["applied_declination"],
+                    facts["true_facing_degree"],
+                ),
+                "rule_ids": ["FS-DIRECTION-NORMALIZE-001", "FS-DECLINATION-001"],
+            },
+            {
+                "title": "坐向与二十四山",
+                "text": "向首归{}山（{}卦、{}），旋转180°后的坐山归{}山（{}卦、{}）。".format(
+                    facing["mountain"]["name"], facing["mountain"]["trigram"], facing["mountain"]["element"],
+                    sitting["mountain"]["name"], sitting["mountain"]["trigram"], sitting["mountain"]["element"],
+                ),
+                "rule_ids": ["FS-24MOUNTAIN-001"],
+            },
+            {
+                "title": "测量误差",
+                "text": "按正负{:.2f}°传播误差，向首候选为{}，坐山候选为{}；向首距最近分界{:.2f}°。".format(
+                    result["normalized_input"]["measurement_error"], facing_names, sitting_names,
+                    facing["distance_to_boundary"],
+                ),
+                "rule_ids": ["FS-UNCERTAINTY-001"],
+            },
+        ],
+        "limitations": list(result.get("warnings", [])),
+    }
+
+
 EXPLAINERS = {
     "calendar": _calendar_explanation,
     "zhouyi": _zhouyi_explanation,
     "meihua": _meihua_explanation,
     "liuyao": _liuyao_explanation,
     "liuren": _liuren_explanation,
+    "fengshui": _fengshui_explanation,
 }
 
 

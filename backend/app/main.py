@@ -1,5 +1,6 @@
 import hashlib
 import json
+import math
 import os
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -26,6 +27,7 @@ from app.core.imagery import collect_imagery
 from app.daliuren import auto_cast as liuren_auto_cast
 from app.daliuren import number_cast as liuren_number_cast
 from app.daliuren import time_cast as liuren_time_cast
+from app.fengshui import calculate_direction as fengshui_direction
 from app.liuyao import auto_cast as liuyao_auto_cast
 from app.liuyao import number_cast as liuyao_number_cast
 from app.liuyao import coin_cast as liuyao_coin_cast
@@ -100,6 +102,27 @@ class LiuyaoCoinRequest(CalendarRequest):
 
 class LiurenNumberRequest(CalendarRequest):
     number: conint(strict=True)
+
+
+class FengshuiDirectionRequest(BaseModel):
+    facing_degree: float
+    input_reference: str = "magnetic"
+    magnetic_declination: float = 0.0
+    measurement_error: float = Field(0.0, ge=0, le=180)
+    declination_source: Optional[constr(strip_whitespace=True, min_length=1, max_length=200)] = None
+    measurement_method: Optional[constr(strip_whitespace=True, min_length=1, max_length=100)] = None
+
+    @validator("facing_degree", "magnetic_declination", "measurement_error", pre=True)
+    def numeric_fields_are_strict_and_finite(cls, value):
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            raise ValueError("must be a finite number")
+        return value
+
+    @validator("input_reference")
+    def reference_is_supported(cls, value):
+        if value not in ("magnetic", "true"):
+            raise ValueError("must be magnetic or true")
+        return value
 
 
 class CalculationRequest(BaseModel):
@@ -193,6 +216,9 @@ def execute(module, method, payload):
         values = request.dict()
         number = values.pop("number")
         return liuren_number_cast(number, **values)
+    if module == "fengshui" and method == "direction":
+        request = FengshuiDirectionRequest(**payload)
+        return fengshui_direction(**request.dict())
     raise ValueError(f"unsupported calculation: {module}/{method}")
 
 
@@ -259,7 +285,7 @@ def comparison_envelope(calculations, context=None):
 app = FastAPI(
     title="天机演象MVP计算API",
     version=APP_VERSION,
-    description="确定性历法、周易、梅花易数、六爻和大六壬事实计算。解释规则尚待专家签署。",
+    description="确定性历法、周易、梅花易数、六爻、大六壬和阳宅方位事实计算。解释规则尚待专家签署。",
 )
 
 
@@ -281,7 +307,7 @@ def health():
         "status": "ok",
         "service": "tianji-mvp-calculation",
         "version": APP_VERSION,
-        "modules": ["calendar", "zhouyi", "meihua", "liuyao", "liuren"],
+        "modules": ["calendar", "zhouyi", "meihua", "liuyao", "liuren", "fengshui"],
     }
 
 
@@ -447,6 +473,11 @@ def cast_liuren_numbers(request: LiurenNumberRequest):
     values = request.dict()
     number = values.pop("number")
     return {"data": liuren_number_cast(number, **values)}
+
+
+@app.post("/v1/fengshui/direction")
+def calculate_fengshui_direction(request: FengshuiDirectionRequest):
+    return {"data": fengshui_direction(**request.dict())}
 
 
 @app.post("/v1/calculations/evaluate")

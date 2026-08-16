@@ -14,6 +14,7 @@ import {
   Info,
   Layers3,
   ListTree,
+  Mountain,
   ShieldCheck,
   Workflow,
 } from "lucide-react";
@@ -25,6 +26,7 @@ const TABS = [
   { id: "meihua", label: "梅花易数", icon: Compass },
   { id: "liuyao", label: "六爻", icon: Grid3X3 },
   { id: "liuren", label: "大六壬", icon: Workflow },
+  { id: "fengshui", label: "阳宅风水", icon: Mountain },
   { id: "comparison", label: "对照分析", icon: GitCompareArrows },
   { id: "explanation", label: "结论建议", icon: FileText },
 ];
@@ -38,7 +40,7 @@ const CATEGORY_LABELS = {
   study: "学业",
   other: "其他",
 };
-const SCENE_LABELS = { combined: "综合推演", zhouyi: "周易", meihua: "梅花易数", liuyao: "六爻", liuren: "大六壬" };
+const SCENE_LABELS = { combined: "综合推演", zhouyi: "周易", meihua: "梅花易数", liuyao: "六爻", liuren: "大六壬", fengshui: "阳宅风水" };
 const IMAGERY_MODULE_LABELS = { zhouyi: "周易", meihua: "梅花", liuyao: "六爻", liuren: "六壬" };
 const IMAGERY_STAGE_LABELS = { original: "本盘", changed: "变盘" };
 const CAST_METHOD_LABELS = {
@@ -183,7 +185,7 @@ function Evidence({ items = [] }) {
   );
 }
 
-function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, onTab }) {
+function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, fengshui, onTab }) {
   const comparison = result.comparison;
   return (
     <div className="view-stack">
@@ -247,6 +249,18 @@ function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, o
               <span>{liuren.facts.month_general.branch}加临{liuren.facts.occupation_time.branch}时</span>
             </div>
             <p>{liuren.facts.three_transmissions.status === "completed" ? `三传 ${liuren.facts.three_transmissions.transmissions.join(" · ")}` : `待补 ${liuren.facts.three_transmissions.pending_path}`}</p>
+          </button>
+        )}
+
+        {fengshui && (
+          <button className="overview-section" onClick={() => onTab("fengshui")}>
+            <div className="overview-head"><span><Mountain size={16} />阳宅坐向</span><ArrowRight size={15} /></div>
+            <div className="direction-overview-core">
+              <div><span>坐</span><strong>{fengshui.facts.sitting.mountain.name}</strong><small>{fengshui.facts.true_sitting_degree}°</small></div>
+              <ArrowRight size={22} />
+              <div><span>向</span><strong>{fengshui.facts.facing.mountain.name}</strong><small>{fengshui.facts.true_facing_degree}°</small></div>
+            </div>
+            <p>{fengshui.facts.classification_stable ? "山向分类稳定" : "测量误差跨界，需复测确认"}</p>
           </button>
         )}
       </section>
@@ -500,6 +514,64 @@ function LiurenView({ result }) {
   );
 }
 
+function MountainFact({ label, direction }) {
+  const mountain = direction.mountain;
+  return (
+    <div className="direction-fact">
+      <span>{label}</span>
+      <strong>{mountain.name}</strong>
+      <b>{direction.degree}°</b>
+      <p>{mountain.trigram}卦 · {mountain.element} · {mountain.direction}</p>
+      <small>区间 [{mountain.start_degree}°, {mountain.end_degree}°)</small>
+    </div>
+  );
+}
+
+function FengshuiView({ result }) {
+  if (!result) return <MissingModule name="阳宅风水" />;
+  const { facts } = result;
+  const facing = facts.facing;
+  const sitting = facts.sitting;
+  return (
+    <div className="view-stack">
+      <section className="view-heading">
+        <div><span className="section-kicker">FENGSHUI DIRECTION</span><h2>阳宅真北坐向</h2><p>磁偏角、坐向换算、二十四山和测量误差按独立规则计算。</p></div>
+        <span className="version-badge">{result.rule_version}</span>
+      </section>
+      <section className="direction-primary-grid">
+        <MountainFact label="坐山" direction={sitting} />
+        <div className="direction-axis"><ArrowRight size={24} /><span>相差 180°</span></div>
+        <MountainFact label="向首" direction={facing} />
+      </section>
+      <section className="two-column-data">
+        <div className="data-band">
+          <div className="band-heading"><div><span className="band-icon"><Compass size={16} /></span><div><h3>真北修正</h3><p>{result.normalized_input.input_reference === "magnetic" ? "磁北输入" : "真北输入"}</p></div></div></div>
+          <div className="key-value-list">
+            <DataState label="原始角度" value={`${result.normalized_input.input_degree}°`} />
+            <DataState label="应用磁偏角" value={`${result.normalized_input.applied_declination}°`} />
+            <DataState label="真北向首" value={`${facts.true_facing_degree}°`} />
+            <DataState label="真北坐山" value={`${facts.true_sitting_degree}°`} />
+          </div>
+        </div>
+        <div className="data-band">
+          <div className="band-heading"><div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>测量稳定性</h3><p>误差 ±{result.normalized_input.measurement_error}°</p></div></div></div>
+          <div className="key-value-list">
+            <DataState label="分类状态" value={facts.classification_stable ? "稳定" : "跨越分界"} />
+            <DataState label="距最近分界" value={`${facing.distance_to_boundary}°`} />
+            <DataState label="向首候选" value={facing.candidate_mountains.map((item) => item.name).join("、")} />
+            <DataState label="坐山候选" value={sitting.candidate_mountains.map((item) => item.name).join("、")} />
+          </div>
+        </div>
+      </section>
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <Steps steps={result.steps} />
+      </section>
+      {result.warnings.map((warning) => <Notice tone={facts.boundary_warning ? "warning" : "neutral"} icon={CircleAlert} key={warning}>{warning}</Notice>)}
+    </div>
+  );
+}
+
 function ComparisonView({ comparison }) {
   const categories = [
     ["consistent", "一致", "同维度、同时间范围内倾向相同"],
@@ -535,7 +607,7 @@ function ComparisonView({ comparison }) {
 }
 
 function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, interpretation }) {
-  const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass, liuyao: Grid3X3, liuren: Workflow };
+  const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass, liuyao: Grid3X3, liuren: Workflow, fengshui: Mountain };
   return (
     <div className="view-stack explanation-view">
       <section className="view-heading">
@@ -812,6 +884,7 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
   const meihua = findModule(result, "meihua");
   const liuyao = findModule(result, "liuyao");
   const liuren = findModule(result, "liuren");
+  const fengshui = findModule(result, "fengshui");
   return (
     <main className="result-workspace">
       <header className="result-header">
@@ -829,12 +902,13 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         ))}
       </nav>
       <div className="result-content">
-        {activeTab === "overview" && <Overview result={result} context={context} calendar={calendar} zhouyi={zhouyi} meihua={meihua} liuyao={liuyao} liuren={liuren} onTab={setActiveTab} />}
+        {activeTab === "overview" && <Overview result={result} context={context} calendar={calendar} zhouyi={zhouyi} meihua={meihua} liuyao={liuyao} liuren={liuren} fengshui={fengshui} onTab={setActiveTab} />}
         {activeTab === "calendar" && <CalendarView calendar={calendar} />}
         {activeTab === "zhouyi" && <ZhouyiView result={zhouyi} />}
         {activeTab === "meihua" && <MeihuaView result={meihua} />}
         {activeTab === "liuyao" && <LiuyaoView result={liuyao} />}
         {activeTab === "liuren" && <LiurenView result={liuren} />}
+        {activeTab === "fengshui" && <FengshuiView result={fengshui} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}
         {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} literature={result.literature} imagery={result.imagery} yuanHui={result.yuan_hui_yun_shi} interpretation={result.interpretation} />}
       </div>

@@ -2,7 +2,7 @@
 
 ## 功能范围
 
-当前版本完成风水功能的第一层基础能力：罗盘方位标准化、磁偏角修正、坐向换算、二十四山判定、九宫基础数据，以及房屋和户型要素的数据结构。
+当前版本完成风水功能的第一层基础能力：独立领域内的罗盘方位标准化、磁偏角修正、坐向换算、二十四山判定、测量误差传播和边界预警；数据层已有九宫基础数据及房屋、户型要素结构。
 
 八宅、玄空飞星、三元九运和形势判断属于流派规则层。数据库已能通过 `rule_definitions.school` 和 `rule_version` 保存不同规则，但在获得专家审核案例前，不生成确定性吉凶结论。
 
@@ -51,7 +51,17 @@
 - 午山：`[172.5°, 187.5°)`。
 - 壬山：`[337.5°, 352.5°)`。
 
-向首与分界线距离不足1度时会产生边界警告。此时应结合测量误差要求用户在不同位置、不同时间复测，而不是直接采用某一山向。
+向首与分界线距离不足1度，或正负测量误差覆盖多个山向时会产生边界警告。响应同时返回`candidate_mountains`和`classification_stable`。此时应要求用户在不同位置、不同时间复测，而不是直接采用某一山向。
+
+## API使用
+
+```bash
+curl -X POST http://127.0.0.1:8090/v1/fengshui/direction \
+  -H 'Content-Type: application/json' \
+  -d '{"facing_degree":6,"input_reference":"magnetic","magnetic_declination":2,"measurement_error":1}'
+```
+
+统一计算接口使用`module: fengshui`和`method: direction`。响应遵守统一事实协议，`judgements`在本阶段固定为空数组。
 
 ## ClickHouse 数据表
 

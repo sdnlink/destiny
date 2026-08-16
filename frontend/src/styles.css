@@ -1022,6 +1022,42 @@ select:focus {
   font-size: 10px;
 }
 
+.direction-overview-core {
+  height: 102px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  background: #f2f0e9;
+}
+
+.direction-overview-core > div {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  gap: 4px 8px;
+  text-align: center;
+}
+
+.direction-overview-core span,
+.direction-overview-core small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.direction-overview-core small {
+  grid-column: 1 / -1;
+}
+
+.direction-overview-core strong {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 26px;
+}
+
+.direction-overview-core > svg {
+  color: var(--amber);
+}
+
 .data-band {
   padding: 18px;
   border: 1px solid var(--line-strong);
@@ -1192,6 +1228,62 @@ select:focus {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.direction-primary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+}
+
+.direction-fact {
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--paper);
+}
+
+.direction-fact > span,
+.direction-fact > small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.direction-fact > strong {
+  margin: 8px 0 2px;
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 54px;
+  font-weight: 600;
+}
+
+.direction-fact > b {
+  color: var(--amber-dark);
+  font-size: 14px;
+}
+
+.direction-fact > p {
+  margin: 12px 0 8px;
+  color: #4c5550;
+  font-size: 12px;
+}
+
+.direction-axis {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--amber-dark);
+}
+
+.direction-axis span {
+  color: var(--muted);
+  font-size: 10px;
 }
 
 .key-value-list {
@@ -2938,6 +3030,15 @@ select:focus {
 
   .hexagram-primary-grid {
     grid-template-columns: 1fr;
+  }
+
+  .direction-primary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .direction-axis {
+    min-height: 58px;
+    flex-direction: row;
   }
 
   .change-arrow {

@@ -67,7 +67,11 @@
         {"rule_id": "INTERP-CORRESPONDENCE-001", "version": "1.0.0"},
         {"rule_id": "INTERP-INTEGRATE-001", "version": "1.0.0"},
         {"rule_id": "ADV-CONTEXT-001", "version": "1.0.0"},
-        {"rule_id": "ADV-MH-RELATION-001", "version": "1.0.0"}
+        {"rule_id": "ADV-MH-RELATION-001", "version": "1.0.0"},
+        {"rule_id": "FS-DIRECTION-NORMALIZE-001", "version": "1.0.0"},
+        {"rule_id": "FS-DECLINATION-001", "version": "1.0.0"},
+        {"rule_id": "FS-24MOUNTAIN-001", "version": "1.0.0"},
+        {"rule_id": "FS-UNCERTAINTY-001", "version": "1.0.0"}
       ]
     }
   ],
@@ -419,6 +423,30 @@
       "title": "梅花体用关系关注点映射", "purpose": "将已计算的体用五行关系映射为待核实的决策关注点", "preconditions": ["梅花体用关系事实已生成", "用户请求研究性事项建议"],
       "inputs": ["relation_code", "category", "question_summary"], "procedure": ["读取本卦阶段体用关系", "映射为资源、约束、投入或协同关注点", "生成验证行动"], "outputs": ["focus", "rationale", "recommendation"],
       "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["映射仅为未审核研究模板", "不映射吉凶", "不生成应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.advisory:generate_advisory"
+    },
+    {
+      "rule_id": "FS-DIRECTION-NORMALIZE-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
+      "title": "罗盘角度标准化", "purpose": "将任意有限角度归一化为正北零度顺时针的0至360度区间", "preconditions": ["向首角度为有限数值"],
+      "inputs": ["facing_degree"], "procedure": ["对输入角度按360度取模", "负角度转换为等价正角度"], "outputs": ["normalized_degree"],
+      "source_refs": ["docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["只处理角度坐标，不判断测量是否正确"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:_normalize"
+    },
+    {
+      "rule_id": "FS-DECLINATION-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
+      "title": "磁偏角真北修正", "purpose": "将磁北向首换算为真北向首", "preconditions": ["输入角度基于磁北或真北", "磁偏角为有限数值"],
+      "inputs": ["input_reference", "magnetic_declination"], "procedure": ["磁北输入加磁偏角", "真北输入不重复修正", "结果按360度归一化"], "outputs": ["applied_declination", "true_facing_degree"],
+      "source_refs": ["docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["磁偏角数值及来源由调用方提供", "不内置地磁模型"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:calculate_direction"
+    },
+    {
+      "rule_id": "FS-24MOUNTAIN-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
+      "title": "真北坐向与二十四山", "purpose": "由真北向首计算相反坐山并确定二十四山归属", "preconditions": ["真北向首已确定"],
+      "inputs": ["true_facing_degree"], "procedure": ["向首加180度得到坐山", "每山以15度划分", "区间采用左闭右开"], "outputs": ["true_sitting_degree", "facing_mountain", "sitting_mountain"],
+      "source_refs": ["data/generated/fengshui_mountains.jsonl", "docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["仅生成方位事实", "不包含流派吉凶判断"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:_mountain_at"
+    },
+    {
+      "rule_id": "FS-UNCERTAINTY-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
+      "title": "坐向测量误差传播", "purpose": "将角度测量误差传播为候选山向、分类稳定性和边界预警", "preconditions": ["测量误差在0至180度之间"],
+      "inputs": ["true_facing_degree", "measurement_error"], "procedure": ["构造角度误差区间", "求区间覆盖的候选二十四山", "计算距最近分界距离", "跨界或距分界不足1度时预警"], "outputs": ["candidate_mountains", "classification_stable", "distance_to_boundary", "boundary_warning"],
+      "source_refs": ["docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["误差值由测量者评估", "预警不能替代现场复测"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:_direction_fact"
     }
   ]
 }

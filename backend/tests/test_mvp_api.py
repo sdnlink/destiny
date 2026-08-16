@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, LiurenNumberRequest, LiuyaoCoinRequest, LiuyaoLineRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, FengshuiDirectionRequest, LiurenNumberRequest, LiuyaoCoinRequest, LiuyaoLineRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
 from pydantic import ValidationError
 
 
@@ -35,6 +35,22 @@ class MvpApiTests(unittest.TestCase):
                 LiurenNumberRequest(number=number, **{
                     "local_datetime": "2026-08-15T16:00:00", "timezone": "Asia/Shanghai",
                 })
+
+    def test_fengshui_api_requires_strict_finite_numbers(self):
+        for value in (True, "180", float("nan"), float("inf")):
+            with self.subTest(value=value), self.assertRaises(ValidationError):
+                FengshuiDirectionRequest(facing_degree=value)
+
+    def test_dispatches_fengshui_direction_and_explanation(self):
+        payload = {"facing_degree": 7.4, "input_reference": "true", "measurement_error": 0.2}
+        result = execute("fengshui", "direction", payload)
+        self.assertEqual(result["facts"]["facing"]["mountain"]["name"], "子")
+        explained = comparison_envelope([
+            CalculationRequest(module="fengshui", method="direction", input=payload),
+        ])
+        module = explained["explanation"]["modules"][0]
+        self.assertEqual(module["module"], "fengshui")
+        self.assertIn("FS-UNCERTAINTY-001", module["sections"][2]["rule_ids"])
     def test_auto_request_rejects_unsafe_nonce(self):
         with self.assertRaises(ValidationError):
             AutoCastRequest(

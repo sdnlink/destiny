@@ -25,6 +25,7 @@
 - [ADR-010：梅花易数独立领域第四阶段基线](./decisions/010-meihua-domain-phase-four.md)
 - [ADR-011：六爻独立领域第五阶段基线](./decisions/011-liuyao-domain-phase-five.md)
 - [ADR-012：大六壬独立领域第六阶段基线](./decisions/012-daliuren-domain-phase-six.md)
+- [ADR-013：阳宅风水方位独立领域第七阶段基线](./decisions/013-fengshui-direction-domain-phase-seven.md)
 
 ## 文档优先级
 

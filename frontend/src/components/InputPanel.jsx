@@ -9,6 +9,7 @@ import {
   Layers3,
   LoaderCircle,
   LocateFixed,
+  Mountain,
   Play,
   RefreshCw,
   RotateCcw,
@@ -21,6 +22,7 @@ const SCENES = [
   { id: "meihua", label: "梅花", icon: Compass },
   { id: "liuyao", label: "六爻", icon: Grid3X3 },
   { id: "liuren", label: "六壬", icon: Workflow },
+  { id: "fengshui", label: "风水", icon: Mountain },
 ];
 
 const LINE_OPTIONS = [
@@ -78,6 +80,7 @@ export default function InputPanel({
   const showMeihua = form.scene === "combined" || form.scene === "meihua";
   const showLiuyao = form.scene === "combined" || form.scene === "liuyao";
   const showLiuren = form.scene === "combined" || form.scene === "liuren";
+  const showFengshui = form.scene === "fengshui";
 
   return (
     <aside className="input-panel" aria-label="推演输入">
@@ -359,6 +362,35 @@ export default function InputPanel({
                 <small className="field-hint">除以12取余映射子至亥，仅替换占时，不修改历法日柱</small>
               </label>
             )}
+          </section>
+        )}
+
+        {showFengshui && (
+          <section className="form-section">
+            <div className="section-title"><Mountain size={16} /><span>阳宅坐向测量</span></div>
+            <label>
+              <FieldLabel>向首方位角</FieldLabel>
+              <input type="number" step="0.01" value={form.fsFacing} onChange={(event) => update("fsFacing", event.target.value)} required />
+              <small className="field-hint">正北为 0°，顺时针增加；应填写建筑向首的现场测量值</small>
+            </label>
+            <div className="segmented method-switch" role="radiogroup" aria-label="方位角基准">
+              <button type="button" className={form.fsReference === "magnetic" ? "active" : ""} onClick={() => update("fsReference", "magnetic")}>磁北测量</button>
+              <button type="button" className={form.fsReference === "true" ? "active" : ""} onClick={() => update("fsReference", "true")}>真北测量</button>
+            </div>
+            <div className="number-pair">
+              <label>
+                <FieldLabel>磁偏角</FieldLabel>
+                <input type="number" step="0.01" value={form.fsDeclination} onChange={(event) => update("fsDeclination", event.target.value)} required />
+              </label>
+              <label>
+                <FieldLabel>测量误差 ±</FieldLabel>
+                <input type="number" step="0.01" min="0" max="180" value={form.fsError} onChange={(event) => update("fsError", event.target.value)} required />
+              </label>
+            </div>
+            <div className="method-note">
+              <LocateFixed size={16} />
+              <p>磁北角按“真北角 = 磁北角 + 磁偏角”修正；误差跨越二十四山分界时保留全部候选并提示复测。</p>
+            </div>
           </section>
         )}
 

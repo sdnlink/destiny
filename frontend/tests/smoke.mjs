@@ -25,6 +25,21 @@ await desktop.getByRole("heading", { name: "推演参数" }).waitFor();
 await assertNoOverflow(desktop, "desktop input");
 await desktop.screenshot({ path: "/tmp/tianji-input-desktop.png", fullPage: true });
 
+await desktop.getByRole("radio", { name: "风水", exact: true }).click();
+await desktop.getByLabel("向首方位角").fill("7.4");
+await desktop.getByRole("button", { name: "真北测量", exact: true }).click();
+await desktop.getByLabel("测量误差 ±").fill("0.2");
+await desktop.getByRole("button", { name: /开始推演/ }).click();
+await desktop.getByText(/^compare_[a-f0-9]+$/).waitFor({ timeout: 15000 });
+await desktop.getByRole("button", { name: "阳宅风水", exact: true }).click();
+await desktop.getByRole("heading", { name: "阳宅真北坐向" }).waitFor();
+await desktop.getByText("跨越分界", { exact: true }).waitFor();
+await desktop.getByText("子、癸", { exact: true }).waitFor();
+await assertNoOverflow(desktop, "desktop fengshui result");
+await desktop.screenshot({ path: "/tmp/tianji-fengshui-desktop.png", fullPage: true });
+
+await desktop.goto(baseUrl, { waitUntil: "networkidle" });
+
 await desktop.getByRole("button", { name: /开始推演/ }).click();
 await desktop.getByText(/^compare_[a-f0-9]+$/).waitFor({ timeout: 15000 });
 await desktop.getByRole("heading", { name: "近期事项推演" }).waitFor();
@@ -80,4 +95,4 @@ if (consoleErrors.length) {
 }
 
 await browser.close();
-console.log("browser smoke passed: desktop input/result, rules drawer, and mobile result");
+console.log("browser smoke passed: fengshui, desktop input/result, rules drawer, and mobile result");
