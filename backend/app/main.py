@@ -38,6 +38,7 @@ from app.meihua import auto_cast as meihua_auto_cast
 from app.meihua import number_cast as meihua_number_cast
 from app.meihua import three_number_cast as meihua_three_number_cast
 from app.meihua import time_cast as meihua_time_cast
+from app.core.db import db_repository
 from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
 from app.core.validation import run_validation_cases
@@ -321,11 +322,28 @@ def health():
 
 @app.get("/v1/constants/trigrams")
 def trigrams():
-    return {"data": [{"number": number, **value} for number, value in TRIGRAMS.items()]}
+    db_rows = db_repository.get_trigrams()
+    if db_rows:
+        return {"data": db_rows, "source": "clickhouse_database"}
+    return {
+        "data": [{"number": number, **value} for number, value in TRIGRAMS.items()],
+        "source": "in_memory_fallback",
+    }
+
+
+@app.get("/v1/constants/trigram-imagery")
+def trigram_imagery(trigram: Optional[str] = None, dimension: Optional[str] = None):
+    db_rows = db_repository.get_trigram_imagery(trigram, dimension)
+    if db_rows is not None:
+        return {"data": db_rows, "source": "clickhouse_database"}
+    return {"data": [], "source": "clickhouse_database", "warning": "database unavailable"}
 
 
 @app.get("/v1/constants/hexagrams")
 def hexagrams():
+    db_rows = db_repository.get_hexagrams()
+    if db_rows:
+        return {"data": db_rows, "source": "clickhouse_database"}
     rows = []
     seen = set()
     for upper_index, matrix_row in enumerate(KING_WEN_MATRIX, 1):
@@ -340,7 +358,60 @@ def hexagrams():
                 "upper_trigram_number": upper_index,
                 "lower_trigram_number": lower_index,
             })
-    return {"data": sorted(rows, key=lambda row: row["ordinal"])}
+    return {"data": sorted(rows, key=lambda row: row["ordinal"]), "source": "in_memory_fallback"}
+
+
+@app.get("/v1/constants/five-elements")
+def five_elements():
+    db_rows = db_repository.get_five_elements()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/stems")
+def heavenly_stems():
+    db_rows = db_repository.get_heavenly_stems()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/branches")
+def earthly_branches():
+    db_rows = db_repository.get_earthly_branches()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/solar-terms")
+def solar_terms():
+    db_rows = db_repository.get_solar_terms()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/sexagenary-cycle")
+def sexagenary_cycle():
+    db_rows = db_repository.get_sexagenary_cycle()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/fengshui-mountains")
+def fengshui_mountains():
+    db_rows = db_repository.get_fengshui_mountains()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/luoshu-palaces")
+def luoshu_palaces():
+    db_rows = db_repository.get_luoshu_palaces()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/database/stats")
+def database_stats():
+    rows = db_repository.get_database_stats()
+    available = db_repository.is_available()
+    return {
+        "status": "connected" if available else "disconnected",
+        "tables": rows or [],
+        "source": "clickhouse",
+    }
 
 
 @app.get("/v1/rules")

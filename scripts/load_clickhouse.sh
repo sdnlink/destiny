@@ -28,7 +28,7 @@ while IFS= read -r -d ';' statement; do
   fi
 done < "$project_dir/clickhouse/init/001_schema.sql"
 
-tables=(data_sources five_elements heavenly_stems earthly_branches trigrams hexagrams solar_terms sexagenary_cycle fengshui_mountains luoshu_palaces)
+tables=(data_sources five_elements heavenly_stems earthly_branches trigrams trigram_imagery hexagrams solar_terms sexagenary_cycle fengshui_mountains luoshu_palaces)
 for table in "${tables[@]}"; do
   curl --silent --show-error --fail --user "$clickhouse_user:$clickhouse_password" \
     --data-binary "TRUNCATE TABLE destiny.$table" "$clickhouse_url/"

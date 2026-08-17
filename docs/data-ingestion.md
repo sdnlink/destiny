@@ -21,7 +21,7 @@ HTTP 接口为 `http://localhost:18123`，Native TCP 接口为 `localhost:19000`
 | --- | --- | --- |
 | 来源与许可 | `data_sources` | 已导入 |
 | 基础常量 | `five_elements`、`heavenly_stems`、`earthly_branches` | 已导入 |
-| 象数基础 | `trigrams`、`hexagrams`、`solar_terms`、`sexagenary_cycle` | 已导入 |
+| 象数基础 | `trigrams`、`trigram_imagery`、`hexagrams`、`solar_terms`、`sexagenary_cycle` | 已导入 |
 | 风水方位 | `fengshui_mountains`、`luoshu_palaces` | 已导入 |
 | 房屋数据 | `fengshui_properties`、`floorplan_features` | 待应用接入 |
 | 风水分析 | `fengshui_assessments` | 待流派规则审核后接入 |

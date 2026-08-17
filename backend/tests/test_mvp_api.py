@@ -220,6 +220,47 @@ class MvpApiTests(unittest.TestCase):
         output = comparison_envelope([calculation])
         self.assertEqual(output["yuan_hui_yun_shi"]["facts"]["hui"]["branch"], "午")
 
+    def test_constants_and_database_endpoints(self):
+        from app.main import (
+            trigrams, trigram_imagery, hexagrams, five_elements,
+            heavenly_stems, earthly_branches, solar_terms,
+            sexagenary_cycle, fengshui_mountains, luoshu_palaces, database_stats
+        )
+        trig = trigrams()
+        self.assertIn("data", trig)
+        self.assertEqual(len(trig["data"]), 8)
+
+        img = trigram_imagery(trigram="乾")
+        self.assertIn("data", img)
+
+        hexs = hexagrams()
+        self.assertIn("data", hexs)
+        self.assertEqual(len(hexs["data"]), 64)
+
+        five = five_elements()
+        self.assertIn("data", five)
+
+        stems = heavenly_stems()
+        self.assertIn("data", stems)
+
+        branches = earthly_branches()
+        self.assertIn("data", branches)
+
+        terms = solar_terms()
+        self.assertIn("data", terms)
+
+        cycles = sexagenary_cycle()
+        self.assertIn("data", cycles)
+
+        mountains = fengshui_mountains()
+        self.assertIn("data", mountains)
+
+        palaces = luoshu_palaces()
+        self.assertIn("data", palaces)
+
+        stats = database_stats()
+        self.assertIn("status", stats)
+
 
 if __name__ == "__main__":
     unittest.main()

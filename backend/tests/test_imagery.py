@@ -19,6 +19,20 @@ class ImageryTests(unittest.TestCase):
         self.assertEqual(len(output["candidates"]), 3)
         self.assertIn("人物", output["candidates"][0]["selected_imagery"])
 
+    def test_all_eight_trigrams_have_complete_imagery_dimensions(self):
+        from app.core.imagery import TRIGRAM_IMAGERY
+        trigram_names = ["乾", "兑", "离", "震", "巽", "坎", "艮", "坤"]
+        expected_dimensions = [
+            "象意", "自然", "方位", "人物", "家庭", "身体",
+            "动物", "事物", "场所", "行为", "色彩", "饮食", "疾病",
+        ]
+        self.assertEqual(sorted(TRIGRAM_IMAGERY.keys()), sorted(trigram_names))
+        for name in trigram_names:
+            imagery = TRIGRAM_IMAGERY[name]
+            for dim in expected_dimensions:
+                self.assertIn(dim, imagery, f"Trigram {name} missing dimension {dim}")
+                self.assertTrue(len(imagery[dim]) > 0, f"Trigram {name} dimension {dim} is empty")
+
 
 if __name__ == "__main__":
     unittest.main()

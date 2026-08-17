@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+BACKEND = ROOT / "backend"
+sys.path.insert(0, str(BACKEND))
+
+from app.core.imagery import TRIGRAM_IMAGERY
+
 OUT = ROOT / "data" / "generated"
 SOURCE = "canonical-traditional-constants-v1"
 VERSION = "1.0.0"
@@ -69,10 +75,38 @@ def main():
         ("巽", "☴", "011", "木", "东南", "长女"), ("坎", "☵", "010", "水", "北", "中男"),
         ("艮", "☶", "001", "土", "东北", "少男"), ("坤", "☷", "000", "土", "西南", "母"),
     ]
-    trigrams = [dict(earlier_heaven_ordinal=i, name=n, symbol=s, binary_code=b,
-                     element=e, direction_later_heaven=d, family_role=f,
-                     source_id=SOURCE, rule_version=VERSION)
-                for i, (n, s, b, e, d, f) in enumerate(trigram_data, 1)]
+    trigrams = []
+    trigram_imagery_rows = []
+    for i, (n, s, b, e, d, f) in enumerate(trigram_data, 1):
+        img = TRIGRAM_IMAGERY.get(n, {})
+        trigrams.append(dict(
+            earlier_heaven_ordinal=i, name=n, symbol=s, binary_code=b,
+            element=e, direction_later_heaven=d, family_role=f,
+            essence=img.get("象意", []),
+            natural_phenomena=img.get("自然", []),
+            persons=img.get("人物", []),
+            family_members=img.get("家庭", []),
+            body_parts=img.get("身体", []),
+            animals=img.get("动物", []),
+            objects=img.get("事物", []),
+            places=img.get("场所", []),
+            actions=img.get("行为", []),
+            colors=img.get("色彩", []),
+            foods=img.get("饮食", []),
+            illnesses=img.get("疾病", []),
+            source_id=SOURCE, rule_version=VERSION,
+        ))
+        for dimension, items in img.items():
+            trigram_imagery_rows.append(dict(
+                earlier_heaven_ordinal=i,
+                trigram_name=n,
+                trigram_symbol=s,
+                element=e,
+                dimension=dimension,
+                imagery_items=items,
+                source_id=SOURCE,
+                rule_version=VERSION,
+            ))
 
     hexagram_names = (
         "乾 坤 屯 蒙 需 讼 师 比 小畜 履 泰 否 同人 大有 谦 豫 随 蛊 临 观 噬嗑 贲 剥 复 "
@@ -147,6 +181,7 @@ def main():
         "heavenly_stems": write_jsonl("heavenly_stems", stems),
         "earthly_branches": write_jsonl("earthly_branches", branches),
         "trigrams": write_jsonl("trigrams", trigrams),
+        "trigram_imagery": write_jsonl("trigram_imagery", trigram_imagery_rows),
         "hexagrams": write_jsonl("hexagrams", hexagrams),
         "solar_terms": write_jsonl("solar_terms", terms),
         "sexagenary_cycle": write_jsonl("sexagenary_cycle", cycles),

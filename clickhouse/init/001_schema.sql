@@ -66,11 +66,37 @@ CREATE TABLE IF NOT EXISTS destiny.trigrams
     element LowCardinality(String),
     direction_later_heaven String,
     family_role String,
+    essence Array(String),
+    natural_phenomena Array(String),
+    persons Array(String),
+    family_members Array(String),
+    body_parts Array(String),
+    animals Array(String),
+    objects Array(String),
+    places Array(String),
+    actions Array(String),
+    colors Array(String),
+    foods Array(String),
+    illnesses Array(String),
     source_id String,
     rule_version String
 )
 ENGINE = ReplacingMergeTree
 ORDER BY earlier_heaven_ordinal;
+
+CREATE TABLE IF NOT EXISTS destiny.trigram_imagery
+(
+    earlier_heaven_ordinal UInt8,
+    trigram_name String,
+    trigram_symbol String,
+    element LowCardinality(String),
+    dimension String,
+    imagery_items Array(String),
+    source_id String,
+    rule_version String
+)
+ENGINE = ReplacingMergeTree
+ORDER BY (earlier_heaven_ordinal, dimension);
 
 CREATE TABLE IF NOT EXISTS destiny.hexagrams
 (
