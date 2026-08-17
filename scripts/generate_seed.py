@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 import json
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BACKEND = ROOT / "backend"
-sys.path.insert(0, str(BACKEND))
-
-from app.core.imagery import TRIGRAM_IMAGERY
-
 OUT = ROOT / "data" / "generated"
 SOURCE = "canonical-traditional-constants-v1"
 VERSION = "1.0.0"
@@ -50,6 +44,9 @@ def main():
                   source_id=SOURCE, rule_version=VERSION)
              for i, (n, p, e, d) in enumerate(stem_data, 1)]
 
+    trigram_imagery_config = json.loads((ROOT / "data" / "rules" / "trigram-imagery.json").read_text(encoding="utf-8"))["imagery"]
+    branch_imagery_config = json.loads((ROOT / "data" / "rules" / "branch-imagery.json").read_text(encoding="utf-8"))["imagery"]
+
     branch_data = [
         ("子", "阳", "水", "鼠", 11, 23, "北", ["癸"]),
         ("丑", "阴", "土", "牛", 12, 1, "东北", ["己", "癸", "辛"]),
@@ -64,10 +61,28 @@ def main():
         ("戌", "阳", "土", "狗", 9, 19, "西北", ["戊", "辛", "丁"]),
         ("亥", "阴", "水", "猪", 10, 21, "西北", ["壬", "甲"]),
     ]
-    branches = [dict(ordinal=i, name=n, polarity=p, element=e, zodiac=z,
-                     lunar_month=m, hour_start=h, direction=d, hidden_stems=hs,
-                     source_id=SOURCE, rule_version=VERSION)
-                for i, (n, p, e, z, m, h, d, hs) in enumerate(branch_data, 1)]
+    branches = []
+    branch_imagery_rows = []
+    for i, (n, p, e, z, m, h, d, hs) in enumerate(branch_data, 1):
+        bimg = branch_imagery_config.get(n, {})
+        branches.append(dict(
+            ordinal=i, name=n, polarity=p, element=e, zodiac=z,
+            lunar_month=m, hour_start=h, direction=d, hidden_stems=hs,
+            directions=bimg.get("方位", []),
+            nature=bimg.get("自然", []),
+            seasons=bimg.get("时令", []),
+            objects=bimg.get("事物", []),
+            source_id=SOURCE, rule_version=VERSION,
+        ))
+        for dimension, items in bimg.items():
+            branch_imagery_rows.append(dict(
+                ordinal=i,
+                branch_name=n,
+                dimension=dimension,
+                imagery_items=items,
+                source_id=SOURCE,
+                rule_version=VERSION,
+            ))
 
     trigram_data = [
         ("乾", "☰", "111", "金", "西北", "父"), ("兑", "☱", "110", "金", "西", "少女"),
@@ -78,7 +93,7 @@ def main():
     trigrams = []
     trigram_imagery_rows = []
     for i, (n, s, b, e, d, f) in enumerate(trigram_data, 1):
-        img = TRIGRAM_IMAGERY.get(n, {})
+        img = trigram_imagery_config.get(n, {})
         trigrams.append(dict(
             earlier_heaven_ordinal=i, name=n, symbol=s, binary_code=b,
             element=e, direction_later_heaven=d, family_role=f,
@@ -180,6 +195,7 @@ def main():
         "five_elements": write_jsonl("five_elements", five_elements),
         "heavenly_stems": write_jsonl("heavenly_stems", stems),
         "earthly_branches": write_jsonl("earthly_branches", branches),
+        "branch_imagery": write_jsonl("branch_imagery", branch_imagery_rows),
         "trigrams": write_jsonl("trigrams", trigrams),
         "trigram_imagery": write_jsonl("trigram_imagery", trigram_imagery_rows),
         "hexagrams": write_jsonl("hexagrams", hexagrams),

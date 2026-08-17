@@ -1,149 +1,16 @@
+import json
 from collections import Counter
+from pathlib import Path
 
 from app.common.ganzhi import BRANCH_ELEMENTS
 from .constants import TRIGRAM_BY_NAME
+from .db import db_repository
 
+ROOT = Path(__file__).resolve().parents[3]
+DATA_RULES = ROOT / "data" / "rules"
 
 ENGINE_VERSION = "imagery-engine-1.0.0"
 RULE_VERSION = "imagery-engineering-baseline-1.0.0"
-
-TRIGRAM_IMAGERY = {
-    "乾": {
-        "象意": ["刚健", "自强", "向上", "统领", "尊贵", "果断", "圆满"],
-        "自然": ["天", "晴空", "寒", "冰", "雹", "霰", "烈日", "大赤日"],
-        "方位": ["西北"],
-        "人物": ["父", "长者", "主事者", "君长", "领袖", "元首", "执法者", "名士", "总裁"],
-        "家庭": ["父亲", "祖父", "老父", "一家之主"],
-        "身体": ["首", "脑", "骨", "肺", "大肠", "面", "颈", "牙齿", "右脚"],
-        "动物": ["马", "天鹅", "狮", "象", "龙", "鹰", "纯种良驹"],
-        "事物": ["金玉", "珠宝", "圆物", "冠冕", "钟表", "镜子", "硬物", "高档品", "钱币", "刀剑", "证书", "印章"],
-        "场所": ["高处", "官署", "大都", "京都", "名胜", "高楼大厦", "公堂", "寺院", "指挥部"],
-        "行为": ["统领", "决断", "健行", "进取", "自强", "主导", "立规", "严加管理"],
-        "色彩": ["大红", "玄黄", "金黄", "纯白", "银色"],
-        "饮食": ["马肉", "珍馔", "硬果", "干肉", "圆物", "辛辣物", "名贵高档食品"],
-        "疾病": ["头部疾病", "脑疾", "骨折", "肺疾", "高血压", "发热", "神经衰弱"],
-    },
-    "坤": {
-        "象意": ["柔顺", "承载", "包容", "厚德", "滋养", "迟缓", "静守", "广博"],
-        "自然": ["地", "阴云", "雾", "露", "冰霜", "阴天", "大雾", "夜空"],
-        "方位": ["西南"],
-        "人物": ["母", "众人", "承事者", "农夫", "妇人", "老妇", "忠厚者", "群众", "顺从者", "后勤人员"],
-        "家庭": ["母亲", "祖母", "主妇", "女主人"],
-        "身体": ["腹", "脾", "胃", "肌肉", "右肩", "肉", "消化系统", "女性胞宫"],
-        "动物": ["牛", "牝马", "百兽", "夜行动物", "蚂蚁", "母畜"],
-        "事物": ["布帛", "容器", "方形物", "瓦器", "农具", "厚重物", "车舆", "丝绵", "土石制品", "被褥", "粮秣"],
-        "场所": ["田野", "平地", "仓储处", "平原", "农田", "乡村", "宅院", "老宅", "空旷平旷之地"],
-        "行为": ["承载", "配合", "包容", "滋养", "静守", "恭顺", "迟缓", "妥协", "辅助"],
-        "色彩": ["黄色", "土黄", "黑黄", "棕黑", "深褐"],
-        "饮食": ["牛肉", "土中物", "面食", "甘味之物", "杂粮", "块茎根类食品"],
-        "疾病": ["脾胃失调", "腹痛", "消化不良", "慢性病", "郁证", "妇科疾病", "乏力虚损"],
-    },
-    "震": {
-        "象意": ["奋起", "振动", "惊动", "开创", "萌发", "急躁", "迅疾", "声名"],
-        "自然": ["雷", "霹雳", "地震", "春雷", "疾风骤雨", "火山喷发", "树林生机"],
-        "方位": ["东"],
-        "人物": ["长男", "行动者", "掌权者", "开创者", "运动员", "军人", "警察", "鼓手", "急躁者", "创业团队"],
-        "家庭": ["长男", "长子", "长兄"],
-        "身体": ["足", "脚", "肝", "胆", "神经", "左肋", "筋", "声音", "头发", "手腕"],
-        "动物": ["龙", "蛇", "百虫", "鸣蝉", "马", "善鸣之兽"],
-        "事物": ["竹木", "车辆", "发声之物", "乐器", "警报器", "电气设备", "枪炮", "运动器材", "木林", "钟鼓"],
-        "场所": ["道路", "林地", "闹市", "繁华地", "车站", "机场", "发电厂", "运动场", "乐器行", "大型集会地"],
-        "行为": ["启动", "惊动", "快速推进", "奋起", "发声", "震动", "暴躁", "激扬", "大声疾呼"],
-        "色彩": ["青绿", "碧绿", "深绿", "青色"],
-        "饮食": ["蹄类", "酸味物", "鲜蔬", "野味", "竹笋", "发酵食品", "春令生鲜"],
-        "疾病": ["足疾", "肝病", "神经官能症", "惊吓", "急躁抽搐", "筋骨伤痛", "躁狂"],
-    },
-    "巽": {
-        "象意": ["顺入", "风行", "渗透", "齐整", "随和", "灵活", "飘浮", "利市三倍"],
-        "自然": ["风", "气流", "飓风", "龙卷风", "彩虹", "温和之风", "春夏之气"],
-        "方位": ["东南"],
-        "人物": ["长女", "协调者", "商人", "教师", "文人", "宣传者", "行旅者", "手艺人", "中介", "设计师"],
-        "家庭": ["长女", "大女儿", "长媳"],
-        "身体": ["股", "大腿", "臀部", "胆", "呼吸", "气管", "左肩", "神经", "头发", "耳道"],
-        "动物": ["鸡", "鹅", "鸭", "飞禽", "百禽", "蝴蝶", "长羽鸟", "蛇虫之类"],
-        "事物": ["绳索", "木器", "细长物", "管乐器", "扇子", "信件", "票据", "竹简", "织物", "工艺品", "管道"],
-        "场所": ["通风处", "出入口", "草木茂盛处", "园林", "机场", "码头", "邮局", "走廊", "商业街", "通衢道口"],
-        "行为": ["进入", "传播", "协商", "随顺", "摇摆", "渗透", "调和", "权衡", "四处奔走"],
-        "色彩": ["浅绿", "柔蓝", "草绿", "白绿", "青碧"],
-        "饮食": ["鸡肉", "细长蔬菜", "酸味", "草木果实", "气味浓烈之物", "面条", "清淡素食"],
-        "疾病": ["胆疾", "呼吸道感染", "气喘", "风湿", "肠气", "股疾", "过敏", "神经麻木"],
-    },
-    "坎": {
-        "象意": ["险陷", "下行", "隐伏", "劳碌", "智谋", "流转", "曲折", "暗昧"],
-        "自然": ["水", "雨", "月", "雪", "霜", "露", "寒冷", "江河湖海", "泉源", "深渊"],
-        "方位": ["北"],
-        "人物": ["中男", "劳作者", "江湖人", "谋士", "水手", "医者", "暗中谋划者", "流亡者", "探险家", "程序员"],
-        "家庭": ["中男", "次子", "次兄"],
-        "身体": ["耳", "肾", "膀胱", "泌尿系统", "血液", "骨髓", "生殖系统", "腰部", "津液"],
-        "动物": ["猪", "水生物", "鱼类", "狐狸", "鼠", "水中水族", "夜行之物"],
-        "事物": ["液体", "沟槽", "弯曲物", "带核之物", "水具", "酒器", "潜艇", "绳缆", "冷冻设备", "潜藏暗器"],
-        "场所": ["低处", "水边", "险处", "湿地", "水库", "泉源", "地下室", "暗室", "酒吧", "洗手间", "冷库"],
-        "行为": ["下行", "隐伏", "反复试探", "劳碌", "智谋", "沉沦", "渗透", "周旋", "随波逐流"],
-        "色彩": ["黑色", "深蓝", "玄色", "水蓝"],
-        "饮食": ["猪肉", "酒类", "饮料", "咸味物", "海鲜", "水产", "汤类", "冷饮"],
-        "疾病": ["肾病", "泌尿感染", "血液疾病", "耳疾", "寒症", "水肿", "免疫力低下", "腰痛"],
-    },
-    "离": {
-        "象意": ["附着", "显现", "光明", "文明", "华丽", "外刚内柔", "明察", "热情"],
-        "自然": ["火", "日", "电", "霞", "虹", "热气", "烈日", "干旱", "极光", "盛夏晴空"],
-        "方位": ["南"],
-        "人物": ["中女", "文职者", "学者", "艺术家", "演艺人员", "军警", "明理者", "美人", "记者", "设计师"],
-        "家庭": ["中女", "次女", "二姑娘"],
-        "身体": ["目", "眼睛", "心", "小肠", "血液", "上焦", "头部", "神经系统", "容貌"],
-        "动物": ["雉", "鸟类", "孔雀", "火鸡", "龟", "蚌", "蟹", "色彩艳丽之禽", "硬壳动物"],
-        "事物": ["文书", "证件", "合同", "图书", "灯火", "屏幕", "字画", "有纹理之物", "热能设备", "电子产品", "甲胄"],
-        "场所": ["明亮处", "文化场所", "学校", "展览馆", "影院", "变电所", "向阳之地", "图书馆", "名胜古迹", "繁华商业街"],
-        "行为": ["观察", "显现", "依附", "明察", "照耀", "文明", "鉴赏", "外刚内柔", "热情交往"],
-        "色彩": ["赤色", "红色", "紫色", "粉红", "橙色"],
-        "饮食": ["烧烤", "煎炸物", "热食", "苦味", "红肉", "辛辣熟食", "烘焙糕点"],
-        "疾病": ["眼疾", "心脏病", "血压异常", "发热", "炎症", "烫伤", "失眠", "心火亢盛"],
-    },
-    "艮": {
-        "象意": ["静止", "阻隔", "坚守", "稳重", "敦厚", "停止", "积聚", "保守"],
-        "自然": ["山", "土石", "云雾", "停滞", "气候转换之期", "山岗", "悬崖"],
-        "方位": ["东北"],
-        "人物": ["少男", "守门者", "矿工", "守卫", "修行者", "童子", "稳重者", "固执者", "安保人员", "宗教学者"],
-        "家庭": ["少男", "小儿子", "幼子", "孙男"],
-        "身体": ["手", "背", "鼻", "关节", "手指", "脾胃", "左脚", "骨骼", "乳房", "脊柱"],
-        "动物": ["狗", "鼠", "虎", "狐", "山中百兽", "坚甲之兽", "穴居动物"],
-        "事物": ["石块", "门槛", "静止物", "台阶", "石雕", "土产", "锁", "堤坝", "桌几", "护栏", "屏障", "碑石"],
-        "场所": ["山地", "门庭", "边界", "关隘", "高坡", "陵园", "仓储", "石径", "寺庙", "山庄", "隔断之处"],
-        "行为": ["停止", "守界", "积累", "静止", "阻隔", "沉稳", "固执", "稳扎稳打", "观望停滞"],
-        "色彩": ["黄色", "棕色", "咖啡色", "土灰", "暗黄"],
-        "饮食": ["兽肉", "土豆等块茎根类", "甜食", "山珍", "坚硬果品", "笋干", "干果"],
-        "疾病": ["鼻疾", "脾胃病", "关节炎", "背痛", "结石", "手指麻木", "皮肤硬化", "肿瘤"],
-    },
-    "兑": {
-        "象意": ["喜悦", "言说", "沟通", "悦服", "毁折", "口舌", "开朗", "收获"],
-        "自然": ["泽", "雨后积水", "露水", "新月", "湿润", "潮气", "秋雨", "池沼"],
-        "方位": ["西"],
-        "人物": ["少女", "言说者", "教师", "律师", "演说家", "歌手", "解说员", "主播", "谈判代表", "医务工作者", "乐手"],
-        "家庭": ["少女", "小女儿", "幼女", "孙女"],
-        "身体": ["口", "舌", "齿", "咽喉", "肺", "大肠", "声带", "气管", "右肋", "口腔"],
-        "动物": ["羊", "水鸟", "鹿", "鸣禽", "池沼禽类", "善叫之禽"],
-        "事物": ["器皿", "缺口之物", "刀剑乐器", "金银首饰", "玩具", "餐具", "带缺口物品", "铜钱", "乐器", "废弃金属"],
-        "场所": ["水边", "娱乐场所", "演播厅", "集市", "茶楼", "缺口处", "沼泽", "废坑", "餐厅", "音乐厅", "辩论场"],
-        "行为": ["言谈", "喜悦", "交换", "辩论", "调侃", "决断", "沟通", "破损", "取悦", "歌唱"],
-        "色彩": ["白色", "银白", "粉白", "浅红", "金黄"],
-        "饮食": ["羊肉", "辛辣物", "水产", "小吃", "酒水", "带壳海鲜", "卤味", "干脆食品"],
-        "疾病": ["口腔溃疡", "咽喉炎", "牙痛", "肺病", "外伤破相", "咳喘", "声带受损", "气管炎"],
-    },
-}
-
-BRANCH_IMAGERY = {
-    "子": {"方位": ["北"], "自然": ["水", "寒"], "时令": ["冬", "夜半"], "事物": ["流动信息", "种子"]},
-    "丑": {"方位": ["东北偏北"], "自然": ["湿土"], "时令": ["季冬"], "事物": ["仓储", "积累"]},
-    "寅": {"方位": ["东北偏东"], "自然": ["木", "初生"], "时令": ["孟春"], "事物": ["道路", "组织启动"]},
-    "卯": {"方位": ["东"], "自然": ["木", "草木"], "时令": ["仲春"], "事物": ["门户", "往来"]},
-    "辰": {"方位": ["东南偏东"], "自然": ["湿土"], "时令": ["季春"], "事物": ["汇集", "转折"]},
-    "巳": {"方位": ["东南偏南"], "自然": ["火"], "时令": ["孟夏"], "事物": ["传播", "变化"]},
-    "午": {"方位": ["南"], "自然": ["火", "日"], "时令": ["仲夏"], "事物": ["显达", "公开"]},
-    "未": {"方位": ["西南偏南"], "自然": ["燥土"], "时令": ["季夏"], "事物": ["整理", "收束"]},
-    "申": {"方位": ["西南偏西"], "自然": ["金"], "时令": ["孟秋"], "事物": ["传递", "制度"]},
-    "酉": {"方位": ["西"], "自然": ["金"], "时令": ["仲秋"], "事物": ["成形", "评定"]},
-    "戌": {"方位": ["西北偏西"], "自然": ["燥土"], "时令": ["季秋"], "事物": ["守卫", "归档"]},
-    "亥": {"方位": ["西北偏北"], "自然": ["水"], "时令": ["孟冬"], "事物": ["收藏", "远行"]},
-}
 
 CATEGORY_DIMENSIONS = {
     "career": ["人物", "行为", "场所", "事物"],
@@ -155,11 +22,8 @@ CATEGORY_DIMENSIONS = {
 }
 
 
-from .db import db_repository
-
-
-def get_loaded_trigram_imagery():
-    """Fetch trigram imagery directly from ClickHouse database when available, fallback to in-memory constants."""
+def load_trigram_imagery():
+    """Load trigram imagery from ClickHouse database, falling back to data/rules/trigram-imagery.json."""
     try:
         rows = db_repository.get_trigram_imagery()
         if rows:
@@ -173,29 +37,80 @@ def get_loaded_trigram_imagery():
                 return mapped
     except Exception:
         pass
-    return TRIGRAM_IMAGERY
+
+    fallback_file = DATA_RULES / "trigram-imagery.json"
+    if fallback_file.exists():
+        try:
+            return json.loads(fallback_file.read_text(encoding="utf-8"))["imagery"]
+        except Exception:
+            pass
+    return {}
+
+
+def load_branch_imagery():
+    """Load branch imagery from ClickHouse database, falling back to data/rules/branch-imagery.json."""
+    try:
+        rows = db_repository.get_branch_imagery()
+        if rows:
+            mapped = {}
+            for row in rows:
+                name = row["branch_name"]
+                dimension = row["dimension"]
+                items = row["imagery_items"]
+                mapped.setdefault(name, {})[dimension] = items
+            if len(mapped) == 12:
+                return mapped
+    except Exception:
+        pass
+
+    fallback_file = DATA_RULES / "branch-imagery.json"
+    if fallback_file.exists():
+        try:
+            return json.loads(fallback_file.read_text(encoding="utf-8"))["imagery"]
+        except Exception:
+            pass
+    return {}
+
+
+# Module level loaded imagery instances
+TRIGRAM_IMAGERY = load_trigram_imagery()
+BRANCH_IMAGERY = load_branch_imagery()
 
 
 def _trigram_candidate(module, role, trigram, dimensions, stage="original"):
-    all_trigrams = get_loaded_trigram_imagery()
-    imagery = all_trigrams.get(trigram["name"], TRIGRAM_IMAGERY[trigram["name"]])
+    all_trigrams = load_trigram_imagery() or TRIGRAM_IMAGERY
+    imagery = all_trigrams.get(trigram["name"], {})
     selected = {dimension: imagery[dimension] for dimension in dimensions if dimension in imagery}
     return {
-        "candidate_id": "{}-{}-{}-{}".format(module, stage, role, trigram["name"]),
-        "module": module, "stage": stage, "role": role, "symbol_type": "trigram",
-        "symbol": trigram["name"], "element": trigram["element"], "direction": trigram["direction"],
-        "selected_imagery": selected, "all_imagery": imagery, "rule_ids": ["XIANG-TRIGRAM-001", "XIANG-CONTEXT-001"],
+        "candidate_id": f"{module}-{stage}-{role}-{trigram['name']}",
+        "module": module,
+        "stage": stage,
+        "role": role,
+        "symbol_type": "trigram",
+        "symbol": trigram["name"],
+        "element": trigram["element"],
+        "direction": trigram["direction"],
+        "selected_imagery": selected,
+        "all_imagery": imagery,
+        "rule_ids": ["XIANG-TRIGRAM-001", "XIANG-CONTEXT-001"],
     }
 
 
 def _branch_candidate(module, role, branch, dimensions, stage="original"):
-    imagery = BRANCH_IMAGERY[branch]
+    all_branches = load_branch_imagery() or BRANCH_IMAGERY
+    imagery = all_branches.get(branch, {})
     selected = {dimension: imagery[dimension] for dimension in dimensions if dimension in imagery}
     return {
-        "candidate_id": "{}-{}-{}-{}".format(module, stage, role, branch),
-        "module": module, "stage": stage, "role": role, "symbol_type": "earthly_branch",
-        "symbol": branch, "element": BRANCH_ELEMENTS[branch], "selected_imagery": selected,
-        "all_imagery": imagery, "rule_ids": ["XIANG-BRANCH-001", "XIANG-CONTEXT-001"],
+        "candidate_id": f"{module}-{stage}-{role}-{branch}",
+        "module": module,
+        "stage": stage,
+        "role": role,
+        "symbol_type": "earthly_branch",
+        "symbol": branch,
+        "element": BRANCH_ELEMENTS.get(branch, ""),
+        "selected_imagery": selected,
+        "all_imagery": imagery,
+        "rule_ids": ["XIANG-BRANCH-001", "XIANG-CONTEXT-001"],
     }
 
 
@@ -226,14 +141,33 @@ def collect_imagery(module_results, context=None):
             for index, branch in enumerate(facts["three_transmissions"].get("transmissions", [])):
                 candidates.append(_branch_candidate(module, ("initial", "middle", "final")[index] + "_transmission", branch, dimensions))
     return {
-        "schema_version": "1.0", "status": "unreviewed_imagery_candidates",
-        "engine_version": ENGINE_VERSION, "rule_version": RULE_VERSION,
-        "context": {"category": category, "priority_dimensions": dimensions, "question_summary": (context or {}).get("question_summary")},
+        "schema_version": "1.0",
+        "status": "unreviewed_imagery_candidates",
+        "engine_version": ENGINE_VERSION,
+        "rule_version": RULE_VERSION,
+        "context": {
+            "category": category,
+            "priority_dimensions": dimensions,
+            "question_summary": (context or {}).get("question_summary"),
+        },
         "candidates": candidates,
         "liuyao_relative_summary": dict(sorted(liuyao_relatives.items())),
         "steps": [
-            {"sequence": 1, "operation": "extract_chart_symbols", "output": {"candidate_count": len(candidates)}, "rule_ids": ["XIANG-TRIGRAM-001", "XIANG-BRANCH-001"]},
-            {"sequence": 2, "operation": "prioritize_imagery_by_question_category", "output": {"category": category, "dimensions": dimensions}, "rule_ids": ["XIANG-CONTEXT-001"]},
+            {
+                "sequence": 1,
+                "operation": "extract_chart_symbols",
+                "output": {"candidate_count": len(candidates)},
+                "rule_ids": ["XIANG-TRIGRAM-001", "XIANG-BRANCH-001"],
+            },
+            {
+                "sequence": 2,
+                "operation": "prioritize_imagery_by_question_category",
+                "output": {"category": category, "dimensions": dimensions},
+                "rule_ids": ["XIANG-CONTEXT-001"],
+            },
         ],
-        "warnings": ["类象是待核实的对应候选，不表示现实中的特定人物或事件。", "类象未经过专家签署，不自动生成吉凶、应期或概率。"],
+        "warnings": [
+            "类象是待核实的对应候选，不表示现实中的特定人物或事件。",
+            "类象未经过专家签署，不自动生成吉凶、应期或概率。",
+        ],
     }

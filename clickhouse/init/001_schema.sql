@@ -51,11 +51,27 @@ CREATE TABLE IF NOT EXISTS destiny.earthly_branches
     hour_start UInt8,
     direction String,
     hidden_stems Array(String),
+    directions Array(String),
+    nature Array(String),
+    seasons Array(String),
+    objects Array(String),
     source_id String,
     rule_version String
 )
 ENGINE = ReplacingMergeTree
 ORDER BY ordinal;
+
+CREATE TABLE IF NOT EXISTS destiny.branch_imagery
+(
+    ordinal UInt8,
+    branch_name String,
+    dimension String,
+    imagery_items Array(String),
+    source_id String,
+    rule_version String
+)
+ENGINE = ReplacingMergeTree
+ORDER BY (ordinal, dimension);
 
 CREATE TABLE IF NOT EXISTS destiny.trigrams
 (

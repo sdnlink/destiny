@@ -63,6 +63,24 @@ class ClickHouseRepository:
             FORMAT JSON
         """, params)
 
+    def get_branch_imagery(self, branch_name=None, dimension=None):
+        filters = ["1"]
+        params = {}
+        if branch_name:
+            filters.append("branch_name = {branch_name:String}")
+            params["branch_name"] = branch_name
+        if dimension:
+            filters.append("dimension = {dimension:String}")
+            params["dimension"] = dimension
+        where = " AND ".join(filters)
+        return self.query(f"""
+            SELECT ordinal, branch_name, dimension, imagery_items, source_id, rule_version
+            FROM destiny.branch_imagery
+            WHERE {where}
+            ORDER BY ordinal, dimension
+            FORMAT JSON
+        """, params)
+
     def get_hexagrams(self):
         return self.query("SELECT * FROM destiny.hexagrams ORDER BY king_wen_ordinal FORMAT JSON")
 
