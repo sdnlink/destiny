@@ -4,16 +4,17 @@
 
 ## 1. 脚本总览
 
-| 脚本 | 作用 |
-| --- | --- |
-| `scripts/build_all.sh` | 在一个脚本中完成后端依赖、Python编译、后端测试、前端依赖和生产构建 |
-| `scripts/start_all.sh` | 启动生产服务，由FastAPI同源提供API和已编译Web文件 |
-| `scripts/deploy.sh` | 一键执行统一构建并启动生产服务 |
-| `scripts/run_mvp_api.sh` | 只启动FastAPI计算服务 |
-| `scripts/run_web.sh` | 只启动Vite开发服务 |
-| `scripts/run_corpus_api.sh` | 独立启动内部语料只读服务 |
+| Linux/macOS 脚本 | Windows 脚本 (CMD / PowerShell) | 作用 |
+| --- | --- | --- |
+| `scripts/build_all.sh` | `scripts/build_all.bat` / `scripts/build_all.ps1` (根目录快捷: `build_all.bat`) | 在一个脚本中完成后端依赖、Python编译、后端测试、前端依赖和生产构建 |
+| `scripts/start_all.sh` | `scripts/start_all.bat` / `scripts/start_all.ps1` (根目录快捷: `start_all.bat`) | 启动生产服务，由FastAPI同源提供API和已编译Web文件 |
+| `scripts/deploy.sh` | - | 一键执行统一构建并启动生产服务 |
+| - | `scripts/start_dev.bat` / `scripts/start_dev.ps1` (根目录快捷: `start_dev.bat`) | Windows开发模式：一键同时启动后端API与前端Vite并打开浏览器 |
+| `scripts/run_mvp_api.sh` | `scripts/run_mvp_api.bat` / `scripts/run_mvp_api.ps1` | 只启动FastAPI计算服务 |
+| `scripts/run_web.sh` | `scripts/run_web.bat` / `scripts/run_web.ps1` | 只启动Vite开发服务 |
+| `scripts/run_corpus_api.sh` | `scripts/run_corpus_api.bat` / `scripts/run_corpus_api.ps1` | 独立启动内部语料只读服务 |
 
-所有脚本使用自身位置解析项目根目录，可以从任意当前工作目录调用。
+所有脚本使用自身位置解析项目根目录，可以从任意当前工作目录调用。Windows 环境下支持直接双击根目录下的 `.bat` 批处理文件。
 
 ## 2. 统一构建
 

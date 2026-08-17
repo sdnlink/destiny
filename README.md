@@ -60,7 +60,12 @@ docker-compose up -d clickhouse
 启动MVP计算API：
 
 ```bash
+# Linux / macOS
 ./scripts/run_mvp_api.sh
+
+# Windows (CMD / PowerShell)
+.\scripts\run_mvp_api.bat
+# 或: powershell -File .\scripts\run_mvp_api.ps1
 ```
 
 计算API默认位于`http://127.0.0.1:8090`，交互文档位于`http://127.0.0.1:8090/docs`。
@@ -71,7 +76,13 @@ docker-compose up -d clickhouse
 cd frontend
 npm install
 cd ..
+
+# Linux / macOS
 ./scripts/run_web.sh
+
+# Windows (CMD / PowerShell)
+.\scripts\run_web.bat
+# 或开发模式一键启动前后端：双击 start_dev.bat
 ```
 
 Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在运行。
@@ -81,13 +92,21 @@ Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在
 统一编译后端、运行测试并构建前端：
 
 ```bash
+# Linux / macOS
 ./scripts/build_all.sh
+
+# Windows (可直接双击根目录 build_all.bat)
+.\scripts\build_all.bat
 ```
 
 启动编译后的前后端单端口服务：
 
 ```bash
+# Linux / macOS
 ./scripts/start_all.sh
+
+# Windows (可直接双击根目录 start_all.bat)
+.\scripts\start_all.bat
 ```
 
 一键构建并部署：
