@@ -84,6 +84,13 @@ class ClickHouseRepository:
     def get_hexagrams(self):
         return self.query("SELECT * FROM destiny.hexagrams ORDER BY king_wen_ordinal FORMAT JSON")
 
+    def get_hexagram_explanations(self, name_or_ordinal=None):
+        if name_or_ordinal is not None:
+            if isinstance(name_or_ordinal, int):
+                return self.query("SELECT * FROM destiny.hexagram_explanations WHERE ordinal = {ordinal:UInt8} FORMAT JSON", {"ordinal": name_or_ordinal})
+            return self.query("SELECT * FROM destiny.hexagram_explanations WHERE name = {name:String} OR full_name = {name:String} FORMAT JSON", {"name": str(name_or_ordinal)})
+        return self.query("SELECT * FROM destiny.hexagram_explanations ORDER BY ordinal FORMAT JSON")
+
     def get_five_elements(self):
         return self.query("SELECT * FROM destiny.five_elements FORMAT JSON")
 

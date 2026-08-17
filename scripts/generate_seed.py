@@ -190,6 +190,14 @@ def main():
                    element=e, family_role=f, source_id=SOURCE, rule_version=VERSION)
               for n, name, t, d, e, f in luoshu_data]
 
+    hexagram_exp_raw = json.loads((ROOT / "data" / "rules" / "hexagram-explanations.json").read_text(encoding="utf-8"))
+    hexagram_explanations = []
+    for item in hexagram_exp_raw:
+        row = dict(item)
+        row["source_id"] = SOURCE
+        row["rule_version"] = VERSION
+        hexagram_explanations.append(row)
+
     counts = {
         "data_sources": write_jsonl("data_sources", source_rows),
         "five_elements": write_jsonl("five_elements", five_elements),
@@ -199,6 +207,7 @@ def main():
         "trigrams": write_jsonl("trigrams", trigrams),
         "trigram_imagery": write_jsonl("trigram_imagery", trigram_imagery_rows),
         "hexagrams": write_jsonl("hexagrams", hexagrams),
+        "hexagram_explanations": write_jsonl("hexagram_explanations", hexagram_explanations),
         "solar_terms": write_jsonl("solar_terms", terms),
         "sexagenary_cycle": write_jsonl("sexagenary_cycle", cycles),
         "fengshui_mountains": write_jsonl("fengshui_mountains", mountains),

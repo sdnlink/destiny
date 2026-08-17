@@ -3440,6 +3440,482 @@ select:focus {
   }
 }
 
+/* ==========================================================================
+   Ziwei Doushu 12-Palace Grid Styles
+   ========================================================================== */
+
+.ziwei-overview-core {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0;
+}
+
+.ziwei-overview-core strong {
+  font-size: 15px;
+  color: var(--gold-accent, #c59b27);
+}
+
+.ziwei-overview-core span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.ziwei-plate-wrapper {
+  margin: 16px 0;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.ziwei-plate-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
+  grid-template-rows: repeat(4, minmax(140px, auto));
+  gap: 8px;
+  min-width: 700px;
+}
+
+.p-si { grid-column: 1; grid-row: 1; }
+.p-wu { grid-column: 2; grid-row: 1; }
+.p-wei { grid-column: 3; grid-row: 1; }
+.p-shen { grid-column: 4; grid-row: 1; }
+.p-you { grid-column: 4; grid-row: 2; }
+.p-xu { grid-column: 4; grid-row: 3; }
+.p-hai { grid-column: 4; grid-row: 4; }
+.p-zi { grid-column: 3; grid-row: 4; }
+.p-chou { grid-column: 2; grid-row: 4; }
+.p-yin { grid-column: 1; grid-row: 4; }
+.p-mao { grid-column: 1; grid-row: 3; }
+.p-chen { grid-column: 1; grid-row: 2; }
+.grid-center-plate {
+  grid-column: 2 / 4;
+  grid-row: 2 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2, rgba(255, 255, 255, 0.03));
+  border: 1px dashed var(--line, #333);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.ziwei-cell {
+  background: var(--surface, #18191c);
+  border: 1px solid var(--line, #2a2b30);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ziwei-cell:hover {
+  border-color: #555;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.ziwei-cell.is-ming {
+  border: 2px solid #d4af37;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(24, 25, 28, 0.95) 100%);
+}
+
+.ziwei-cell.is-shen {
+  border-left: 3px solid #8e44ad;
+}
+
+.ziwei-cell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line, #2a2b30);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+.ziwei-palace-name {
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ziwei-cell.is-ming .ziwei-palace-name {
+  color: #d4af37;
+}
+
+.ziwei-shen-badge {
+  background: #8e44ad;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.ziwei-palace-stem {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--muted, #888);
+}
+
+.ziwei-stars-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.ziwei-main-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ziwei-star.main {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f39c12;
+}
+
+.ziwei-lucky-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.ziwei-star.lucky {
+  font-size: 10px;
+  color: #2ecc71;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ziwei-bad-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.ziwei-star.bad {
+  font-size: 10px;
+  color: #e74c3c;
+}
+
+.sihua-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 2px;
+  color: #fff;
+}
+
+.sihua-badge.化禄, .sihua-tag.化禄 { background: #27ae60; color: #fff; }
+.sihua-badge.化权, .sihua-tag.化权 { background: #c0392b; color: #fff; }
+.sihua-badge.化科, .sihua-tag.化科 { background: #2980b9; color: #fff; }
+.sihua-badge.化忌, .sihua-tag.化忌 { background: #8e44ad; color: #fff; }
+
+.sihua-badge.mini {
+  font-size: 8px;
+  padding: 0 2px;
+}
+
+.ziwei-cell-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line, #2a2b30);
+  padding-top: 4px;
+  font-size: 10px;
+  color: var(--muted, #888);
+}
+
+.ziwei-branch-name {
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.center-info-content {
+  width: 100%;
+  text-align: center;
+}
+
+.center-info-content h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--gold-accent, #d4af37);
+  letter-spacing: 2px;
+}
+
+.center-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+  text-align: left;
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.center-info-grid div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.center-info-grid b {
+  color: var(--muted, #888);
+}
+
+.center-sihua-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line, #333);
+}
+
+.sihua-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted, #888);
+}
+
+.sihua-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Comprehensive Advisory & Interpretation Styles
+   ========================================================================== */
+
+.category-badge {
+  background: var(--gold-accent, #d4af37);
+  color: #111;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badge-sub {
+  font-size: 11px;
+  color: var(--muted, #888);
+  border: 1px solid var(--line, #333);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.advisory-headline {
+  margin: 10px 0 6px;
+  font-size: 19px;
+  color: var(--gold-accent, #f39c12);
+  letter-spacing: 0.5px;
+}
+
+.domain-analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.analysis-card {
+  background: var(--surface, #18191c);
+  border: 1px solid var(--line, #2a2b30);
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.status-card {
+  border-top: 3px solid #2ecc71;
+}
+
+.trend-card {
+  border-top: 3px solid #3498db;
+}
+
+.risk-card {
+  border-top: 3px solid #e67e22;
+}
+
+.analysis-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line, #2a2b30);
+}
+
+.analysis-card-head h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #eee);
+}
+
+.card-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot-green { background: #2ecc71; box-shadow: 0 0 6px rgba(46, 204, 113, 0.6); }
+.status-dot-blue { background: #3498db; box-shadow: 0 0 6px rgba(52, 152, 219, 0.6); }
+.status-dot-orange { background: #e67e22; box-shadow: 0 0 6px rgba(230, 126, 34, 0.6); }
+
+.analysis-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary, #ccc);
+}
+
+.analysis-card li {
+  margin-bottom: 8px;
+}
+
+.analysis-card li:last-child {
+  margin-bottom: 0;
+}
+
+.recommendation-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 80px;
+}
+
+.recommendation-priority {
+  width: 26px;
+  height: 26px;
+  background: var(--gold-accent, #d4af37);
+  color: #111;
+  font-weight: 800;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+
+.recommendation-phase {
+  font-size: 10px;
+  color: var(--muted, #888);
+  white-space: nowrap;
+}
+
+.recommendation-body {
+  flex: 1;
+}
+
+.recommendation-body strong {
+  font-size: 14px;
+  color: var(--text, #fff);
+}
+
+.recommendation-body p {
+  margin: 4px 0 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary, #ccc);
+}
+
+.recommendation-body small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted, #888);
+  margin-bottom: 6px;
+}
+
+.styled-ol {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.styled-ol li {
+  margin-bottom: 6px;
+}
+
+.interp-module-card {
+  background: var(--surface, #18191c);
+  border: 1px solid var(--line, #2a2b30);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.interp-module-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.interp-module-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gold-accent, #d4af37);
+}
+
+.interp-fact-pill {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.interp-fact-pill strong {
+  color: var(--muted, #888);
+}
+
+.interp-quote {
+  background: rgba(212, 175, 55, 0.08);
+  border-left: 3px solid var(--gold-accent, #d4af37);
+  padding: 6px 12px;
+  border-radius: 0 4px 4px 0;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: #f1c40f;
+}
+
+.interp-content p {
+  margin: 6px 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text, #ddd);
+}
+
+.interp-action-hint {
+  background: rgba(52, 152, 219, 0.08);
+  border-left: 3px solid #3498db;
+  padding: 6px 12px;
+  border-radius: 0 4px 4px 0;
+  font-size: 12px;
+  margin: 8px 0;
+  color: #90caf9;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -14,6 +14,7 @@ from app.liuyao import line_cast as liuyao_line_cast
 from app.core.meihua import number_cast as meihua_number_cast
 from app.core.meihua import time_cast as meihua_time_cast
 from app.meihua import three_number_cast as meihua_three_number_cast
+from app.ziwei import time_cast as ziwei_time_cast, auto_cast as ziwei_auto_cast
 from app.core.registry import load_rule_registry, load_validation_cases, unknown_rule_ids
 
 
@@ -58,6 +59,10 @@ def execute_validation_case(case):
         values = dict(payload)
         number = values.pop("number")
         return liuren_number_cast(number, **values)
+    if system == "ziwei" and method == "time":
+        return ziwei_time_cast(**payload)
+    if system == "ziwei" and method == "auto":
+        return ziwei_auto_cast(**payload)
     if system == "fengshui" and method == "direction":
         return fengshui_direction(**payload)
     if system == "fengshui" and method == "measurements":

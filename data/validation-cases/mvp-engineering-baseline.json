@@ -176,6 +176,18 @@
       "input": {"measurements": [{"facing_degree": 0, "input_reference": "true", "measurement_error": 0.5}, {"facing_degree": 120, "input_reference": "true", "measurement_error": 0.5}, {"facing_degree": 240, "input_reference": "true", "measurement_error": 0.5}]},
       "expected": {"facts": {"consensus": {"status": "inconsistent", "circular_mean_degree": null, "angular_spread": 240.0, "aggregate": null}}},
       "tags": ["multiple-measurements", "inconsistent", "no-fabrication"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/014-fengshui-measurement-consensus-phase-eight.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_zw_0001", "system": "ziwei", "school": "mvp-engineering-baseline", "method": "time", "title": "甲辰年正月初一男命紫微排盘",
+      "input": {"local_datetime": "2024-02-10T10:00:00", "timezone": "Asia/Shanghai", "gender": "男"},
+      "expected": {"facts": {"four_pillars": {"year": "甲辰"}, "yin_yang_gender": "阳男", "is_forward_decade": true, "si_hua": {"化禄": "廉贞", "化权": "破军", "化科": "武曲", "化忌": "太阳"}}},
+      "tags": ["ziwei", "natal-chart", "si-hua"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_zw_0002", "system": "ziwei", "school": "mvp-engineering-baseline", "method": "time", "title": "乙巳年阴女逆顺大限排盘",
+      "input": {"local_datetime": "2025-05-15T14:00:00", "timezone": "Asia/Shanghai", "gender": "女"},
+      "expected": {"facts": {"yin_yang_gender": "阴女", "is_forward_decade": true, "si_hua": {"化禄": "天机", "化权": "天梁", "化科": "紫微", "化忌": "太阴"}}},
+      "tags": ["ziwei", "natal-chart", "gender-polarity"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "reviewers": []
     }
   ]
 }

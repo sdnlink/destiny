@@ -454,6 +454,42 @@
       "title": "多次坐向测量圆周共识", "purpose": "汇总三至十二次真北读数并识别一致、跨界或相互矛盾的测量结果", "preconditions": ["至少三次且最多十二次有效测量", "每次测量已独立修正为真北角度"],
       "inputs": ["measurements", "true_facing_degrees", "measurement_errors"], "procedure": ["计算圆周均值和方向集中度", "计算包含全部读数的最小圆弧", "以最大角偏差加单次误差形成保守误差包络", "跨度超过10度或方向抵消时标记不一致", "误差包络跨山界时保留全部候选"], "outputs": ["status", "circular_mean_degree", "resultant_length", "angular_spread", "effective_measurement_error", "aggregate"],
       "source_refs": ["docs/design/decisions/014-fengshui-measurement-consensus-phase-eight.md"], "limitations": ["10度一致性阈值为待专家和测量规范复核的工程基线", "不替代现场校准和设备检定", "不生成流派判断"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:analyze_measurements"
+    },
+    {
+      "rule_id": "ZW-CAL-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "紫微斗数农历与四柱转换", "purpose": "将公历出生时刻转换为农历生年月日時及八字四柱干支", "preconditions": ["有效公历时间输入"],
+      "inputs": ["local_datetime", "timezone"], "procedure": ["调用高精度农历转换算法", "提取农历生年、生月、生日、生时支", "生成四柱八字"], "outputs": ["lunar_calendar", "four_pillars"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["不作宿命论推断"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:_get_lunar_info"
+    },
+    {
+      "rule_id": "ZW-MING-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "紫微斗数安命宫与身宫", "purpose": "寅宫起正月顺数生月逆数生时定命宫，顺数生时定身宫", "preconditions": ["农历月日时已确定"],
+      "inputs": ["lunar_month", "hour_branch"], "procedure": ["寅宫顺数至生月", "逆数生时定命宫地支", "顺数生时定身宫地支", "五虎遁布十二宫干"], "outputs": ["ming_palace", "shen_palace", "palaces_by_order"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-BUREAU-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "紫微斗数纳音定五行局", "purpose": "根据命宫干支的六十甲子纳音确定水二、木三、金四、土五或火六局", "preconditions": ["命宫干支已确定"],
+      "inputs": ["ming_stem", "ming_branch"], "procedure": ["匹配六十甲子纳音五行", "映射为对应局数及起运岁数"], "outputs": ["bureau"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-STARS-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "紫微斗数十四主星与吉煞安星", "purpose": "按局数与生日定紫微天府位置，顺逆布十四主星、六吉六煞诸星", "preconditions": ["五行局与农历日已确定"],
+      "inputs": ["bureau_number", "lunar_day", "lunar_month", "hour_branch", "year_stem", "year_branch"], "procedure": ["推算紫微星与天府星地支", "逆布紫微系六星", "顺布天府系八星", "按月日时年干支布六吉六煞"], "outputs": ["palaces_with_stars"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-SIHUA-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "紫微斗数生年四化配置", "purpose": "依据出生年天干配置化禄、化权、化科、化忌四化星曜", "preconditions": ["生年干已确定"],
+      "inputs": ["year_stem"], "procedure": ["查十干四化表", "为命中对应星曜打上四化标记"], "outputs": ["si_hua"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-DECADE-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
+      "title": "紫微斗数大限顺逆推排", "purpose": "按阴阳男女与五行局数计算各宫大限起止年龄", "preconditions": ["阴阳性别与五行局已确定"],
+      "inputs": ["yin_yang_gender", "bureau_number"], "procedure": ["阳男阴女顺行", "阴男阳女逆行", "以五行局数为起运起点每十年一限"], "outputs": ["major_limits"],
+      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
     }
   ]
 }

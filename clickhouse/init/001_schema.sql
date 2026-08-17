@@ -126,6 +126,27 @@ CREATE TABLE IF NOT EXISTS destiny.hexagrams
 ENGINE = ReplacingMergeTree
 ORDER BY king_wen_ordinal;
 
+CREATE TABLE IF NOT EXISTS destiny.hexagram_explanations
+(
+    ordinal UInt8,
+    name String,
+    full_name String,
+    nature String,
+    judgment String,
+    great_image String,
+    summary String,
+    career_interpretation String,
+    finance_interpretation String,
+    relationship_interpretation String,
+    study_interpretation String,
+    travel_interpretation String,
+    general_advice String,
+    source_id String,
+    rule_version String
+)
+ENGINE = ReplacingMergeTree
+ORDER BY ordinal;
+
 CREATE TABLE IF NOT EXISTS destiny.solar_terms
 (
     ordinal UInt8,

@@ -4,9 +4,10 @@ MODULE_LABELS = {
     "meihua": "梅花易数",
     "liuyao": "六爻",
     "liuren": "大六壬",
+    "ziwei": "紫微斗数",
     "fengshui": "阳宅方位",
 }
-MODULE_ORDER = {"calendar": 0, "zhouyi": 1, "meihua": 2, "liuyao": 3, "liuren": 4, "fengshui": 5}
+MODULE_ORDER = {"calendar": 0, "zhouyi": 1, "meihua": 2, "liuyao": 3, "liuren": 4, "ziwei": 5, "fengshui": 6}
 
 
 def _calendar_explanation(item):
@@ -380,12 +381,50 @@ def _fengshui_explanation(item):
     }
 
 
+def _ziwei_explanation(item):
+    result = item["result"]
+    facts = result["facts"]
+    ming_palace = facts["ming_palace"]
+    shen_palace = facts["shen_palace"]
+    bureau = facts["bureau"]
+    ming_p = next(p for p in facts["palaces_by_order"] if p["name"] == "命宫")
+    main_stars = "、".join(s["name"] for s in ming_p["main_stars"]) or "无主星"
+    lucky_stars = "、".join(s["name"] for s in ming_p["lucky_stars"]) or "无"
+    bad_stars = "、".join(s["name"] for s in ming_p["bad_stars"]) or "无"
+    sihua_text = "、".join(f"{v}{k}" for k, v in facts["si_hua"].items())
+
+    return {
+        "module": "ziwei",
+        "title": "紫微斗数命盘",
+        "summary": f"命宫在{ming_palace['palace_stem_branch']}，五行局为{bureau['name']}（{bureau['nayin']}），命宫主星为{main_stars}，身宫在{shen_palace['palace_stem_branch']}。",
+        "sections": [
+            {
+                "title": "命身宫位与五行局",
+                "text": f"生辰八字四柱为{facts['four_pillars']['year']}、{facts['four_pillars']['month']}、{facts['four_pillars']['day']}、{facts['four_pillars']['hour']}，{facts['yin_yang_gender']}，大限{'顺行' if facts['is_forward_decade'] else '逆行'}。命宫在{ming_palace['palace_stem_branch']}，身宫在{shen_palace['palace_stem_branch']}；五行局定为{bureau['name']}，命主为{facts['ming_zhu']}，身主为{facts['shen_zhu']}。",
+                "rule_ids": ["ZW-CAL-001", "ZW-MING-001", "ZW-BUREAU-001"],
+            },
+            {
+                "title": "命宫星曜配置",
+                "text": f"命宫主星：{main_stars}；吉星辅曜：{lucky_stars}；煞星杂曜：{bad_stars}。",
+                "rule_ids": ["ZW-STARS-001"],
+            },
+            {
+                "title": "生年四化与大限",
+                "text": f"生年四化配置为：{sihua_text}。起运大限从{bureau['number']}岁起步，按十天干地支顺布十二宫位。",
+                "rule_ids": ["ZW-SIHUA-001", "ZW-DECADE-001"],
+            },
+        ],
+        "limitations": list(result.get("warnings", [])),
+    }
+
+
 EXPLAINERS = {
     "calendar": _calendar_explanation,
     "zhouyi": _zhouyi_explanation,
     "meihua": _meihua_explanation,
     "liuyao": _liuyao_explanation,
     "liuren": _liuren_explanation,
+    "ziwei": _ziwei_explanation,
     "fengshui": _fengshui_explanation,
 }
 

@@ -50,6 +50,8 @@ function initialForm() {
     lyUpper: "8",
     liurenMethod: "auto",
     lrNumber: "8",
+    ziweiMethod: "time",
+    ziweiGender: "男",
     fsFacing: "180",
     fsMode: "single",
     fsMeasurements: ["179", "180", "181"],
@@ -123,6 +125,13 @@ function buildCalculations(form) {
         : { module: "liuren", method: "numbers", input: { ...calendar, number: Number(form.lrNumber) } },
     );
   }
+  if (form.scene === "combined" || form.scene === "ziwei") {
+    calculations.push(
+      form.ziweiMethod === "auto"
+        ? { module: "ziwei", method: "auto", input: { ...auto, gender: form.ziweiGender } }
+        : { module: "ziwei", method: "time", input: { ...calendar, gender: form.ziweiGender } },
+    );
+  }
   if (form.scene === "fengshui") {
     calculations.push({
       module: "fengshui",
@@ -193,7 +202,7 @@ function RulesDrawer({ open, onClose, rules, loading }) {
         </header>
         <div className="drawer-notice"><ShieldCheck size={16} /><span>当前规则均为工程草稿，尚未经过专家签署。</span></div>
         <div className="segmented drawer-filter">
-          {[["all", "全部"], ["calendar", "历法"], ["zhouyi", "周易"], ["meihua", "梅花"], ["liuyao", "六爻"], ["liuren", "六壬"], ["fengshui", "风水"]].map(([id, label]) => (
+          {[["all", "全部"], ["calendar", "历法"], ["zhouyi", "周易"], ["meihua", "梅花"], ["liuyao", "六爻"], ["liuren", "六壬"], ["ziwei", "紫微"], ["fengshui", "风水"]].map(([id, label]) => (
             <button key={id} className={system === id ? "active" : ""} onClick={() => setSystem(id)}>{label}</button>
           ))}
         </div>

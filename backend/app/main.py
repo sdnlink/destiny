@@ -38,6 +38,7 @@ from app.meihua import auto_cast as meihua_auto_cast
 from app.meihua import number_cast as meihua_number_cast
 from app.meihua import three_number_cast as meihua_three_number_cast
 from app.meihua import time_cast as meihua_time_cast
+from app.ziwei import time_cast as ziwei_time_cast, auto_cast as ziwei_auto_cast
 from app.core.db import db_repository
 from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
@@ -104,6 +105,14 @@ class LiuyaoCoinRequest(CalendarRequest):
 
 class LiurenNumberRequest(CalendarRequest):
     number: conint(strict=True)
+
+
+class ZiweiRequest(CalendarRequest):
+    gender: str = Field("男", example="男")
+
+
+class ZiweiAutoRequest(AutoCastRequest):
+    gender: str = Field("男", example="男")
 
 
 class FengshuiDirectionRequest(BaseModel):
@@ -222,6 +231,12 @@ def execute(module, method, payload):
         values = request.dict()
         number = values.pop("number")
         return liuren_number_cast(number, **values)
+    if module == "ziwei" and method == "time":
+        request = ZiweiRequest(**payload)
+        return ziwei_time_cast(**request.dict())
+    if module == "ziwei" and method == "auto":
+        request = ZiweiAutoRequest(**payload)
+        return ziwei_auto_cast(**request.dict())
     if module == "fengshui" and method == "direction":
         request = FengshuiDirectionRequest(**payload)
         return fengshui_direction(**request.dict())
@@ -359,6 +374,20 @@ def hexagrams():
                 "lower_trigram_number": lower_index,
             })
     return {"data": sorted(rows, key=lambda row: row["ordinal"]), "source": "in_memory_fallback"}
+
+
+@app.get("/v1/constants/hexagram-explanations")
+def hexagram_explanations(name: Optional[str] = None):
+    db_rows = db_repository.get_hexagram_explanations(name)
+    if db_rows:
+        return {"data": db_rows, "source": "clickhouse_database"}
+    from app.core.hexagram_service import get_hexagram_explanation, _load_all
+    if name:
+        res = get_hexagram_explanation(name)
+        return {"data": [res] if res else [], "source": "file_cache"}
+    all_data = _load_all()
+    unique_rows = sorted({v["ordinal"]: v for v in all_data.values()}.values(), key=lambda x: x["ordinal"])
+    return {"data": unique_rows, "source": "file_cache"}
 
 
 @app.get("/v1/constants/five-elements")
@@ -552,6 +581,16 @@ def cast_liuren_numbers(request: LiurenNumberRequest):
     values = request.dict()
     number = values.pop("number")
     return {"data": liuren_number_cast(number, **values)}
+
+
+@app.post("/v1/ziwei/time")
+def cast_ziwei_time(request: ZiweiRequest):
+    return {"data": ziwei_time_cast(**request.dict())}
+
+
+@app.post("/v1/ziwei/auto")
+def cast_ziwei_auto(request: ZiweiAutoRequest):
+    return {"data": ziwei_auto_cast(**request.dict())}
 
 
 @app.post("/v1/fengshui/direction")

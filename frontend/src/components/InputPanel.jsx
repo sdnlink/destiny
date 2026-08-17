@@ -14,6 +14,7 @@ import {
   Play,
   RefreshCw,
   RotateCcw,
+  Sparkles,
   Trash2,
   Workflow,
 } from "lucide-react";
@@ -24,6 +25,7 @@ const SCENES = [
   { id: "meihua", label: "梅花", icon: Compass },
   { id: "liuyao", label: "六爻", icon: Grid3X3 },
   { id: "liuren", label: "六壬", icon: Workflow },
+  { id: "ziwei", label: "紫微", icon: Sparkles },
   { id: "fengshui", label: "风水", icon: Mountain },
 ];
 
@@ -95,6 +97,7 @@ export default function InputPanel({
   const showMeihua = form.scene === "combined" || form.scene === "meihua";
   const showLiuyao = form.scene === "combined" || form.scene === "liuyao";
   const showLiuren = form.scene === "combined" || form.scene === "liuren";
+  const showZiwei = form.scene === "combined" || form.scene === "ziwei";
   const showFengshui = form.scene === "fengshui";
 
   return (
@@ -377,6 +380,53 @@ export default function InputPanel({
                 <small className="field-hint">除以12取余映射子至亥，仅替换占时，不修改历法日柱</small>
               </label>
             )}
+          </section>
+        )}
+
+        {showZiwei && (
+          <section className="form-section">
+            <div className="section-title">
+              <Sparkles size={16} />
+              <span>紫微斗数</span>
+            </div>
+            <div className="segmented method-switch" role="radiogroup" aria-label="紫微斗数排盘模式">
+              <button
+                type="button"
+                className={form.ziweiMethod === "time" ? "active" : ""}
+                onClick={() => update("ziweiMethod", "time")}
+              >
+                传统时间
+              </button>
+              <button
+                type="button"
+                className={form.ziweiMethod === "auto" ? "active" : ""}
+                onClick={() => update("ziweiMethod", "auto")}
+              >
+                个体自动
+              </button>
+            </div>
+            <div className="input-row">
+              <label>
+                <FieldLabel>命造性别</FieldLabel>
+                <div className="segmented">
+                  <button
+                    type="button"
+                    className={form.ziweiGender === "男" ? "active" : ""}
+                    onClick={() => update("ziweiGender", "男")}
+                  >
+                    乾造（男命）
+                  </button>
+                  <button
+                    type="button"
+                    className={form.ziweiGender === "女" ? "active" : ""}
+                    onClick={() => update("ziweiGender", "女")}
+                  >
+                    坤造（女命）
+                  </button>
+                </div>
+                <small className="field-hint">用于推算阴阳男女与起运大限顺逆</small>
+              </label>
+            </div>
           </section>
         )}
 
