@@ -2,6 +2,8 @@
 set -u
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$project_dir/scripts/env_python.sh"
+
 cooldown_seconds="${CACHE_RETRY_COOLDOWN:-60}"
 attempt=0
 
@@ -9,7 +11,7 @@ while true; do
   attempt=$((attempt + 1))
   echo "starting cache attempt $attempt at $(date -Iseconds)"
 
-  if "$project_dir/scripts/cache_daorenjia_texts.py" \
+  if "$PYTHON_BIN" "$project_dir/scripts/cache_daorenjia_texts.py" \
     --output "$project_dir/cache/daorenjia" \
     --reuse-catalog \
     --source mobile-api \

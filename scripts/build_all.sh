@@ -2,7 +2,8 @@
 set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-venv_dir="$project_dir/.venv"
+source "$project_dir/scripts/env_python.sh"
+
 frontend_dir="$project_dir/frontend"
 install_dependencies="${BUILD_INSTALL_DEPENDENCIES:-1}"
 run_tests="${BUILD_RUN_TESTS:-1}"
@@ -14,32 +15,34 @@ require_command() {
   fi
 }
 
-require_command python3
 require_command npm
 
-if [[ ! -x "$venv_dir/bin/python" ]]; then
-  echo "[build] creating Python virtual environment"
-  python3 -m venv "$venv_dir"
+if [[ ! -x "$PYTHON_BIN" ]]; then
+  echo "Python binary not found or not executable: $PYTHON_BIN" >&2
+  exit 2
 fi
 
+echo "[build] using Python environment: $PYTHON_BIN"
+"$PYTHON_BIN" --version
+
 if [[ "$install_dependencies" == "1" ]]; then
-  echo "[build] installing backend dependencies"
-  "$venv_dir/bin/pip" install -r "$project_dir/backend/requirements.txt"
-  "$venv_dir/bin/pip" install -r "$project_dir/backend/requirements-dev.txt"
+  echo "[build] installing backend dependencies into Python environment"
+  "$PYTHON_BIN" -m pip install -r "$project_dir/backend/requirements.txt"
+  "$PYTHON_BIN" -m pip install -r "$project_dir/backend/requirements-dev.txt"
 
   echo "[build] installing frontend dependencies"
-  npm --prefix "$frontend_dir" ci
+  npm --prefix "$frontend_dir" install
 elif [[ ! -d "$frontend_dir/node_modules" ]]; then
   echo "Frontend dependencies are missing and BUILD_INSTALL_DEPENDENCIES=0" >&2
   exit 2
 fi
 
 echo "[build] compiling backend Python sources"
-"$venv_dir/bin/python" -m compileall -q "$project_dir/backend/app" "$project_dir/backend/tests"
+"$PYTHON_BIN" -m compileall -q "$project_dir/backend/app" "$project_dir/backend/tests"
 
 if [[ "$run_tests" == "1" ]]; then
   echo "[build] running backend tests"
-  "$venv_dir/bin/python" -m pytest "$project_dir/backend/tests"
+  "$PYTHON_BIN" -m pytest "$project_dir/backend/tests"
 fi
 
 echo "[build] building same-origin frontend assets"
@@ -51,5 +54,6 @@ if [[ ! -f "$frontend_dir/dist/index.html" ]]; then
 fi
 
 echo "[build] complete"
-echo "  backend: $project_dir/backend/app"
+echo "  python:   $PYTHON_BIN"
+echo "  backend:  $project_dir/backend/app"
 echo "  frontend: $frontend_dir/dist"

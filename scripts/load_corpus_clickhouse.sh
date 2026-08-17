@@ -2,14 +2,16 @@
 set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$project_dir/scripts/env_python.sh"
+
 clickhouse_url="${CLICKHOUSE_URL:-http://localhost:18123}"
 clickhouse_user="${CLICKHOUSE_USER:-destiny}"
 clickhouse_password="${CLICKHOUSE_PASSWORD:-destiny_local}"
 generated_dir="$project_dir/data/generated/corpus"
 open_generated_dir="$project_dir/data/generated/wikisource-corpus"
 
-"$project_dir/scripts/build_corpus.py"
-"$project_dir/scripts/build_wikisource_corpus.py"
+"$PYTHON_BIN" "$project_dir/scripts/build_corpus.py"
+"$PYTHON_BIN" "$project_dir/scripts/build_wikisource_corpus.py"
 
 for attempt in $(seq 1 30); do
   if curl --silent --fail --user "$clickhouse_user:$clickhouse_password" "$clickhouse_url/ping" >/dev/null; then

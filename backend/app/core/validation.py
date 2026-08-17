@@ -5,6 +5,7 @@ from app.core.iching import time_cast as yi_time_cast
 from app.zhouyi import three_number_cast as yi_three_number_cast
 from app.daliuren import number_cast as liuren_number_cast
 from app.daliuren import time_cast as liuren_time_cast
+from app.fengshui import analyze_measurements as fengshui_measurements
 from app.fengshui import calculate_direction as fengshui_direction
 from app.core.liuyao import number_cast as liuyao_number_cast
 from app.core.liuyao import time_cast as liuyao_time_cast
@@ -59,6 +60,8 @@ def execute_validation_case(case):
         return liuren_number_cast(number, **values)
     if system == "fengshui" and method == "direction":
         return fengshui_direction(**payload)
+    if system == "fengshui" and method == "measurements":
+        return fengshui_measurements(payload["measurements"])
     raise ValueError("unsupported validation case: {}/{}".format(system, method))
 
 

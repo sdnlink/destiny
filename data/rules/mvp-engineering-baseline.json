@@ -71,7 +71,8 @@
         {"rule_id": "FS-DIRECTION-NORMALIZE-001", "version": "1.0.0"},
         {"rule_id": "FS-DECLINATION-001", "version": "1.0.0"},
         {"rule_id": "FS-24MOUNTAIN-001", "version": "1.0.0"},
-        {"rule_id": "FS-UNCERTAINTY-001", "version": "1.0.0"}
+        {"rule_id": "FS-UNCERTAINTY-001", "version": "1.0.0"},
+        {"rule_id": "FS-MEASUREMENT-CONSENSUS-001", "version": "1.0.0"}
       ]
     }
   ],
@@ -447,6 +448,12 @@
       "title": "坐向测量误差传播", "purpose": "将角度测量误差传播为候选山向、分类稳定性和边界预警", "preconditions": ["测量误差在0至180度之间"],
       "inputs": ["true_facing_degree", "measurement_error"], "procedure": ["构造角度误差区间", "求区间覆盖的候选二十四山", "计算距最近分界距离", "跨界或距分界不足1度时预警"], "outputs": ["candidate_mountains", "classification_stable", "distance_to_boundary", "boundary_warning"],
       "source_refs": ["docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["误差值由测量者评估", "预警不能替代现场复测"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:_direction_fact"
+    },
+    {
+      "rule_id": "FS-MEASUREMENT-CONSENSUS-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
+      "title": "多次坐向测量圆周共识", "purpose": "汇总三至十二次真北读数并识别一致、跨界或相互矛盾的测量结果", "preconditions": ["至少三次且最多十二次有效测量", "每次测量已独立修正为真北角度"],
+      "inputs": ["measurements", "true_facing_degrees", "measurement_errors"], "procedure": ["计算圆周均值和方向集中度", "计算包含全部读数的最小圆弧", "以最大角偏差加单次误差形成保守误差包络", "跨度超过10度或方向抵消时标记不一致", "误差包络跨山界时保留全部候选"], "outputs": ["status", "circular_mean_degree", "resultant_length", "angular_spread", "effective_measurement_error", "aggregate"],
+      "source_refs": ["docs/design/decisions/014-fengshui-measurement-consensus-phase-eight.md"], "limitations": ["10度一致性阈值为待专家和测量规范复核的工程基线", "不替代现场校准和设备检定", "不生成流派判断"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:analyze_measurements"
     }
   ]
 }

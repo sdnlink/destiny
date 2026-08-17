@@ -4,7 +4,7 @@ import unittest
 
 import pytest
 
-from app.fengshui import calculate_direction
+from app.fengshui import analyze_measurements, calculate_direction
 
 
 MODULE_PATH = Path(__file__).resolve().parents[2] / "scripts" / "fengshui_direction.py"
@@ -75,6 +75,56 @@ def test_invalid_numeric_inputs_are_rejected(field, value):
     payload = {"facing_degree": 180, field: value}
     with pytest.raises(ValueError):
         calculate_direction(**payload)
+
+
+def _measurements(values, error=0.5):
+    return [
+        {"facing_degree": value, "input_reference": "true", "measurement_error": error}
+        for value in values
+    ]
+
+
+def test_multiple_measurements_use_circular_mean_across_north():
+    result = analyze_measurements(_measurements([359, 0, 1]))
+    consensus = result["facts"]["consensus"]
+    assert consensus["status"] == "consistent"
+    assert consensus["circular_mean_degree"] == 0
+    assert consensus["angular_spread"] == 2
+    assert consensus["effective_measurement_error"] == 1.5
+    assert consensus["aggregate"]["facing"]["mountain"]["name"] == "子"
+
+
+def test_multiple_measurements_propagate_boundary_candidates():
+    result = analyze_measurements(_measurements([6, 8, 10]))
+    consensus = result["facts"]["consensus"]
+    assert consensus["status"] == "boundary_sensitive"
+    assert consensus["circular_mean_degree"] == 8
+    assert {value["name"] for value in consensus["aggregate"]["facing"]["candidate_mountains"]} == {"子", "癸"}
+    assert result["judgements"] == []
+
+
+def test_opposing_measurements_do_not_fabricate_consensus():
+    result = analyze_measurements(_measurements([0, 120, 240]))
+    consensus = result["facts"]["consensus"]
+    assert consensus["status"] == "inconsistent"
+    assert consensus["circular_mean_degree"] is None
+    assert consensus["aggregate"] is None
+    assert "不能形成可信坐向" in result["warnings"][0]
+
+
+def test_widely_spread_measurements_keep_diagnostic_mean_but_no_direction():
+    result = analyze_measurements(_measurements([0, 20, 40]))
+    consensus = result["facts"]["consensus"]
+    assert consensus["status"] == "inconsistent"
+    assert consensus["circular_mean_degree"] == 20
+    assert consensus["angular_spread"] == 40
+    assert consensus["aggregate"] is None
+
+
+@pytest.mark.parametrize("count", [0, 2, 13])
+def test_measurement_batch_requires_three_to_twelve_readings(count):
+    with pytest.raises(ValueError):
+        analyze_measurements(_measurements([180] * count))
 
 
 if __name__ == "__main__":

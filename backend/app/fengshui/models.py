@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 
 def _finite_number(value, label):
@@ -42,3 +42,16 @@ class DirectionInput:
             object.__setattr__(self, "declination_source", self.declination_source.strip())
         if self.measurement_method is not None:
             object.__setattr__(self, "measurement_method", self.measurement_method.strip())
+
+
+@dataclass(frozen=True)
+class MeasurementBatchInput:
+    measurements: Tuple[DirectionInput, ...]
+
+    def __post_init__(self):
+        if not isinstance(self.measurements, tuple):
+            raise ValueError("measurements must be an immutable sequence")
+        if not 3 <= len(self.measurements) <= 12:
+            raise ValueError("measurement batch must contain between 3 and 12 readings")
+        if not all(isinstance(value, DirectionInput) for value in self.measurements):
+            raise ValueError("every measurement must be a direction input")

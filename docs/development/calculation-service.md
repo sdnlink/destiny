@@ -18,6 +18,7 @@
 - 六爻六爻值、三枚硬币、时间、双数和个体自动排盘，以及八宫、世应、纳甲、六亲、六神、月建、日辰和旬空。
 - 大六壬时间、数字占时和个体报数排盘，输出月将、天地盘、四课、十二天将、旬空和逐课体覆盖矩阵；三传已覆盖贼克、克、比用、涉害、遥克、昴星、别责、八专、伏吟和返吟。
 - 阳宅坐向角度归一化、磁偏角真北修正、二十四山、测量误差候选和边界预警。
+- 阳宅三至十二次读数的圆周均值、最小覆盖弧、保守误差包络和一致性状态。
 - 周易、梅花、六爻和六壬个体自动排盘；各模块使用独立派生域并支持凭证重放。
 - 规范输入哈希、幂等任务编号、多模块并行计算。
 - 规则登记、来源引用、规则集合校验和工程案例回归。
@@ -88,6 +89,7 @@ APP_API_BIND=0.0.0.0 APP_API_TOKEN='replace-me' ./scripts/run_mvp_api.sh
 | `POST` | `/v1/liuren/time` | 大六壬传统时间排盘 |
 | `POST` | `/v1/liuren/numbers` | 大六壬数字占时排盘 |
 | `POST` | `/v1/fengshui/direction` | 阳宅真北坐向、二十四山及误差分析 |
+| `POST` | `/v1/fengshui/measurements` | 阳宅多次坐向测量圆周共识 |
 | `POST` | `/v1/calculations/evaluate` | 统一单模块计算封装 |
 | `POST` | `/v1/calculations/compare` | 最多8个模块并行计算和综合比较 |
 
@@ -249,7 +251,7 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 - 只有一条判断进入`unpaired`。
 - 包含`indeterminate`进入`indeterminate`。
 
-当前登记的62条规则均为`draft`工程基线，各模块也没有解释性`judgements`，因此正常综合结果是保留模块事实，并提示没有可比较的已发布判断。两个`ADV-*`规则只产生未审核检查清单，不把五行关系转换为吉凶。
+当前登记的63条规则均为`draft`工程基线，各模块也没有解释性`judgements`，因此正常综合结果是保留模块事实，并提示没有可比较的已发布判断。两个`ADV-*`规则只产生未审核检查清单，不把五行关系转换为吉凶。
 
 ## 5. 规则与案例
 
@@ -268,8 +270,8 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 ## 6. 验证
 
 ```bash
-.venv/bin/python -m pytest backend/tests
-.venv/bin/python -m compileall -q backend/app backend/tests
+python -m pytest backend/tests
+python -m compileall -q backend/app backend/tests
 ./scripts/run_validation_cases.py
 ```
 

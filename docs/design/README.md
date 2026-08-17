@@ -26,6 +26,7 @@
 - [ADR-011：六爻独立领域第五阶段基线](./decisions/011-liuyao-domain-phase-five.md)
 - [ADR-012：大六壬独立领域第六阶段基线](./decisions/012-daliuren-domain-phase-six.md)
 - [ADR-013：阳宅风水方位独立领域第七阶段基线](./decisions/013-fengshui-direction-domain-phase-seven.md)
+- [ADR-014：阳宅多次测量共识第八阶段基线](./decisions/014-fengshui-measurement-consensus-phase-eight.md)
 
 ## 文档优先级
 

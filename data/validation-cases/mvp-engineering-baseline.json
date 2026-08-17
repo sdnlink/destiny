@@ -158,6 +158,24 @@
       "input": {"facing_degree": 7.5, "input_reference": "true", "measurement_error": 0},
       "expected": {"facts": {"facing": {"mountain": {"name": "癸"}, "distance_to_boundary": 0.0}, "boundary_warning": true}},
       "tags": ["half-open", "boundary", "twenty-four-mountains"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_fs_0004", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "method": "measurements", "title": "跨正北多次读数圆周均值",
+      "input": {"measurements": [{"facing_degree": 359, "input_reference": "true", "measurement_error": 0.5}, {"facing_degree": 0, "input_reference": "true", "measurement_error": 0.5}, {"facing_degree": 1, "input_reference": "true", "measurement_error": 0.5}]},
+      "expected": {"facts": {"consensus": {"status": "consistent", "sample_count": 3, "circular_mean_degree": 0.0, "angular_spread": 2.0, "effective_measurement_error": 1.5, "aggregate": {"facing": {"mountain": {"name": "子"}}}}}},
+      "tags": ["multiple-measurements", "circular-mean", "north-wrap"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/014-fengshui-measurement-consensus-phase-eight.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_fs_0005", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "method": "measurements", "title": "多次读数误差跨二十四山分界",
+      "input": {"measurements": [{"facing_degree": 6, "input_reference": "true", "measurement_error": 0.5}, {"facing_degree": 8, "input_reference": "true", "measurement_error": 0.5}, {"facing_degree": 10, "input_reference": "true", "measurement_error": 0.5}]},
+      "expected": {"facts": {"consensus": {"status": "boundary_sensitive", "circular_mean_degree": 8.0, "angular_spread": 4.0, "effective_measurement_error": 2.5, "aggregate": {"classification_stable": false}}}},
+      "tags": ["multiple-measurements", "boundary", "uncertainty"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/014-fengshui-measurement-consensus-phase-eight.md"], "reviewers": []
+    },
+    {
+      "case_id": "case_fs_0006", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "method": "measurements", "title": "相互抵消读数不生成共识坐向",
+      "input": {"measurements": [{"facing_degree": 0, "input_reference": "true", "measurement_error": 0.5}, {"facing_degree": 120, "input_reference": "true", "measurement_error": 0.5}, {"facing_degree": 240, "input_reference": "true", "measurement_error": 0.5}]},
+      "expected": {"facts": {"consensus": {"status": "inconsistent", "circular_mean_degree": null, "angular_spread": 240.0, "aggregate": null}}},
+      "tags": ["multiple-measurements", "inconsistent", "no-fabrication"], "review_status": "engineering_baseline", "source_refs": ["docs/design/decisions/014-fengshui-measurement-consensus-phase-eight.md"], "reviewers": []
     }
   ]
 }

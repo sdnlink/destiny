@@ -10,9 +10,11 @@ import {
   LoaderCircle,
   LocateFixed,
   Mountain,
+  Plus,
   Play,
   RefreshCw,
   RotateCcw,
+  Trash2,
   Workflow,
 } from "lucide-react";
 
@@ -75,6 +77,19 @@ export default function InputPanel({
     const lines = [...form.lines];
     lines[index] = value;
     update("lines", lines);
+  };
+  const updateMeasurement = (index, value) => {
+    const measurements = [...form.fsMeasurements];
+    measurements[index] = value;
+    update("fsMeasurements", measurements);
+  };
+  const addMeasurement = () => {
+    if (form.fsMeasurements.length < 12) update("fsMeasurements", [...form.fsMeasurements, "180"]);
+  };
+  const removeMeasurement = (index) => {
+    if (form.fsMeasurements.length > 3) {
+      update("fsMeasurements", form.fsMeasurements.filter((_, current) => current !== index));
+    }
   };
   const showZhouyi = form.scene === "combined" || form.scene === "zhouyi";
   const showMeihua = form.scene === "combined" || form.scene === "meihua";
@@ -368,11 +383,29 @@ export default function InputPanel({
         {showFengshui && (
           <section className="form-section">
             <div className="section-title"><Mountain size={16} /><span>阳宅坐向测量</span></div>
-            <label>
-              <FieldLabel>向首方位角</FieldLabel>
-              <input type="number" step="0.01" value={form.fsFacing} onChange={(event) => update("fsFacing", event.target.value)} required />
-              <small className="field-hint">正北为 0°，顺时针增加；应填写建筑向首的现场测量值</small>
-            </label>
+            <div className="segmented method-switch" role="radiogroup" aria-label="坐向测量模式">
+              <button type="button" className={form.fsMode === "single" ? "active" : ""} onClick={() => update("fsMode", "single")}>单次分析</button>
+              <button type="button" className={form.fsMode === "multiple" ? "active" : ""} onClick={() => update("fsMode", "multiple")}>多次共识</button>
+            </div>
+            {form.fsMode === "single" ? (
+              <label>
+                <FieldLabel>向首方位角</FieldLabel>
+                <input type="number" step="0.01" value={form.fsFacing} onChange={(event) => update("fsFacing", event.target.value)} required />
+                <small className="field-hint">正北为 0°，顺时针增加；应填写建筑向首的现场测量值</small>
+              </label>
+            ) : (
+              <div className="measurement-inputs">
+                <div className="measurement-inputs-head"><FieldLabel>向首读数</FieldLabel><small>{form.fsMeasurements.length} / 12</small></div>
+                {form.fsMeasurements.map((value, index) => (
+                  <div className="measurement-input-row" key={index}>
+                    <span>{index + 1}</span>
+                    <input aria-label={`第${index + 1}次向首读数`} type="number" step="0.01" value={value} onChange={(event) => updateMeasurement(index, event.target.value)} required />
+                    <button className="icon-button" type="button" title="删除本次读数" aria-label={`删除第${index + 1}次读数`} disabled={form.fsMeasurements.length <= 3} onClick={() => removeMeasurement(index)}><Trash2 size={15} /></button>
+                  </div>
+                ))}
+                <button className="secondary-command" type="button" disabled={form.fsMeasurements.length >= 12} onClick={addMeasurement}><Plus size={15} />增加读数</button>
+              </div>
+            )}
             <div className="segmented method-switch" role="radiogroup" aria-label="方位角基准">
               <button type="button" className={form.fsReference === "magnetic" ? "active" : ""} onClick={() => update("fsReference", "magnetic")}>磁北测量</button>
               <button type="button" className={form.fsReference === "true" ? "active" : ""} onClick={() => update("fsReference", "true")}>真北测量</button>
@@ -389,7 +422,7 @@ export default function InputPanel({
             </div>
             <div className="method-note">
               <LocateFixed size={16} />
-              <p>磁北角按“真北角 = 磁北角 + 磁偏角”修正；误差跨越二十四山分界时保留全部候选并提示复测。</p>
+              <p>{form.fsMode === "multiple" ? "每次读数独立修正真北，再用圆周均值汇总；离散超过 10° 时不生成可信坐向。" : "磁北角按“真北角 = 磁北角 + 磁偏角”修正；误差跨界时保留全部候选。"}</p>
             </div>
           </section>
         )}

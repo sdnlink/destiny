@@ -23,14 +23,13 @@
 
 默认依次执行：
 
-1. 检查Python 3.11+和`npm`。
-2. 不存在时创建根目录`.venv`。
-3. 从`backend/requirements.txt`和`backend/requirements-dev.txt`安装固定版本Python依赖。
-4. 使用`npm ci`按锁文件安装前端依赖。
-5. 编译`backend/app`和`backend/tests`中的Python文件。
-6. 使用pytest运行全部后端测试。
-7. 以同源API模式构建React前端到`frontend/dist`。
-8. 检查`frontend/dist/index.html`存在。
+1. 检查 Python 3.11+（优先自动检测 Conda `base` 环境，支持 `CONDA_PREFIX`、`PYTHON_BIN`）和 `npm`。
+2. 从 `backend/requirements.txt` 和 `backend/requirements-dev.txt` 安装固定版本 Python 依赖。
+3. 安装前端依赖。
+4. 编译 `backend/app` 和 `backend/tests` 中的 Python 文件。
+5. 使用 pytest 运行全部后端测试。
+6. 以同源 API 模式构建 React 前端到 `frontend/dist`。
+7. 检查 `frontend/dist/index.html` 存在。
 
 可用参数：
 
@@ -87,7 +86,7 @@ START_CORPUS_API=0 CORPUS_API_URL=http://127.0.0.1:8088 ./scripts/start_all.sh
 
 启动脚本会在以下情况立即失败并给出提示：
 
-- `.venv/bin/uvicorn`不存在。
+- Python 环境依赖缺失（未安装 uvicorn、fastapi 等）。
 - `frontend/dist/index.html`不存在。
 - 请求启动ClickHouse但系统没有Docker。
 - 绑定非回环地址但没有配置`APP_API_TOKEN`。

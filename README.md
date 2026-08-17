@@ -30,12 +30,13 @@ docs/          项目计划、设计决策和运行手册
 
 ## 本地启动
 
-首次安装后端依赖：
+首次安装后端依赖（使用 Conda `base` 环境）：
 
 ```bash
-python3.11 -m venv .venv
-.venv/bin/pip install -r backend/requirements.txt
-.venv/bin/pip install -r backend/requirements-dev.txt
+# 激活 Conda base 环境并安装依赖
+conda activate base
+pip install -r backend/requirements.txt
+pip install -r backend/requirements-dev.txt
 ```
 
 启动ClickHouse：
@@ -100,7 +101,7 @@ Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在
 验证：
 
 ```bash
-.venv/bin/python -m pytest backend/tests
+python -m pytest backend/tests
 ./scripts/run_validation_cases.py
 npm --prefix frontend run build
 npm --prefix frontend run test:browser

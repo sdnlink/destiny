@@ -51,6 +51,8 @@ function initialForm() {
     liurenMethod: "auto",
     lrNumber: "8",
     fsFacing: "180",
+    fsMode: "single",
+    fsMeasurements: ["179", "180", "181"],
     fsReference: "magnetic",
     fsDeclination: "0",
     fsError: "1",
@@ -124,14 +126,24 @@ function buildCalculations(form) {
   if (form.scene === "fengshui") {
     calculations.push({
       module: "fengshui",
-      method: "direction",
-      input: {
-        facing_degree: Number(form.fsFacing),
-        input_reference: form.fsReference,
-        magnetic_declination: Number(form.fsDeclination),
-        measurement_error: Number(form.fsError),
-        measurement_method: "web_manual_entry",
-      },
+      method: form.fsMode === "multiple" ? "measurements" : "direction",
+      input: form.fsMode === "multiple"
+        ? {
+            measurements: form.fsMeasurements.map((degree) => ({
+              facing_degree: Number(degree),
+              input_reference: form.fsReference,
+              magnetic_declination: Number(form.fsDeclination),
+              measurement_error: Number(form.fsError),
+              measurement_method: "web_multi_entry",
+            })),
+          }
+        : {
+            facing_degree: Number(form.fsFacing),
+            input_reference: form.fsReference,
+            magnetic_declination: Number(form.fsDeclination),
+            measurement_error: Number(form.fsError),
+            measurement_method: "web_manual_entry",
+          },
     });
   }
   return calculations;

@@ -63,6 +63,16 @@ curl -X POST http://127.0.0.1:8090/v1/fengshui/direction \
 
 统一计算接口使用`module: fengshui`和`method: direction`。响应遵守统一事实协议，`judgements`在本阶段固定为空数组。
 
+多次测量使用三至十二个独立读数：
+
+```bash
+curl -X POST http://127.0.0.1:8090/v1/fengshui/measurements \
+  -H 'Content-Type: application/json' \
+  -d '{"measurements":[{"facing_degree":359,"input_reference":"true","measurement_error":0.5},{"facing_degree":0,"input_reference":"true","measurement_error":0.5},{"facing_degree":1,"input_reference":"true","measurement_error":0.5}]}'
+```
+
+多次测量采用圆周均值而非普通平均。结果状态为`consistent`、`boundary_sensitive`或`inconsistent`，并保留逐次真北修正和合并误差。
+
 ## ClickHouse 数据表
 
 | 表 | 用途 |

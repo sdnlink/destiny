@@ -289,6 +289,54 @@ def _liuren_explanation(item):
 def _fengshui_explanation(item):
     result = item["result"]
     facts = result["facts"]
+    if facts.get("mode") == "multiple_measurements":
+        consensus = facts["consensus"]
+        aggregate = consensus["aggregate"]
+        status_labels = {
+            "consistent": "一致", "boundary_sensitive": "跨山界", "inconsistent": "读数不一致",
+        }
+        if aggregate is None:
+            direction_summary = "读数不能形成唯一圆周均值，未生成合并山向"
+            mountain_text = "没有生成合并坐向；应检查是否混入坐山读数或测量方向相反。"
+        else:
+            facing = aggregate["facing"]
+            sitting = aggregate["sitting"]
+            direction_summary = "共识向首{:.1f}°为{}向，坐山{:.1f}°为{}坐".format(
+                aggregate["true_facing_degree"], facing["mountain"]["name"],
+                aggregate["true_sitting_degree"], sitting["mountain"]["name"],
+            )
+            mountain_text = "合并向首候选为{}，坐山候选为{}。".format(
+                "、".join(value["name"] for value in facing["candidate_mountains"]),
+                "、".join(value["name"] for value in sitting["candidate_mountains"]),
+            )
+        return {
+            "module": "fengshui",
+            "title": "阳宅多次坐向测量",
+            "summary": "共{}次测量，状态为{}；{}。".format(
+                consensus["sample_count"], status_labels[consensus["status"]], direction_summary,
+            ),
+            "sections": [
+                {
+                    "title": "逐次真北修正",
+                    "text": "{}次读数分别完成角度归一化和磁偏角修正，未先做普通算术平均。".format(consensus["sample_count"]),
+                    "rule_ids": ["FS-DIRECTION-NORMALIZE-001", "FS-DECLINATION-001"],
+                },
+                {
+                    "title": "圆周共识",
+                    "text": "最小覆盖弧为{:.2f}°，方向集中度为{:.4f}；工程允许的最大一致跨度为{:.2f}°。".format(
+                        consensus["angular_spread"], consensus["resultant_length"],
+                        consensus["maximum_consensus_spread"],
+                    ),
+                    "rule_ids": ["FS-MEASUREMENT-CONSENSUS-001"],
+                },
+                {
+                    "title": "合并山向与误差",
+                    "text": mountain_text,
+                    "rule_ids": ["FS-MEASUREMENT-CONSENSUS-001", "FS-24MOUNTAIN-001", "FS-UNCERTAINTY-001"],
+                },
+            ],
+            "limitations": list(result.get("warnings", [])),
+        }
     facing = facts["facing"]
     sitting = facts["sitting"]
     facing_names = "、".join(value["name"] for value in facing["candidate_mountains"])

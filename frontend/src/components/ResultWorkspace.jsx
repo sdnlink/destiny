@@ -255,12 +255,17 @@ function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, f
         {fengshui && (
           <button className="overview-section" onClick={() => onTab("fengshui")}>
             <div className="overview-head"><span><Mountain size={16} />阳宅坐向</span><ArrowRight size={15} /></div>
-            <div className="direction-overview-core">
-              <div><span>坐</span><strong>{fengshui.facts.sitting.mountain.name}</strong><small>{fengshui.facts.true_sitting_degree}°</small></div>
-              <ArrowRight size={22} />
-              <div><span>向</span><strong>{fengshui.facts.facing.mountain.name}</strong><small>{fengshui.facts.true_facing_degree}°</small></div>
-            </div>
-            <p>{fengshui.facts.classification_stable ? "山向分类稳定" : "测量误差跨界，需复测确认"}</p>
+            {(fengshui.facts.mode === "multiple_measurements" ? fengshui.facts.consensus.aggregate : fengshui.facts) ? (() => {
+              const direction = fengshui.facts.mode === "multiple_measurements" ? fengshui.facts.consensus.aggregate : fengshui.facts;
+              return <>
+                <div className="direction-overview-core">
+                  <div><span>坐</span><strong>{direction.sitting.mountain.name}</strong><small>{direction.true_sitting_degree}°</small></div>
+                  <ArrowRight size={22} />
+                  <div><span>向</span><strong>{direction.facing.mountain.name}</strong><small>{direction.true_facing_degree}°</small></div>
+                </div>
+                <p>{direction.classification_stable ? "山向分类稳定" : "测量误差跨界，需复测确认"}</p>
+              </>;
+            })() : <div className="direction-overview-empty"><CircleAlert size={22} /><strong>读数不一致</strong><span>未生成合并山向</span></div>}
           </button>
         )}
       </section>
@@ -527,8 +532,64 @@ function MountainFact({ label, direction }) {
   );
 }
 
+function MeasurementConsensusView({ result }) {
+  const { measurements, consensus } = result.facts;
+  const aggregate = consensus.aggregate;
+  const statusLabels = { consistent: "一致", boundary_sensitive: "跨山界", inconsistent: "读数不一致" };
+  return (
+    <div className="view-stack">
+      <section className="view-heading">
+        <div><span className="section-kicker">FENGSHUI MEASUREMENT CONSENSUS</span><h2>阳宅多次测量共识</h2><p>每次读数独立修正真北，再以圆周统计汇总方向和保守误差。</p></div>
+        <span className="version-badge">{result.rule_version}</span>
+      </section>
+      <section className="liuren-facts-band">
+        <DataState label="测量次数" value={consensus.sample_count} />
+        <DataState label="共识状态" value={statusLabels[consensus.status]} />
+        <DataState label="最小覆盖弧" value={`${consensus.angular_spread}°`} />
+        <DataState label="方向集中度" value={consensus.resultant_length} mono />
+      </section>
+      {aggregate ? (
+        <>
+          <section className="direction-primary-grid">
+            <MountainFact label="共识坐山" direction={aggregate.sitting} />
+            <div className="direction-axis"><ArrowRight size={24} /><span>相差 180°</span></div>
+            <MountainFact label="共识向首" direction={aggregate.facing} />
+          </section>
+          <section className="data-band">
+            <div className="band-heading"><div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>保守误差范围</h3><p>包含每次读数偏差与设备误差</p></div></div></div>
+            <div className="comparison-counts">
+              <DataState label="圆周均值" value={`${consensus.circular_mean_degree}°`} />
+              <DataState label="最大偏差" value={`${consensus.maximum_deviation}°`} />
+              <DataState label="合并误差 ±" value={`${consensus.effective_measurement_error}°`} />
+              <DataState label="向首候选" value={aggregate.facing.candidate_mountains.map((item) => item.name).join("、")} />
+            </div>
+          </section>
+        </>
+      ) : <Notice tone="warning" icon={CircleAlert}>这些读数不能形成唯一方向，系统未生成合并山向。请检查是否混入坐山读数或测量方向相反。</Notice>}
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><Compass size={16} /></span><div><h3>逐次真北读数</h3><p>原始输入与修正结果并列保留</p></div></div></div>
+        <div className="measurement-table-wrap">
+          <table className="measurement-table">
+            <thead><tr><th>次数</th><th>原始角度</th><th>基准</th><th>磁偏角</th><th>真北角</th><th>山向</th><th>距分界</th></tr></thead>
+            <tbody>{measurements.map((row) => <tr key={row.sequence}>
+              <td>{row.sequence}</td><td>{row.input.facing_degree}°</td><td>{row.input.input_reference === "magnetic" ? "磁北" : "真北"}</td>
+              <td>{row.input.magnetic_declination}°</td><td>{row.true_facing_degree}°</td><td>{row.facing_mountain.name}</td><td>{row.distance_to_boundary}°</td>
+            </tr>)}</tbody>
+          </table>
+        </div>
+      </section>
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <Steps steps={result.steps} />
+      </section>
+      {result.warnings.map((warning) => <Notice tone={consensus.status === "consistent" ? "neutral" : "warning"} icon={CircleAlert} key={warning}>{warning}</Notice>)}
+    </div>
+  );
+}
+
 function FengshuiView({ result }) {
   if (!result) return <MissingModule name="阳宅风水" />;
+  if (result.facts.mode === "multiple_measurements") return <MeasurementConsensusView result={result} />;
   const { facts } = result;
   const facing = facts.facing;
   const sitting = facts.sitting;

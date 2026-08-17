@@ -2,9 +2,10 @@
 set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$project_dir/scripts/env_python.sh"
 
-if [[ ! -x "$project_dir/.venv/bin/uvicorn" ]]; then
-  echo "Backend dependencies are missing. Run ./scripts/build_all.sh first." >&2
+if ! "$PYTHON_BIN" -c "import uvicorn, fastapi, lunar_python, pydantic, pytz" >/dev/null 2>&1; then
+  echo "Backend dependencies are missing in Python environment ($PYTHON_BIN). Run ./scripts/build_all.sh first." >&2
   exit 2
 fi
 

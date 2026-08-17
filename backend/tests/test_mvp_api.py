@@ -4,7 +4,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, FengshuiDirectionRequest, LiurenNumberRequest, LiuyaoCoinRequest, LiuyaoLineRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
+from app.main import AutoCastRequest, AdvisoryContext, CalculationRequest, FengshuiDirectionRequest, FengshuiMeasurementsRequest, LiurenNumberRequest, LiuyaoCoinRequest, LiuyaoLineRequest, MeihuaThreeNumberRequest, YiThreeNumberRequest, calculation_envelope, canonical_hash, comparison_envelope, execute
 from pydantic import ValidationError
 
 
@@ -51,6 +51,26 @@ class MvpApiTests(unittest.TestCase):
         module = explained["explanation"]["modules"][0]
         self.assertEqual(module["module"], "fengshui")
         self.assertIn("FS-UNCERTAINTY-001", module["sections"][2]["rule_ids"])
+
+    def test_dispatches_fengshui_measurement_consensus(self):
+        readings = [
+            {"facing_degree": value, "input_reference": "true", "measurement_error": 0.5}
+            for value in (179, 180, 181)
+        ]
+        result = execute("fengshui", "measurements", {"measurements": readings})
+        self.assertEqual(result["facts"]["consensus"]["status"], "consistent")
+        explained = comparison_envelope([
+            CalculationRequest(module="fengshui", method="measurements", input={"measurements": readings}),
+        ])
+        module = explained["explanation"]["modules"][0]
+        self.assertEqual(module["title"], "阳宅多次坐向测量")
+        self.assertIn("FS-MEASUREMENT-CONSENSUS-001", module["sections"][1]["rule_ids"])
+
+    def test_fengshui_measurement_api_requires_three_to_twelve_readings(self):
+        reading = {"facing_degree": 180, "input_reference": "true"}
+        for values in ([reading] * 2, [reading] * 13):
+            with self.subTest(count=len(values)), self.assertRaises(ValidationError):
+                FengshuiMeasurementsRequest(measurements=values)
     def test_auto_request_rejects_unsafe_nonce(self):
         with self.assertRaises(ValidationError):
             AutoCastRequest(

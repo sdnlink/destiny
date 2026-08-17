@@ -27,6 +27,7 @@ from app.core.imagery import collect_imagery
 from app.daliuren import auto_cast as liuren_auto_cast
 from app.daliuren import number_cast as liuren_number_cast
 from app.daliuren import time_cast as liuren_time_cast
+from app.fengshui import analyze_measurements as fengshui_measurements
 from app.fengshui import calculate_direction as fengshui_direction
 from app.liuyao import auto_cast as liuyao_auto_cast
 from app.liuyao import number_cast as liuyao_number_cast
@@ -125,6 +126,10 @@ class FengshuiDirectionRequest(BaseModel):
         return value
 
 
+class FengshuiMeasurementsRequest(BaseModel):
+    measurements: conlist(FengshuiDirectionRequest, min_items=3, max_items=12)
+
+
 class CalculationRequest(BaseModel):
     module: str
     method: str
@@ -219,6 +224,9 @@ def execute(module, method, payload):
     if module == "fengshui" and method == "direction":
         request = FengshuiDirectionRequest(**payload)
         return fengshui_direction(**request.dict())
+    if module == "fengshui" and method == "measurements":
+        request = FengshuiMeasurementsRequest(**payload)
+        return fengshui_measurements([value.dict() for value in request.measurements])
     raise ValueError(f"unsupported calculation: {module}/{method}")
 
 
@@ -478,6 +486,11 @@ def cast_liuren_numbers(request: LiurenNumberRequest):
 @app.post("/v1/fengshui/direction")
 def calculate_fengshui_direction(request: FengshuiDirectionRequest):
     return {"data": fengshui_direction(**request.dict())}
+
+
+@app.post("/v1/fengshui/measurements")
+def analyze_fengshui_measurements(request: FengshuiMeasurementsRequest):
+    return {"data": fengshui_measurements([value.dict() for value in request.measurements])}
 
 
 @app.post("/v1/calculations/evaluate")

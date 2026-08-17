@@ -2,6 +2,8 @@
 set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$project_dir/scripts/env_python.sh"
+
 bind="${APP_API_BIND:-127.0.0.1}"
 port="${APP_API_PORT:-8090}"
 
@@ -10,7 +12,7 @@ if [[ "$bind" != "127.0.0.1" && "$bind" != "localhost" && "$bind" != "::1" && -z
   exit 2
 fi
 
-exec "$project_dir/.venv/bin/uvicorn" app.main:app \
+exec "$PYTHON_BIN" -m uvicorn app.main:app \
   --app-dir "$project_dir/backend" \
   --host "$bind" \
   --port "$port"
