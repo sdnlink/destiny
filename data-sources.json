@@ -23,8 +23,8 @@
     "category": "classical_text",
     "url": "https://zh.wikisource.org/",
     "license": "CC BY-SA 4.0; per-page public-domain status",
-    "access_status": "network_unavailable",
-    "notes": "当前环境无法访问；恢复网络后按页面版权状态和署名要求下载"
+    "access_status": "available",
+    "notes": "已接入53部公有领域及开放许可经典古籍（周易、梅花易数、六爻、象数、命理、奇门、六壬、堪舆），共计311万字、2521切片。"
   },
   {
     "source_id": "nasa-jpl-de440",

@@ -207,7 +207,8 @@ for item in HEXAGRAM_REST:
 
 HEXAGRAMS_DATA.sort(key=lambda x: x["ordinal"])
 
-output_file = Path("/home/skn/destiny/data/rules/hexagram-explanations.json")
+output_file = Path(__file__).resolve().parents[1] / "data" / "rules" / "hexagram-explanations.json"
+output_file.parent.mkdir(parents=True, exist_ok=True)
 with open(output_file, "w", encoding="utf-8") as f:
     json.dump(HEXAGRAMS_DATA, f, ensure_ascii=False, indent=2)
 

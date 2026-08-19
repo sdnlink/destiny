@@ -74,7 +74,7 @@ class VisibleTextParser(HTMLParser):
 
 
 class ApiClient:
-    def __init__(self, api_url, delay=1.0, timeout=60, retries=4):
+    def __init__(self, api_url, delay=1.5, timeout=60, retries=6):
         self.api_url = api_url
         self.delay = delay
         self.timeout = timeout
@@ -107,10 +107,13 @@ class ApiClient:
                 if status not in (429, 500, 502, 503, 504):
                     raise HTTPError(self.api_url, status, "Wikisource API request failed", {}, None)
                 last_error = HTTPError(self.api_url, status, "retryable Wikisource API response", {}, None)
-                time.sleep(min(60, 2 ** attempt))
+                backoff = min(60, 5 + 3 * (2 ** attempt))
+                print(f"[rate-limit retry {attempt + 1}/{self.retries}] sleeping {backoff}s...", flush=True)
+                time.sleep(backoff)
             except (URLError, TimeoutError, ValueError, OSError) as exc:
                 last_error = exc
-                time.sleep(min(60, 2 ** attempt))
+                backoff = min(60, 3 + 2 * (2 ** attempt))
+                time.sleep(backoff)
         raise last_error
 
 
@@ -341,9 +344,9 @@ def main():
     parser = argparse.ArgumentParser(description="缓存中文维基文库开放许可书籍纯文本")
     parser.add_argument("--manifest", type=Path, default=Path("data/sources/wikisource-books.json"))
     parser.add_argument("--output", type=Path, default=Path("cache/wikisource"))
-    parser.add_argument("--delay", type=float, default=1.0)
+    parser.add_argument("--delay", type=float, default=1.5)
     parser.add_argument("--timeout", type=int, default=60)
-    parser.add_argument("--retries", type=int, default=4)
+    parser.add_argument("--retries", type=int, default=8)
     args = parser.parse_args()
     try:
         cache(args.manifest.resolve(), args.output.resolve(), args.delay, args.timeout, args.retries)

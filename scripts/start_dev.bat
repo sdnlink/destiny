@@ -25,8 +25,8 @@ if not exist "%PROJECT_DIR%\frontend\node_modules" (
 
 echo =======================================================
 echo  天机演象 开发模式一键启动
-echo  后端 API (带热重载): http://127.0.0.1:8090
-echo  前端 Web (Vite开发): http://127.0.0.1:5173
+echo  后端 API [热重载]: http://127.0.0.1:8090
+echo  前端 Web [Vite]:   http://127.0.0.1:5173
 echo =======================================================
 
 echo 正在分别启动后端和前端服务窗口...
@@ -34,7 +34,7 @@ start "天机演象 - 后端API (Port 8090)" cmd /c "call "%~dp0run_mvp_api.bat"
 start "天机演象 - 前端Web (Port 5173)" cmd /c "call "%~dp0run_web.bat""
 
 rem 等待 2 秒后打开浏览器
-timeout /t 2 /nobreak >nul
+ping 127.0.0.1 -n 3 >nul 2>nul
 start http://127.0.0.1:5173
 
 echo.
