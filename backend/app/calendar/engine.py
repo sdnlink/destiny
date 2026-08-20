@@ -158,6 +158,15 @@ class CalendarEngine:
                 "day_nine_star": str(reference_lunar.getDayNineStar()),
                 "favorable_activities": list(reference_lunar.getDayYi()),
                 "unfavorable_activities": list(reference_lunar.getDayJi()),
+                "lucky_directions": {
+                    "joy_deity": reference_lunar.getDayPositionXiDesc(),
+                    "wealth_deity": reference_lunar.getDayPositionCaiDesc(),
+                    "blessing_deity": reference_lunar.getDayPositionFuDesc(),
+                    "yang_noble": reference_lunar.getDayPositionYangGuiDesc(),
+                    "yin_noble": reference_lunar.getDayPositionYinGuiDesc(),
+                },
+                "auspicious_spirits": list(reference_lunar.getDayJiShen()),
+                "inauspicious_spirits": list(reference_lunar.getDayXiongSha()),
                 "pengzu": {
                     "gan": reference_lunar.getPengZuGan(),
                     "zhi": reference_lunar.getPengZuZhi(),

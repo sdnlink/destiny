@@ -5124,6 +5124,57 @@ select:focus {
   border: 1px solid rgba(165, 62, 45, 0.15);
 }
 
+.almanac-deities-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+@media (max-width: 860px) {
+  .almanac-deities-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.deity-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.deity-label {
+  font-size: 11px;
+  color: var(--muted, #69716c);
+}
+
+.deity-item strong {
+  font-size: 13px;
+  color: var(--amber, #a66d1e);
+}
+
+.almanac-pengzu-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted, #69716c);
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.02);
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.pengzu-label {
+  font-weight: bold;
+  color: var(--ink, #202622);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

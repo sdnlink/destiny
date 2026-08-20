@@ -24,7 +24,21 @@ export function generateMarkdownReport(result, context) {
     md += `- **农历生辰**：${cal.lunar?.year}年 ${cal.lunar?.is_leap_month ? "闰" : ""}${cal.lunar?.month_name}月${cal.lunar?.day_name}\n`;
     md += `- **四柱干支**：年柱【${cal.pillars?.year}】 · 月柱【${cal.pillars?.month}】 · 日柱【${cal.pillars?.day}】 · 时柱【${cal.pillars?.time}】\n`;
     md += `- **节气背景**：${cal.solar_terms?.previous_month_boundary?.name || ""} → ${cal.solar_terms?.next_month_boundary?.name || ""}\n`;
-    md += `- **日柱旬空**：${cal.xun?.empty_branches?.join("、") || "无"}\n\n`;
+    md += `- **日柱旬空**：${cal.xun?.empty_branches?.join("、") || "无"}\n`;
+    if (cal.almanac) {
+      const a = cal.almanac;
+      md += `- **黄历择吉**：十二建星【${a.duty_officer}日】 · 二十八宿【${a.twenty_eight_mansion?.name}宿·${a.twenty_eight_mansion?.luck}】 · 值日天神【${a.day_tian_shen?.type}·${a.day_tian_shen?.name}】\n`;
+      if (a.lucky_directions) {
+        md += `- **吉神方位**：喜神【${a.lucky_directions.joy_deity}】 · 财神【${a.lucky_directions.wealth_deity}】 · 福神【${a.lucky_directions.blessing_deity}】 · 阳贵【${a.lucky_directions.yang_noble}】 · 阴贵【${a.lucky_directions.yin_noble}】\n`;
+      }
+      if (a.favorable_activities?.length) {
+        md += `- **当日宜忌**：【宜】${a.favorable_activities.slice(0, 8).join("、")}  |  【忌】${a.unfavorable_activities?.slice(0, 6).join("、") || "无"}\n`;
+      }
+      if (a.pengzu) {
+        md += `- **彭祖百忌**：${a.pengzu.gan} · ${a.pengzu.zhi}\n`;
+      }
+    }
+    md += `\n`;
   }
 
   // 2. 核心研判与策略建议

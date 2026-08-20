@@ -486,6 +486,23 @@ function CalendarView({ calendar }) {
               </div>
             </div>
           </div>
+
+          {calendar.almanac.lucky_directions && (
+            <div className="almanac-deities-grid">
+              <div className="deity-item"><span className="deity-label">喜神</span><strong>{calendar.almanac.lucky_directions.joy_deity}</strong></div>
+              <div className="deity-item"><span className="deity-label">财神</span><strong>{calendar.almanac.lucky_directions.wealth_deity}</strong></div>
+              <div className="deity-item"><span className="deity-label">福神</span><strong>{calendar.almanac.lucky_directions.blessing_deity}</strong></div>
+              <div className="deity-item"><span className="deity-label">阳贵神</span><strong>{calendar.almanac.lucky_directions.yang_noble}</strong></div>
+              <div className="deity-item"><span className="deity-label">阴贵神</span><strong>{calendar.almanac.lucky_directions.yin_noble}</strong></div>
+            </div>
+          )}
+
+          {calendar.almanac.pengzu && (
+            <div className="almanac-pengzu-row">
+              <span className="pengzu-label">彭祖百忌：</span>
+              <span>{calendar.almanac.pengzu.gan} · {calendar.almanac.pengzu.zhi}</span>
+            </div>
+          )}
         </section>
       )}
 
