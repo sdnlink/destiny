@@ -400,7 +400,7 @@ def _ziwei_explanation(item):
         "sections": [
             {
                 "title": "命身宫位与五行局",
-                "text": f"生辰八字四柱为{facts['four_pillars']['year']}、{facts['four_pillars']['month']}、{facts['four_pillars']['day']}、{facts['four_pillars']['hour']}，{facts['yin_yang_gender']}，大限{'顺行' if facts['is_forward_decade'] else '逆行'}。命宫在{ming_palace['palace_stem_branch']}，身宫在{shen_palace['palace_stem_branch']}；五行局定为{bureau['name']}，命主为{facts['ming_zhu']}，身主为{facts['shen_zhu']}。",
+                "text": f"生辰八字四柱为{facts['four_pillars'].get('year', '')}、{facts['four_pillars'].get('month', '')}、{facts['four_pillars'].get('day', '')}、{facts['four_pillars'].get('hour', facts['four_pillars'].get('time', ''))}，{facts.get('yin_yang_gender', '')}，大限{'顺行' if facts.get('is_forward_decade') else '逆行'}。命宫在{ming_palace.get('palace_stem_branch', '')}，身宫在{shen_palace.get('palace_stem_branch', '')}；五行局定为{bureau.get('name', '')}，命主为{facts.get('ming_zhu', '')}，身主为{facts.get('shen_zhu', '')}。",
                 "rule_ids": ["ZW-CAL-001", "ZW-MING-001", "ZW-BUREAU-001"],
             },
             {

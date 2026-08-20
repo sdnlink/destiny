@@ -314,6 +314,7 @@ def calculate_ziwei_chart(
             "year": cal_res["ganzhi"]["year"]["text"],
             "month": cal_res["ganzhi"]["month"]["text"],
             "day": cal_res["ganzhi"]["day"]["text"],
+            "hour": cal_res["ganzhi"]["hour"]["text"],
             "time": cal_res["ganzhi"]["hour"]["text"],
         },
         "bureau": {
