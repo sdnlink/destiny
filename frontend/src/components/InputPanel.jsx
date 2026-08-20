@@ -31,6 +31,14 @@ const SCENES = [
   { id: "fengshui", label: "风水", icon: Mountain },
 ];
 
+const QUESTION_PRESETS = [
+  { category: "career", question: "是否接受新的工作机会与团队邀请" },
+  { category: "finance", question: "近期重大项目投资与资金布局可行性" },
+  { category: "relationship", question: "跨团队商务合作与关键人际沟通走势" },
+  { category: "study", question: "专业深造与关键学术资质评审前景" },
+  { category: "travel", question: "重要商务差旅与异地业务拓展吉凶" },
+];
+
 const LINE_OPTIONS = [
   { value: 6, label: "老阴", glyph: "⚋ ×" },
   { value: 7, label: "少阳", glyph: "⚊" },
@@ -162,6 +170,24 @@ export default function InputPanel({
               />
               <small className="field-hint">用于生成事项建议，不进入排盘公式且不持久化</small>
             </label>
+          </div>
+          <div className="preset-questions-row">
+            <span className="preset-label">快捷示例：</span>
+            <div className="preset-chips">
+              {QUESTION_PRESETS.map((p, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className="preset-chip"
+                  onClick={() => {
+                    update("category", p.category);
+                    update("question", p.question);
+                  }}
+                >
+                  {p.question}
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 

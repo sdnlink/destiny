@@ -5175,6 +5175,48 @@ select:focus {
   color: var(--ink, #202622);
 }
 
+.preset-questions-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.preset-label {
+  font-size: 11px;
+  color: var(--muted, #69716c);
+  padding-top: 3px;
+  white-space: nowrap;
+}
+
+.preset-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preset-chip {
+  font-size: 11px;
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 12px;
+  padding: 2px 9px;
+  color: var(--ink, #202622);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preset-chip:hover {
+  background: var(--paper-deep, #f3f1ea);
+  border-color: var(--jade, #297267);
+  color: var(--jade, #297267);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
