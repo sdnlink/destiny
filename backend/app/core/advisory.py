@@ -255,6 +255,162 @@ def generate_advisory(module_results: List[Dict[str, Any]], context: Optional[Di
             "rule_ids": ["ADV-CONTEXT-001"],
         })
 
+    # 8. 多术数交叉印证与共振指数计算 (Multi-System Resonance & Consensus Matrix)
+    qimen = _find_module(module_results, "qimen")
+    matrix_items = []
+    synergies = []
+    tensions = []
+    system_scores = []
+
+    # 周易象数
+    if zhouyi:
+        score = 0.82 if not moving_lines else 0.72
+        system_scores.append(score)
+        matrix_items.append({
+            "system_id": "zhouyi",
+            "system_name": "周易本变",
+            "stance_label": "吉利顺遂" if score >= 0.75 else "动变求稳",
+            "stance_type": "positive" if score >= 0.75 else "cautious",
+            "key_evidence": f"本卦《{orig_hex_name or '周易'}》" + (f" 动爻第{'、'.join(map(str, moving_lines))}爻" if moving_lines else " 六爻持重"),
+            "element_focus": orig_exp.get("nature", "乾坤卦气") if orig_exp else "周易六爻",
+            "weight": 1.0,
+        })
+
+    # 梅花体用
+    if meihua and mh_guidance:
+        rel_code = meihua.get("evidence", [{}])[0].get("code", "")
+        if rel_code in ("use_generates_body", "same_element"):
+            mh_score = 0.9
+            stance_type = "positive"
+            stance_label = "生体比和 · 大顺"
+            synergies.append("梅花体用比和/相生，提示主体能力与外部环境高度同频。")
+        elif rel_code == "body_controls_use":
+            mh_score = 0.75
+            stance_type = "positive"
+            stance_label = "克用主导 · 可为"
+            synergies.append("梅花体克用，提示自身具备掌控力，宜主动作为。")
+        elif rel_code == "body_generates_use":
+            mh_score = 0.5
+            stance_type = "neutral"
+            stance_label = "体生用 · 需节制"
+            tensions.append("梅花体生用提示有付出消耗，需防范过度透支精力资金。")
+        else:
+            mh_score = 0.3
+            stance_type = "cautious"
+            stance_label = "用克体 · 宜守正"
+            tensions.append("梅花用克体提示外部约束较强，宜柔和防守避免硬碰硬。")
+        system_scores.append(mh_score)
+        matrix_items.append({
+            "system_id": "meihua",
+            "system_name": "梅花体用",
+            "stance_label": stance_label,
+            "stance_type": stance_type,
+            "key_evidence": mh_guidance.get("focus", "体用生克"),
+            "element_focus": f"体{meihua.get('facts', {}).get('body_use', {}).get('body_trigram', {}).get('element', '')} / 用{meihua.get('facts', {}).get('body_use', {}).get('use_trigram', {}).get('element', '')}",
+            "weight": 0.95,
+        })
+
+    # 奇门遁甲
+    if qimen:
+        qm_facts = qimen.get("facts", {})
+        hp = qm_facts.get("hour_palace", {})
+        gate = hp.get("gate", "")
+        if gate in ("开门", "休门", "生门"):
+            qm_score = 0.88
+            qm_stance = "positive"
+            qm_label = f"逢{gate} · 吉方得势"
+            synergies.append(f"奇门逢三吉门【{gate}】，利于行动拓展与开创新局。")
+        elif gate in ("景门", "杜门"):
+            qm_score = 0.6
+            qm_stance = "neutral"
+            qm_label = f"逢{gate} · 谋定后动"
+        else:
+            qm_score = 0.35
+            qm_stance = "cautious"
+            qm_label = f"逢{gate} · 防范阻碍"
+            tensions.append(f"奇门值使门逢【{gate}】，提示执行中需防范意外卡点。")
+        system_scores.append(qm_score)
+        matrix_items.append({
+            "system_id": "qimen",
+            "system_name": "奇门时空",
+            "stance_label": qm_label,
+            "stance_type": qm_stance,
+            "key_evidence": f"时落{hp.get('palace_name', '')}，值使门【{gate}】，值符星【{hp.get('star', '')}】",
+            "element_focus": f"{hp.get('spirit', '')}乘{hp.get('tian_pan_yi', '')}",
+            "weight": 1.0,
+        })
+
+    # 八字命理
+    if bazi:
+        bz_facts = bazi.get("facts", {})
+        bz_str = bz_facts.get("day_master_strength", {})
+        lvl = bz_str.get("level", "中和")
+        if lvl in ("中和", "偏旺"):
+            bz_score = 0.82
+            bz_stance = "positive"
+            bz_label = f"日元{lvl} · 根基稳固"
+        else:
+            bz_score = 0.65
+            bz_stance = "neutral"
+            bz_label = f"日元{lvl} · 喜扶助"
+        system_scores.append(bz_score)
+        matrix_items.append({
+            "system_id": "bazi",
+            "system_name": "子平八字",
+            "stance_label": bz_label,
+            "stance_type": bz_stance,
+            "key_evidence": f"日主【{bazi.get('day_master')}】{lvl}，喜用【{'、'.join(bz_str.get('favorable_elements', []))}】",
+            "element_focus": f"喜{'/'.join(bz_str.get('favorable_elements', []))}",
+            "weight": 0.9,
+        })
+
+    # 大六壬
+    if liuren:
+        lr_facts = liuren.get("facts", {})
+        tt = lr_facts.get("three_transmissions", {})
+        l_type = tt.get("lesson_type", "贼克")
+        lr_score = 0.78 if l_type in ("比用", "涉害", "元首") else 0.6
+        system_scores.append(lr_score)
+        matrix_items.append({
+            "system_id": "liuren",
+            "system_name": "大六壬",
+            "stance_label": f"发传【{l_type}】",
+            "stance_type": "positive" if lr_score >= 0.7 else "neutral",
+            "key_evidence": f"初传【{tt.get('transmissions', [''])[0]}】，三传成象",
+            "element_focus": f"课体{l_type}",
+            "weight": 0.85,
+        })
+
+    if system_scores:
+        avg_score = sum(system_scores) / len(system_scores)
+        variance = sum((s - avg_score) ** 2 for s in system_scores) / len(system_scores)
+        consensus_rate = max(0.5, 1.0 - (variance ** 0.5))
+        final_resonance_score = int(round((avg_score * 0.7 + consensus_rate * 0.3) * 100))
+    else:
+        final_resonance_score = 78
+
+    if final_resonance_score >= 80:
+        consensus_title = "高阶共振 · 多术同向"
+        consensus_desc = "周易卦气、时空奇门与干支五行呈现高度利好共振，事态顺畅度高，宜抓紧关键窗口期果断推进。"
+    elif final_resonance_score >= 65:
+        consensus_title = "稳健同向 · 顺势而为"
+        consensus_desc = "各术数核心立场基本一致，主流方向清晰，在稳扎稳打、注意细节把控的前提下可积极谋划。"
+    elif final_resonance_score >= 50:
+        consensus_title = "多元互补 · 稳中求进"
+        consensus_desc = "不同术数从宏观与微观层面呈现互补视角，机遇与约束并存，建议以小步验证、定期复盘为主。"
+    else:
+        consensus_title = "转折分歧 · 审慎行事"
+        consensus_desc = "各术数指向存在一定张力或动态转折，提示当前处于关键分水岭，宜守正防守，切忌盲动。"
+
+    multi_system_resonance = {
+        "score": final_resonance_score,
+        "level": consensus_title,
+        "description": consensus_desc,
+        "matrix": matrix_items,
+        "synergies": synergies or ["各术数在核心格局与整体态势上保持稳健对齐。"],
+        "tensions": tensions or ["未见显著术数分歧，主要依常理规矩稳健行事。"],
+    }
+
     return {
         "schema_version": "1.0",
         "status": "provisional_research_advice",
@@ -270,6 +426,7 @@ def generate_advisory(module_results: List[Dict[str, Any]], context: Optional[Di
             "polarity": "indeterminate",
             "confidence_label": "理象融合研判",
         },
+        "multi_system_resonance": multi_system_resonance,
         "domain_analysis": {
             "status_quo": status_quo_points,
             "trend_evolution": trend_points,

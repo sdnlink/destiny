@@ -47,6 +47,30 @@ export function generateMarkdownReport(result, context) {
     md += `## 二、 综合研判与策略指引\n\n`;
     md += `### 核心定调\n\n**【${adv.conclusion?.headline}】**\n\n${adv.conclusion?.text}\n\n`;
 
+    if (adv.multi_system_resonance) {
+      const res = adv.multi_system_resonance;
+      md += `### 多术数共振与交叉印证（共振指数：${res.score}% · ${res.level}）\n\n`;
+      md += `> ${res.description}\n\n`;
+      if (res.matrix?.length) {
+        md += `| 术数体系 | 立场判定 | 核心论据 | 五行/格局焦点 |\n`;
+        md += `| :--- | :--- | :--- | :--- |\n`;
+        res.matrix.forEach((m) => {
+          md += `| **${m.system_name}** | \`${m.stance_label}\` | ${m.key_evidence} | ${m.element_focus} |\n`;
+        });
+        md += `\n`;
+      }
+      if (res.synergies?.length) {
+        md += `**核心共振契合点**：\n`;
+        res.synergies.forEach((s) => { md += `- 💡 ${s}\n`; });
+        md += `\n`;
+      }
+      if (res.tensions?.length) {
+        md += `**交叉张力与风控防范**：\n`;
+        res.tensions.forEach((t) => { md += `- ⚠️ ${t}\n`; });
+        md += `\n`;
+      }
+    }
+
     if (adv.domain_analysis) {
       md += `### 现状、趋向与风险剖析\n\n`;
       if (adv.domain_analysis.status_quo?.length) {

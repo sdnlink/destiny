@@ -1622,6 +1622,65 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
             <p className="advisory-headline-summary">{advisory.conclusion.text}</p>
           </section>
 
+          {advisory.multi_system_resonance && (
+            <section className="data-band resonance-band">
+              <div className="band-heading">
+                <div>
+                  <span className="band-icon"><Sparkles size={16} /></span>
+                  <div>
+                    <h3>多术数立体共振指数与交叉印证矩阵</h3>
+                    <p>综合周易、梅花、六爻、六壬、奇门与八字之数理多维共振打分</p>
+                  </div>
+                </div>
+                <div className="resonance-badge-group">
+                  <span className="resonance-score-pill">共振指数 {advisory.multi_system_resonance.score}%</span>
+                  <span className="resonance-level-tag">{advisory.multi_system_resonance.level}</span>
+                </div>
+              </div>
+
+              <div className="resonance-banner">
+                <div className="resonance-meter">
+                  <div className="resonance-meter-fill" style={{ width: `${advisory.multi_system_resonance.score}%` }} />
+                </div>
+                <p className="resonance-desc">{advisory.multi_system_resonance.description}</p>
+              </div>
+
+              {/* 交叉印证对照方阵 */}
+              <div className="resonance-matrix-grid">
+                {advisory.multi_system_resonance.matrix.map((item) => (
+                  <div key={item.system_id} className={`res-card stance-${item.stance_type}`}>
+                    <div className="res-card-head">
+                      <strong>{item.system_name}</strong>
+                      <span className={`res-stance-pill ${item.stance_type}`}>{item.stance_label}</span>
+                    </div>
+                    <p className="res-evidence">{item.key_evidence}</p>
+                    <small className="res-focus">{item.element_focus}</small>
+                  </div>
+                ))}
+              </div>
+
+              {/* 共识与张力 */}
+              <div className="resonance-insights-row">
+                <div className="res-insight-col synergy">
+                  <strong>💡 核心共振契合点</strong>
+                  <ul>
+                    {advisory.multi_system_resonance.synergies.map((s, idx) => (
+                      <li key={idx}>{s}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="res-insight-col tension">
+                  <strong>⚠️ 交叉张力与风控防范</strong>
+                  <ul>
+                    {advisory.multi_system_resonance.tensions.map((t, idx) => (
+                      <li key={idx}>{t}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </section>
+          )}
+
           <section className="advisory-domain-grid">
             <div className="data-band domain-status-band">
               <div className="band-heading">
