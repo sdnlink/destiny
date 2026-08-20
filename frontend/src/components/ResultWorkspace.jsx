@@ -527,17 +527,69 @@ function MeihuaView({ result }) {
   );
 }
 
+const NAJIA_TABLE = {
+  乾: { lower: ["甲子", "甲寅", "甲辰"], upper: ["壬午", "壬申", "壬戌"] },
+  坤: { lower: ["乙未", "乙巳", "乙卯"], upper: ["癸丑", "癸亥", "癸酉"] },
+  震: { lower: ["庚子", "庚寅", "庚辰"], upper: ["庚午", "庚申", "庚戌"] },
+  巽: { lower: ["辛丑", "辛亥", "辛酉"], upper: ["辛未", "辛巳", "辛卯"] },
+  坎: { lower: ["戊寅", "戊辰", "戊午"], upper: ["戊申", "戊戌", "戊子"] },
+  离: { lower: ["己卯", "己丑", "己亥"], upper: ["己酉", "己未", "己巳"] },
+  艮: { lower: ["丙辰", "丙午", "丙申"], upper: ["丙戌", "丙子", "丙寅"] },
+  兑: { lower: ["丁巳", "丁卯", "丁丑"], upper: ["丁亥", "丁酉", "丁未"] },
+};
+
+const BRANCH_ELEMENTS_MAP = {
+  子: "水", 丑: "土", 寅: "木", 卯: "木", 辰: "土", 巳: "火",
+  午: "火", 未: "土", 申: "金", 酉: "金", 戌: "土", 亥: "水",
+};
+
+const FIVE_ELEMENTS_GENERATES = { 木: "火", 火: "土", 土: "金", 金: "水", 水: "木" };
+const FIVE_ELEMENTS_CONTROLS = { 木: "土", 土: "水", 水: "火", 火: "金", 金: "木" };
+
+function getLiuyaoRelative(palaceElement, lineElement) {
+  if (palaceElement === lineElement) return "兄弟";
+  if (FIVE_ELEMENTS_GENERATES[lineElement] === palaceElement) return "父母";
+  if (FIVE_ELEMENTS_GENERATES[palaceElement] === lineElement) return "子孙";
+  if (FIVE_ELEMENTS_CONTROLS[lineElement] === palaceElement) return "官鬼";
+  if (FIVE_ELEMENTS_CONTROLS[palaceElement] === lineElement) return "妻财";
+  return "比和";
+}
+
 function LiuyaoView({ result }) {
   if (!result) return <MissingModule name="六爻" />;
   const { facts } = result;
   const [selectedPos, setSelectedPos] = useState(facts.palace.host_line || 1);
+
+  // 伏神分析
+  const palaceName = facts.palace.name;
+  const palaceElem = facts.palace.element;
+  const pureConfig = NAJIA_TABLE[palaceName];
+  const pureGanzhi = pureConfig ? [...pureConfig.lower, ...pureConfig.upper] : [];
+  const pureLines = pureGanzhi.map((gz, i) => {
+    const br = gz[1];
+    const elem = BRANCH_ELEMENTS_MAP[br] || "土";
+    return {
+      position: i + 1,
+      ganzhi: gz,
+      element: elem,
+      relative: getLiuyaoRelative(palaceElem, elem),
+    };
+  });
+
+  const currentRelatives = new Set(facts.line_chart.map((l) => l.six_relative));
+  const allRelatives = ["父母", "兄弟", "子孙", "妻财", "官鬼"];
+  const missingRelatives = allRelatives.filter((r) => !currentRelatives.has(r));
+  const hiddenSpirits = pureLines.filter((pl) => missingRelatives.includes(pl.relative));
+
+  const activeLine = facts.line_chart.find((l) => l.position === selectedPos) || facts.line_chart[0];
+  const activeHidden = hiddenSpirits.find((h) => h.position === selectedPos);
 
   return (
     <div className="view-stack">
       <section className="view-heading">
         <div>
           <span className="section-kicker">LIU YAO NA JIA</span>
-          <h2>六爻纳甲盘</h2>
+          <h2>六爻纳甲盘与伏神飞神</h2>
           <p>八宫世应、纳甲六亲、六神与动变爻位立体交互排盘。</p>
         </div>
         <span className="version-badge">{result.rule_version}</span>
@@ -572,31 +624,90 @@ function LiuyaoView({ result }) {
                 <th>五行</th>
                 <th>世应</th>
                 <th>状态</th>
-                <th>详情</th>
+                <th>本宫伏神</th>
               </tr>
             </thead>
             <tbody>
-              {[...facts.line_chart].reverse().map((line) => (
-                <tr
-                  key={line.position}
-                  className={`${line.is_moving ? "moving-line" : ""} ${selectedPos === line.position ? "selected-line" : ""}`}
-                  onClick={() => setSelectedPos(line.position)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <td><strong>{line.position === 6 ? "上爻" : line.position === 1 ? "初爻" : `${line.position}爻`}</strong></td>
-                  <td><span className="spirit-badge">{line.six_spirit}</span></td>
-                  <td><strong>{line.six_relative}</strong></td>
-                  <td>{line.najia_stem}{line.najia_branch}</td>
-                  <td><span style={{ color: ELEMENT_COLORS[line.element] || "inherit" }}>{line.element}</span></td>
-                  <td>{line.roles.includes("世爻") ? <span className="shi-badge">世</span> : line.roles.includes("应爻") ? <span className="ying-badge">应</span> : "—"}</td>
-                  <td>{line.is_moving ? <span className="moving-badge">发动 ○</span> : "静爻"}{line.is_void ? " · 旬空" : ""}</td>
-                  <td><small className="inspect-link">点击对齐</small></td>
-                </tr>
-              ))}
+              {[...facts.line_chart].reverse().map((line) => {
+                const hidden = hiddenSpirits.find((h) => h.position === line.position);
+                return (
+                  <tr
+                    key={line.position}
+                    className={`${line.is_moving ? "moving-line" : ""} ${selectedPos === line.position ? "selected-line" : ""}`}
+                    onClick={() => setSelectedPos(line.position)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <td><strong>{line.position === 6 ? "上爻" : line.position === 1 ? "初爻" : `${line.position}爻`}</strong></td>
+                    <td><span className="spirit-badge">{line.six_spirit}</span></td>
+                    <td><strong>{line.six_relative}</strong></td>
+                    <td>{line.najia_stem}{line.najia_branch}</td>
+                    <td><span style={{ color: ELEMENT_COLORS[line.element] || "inherit" }}>{line.element}</span></td>
+                    <td>{line.roles.includes("世爻") ? <span className="shi-badge">世</span> : line.roles.includes("应爻") ? <span className="ying-badge">应</span> : "—"}</td>
+                    <td>{line.is_moving ? <span className="moving-badge">发动 ○</span> : "静爻"}{line.is_void ? " · 旬空" : ""}</td>
+                    <td>
+                      {hidden ? (
+                        <span className="hidden-pill-tag" title={`伏于${line.najia_branch}下`}>
+                          伏 {hidden.relative} {hidden.ganzhi}
+                        </span>
+                      ) : (
+                        <small className="inspect-link">查看详情</small>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </section>
+
+      {/* 伏神飞神聚焦研判卡片 */}
+      {hiddenSpirits.length > 0 && (
+        <section className="data-band hidden-spirits-band">
+          <div className="band-heading">
+            <div>
+              <span className="band-icon"><Sparkles size={16} /></span>
+              <div>
+                <h3>本宫八纯伏神对照（{palaceName}为{palaceName}）</h3>
+                <p>本卦缺【{missingRelatives.join("、")}】，从本宫纯卦提取伏神以明隐微之事</p>
+              </div>
+            </div>
+          </div>
+          <div className="hidden-spirits-grid">
+            {hiddenSpirits.map((h) => {
+              const flyLine = facts.line_chart[h.position - 1];
+              let relType = "同气比和";
+              let relDesc = "比和得气，同气相求。";
+              if (FIVE_ELEMENTS_GENERATES[flyLine.element] === h.element) {
+                relType = "飞生伏";
+                relDesc = "飞来生伏得长生，虽伏易出，吉象。";
+              } else if (FIVE_ELEMENTS_GENERATES[h.element] === flyLine.element) {
+                relType = "伏生飞";
+                relDesc = "伏去生飞泄气，耗神泄力。";
+              } else if (FIVE_ELEMENTS_CONTROLS[flyLine.element] === h.element) {
+                relType = "飞克伏";
+                relDesc = "飞来克伏受制，为害最深，难拔难出。";
+              } else if (FIVE_ELEMENTS_CONTROLS[h.element] === flyLine.element) {
+                relType = "伏克飞";
+                relDesc = "伏去克飞为财，冲克飞神方能显现。";
+              }
+
+              return (
+                <div key={h.position} className="hidden-spirit-card">
+                  <div className="h-card-head">
+                    <strong>伏神【{h.relative} {h.ganzhi}（{h.element}）】</strong>
+                    <span className={`h-rel-badge rel-${relType}`}>{relType}</span>
+                  </div>
+                  <p className="h-card-detail">
+                    伏于第 {h.position} 爻 <b>{flyLine.six_relative} {flyLine.najia_stem}{flyLine.najia_branch}（{flyLine.element}）</b> 飞神之下。
+                  </p>
+                  <small className="h-card-desc">{relDesc}</small>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="data-band">
         <div className="band-heading">
