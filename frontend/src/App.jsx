@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
   ArrowRight,
@@ -7,13 +7,17 @@ import {
   Download,
   FileClock,
   Menu,
+  Moon,
+  Palette,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
   RefreshCw,
   Settings,
   ShieldCheck,
+  Sun,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import InputPanel from "./components/InputPanel";
@@ -23,7 +27,9 @@ import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
 import {
   clearDeductionHistory,
   deleteDeductionHistory,
+  exportAllHistoryJSON,
   getDeductionHistory,
+  importHistoryJSON,
   saveDeductionHistory,
 } from "./lib/storage";
 
@@ -186,7 +192,11 @@ function buildCalculations(form) {
   return calculations;
 }
 
-function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, serviceOnline }) {
+function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, serviceOnline, theme, setTheme }) {
+  const nextTheme = theme === "paper" ? "dark" : theme === "dark" ? "jade" : "paper";
+  const themeLabel = theme === "paper" ? "宣纸素雅" : theme === "dark" ? "玄墨深邃" : "青铜古韵";
+  const ThemeIcon = theme === "paper" ? Sun : theme === "dark" ? Moon : Palette;
+
   return (
     <nav className={`app-navigation ${collapsed ? "collapsed" : ""}`} aria-label="主导航">
       <div className="brand-lockup">
@@ -200,7 +210,10 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, servic
         <button onClick={openHistory} title="历史推演记录"><FileClock size={18} /><span>历史任务</span></button>
       </div>
       <div className="nav-bottom">
-        <button disabled title="设置尚未启用"><Settings size={18} /><span>设置</span></button>
+        <button className="theme-toggle-btn" onClick={() => setTheme(nextTheme)} title={`切换主题（当前：${themeLabel}，点击切换）`}>
+          <ThemeIcon size={18} />
+          {!collapsed && <span>{themeLabel}</span>}
+        </button>
         <div className="service-state" title={serviceOnline ? "计算服务在线" : "计算服务离线"}>
           <i className={serviceOnline ? "online" : ""} />
           {!collapsed && <span>{serviceOnline ? "计算服务在线" : "服务连接异常"}</span>}
@@ -259,10 +272,13 @@ function RulesDrawer({ open, onClose, rules, loading }) {
 
 function HistoryDrawer({ open, onClose, onLoadHistory }) {
   const [history, setHistory] = useState([]);
+  const [importStatus, setImportStatus] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (open) {
       setHistory(getDeductionHistory());
+      setImportStatus("");
     }
   }, [open]);
 
@@ -287,6 +303,34 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
     downloadMarkdownFile(md, filename);
   };
 
+  const handleExportAllJSON = () => {
+    if (history.length === 0) {
+      alert("当前暂无历史记录可导出。");
+      return;
+    }
+    exportAllHistoryJSON();
+  };
+
+  const handleFileImport = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result;
+      if (typeof content === "string") {
+        const res = importHistoryJSON(content);
+        if (res.success) {
+          setHistory(getDeductionHistory());
+          setImportStatus(`成功导入 ${res.count} 条案例（总计 ${res.total} 条）`);
+        } else {
+          setImportStatus(`导入失败：${res.error}`);
+        }
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
   if (!open) return null;
 
   return (
@@ -298,9 +342,24 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
             <h2>历史推演与案例库</h2>
           </div>
           <div className="header-actions">
+            <button className="history-json-btn" onClick={handleExportAllJSON} title="导出全部案例为 JSON 备份包">
+              <Download size={14} />
+              <span>备份导出</span>
+            </button>
+            <button className="history-json-btn" onClick={() => fileInputRef.current?.click()} title="从 JSON 文件导入案例包">
+              <Upload size={14} />
+              <span>导入备份</span>
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".json"
+              style={{ display: "none" }}
+              onChange={handleFileImport}
+            />
             {history.length > 0 && (
               <button className="clear-history-btn" onClick={handleClear} title="清空全部历史">
-                <Trash2 size={15} />
+                <Trash2 size={14} />
                 <span>清空</span>
               </button>
             )}
@@ -310,8 +369,14 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
 
         <div className="drawer-notice">
           <FileClock size={16} />
-          <span>本地保存最近 50 次推演记录，点击即可一键复盘或导出 Markdown 报告。</span>
+          <span>本地保存最近 50 次推演记录，支持一键复盘、Markdown 导出与 JSON 数据全量备份还原。</span>
         </div>
+
+        {importStatus && (
+          <div className="history-import-banner">
+            <span>{importStatus}</span>
+          </div>
+        )}
 
         <div className="history-list-wrap">
           {history.length === 0 ? (
@@ -380,6 +445,12 @@ export default function App() {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [rules, setRules] = useState([]);
   const [rulesLoading, setRulesLoading] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem("tianji_theme") || "paper");
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("tianji_theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     checkHealth().then(() => setServiceOnline(true)).catch(() => setServiceOnline(false));
@@ -474,6 +545,8 @@ export default function App() {
         openRules={openRules}
         openHistory={() => setHistoryOpen(true)}
         serviceOnline={serviceOnline}
+        theme={theme}
+        setTheme={setTheme}
       />
       <div className="mobile-topbar">
         <div className="brand-mark"><span>☰</span><span>☷</span></div>

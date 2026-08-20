@@ -64,3 +64,56 @@ export function clearDeductionHistory() {
     return [];
   }
 }
+
+export function exportAllHistoryJSON() {
+  try {
+    const history = getDeductionHistory();
+    const payload = {
+      version: "1.0",
+      app: "tianji-yanxiang",
+      exported_at: new Date().toISOString(),
+      count: history.length,
+      records: history,
+    };
+    const jsonStr = JSON.stringify(payload, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `tianji_cases_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return true;
+  } catch (err) {
+    console.error("Failed to export history JSON:", err);
+    return false;
+  }
+}
+
+export function importHistoryJSON(jsonStr) {
+  try {
+    const parsed = JSON.parse(jsonStr);
+    const incoming = Array.isArray(parsed) ? parsed : parsed.records;
+    if (!Array.isArray(incoming)) {
+      throw new Error("Invalid format: expected array of records");
+    }
+    const current = getDeductionHistory();
+    const map = new Map();
+    incoming.forEach((item) => {
+      if (item && item.id) map.set(item.id, item);
+    });
+    current.forEach((item) => {
+      if (item && item.id && !map.has(item.id)) map.set(item.id, item);
+    });
+    const merged = Array.from(map.values())
+      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+      .slice(0, MAX_HISTORY_ITEMS);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    return { success: true, count: incoming.length, total: merged.length, merged };
+  } catch (err) {
+    console.error("Failed to import history JSON:", err);
+    return { success: false, error: err.message };
+  }
+}

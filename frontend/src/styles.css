@@ -21,6 +21,48 @@
   --shadow: 0 14px 36px rgba(29, 35, 31, 0.1);
 }
 
+[data-theme="dark"] {
+  color-scheme: dark;
+  color: #e2e8e4;
+  background: #111513;
+  --ink: #e6ede8;
+  --muted: #95a29a;
+  --faint: #637068;
+  --paper: #1a201c;
+  --paper-deep: #141916;
+  --line: #2d3831;
+  --line-strong: #3d4a42;
+  --nav: #121614;
+  --nav-soft: #1d2320;
+  --vermilion: #e06c58;
+  --vermilion-dark: #b84c39;
+  --jade: #42b3a1;
+  --amber: #d49b45;
+  --blue: #588fa8;
+  --shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="jade"] {
+  color-scheme: light;
+  color: #12241c;
+  background: #dfe8e2;
+  --ink: #12241c;
+  --muted: #435e53;
+  --faint: #739185;
+  --paper: #edf4f0;
+  --paper-deep: #e1ede5;
+  --line: #c1d6ca;
+  --line-strong: #a6c4b4;
+  --nav: #172d24;
+  --nav-soft: #233e32;
+  --vermilion: #9e392a;
+  --vermilion-dark: #7a261a;
+  --jade: #1d6155;
+  --amber: #8e621d;
+  --blue: #2f5666;
+  --shadow: 0 14px 36px rgba(18, 36, 28, 0.12);
+}
+
 * {
   box-sizing: border-box;
   letter-spacing: 0;
@@ -35,7 +77,8 @@ body,
 
 body {
   min-width: 320px;
-  background: #e9e8e3;
+  background: var(--paper-deep, #e9e8e3);
+  color: var(--ink, #202622);
 }
 
 button,
@@ -5390,6 +5433,59 @@ select:focus {
   font-size: 12px;
   line-height: 1.6;
   color: var(--ink, #202622);
+}
+
+/* Theme Toggle & JSON Backup Styles */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--line, #323936);
+  border-radius: 6px;
+  color: var(--paper, #fbfaf6);
+  padding: 7px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s ease;
+  margin-bottom: 8px;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--jade, #297267);
+  color: var(--jade, #297267);
+}
+
+.history-json-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--paper-deep, #f3f1ea);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--ink, #202622);
+  transition: all 0.15s ease;
+}
+
+.history-json-btn:hover {
+  border-color: var(--jade, #297267);
+  color: var(--jade, #297267);
+}
+
+.history-import-banner {
+  background: rgba(41, 114, 103, 0.1);
+  color: var(--jade, #297267);
+  border: 1px solid rgba(41, 114, 103, 0.25);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 12px;
+  margin-bottom: 10px;
+  text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
