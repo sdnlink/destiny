@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 from lunar_python import Solar
 
+from app.calendar.engine import CalendarEngine
 from .rules import (
     BRANCH_TO_INDEX,
     EARTHLY_BRANCHES,
@@ -94,15 +95,20 @@ def calculate_ziwei_chart(
     longitude: Optional[float] = None,
     use_true_solar_time: bool = False,
 ) -> Dict[str, Any]:
-    """Calculate the complete Ziwei Doushu chart."""
-    dt = datetime.fromisoformat(local_datetime)
-    lunar_info = _get_lunar_info(dt)
+    """Calculate the complete Ziwei Doushu chart using CalendarEngine baseline."""
+    cal_engine = CalendarEngine()
+    cal_res = cal_engine.calculate(
+        local_datetime=local_datetime,
+        timezone=timezone,
+        longitude=longitude,
+        use_true_solar_time=use_true_solar_time,
+    )
 
-    year_stem = lunar_info["year_stem"]
-    year_branch = lunar_info["year_branch"]
-    hour_branch = lunar_info["hour_branch"]
-    lunar_month = lunar_info["lunar_month"]
-    lunar_day = lunar_info["lunar_day"]
+    year_ganzhi = cal_res["ganzhi"]["year"]["text"]
+    year_stem, year_branch = year_ganzhi[0], year_ganzhi[1]
+    hour_branch = cal_res["time_branch"]["name"]
+    lunar_month = abs(cal_res["lunar"]["month"])
+    lunar_day = cal_res["lunar"]["day"]
 
     # 1. 阴阳男女判定
     stem_idx = STEM_TO_INDEX[year_stem]
@@ -299,12 +305,17 @@ def calculate_ziwei_chart(
         "yin_yang_gender": yin_yang_gender,
         "is_forward_decade": is_forward,
         "lunar_calendar": {
-            "lunar_year": lunar_info["lunar_year"],
-            "lunar_month": lunar_info["lunar_month"],
-            "lunar_day": lunar_info["lunar_day"],
-            "is_leap": lunar_info["is_leap"],
+            "lunar_year": cal_res["lunar"]["year"],
+            "lunar_month": abs(cal_res["lunar"]["month"]),
+            "lunar_day": cal_res["lunar"]["day"],
+            "is_leap": cal_res["lunar"].get("is_leap", False),
         },
-        "four_pillars": lunar_info["four_pillars"],
+        "four_pillars": {
+            "year": cal_res["ganzhi"]["year"]["text"],
+            "month": cal_res["ganzhi"]["month"]["text"],
+            "day": cal_res["ganzhi"]["day"]["text"],
+            "time": cal_res["ganzhi"]["hour"]["text"],
+        },
         "bureau": {
             "name": bureau_name,
             "number": bureau_number,
