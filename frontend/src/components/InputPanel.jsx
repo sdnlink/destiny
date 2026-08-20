@@ -193,8 +193,21 @@ export default function InputPanel({
 
         <section className="form-section">
           <div className="section-title"><CalendarClock size={16} /><span>时间基准</span></div>
-          <label>
+          <div className="field-head-with-action">
             <FieldLabel>本地日期时间</FieldLabel>
+            <button
+              type="button"
+              className="link-action-btn"
+              onClick={() => {
+                const now = new Date();
+                const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+                update("localDatetime", local.toISOString().slice(0, 16));
+              }}
+            >
+              设为当前时间
+            </button>
+          </div>
+          <label>
             <input
               type="datetime-local"
               value={form.localDatetime}

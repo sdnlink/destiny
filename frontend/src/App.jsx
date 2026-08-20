@@ -561,12 +561,18 @@ export default function App() {
     event.preventDefault();
     setLoading(true);
     setError("");
+
+    // Generate fresh castNonce for each submission so automatic casting yields a new random seed
+    const activeNonce = newCastNonce();
+    const activeForm = { ...form, castNonce: activeNonce };
+    setForm(activeForm);
+
     try {
-      const response = await compareCalculations(buildCalculations(form), {
-        category: form.category,
-        question_summary: form.question,
+      const response = await compareCalculations(buildCalculations(activeForm), {
+        category: activeForm.category,
+        question_summary: activeForm.question,
       });
-      const ctx = { scene: form.scene, category: form.category, question: form.question };
+      const ctx = { scene: activeForm.scene, category: activeForm.category, question: activeForm.question };
       setResult(response);
       setResultContext(ctx);
       setActiveTab("overview");

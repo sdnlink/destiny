@@ -5845,6 +5845,28 @@ select:focus {
   color: var(--muted, #69716c);
 }
 
+.field-head-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.link-action-btn {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: var(--jade, #297267);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link-action-btn:hover {
+  color: var(--ink, #202622);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
