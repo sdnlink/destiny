@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
   ArrowRight,
+  BookOpen,
   BookOpenCheck,
   Database,
   Download,
@@ -13,6 +14,7 @@ import {
   PanelLeftOpen,
   Plus,
   RefreshCw,
+  Search,
   Settings,
   ShieldCheck,
   Sun,
@@ -24,6 +26,7 @@ import InputPanel from "./components/InputPanel";
 import ResultWorkspace from "./components/ResultWorkspace";
 import { analyzeCalendar, checkHealth, compareCalculations, loadRules } from "./lib/api";
 import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
+import { GLOSSARY_CATEGORIES, GLOSSARY_ITEMS } from "./lib/glossary";
 import {
   clearDeductionHistory,
   deleteDeductionHistory,
@@ -192,7 +195,7 @@ function buildCalculations(form) {
   return calculations;
 }
 
-function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, serviceOnline, theme, setTheme }) {
+function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGlossary, serviceOnline, theme, setTheme }) {
   const nextTheme = theme === "paper" ? "dark" : theme === "dark" ? "jade" : "paper";
   const themeLabel = theme === "paper" ? "宣纸素雅" : theme === "dark" ? "玄墨深邃" : "青铜古韵";
   const ThemeIcon = theme === "paper" ? Sun : theme === "dark" ? Moon : Palette;
@@ -207,6 +210,7 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, servic
         <button className="active" title="新建推演"><Plus size={18} /><span>新建推演</span></button>
         <button onClick={openHistory} title="历史推演记录与案例库"><Archive size={18} /><span>案例库</span></button>
         <button onClick={openRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
+        <button onClick={openGlossary} title="术数典籍与核心概念速查"><BookOpen size={18} /><span>概念速查</span></button>
         <button onClick={openHistory} title="历史推演记录"><FileClock size={18} /><span>历史任务</span></button>
       </div>
       <div className="nav-bottom">
@@ -224,6 +228,89 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, servic
         </button>
       </div>
     </nav>
+  );
+}
+
+function GlossaryDrawer({ open, onClose }) {
+  const [selectedCat, setSelectedCat] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredItems = useMemo(() => {
+    return GLOSSARY_ITEMS.filter((item) => {
+      const matchCat = selectedCat === "all" || item.category === selectedCat;
+      const matchQuery =
+        !searchQuery.trim() ||
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.tag.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCat && matchQuery;
+    });
+  }, [selectedCat, searchQuery]);
+
+  if (!open) return null;
+
+  return (
+    <div className="drawer-layer" role="presentation" onMouseDown={onClose}>
+      <aside className="rules-drawer glossary-drawer" role="dialog" aria-modal="true" aria-label="术数典籍与核心概念速查" onMouseDown={(e) => e.stopPropagation()}>
+        <header>
+          <div>
+            <p className="section-kicker">CLASSICAL KNOWLEDGE BASE</p>
+            <h2>术数典籍与概念速查</h2>
+          </div>
+          <button className="icon-button" onClick={onClose} aria-label="关闭概念速查"><X size={19} /></button>
+        </header>
+
+        <div className="drawer-search-row">
+          <Search size={15} />
+          <input
+            type="text"
+            placeholder="快速检索卦名、十神、八门九星、二十四山、典籍出处..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="clear-search-btn" onClick={() => setSearchQuery("")}><X size={14} /></button>
+          )}
+        </div>
+
+        <div className="segmented drawer-filter">
+          {GLOSSARY_CATEGORIES.map(({ id, label }) => (
+            <button
+              key={id}
+              className={selectedCat === id ? "active" : ""}
+              onClick={() => setSelectedCat(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="glossary-items-wrap">
+          {filteredItems.length === 0 ? (
+            <div className="drawer-loading">未找到匹配的术数概念词条。</div>
+          ) : (
+            <div className="glossary-cards-list">
+              {filteredItems.map((item, idx) => (
+                <div key={idx} className="glossary-card">
+                  <div className="glossary-card-top">
+                    <span className="glossary-tag">{item.tag}</span>
+                    <span className="glossary-source">{item.source}</span>
+                  </div>
+                  <strong className="glossary-title">{item.title}</strong>
+                  <p className="glossary-desc">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <footer>
+          <BookOpen size={15} />
+          <span>共收录 {filteredItems.length} 条结构化典籍概念与释义</span>
+        </footer>
+      </aside>
+    </div>
   );
 }
 
@@ -443,6 +530,7 @@ export default function App() {
   const [mobileInputOpen, setMobileInputOpen] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
   const [rules, setRules] = useState([]);
   const [rulesLoading, setRulesLoading] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("tianji_theme") || "paper");
@@ -544,6 +632,7 @@ export default function App() {
         setCollapsed={setNavCollapsed}
         openRules={openRules}
         openHistory={() => setHistoryOpen(true)}
+        openGlossary={() => setGlossaryOpen(true)}
         serviceOnline={serviceOnline}
         theme={theme}
         setTheme={setTheme}
@@ -570,6 +659,7 @@ export default function App() {
       <ResultWorkspace result={result} context={resultContext} activeTab={activeTab} setActiveTab={setActiveTab} />
       <RulesDrawer open={rulesOpen} onClose={() => setRulesOpen(false)} rules={rules} loading={rulesLoading} />
       <HistoryDrawer open={historyOpen} onClose={() => setHistoryOpen(false)} onLoadHistory={handleLoadHistory} />
+      <GlossaryDrawer open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
     </div>
   );
 }
