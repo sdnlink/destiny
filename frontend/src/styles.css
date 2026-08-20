@@ -4998,6 +4998,132 @@ select:focus {
   color: var(--muted, #69716c);
 }
 
+/* ==========================================================================
+   Almanac & 28 Mansions & 12 Duty Officers Styles
+   ========================================================================== */
+
+.almanac-hd-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.almanac-hd-badge.is-huangdao {
+  background: rgba(41, 114, 103, 0.12);
+  color: var(--jade, #297267);
+  border: 1px solid rgba(41, 114, 103, 0.25);
+}
+
+.almanac-hd-badge.is-heidao {
+  background: rgba(165, 62, 45, 0.08);
+  color: var(--vermilion, #a53e2d);
+  border: 1px solid rgba(165, 62, 45, 0.2);
+}
+
+.almanac-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 760px) {
+  .almanac-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.almanac-card {
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.almanac-label {
+  font-size: 11px;
+  color: var(--muted, #69716c);
+}
+
+.almanac-duty {
+  font-size: 16px;
+  color: var(--jade, #297267);
+}
+
+.almanac-mansion {
+  font-size: 14px;
+  color: var(--blue, #3e6478);
+}
+
+.almanac-ninestar {
+  font-size: 14px;
+  color: var(--amber, #a66d1e);
+}
+
+.almanac-card small {
+  font-size: 11px;
+  color: var(--faint, #929993);
+  margin-top: 2px;
+}
+
+.almanac-activities-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  border-top: 1px solid var(--line, #d9d8d1);
+  padding-top: 10px;
+}
+
+.activity-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.act-tag-label {
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 45px;
+  padding-top: 2px;
+}
+
+.activity-group.favorable .act-tag-label {
+  color: var(--jade, #297267);
+}
+
+.activity-group.unfavorable .act-tag-label {
+  color: var(--vermilion, #a53e2d);
+}
+
+.act-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.act-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.act-pill.fav {
+  background: rgba(41, 114, 103, 0.08);
+  color: var(--jade, #297267);
+  border: 1px solid rgba(41, 114, 103, 0.15);
+}
+
+.act-pill.unfav {
+  background: rgba(165, 62, 45, 0.06);
+  color: var(--vermilion, #a53e2d);
+  border: 1px solid rgba(165, 62, 45, 0.15);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

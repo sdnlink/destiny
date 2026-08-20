@@ -143,6 +143,26 @@ class CalendarEngine:
             "xun_kong": list(day_xun["empty_branches"]),
             "solar_term": terms,
             "solar_terms": terms,
+            "almanac": {
+                "duty_officer": reference_lunar.getZhiXing(),
+                "twenty_eight_mansion": {
+                    "name": reference_lunar.getXiu(),
+                    "luck": reference_lunar.getXiuLuck(),
+                    "song": reference_lunar.getXiuSong(),
+                },
+                "day_tian_shen": {
+                    "name": reference_lunar.getDayTianShen(),
+                    "type": reference_lunar.getDayTianShenType(),
+                    "luck": reference_lunar.getDayTianShenLuck(),
+                },
+                "day_nine_star": str(reference_lunar.getDayNineStar()),
+                "favorable_activities": list(reference_lunar.getDayYi()),
+                "unfavorable_activities": list(reference_lunar.getDayJi()),
+                "pengzu": {
+                    "gan": reference_lunar.getPengZuGan(),
+                    "zhi": reference_lunar.getPengZuZhi(),
+                },
+            },
             "calculation_trace": trace,
             "steps": [
                 {

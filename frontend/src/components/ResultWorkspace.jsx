@@ -434,6 +434,61 @@ function CalendarView({ calendar }) {
         </div>
       </section>
 
+      {/* 黄历择吉与建除星宿 */}
+      {calendar.almanac && (
+        <section className="data-band almanac-band">
+          <div className="band-heading">
+            <div>
+              <span className="band-icon"><Sparkles size={16} /></span>
+              <div>
+                <h3>天时时空与建除星宿</h3>
+                <p>十二建星 · 二十八宿 · 黄道天神 · 宜忌择吉</p>
+              </div>
+            </div>
+            <span className={`almanac-hd-badge ${calendar.almanac.day_tian_shen?.type === "黄道" ? "is-huangdao" : "is-heidao"}`}>
+              {calendar.almanac.day_tian_shen?.type} · {calendar.almanac.day_tian_shen?.name} ({calendar.almanac.day_tian_shen?.luck})
+            </span>
+          </div>
+
+          <div className="almanac-grid">
+            <div className="almanac-card">
+              <span className="almanac-label">十二建星</span>
+              <strong className="almanac-duty">【{calendar.almanac.duty_officer}日】</strong>
+              <small>执掌当令时序吉凶</small>
+            </div>
+            <div className="almanac-card">
+              <span className="almanac-label">二十八宿</span>
+              <strong className="almanac-mansion">【{calendar.almanac.twenty_eight_mansion?.name}宿 · {calendar.almanac.twenty_eight_mansion?.luck}】</strong>
+              <small>{calendar.almanac.twenty_eight_mansion?.song || "星宿当值"}</small>
+            </div>
+            <div className="almanac-card">
+              <span className="almanac-label">九星值日</span>
+              <strong className="almanac-ninestar">{calendar.almanac.day_nine_star}</strong>
+              <small>紫白九星天运流转</small>
+            </div>
+          </div>
+
+          <div className="almanac-activities-row">
+            <div className="activity-group favorable">
+              <span className="act-tag-label">【宜】</span>
+              <div className="act-pills">
+                {calendar.almanac.favorable_activities?.slice(0, 10).map((act) => (
+                  <span key={act} className="act-pill fav">{act}</span>
+                ))}
+              </div>
+            </div>
+            <div className="activity-group unfavorable">
+              <span className="act-tag-label">【忌】</span>
+              <div className="act-pills">
+                {calendar.almanac.unfavorable_activities?.slice(0, 8).map((act) => (
+                  <span key={act} className="act-pill unfav">{act}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="data-band">
         <div className="band-heading">
           <div><span className="band-icon"><ListTree size={16} /></span><div><h3>推演步骤</h3><p>{calendar.engine_version}</p></div></div>
