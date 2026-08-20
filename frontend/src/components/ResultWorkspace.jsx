@@ -19,6 +19,7 @@ import {
   Layers3,
   ListTree,
   Mountain,
+  Printer,
   RefreshCw,
   ShieldCheck,
   Sparkles,
@@ -501,6 +502,40 @@ function CalendarView({ calendar }) {
             <div className="almanac-pengzu-row">
               <span className="pengzu-label">彭祖百忌：</span>
               <span>{calendar.almanac.pengzu.gan} · {calendar.almanac.pengzu.zhi}</span>
+            </div>
+          )}
+
+          {calendar.almanac.hourly_timeline?.length > 0 && (
+            <div className="almanac-hourly-section">
+              <div className="hourly-section-title">
+                <Clock3 size={15} />
+                <span>当日十二时辰吉凶时序（择吉与时值天神）</span>
+              </div>
+              <div className="hourly-timeline-grid">
+                {calendar.almanac.hourly_timeline.map((item) => {
+                  const isCurrentHour = item.branch === calendar.time_branch?.name;
+                  const isHuangdao = item.tian_shen?.type === "黄道";
+                  return (
+                    <div
+                      key={item.hour}
+                      className={`hourly-card ${isHuangdao ? "is-huangdao" : "is-heidao"} ${isCurrentHour ? "is-current-hour" : ""}`}
+                    >
+                      <div className="hourly-top">
+                        <span className="hourly-branch">{item.branch}时</span>
+                        <span className={`hourly-tag ${isHuangdao ? "fav" : "unfav"}`}>
+                          {item.tian_shen?.name} ({item.tian_shen?.type})
+                        </span>
+                      </div>
+                      <div className="hourly-time-range">{item.time_range}</div>
+                      <div className="hourly-ganzhi">{item.ganzhi}</div>
+                      <small className="hourly-clash">冲{item.clash?.animal} · 煞{item.clash?.direction}</small>
+                      {item.favorable_activities?.length > 0 && (
+                        <div className="hourly-yi">宜: {item.favorable_activities.slice(0, 3).join(" ")}</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </section>
@@ -2011,6 +2046,10 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
             <button className="export-btn" onClick={handleDownloadReport} title="下载 Markdown 报告文件">
               <Download size={14} />
               <span>导出报告</span>
+            </button>
+            <button className="export-btn" onClick={() => window.print()} title="打印或导出为 PDF 文件">
+              <Printer size={14} />
+              <span>打印/PDF</span>
             </button>
           </div>
           <time>{new Date(result.calculated_at).toLocaleString("zh-CN", { hour12: false })}</time>

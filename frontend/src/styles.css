@@ -5488,6 +5488,141 @@ select:focus {
   text-align: center;
 }
 
+/* ==========================================================================
+   24h Auspicious Hours Timeline (十二时辰吉凶择吉)
+   ========================================================================== */
+
+.almanac-hourly-section {
+  margin-top: 14px;
+  border-top: 1px solid var(--line, #d9d8d1);
+  padding-top: 12px;
+}
+
+.hourly-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+  margin-bottom: 10px;
+}
+
+.hourly-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.hourly-card {
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: all 0.15s ease;
+}
+
+.hourly-card.is-huangdao {
+  border-top: 2px solid var(--jade, #297267);
+}
+
+.hourly-card.is-heidao {
+  border-top: 2px solid var(--muted, #69716c);
+}
+
+.hourly-card.is-current-hour {
+  border-color: var(--jade, #297267);
+  box-shadow: 0 0 0 1px var(--jade, #297267), 0 4px 12px rgba(41, 114, 103, 0.15);
+  background: rgba(41, 114, 103, 0.04);
+}
+
+.hourly-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hourly-branch {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+}
+
+.hourly-tag {
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.hourly-tag.fav {
+  background: rgba(41, 114, 103, 0.12);
+  color: var(--jade, #297267);
+}
+
+.hourly-tag.unfav {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--muted, #69716c);
+}
+
+.hourly-time-range {
+  font-size: 11px;
+  color: var(--faint, #929993);
+}
+
+.hourly-ganzhi {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--amber, #a66d1e);
+}
+
+.hourly-clash {
+  font-size: 10px;
+  color: var(--muted, #69716c);
+}
+
+.hourly-yi {
+  font-size: 10px;
+  color: var(--jade, #297267);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   Print-Optimized Styles (@media print)
+   ========================================================================== */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .app-navigation,
+  .mobile-topbar,
+  .input-column,
+  .workspace-actions,
+  .rules-drawer,
+  .history-drawer,
+  .drawer-layer {
+    display: none !important;
+  }
+
+  .result-workspace {
+    padding: 0 !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+  }
+
+  .view-stack,
+  .data-band {
+    page-break-inside: avoid;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

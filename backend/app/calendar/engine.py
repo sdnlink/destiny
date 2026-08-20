@@ -108,6 +108,38 @@ class CalendarEngine:
             "derive month branch, zodiac, xun and empty branches",
         ]
 
+        # 计算当日十二时辰吉凶时序轮盘
+        hourly_timeline = []
+        hour_samples = [
+            (0, "23:00 - 01:00"), (2, "01:00 - 03:00"), (4, "03:00 - 05:00"),
+            (6, "05:00 - 07:00"), (8, "07:00 - 09:00"), (10, "09:00 - 11:00"),
+            (12, "11:00 - 13:00"), (14, "13:00 - 15:00"), (16, "15:00 - 17:00"),
+            (18, "17:00 - 19:00"), (20, "19:00 - 21:00"), (22, "21:00 - 23:00"),
+        ]
+        for h_sample, time_range in hour_samples:
+            try:
+                sample_solar = Solar.fromYmdHms(effective.year, effective.month, effective.day, h_sample, 0, 0)
+                sample_lunar = sample_solar.getLunar()
+                hourly_timeline.append({
+                    "hour": h_sample,
+                    "branch": sample_lunar.getTimeZhi(),
+                    "time_range": time_range,
+                    "ganzhi": sample_lunar.getTimeInGanZhi(),
+                    "tian_shen": {
+                        "name": sample_lunar.getTimeTianShen(),
+                        "type": sample_lunar.getTimeTianShenType(),
+                        "luck": sample_lunar.getTimeTianShenLuck(),
+                    },
+                    "clash": {
+                        "animal": sample_lunar.getTimeChongShengXiao(),
+                        "direction": sample_lunar.getTimeSha(),
+                    },
+                    "favorable_activities": list(sample_lunar.getTimeYi())[:6],
+                    "unfavorable_activities": list(sample_lunar.getTimeJi())[:4],
+                })
+            except Exception:
+                pass
+
         return {
             "schema_version": "2.0",
             "system": "calendar",
@@ -171,6 +203,7 @@ class CalendarEngine:
                     "gan": reference_lunar.getPengZuGan(),
                     "zhi": reference_lunar.getPengZuZhi(),
                 },
+                "hourly_timeline": hourly_timeline,
             },
             "calculation_trace": trace,
             "steps": [
