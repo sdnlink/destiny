@@ -39,6 +39,8 @@ from app.meihua import number_cast as meihua_number_cast
 from app.meihua import three_number_cast as meihua_three_number_cast
 from app.meihua import time_cast as meihua_time_cast
 from app.ziwei import time_cast as ziwei_time_cast, auto_cast as ziwei_auto_cast
+from app.bazi import calculate_bazi, time_cast as bazi_time_cast, auto_cast as bazi_auto_cast
+from app.qimen import calculate_qimen_chart, time_cast as qimen_time_cast, auto_cast as qimen_auto_cast
 from app.core.db import db_repository
 from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
@@ -112,6 +114,14 @@ class ZiweiRequest(CalendarRequest):
 
 
 class ZiweiAutoRequest(AutoCastRequest):
+    gender: str = Field("男", example="男")
+
+
+class BaZiRequest(CalendarRequest):
+    gender: str = Field("男", example="男")
+
+
+class BaZiAutoRequest(AutoCastRequest):
     gender: str = Field("男", example="男")
 
 
@@ -237,6 +247,18 @@ def execute(module, method, payload):
     if module == "ziwei" and method == "auto":
         request = ZiweiAutoRequest(**payload)
         return ziwei_auto_cast(**request.dict())
+    if module == "bazi" and method == "time":
+        request = BaZiRequest(**payload)
+        return bazi_time_cast(**request.dict())
+    if module == "bazi" and method == "auto":
+        request = BaZiAutoRequest(**payload)
+        return bazi_auto_cast(**request.dict())
+    if module == "qimen" and method == "time":
+        request = CalendarRequest(**payload)
+        return qimen_time_cast(**request.dict())
+    if module == "qimen" and method == "auto":
+        request = AutoCastRequest(**payload)
+        return qimen_auto_cast(**request.dict())
     if module == "fengshui" and method == "direction":
         request = FengshuiDirectionRequest(**payload)
         return fengshui_direction(**request.dict())
@@ -298,7 +320,7 @@ def comparison_envelope(calculations, context=None):
         "comparison": comparison,
         "explanation": explain_calculation_set(module_results, comparison),
         "advisory": generate_advisory(module_results, normalized_context),
-        "literature": collect_literature_opinions(module_results),
+        "literature": collect_literature_opinions(module_results, context=normalized_context),
         "imagery": imagery,
         "yuan_hui_yun_shi": yuan_hui,
         "interpretation": explain_correspondences(module_results, normalized_context, imagery, yuan_hui),
@@ -591,6 +613,26 @@ def cast_ziwei_time(request: ZiweiRequest):
 @app.post("/v1/ziwei/auto")
 def cast_ziwei_auto(request: ZiweiAutoRequest):
     return {"data": ziwei_auto_cast(**request.dict())}
+
+
+@app.post("/v1/bazi/time")
+def cast_bazi_time(request: BaZiRequest):
+    return {"data": bazi_time_cast(**request.dict())}
+
+
+@app.post("/v1/bazi/auto")
+def cast_bazi_auto(request: BaZiAutoRequest):
+    return {"data": bazi_auto_cast(**request.dict())}
+
+
+@app.post("/v1/qimen/time")
+def cast_qimen_time(request: CalendarRequest):
+    return {"data": qimen_time_cast(**request.dict())}
+
+
+@app.post("/v1/qimen/auto")
+def cast_qimen_auto(request: AutoCastRequest):
+    return {"data": qimen_auto_cast(**request.dict())}
 
 
 @app.post("/v1/fengshui/direction")

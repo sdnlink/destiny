@@ -25,6 +25,8 @@ const SCENES = [
   { id: "meihua", label: "梅花", icon: Compass },
   { id: "liuyao", label: "六爻", icon: Grid3X3 },
   { id: "liuren", label: "六壬", icon: Workflow },
+  { id: "qimen", label: "奇门", icon: Compass },
+  { id: "bazi", label: "八字", icon: Sparkles },
   { id: "ziwei", label: "紫微", icon: Sparkles },
   { id: "fengshui", label: "风水", icon: Mountain },
 ];
@@ -97,6 +99,8 @@ export default function InputPanel({
   const showMeihua = form.scene === "combined" || form.scene === "meihua";
   const showLiuyao = form.scene === "combined" || form.scene === "liuyao";
   const showLiuren = form.scene === "combined" || form.scene === "liuren";
+  const showQimen = form.scene === "combined" || form.scene === "qimen";
+  const showBazi = form.scene === "combined" || form.scene === "bazi";
   const showZiwei = form.scene === "combined" || form.scene === "ziwei";
   const showFengshui = form.scene === "fengshui";
 
@@ -380,6 +384,82 @@ export default function InputPanel({
                 <small className="field-hint">除以12取余映射子至亥，仅替换占时，不修改历法日柱</small>
               </label>
             )}
+          </section>
+        )}
+
+        {showQimen && (
+          <section className="form-section">
+            <div className="section-title">
+              <Compass size={16} />
+              <span>时家转盘奇门遁甲</span>
+            </div>
+            <div className="segmented method-switch" role="radiogroup" aria-label="奇门排盘模式">
+              <button
+                type="button"
+                className={(form.qimenMethod || "time") === "time" ? "active" : ""}
+                onClick={() => update("qimenMethod", "time")}
+              >
+                传统时间
+              </button>
+              <button
+                type="button"
+                className={form.qimenMethod === "auto" ? "active" : ""}
+                onClick={() => update("qimenMethod", "auto")}
+              >
+                个体自动
+              </button>
+            </div>
+            <div className="method-note">
+              <Compass size={16} />
+              <p>拆补法定阴阳局，排布九星、八门、八神与三奇六仪格局。</p>
+            </div>
+          </section>
+        )}
+
+        {showBazi && (
+          <section className="form-section">
+            <div className="section-title">
+              <Sparkles size={16} />
+              <span>八字四柱命理</span>
+            </div>
+            <div className="segmented method-switch" role="radiogroup" aria-label="八字排盘模式">
+              <button
+                type="button"
+                className={form.baziMethod === "time" ? "active" : ""}
+                onClick={() => update("baziMethod", "time")}
+              >
+                传统时间
+              </button>
+              <button
+                type="button"
+                className={form.baziMethod === "auto" ? "active" : ""}
+                onClick={() => update("baziMethod", "auto")}
+              >
+                个体自动
+              </button>
+            </div>
+            <div className="input-row">
+              <label>
+                <FieldLabel>命造性别</FieldLabel>
+                <div className="segmented">
+                  <button
+                    type="button"
+                    className={(form.baziGender || "男") === "男" ? "active" : ""}
+                    onClick={() => update("baziGender", "男")}
+                  >
+                    乾造（男命）
+                  </button>
+                  <button
+                    type="button"
+                    className={form.baziGender === "女" ? "active" : ""}
+                    onClick={() => update("baziGender", "女")}
+                  >
+                    坤造（女命）
+                  </button>
+                </div>
+                <small className="field-hint">用于顺逆排布大运与起运交运折算</small>
+              </label>
+            </div>
           </section>
         )}
 

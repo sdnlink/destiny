@@ -122,6 +122,7 @@ def generate_advisory(module_results: List[Dict[str, Any]], context: Optional[Di
     liuyao = _find_module(module_results, "liuyao")
     liuren = _find_module(module_results, "liuren")
     ziwei = _find_module(module_results, "ziwei")
+    bazi = _find_module(module_results, "bazi")
 
     evidence_basis = []
     
@@ -148,6 +149,15 @@ def generate_advisory(module_results: List[Dict[str, Any]], context: Optional[Di
             "rule_ids": original_evidence.get("rule_ids", []),
         })
 
+    if bazi:
+        bz_facts = bazi.get("facts", {})
+        bz_strength = bz_facts.get("day_master_strength", {})
+        evidence_basis.append({
+            "module": "bazi",
+            "fact": f"日主【{bazi.get('day_master')}】{bz_strength.get('level')}，喜用【{'、'.join(bz_strength.get('favorable_elements', []))}】",
+            "rule_ids": ["BAZI-ZIPING-001"],
+        })
+
     # 3. 综合现状剖析 (Status Quo)
     status_quo_points = []
     if orig_exp:
@@ -158,6 +168,10 @@ def generate_advisory(module_results: List[Dict[str, Any]], context: Optional[Di
         mh_facts = meihua.get("facts", {})
         bu = mh_facts.get("body_use", {})
         status_quo_points.append(f"【体用定位】以【{bu.get('body_trigram', {}).get('name')}】（属{bu.get('body_trigram', {}).get('element')}）为主体，【{bu.get('use_trigram', {}).get('name')}】（属{bu.get('use_trigram', {}).get('element')}）为外部事态。{mh_guidance['rationale'] if mh_guidance else ''}")
+    if bazi:
+        bz_facts = bazi.get("facts", {})
+        bz_strength = bz_facts.get("day_master_strength", {})
+        status_quo_points.append(f"【八字命理】日元为【{bazi.get('day_master')}】（属{bz_strength.get('element')}），全局五行气机呈【{bz_strength.get('level')}】。喜用五行：【{'、'.join(bz_strength.get('favorable_elements', []))}】；忌神五行：【{'、'.join(bz_strength.get('unfavorable_elements', []))}】。")
     if liuyao:
         ly_facts = liuyao.get("facts", {})
         palace = ly_facts.get("palace", {})

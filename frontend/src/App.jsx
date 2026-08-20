@@ -1,20 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Archive,
+  ArrowRight,
   BookOpenCheck,
   Database,
+  Download,
   FileClock,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
   Plus,
+  RefreshCw,
   Settings,
   ShieldCheck,
+  Trash2,
   X,
 } from "lucide-react";
 import InputPanel from "./components/InputPanel";
 import ResultWorkspace from "./components/ResultWorkspace";
 import { analyzeCalendar, checkHealth, compareCalculations, loadRules } from "./lib/api";
+import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
+import {
+  clearDeductionHistory,
+  deleteDeductionHistory,
+  getDeductionHistory,
+  saveDeductionHistory,
+} from "./lib/storage";
 
 function localDateTimeValue(date = new Date()) {
   const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -50,6 +61,9 @@ function initialForm() {
     lyUpper: "8",
     liurenMethod: "auto",
     lrNumber: "8",
+    qimenMethod: "time",
+    baziMethod: "time",
+    baziGender: "男",
     ziweiMethod: "time",
     ziweiGender: "男",
     fsFacing: "180",
@@ -125,6 +139,20 @@ function buildCalculations(form) {
         : { module: "liuren", method: "numbers", input: { ...calendar, number: Number(form.lrNumber) } },
     );
   }
+  if (form.scene === "combined" || form.scene === "qimen") {
+    calculations.push(
+      form.qimenMethod === "auto"
+        ? { module: "qimen", method: "auto", input: auto }
+        : { module: "qimen", method: "time", input: calendar },
+    );
+  }
+  if (form.scene === "combined" || form.scene === "bazi") {
+    calculations.push(
+      form.baziMethod === "auto"
+        ? { module: "bazi", method: "auto", input: { ...auto, gender: form.baziGender || form.ziweiGender || "男" } }
+        : { module: "bazi", method: "time", input: { ...calendar, gender: form.baziGender || form.ziweiGender || "男" } },
+    );
+  }
   if (form.scene === "combined" || form.scene === "ziwei") {
     calculations.push(
       form.ziweiMethod === "auto"
@@ -158,7 +186,7 @@ function buildCalculations(form) {
   return calculations;
 }
 
-function AppNavigation({ collapsed, setCollapsed, openRules, serviceOnline }) {
+function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, serviceOnline }) {
   return (
     <nav className={`app-navigation ${collapsed ? "collapsed" : ""}`} aria-label="主导航">
       <div className="brand-lockup">
@@ -167,9 +195,9 @@ function AppNavigation({ collapsed, setCollapsed, openRules, serviceOnline }) {
       </div>
       <div className="nav-items">
         <button className="active" title="新建推演"><Plus size={18} /><span>新建推演</span></button>
-        <button disabled title="案例库尚未启用"><Archive size={18} /><span>案例库</span><small>待建设</small></button>
+        <button onClick={openHistory} title="历史推演记录与案例库"><Archive size={18} /><span>案例库</span></button>
         <button onClick={openRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
-        <button disabled title="历史任务尚未持久化"><FileClock size={18} /><span>历史任务</span><small>待建设</small></button>
+        <button onClick={openHistory} title="历史推演记录"><FileClock size={18} /><span>历史任务</span></button>
       </div>
       <div className="nav-bottom">
         <button disabled title="设置尚未启用"><Settings size={18} /><span>设置</span></button>
@@ -202,7 +230,7 @@ function RulesDrawer({ open, onClose, rules, loading }) {
         </header>
         <div className="drawer-notice"><ShieldCheck size={16} /><span>当前规则均为工程草稿，尚未经过专家签署。</span></div>
         <div className="segmented drawer-filter">
-          {[["all", "全部"], ["calendar", "历法"], ["zhouyi", "周易"], ["meihua", "梅花"], ["liuyao", "六爻"], ["liuren", "六壬"], ["ziwei", "紫微"], ["fengshui", "风水"]].map(([id, label]) => (
+          {[["all", "全部"], ["calendar", "历法"], ["zhouyi", "周易"], ["meihua", "梅花"], ["liuyao", "六爻"], ["liuren", "六壬"], ["qimen", "奇门"], ["bazi", "八字"], ["ziwei", "紫微"], ["fengshui", "风水"]].map(([id, label]) => (
             <button key={id} className={system === id ? "active" : ""} onClick={() => setSystem(id)}>{label}</button>
           ))}
         </div>
@@ -229,6 +257,113 @@ function RulesDrawer({ open, onClose, rules, loading }) {
   );
 }
 
+function HistoryDrawer({ open, onClose, onLoadHistory }) {
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    if (open) {
+      setHistory(getDeductionHistory());
+    }
+  }, [open]);
+
+  const handleDelete = (id, e) => {
+    e.stopPropagation();
+    const updated = deleteDeductionHistory(id);
+    setHistory(updated);
+  };
+
+  const handleClear = () => {
+    if (window.confirm("确定要清空所有本地推演历史记录吗？")) {
+      clearDeductionHistory();
+      setHistory([]);
+    }
+  };
+
+  const handleExport = (item, e) => {
+    e.stopPropagation();
+    const md = generateMarkdownReport(item.result, item.context);
+    const dateStr = new Date(item.timestamp).toISOString().slice(0, 10);
+    const filename = `推演报告_${item.question.slice(0, 8)}_${dateStr}.md`;
+    downloadMarkdownFile(md, filename);
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="drawer-layer" role="presentation" onMouseDown={onClose}>
+      <aside className="rules-drawer history-drawer" role="dialog" aria-modal="true" aria-label="历史推演与案例库" onMouseDown={(e) => e.stopPropagation()}>
+        <header>
+          <div>
+            <p className="section-kicker">LOCAL PERSISTENCE</p>
+            <h2>历史推演与案例库</h2>
+          </div>
+          <div className="header-actions">
+            {history.length > 0 && (
+              <button className="clear-history-btn" onClick={handleClear} title="清空全部历史">
+                <Trash2 size={15} />
+                <span>清空</span>
+              </button>
+            )}
+            <button className="icon-button" onClick={onClose} aria-label="关闭历史抽屉"><X size={19} /></button>
+          </div>
+        </header>
+
+        <div className="drawer-notice">
+          <FileClock size={16} />
+          <span>本地保存最近 50 次推演记录，点击即可一键复盘或导出 Markdown 报告。</span>
+        </div>
+
+        <div className="history-list-wrap">
+          {history.length === 0 ? (
+            <div className="drawer-loading">暂无历史推演记录。从左侧发起一次推演即可自动保存。</div>
+          ) : (
+            <div className="history-items-list">
+              {history.map((item) => (
+                <div
+                  key={item.id}
+                  className="history-item-card"
+                  onClick={() => {
+                    onLoadHistory(item);
+                    onClose();
+                  }}
+                >
+                  <div className="item-top">
+                    <div className="item-badges">
+                      <span className="cat-badge">{item.category}</span>
+                      <span className="scene-badge">{item.scene}</span>
+                    </div>
+                    <time>{new Date(item.timestamp).toLocaleString("zh-CN", { hour12: false })}</time>
+                  </div>
+                  <strong className="item-question">{item.question}</strong>
+                  <p className="item-summary">{item.summary}</p>
+                  <div className="item-actions">
+                    <button className="btn-load-history">
+                      <ArrowRight size={13} />
+                      <span>复盘载入</span>
+                    </button>
+                    <button className="btn-export-history" onClick={(e) => handleExport(item, e)}>
+                      <Download size={13} />
+                      <span>导出</span>
+                    </button>
+                    <button className="btn-delete-history" onClick={(e) => handleDelete(item.id, e)} title="删除记录">
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <footer>
+          <Database size={15} />
+          <span>共 {history.length} 条本地推演存档</span>
+        </footer>
+      </aside>
+    </div>
+  );
+}
+
 export default function App() {
   const [form, setForm] = useState(initialForm);
   const [result, setResult] = useState(null);
@@ -242,6 +377,7 @@ export default function App() {
   const [navCollapsed, setNavCollapsed] = useState(false);
   const [mobileInputOpen, setMobileInputOpen] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [rules, setRules] = useState([]);
   const [rulesLoading, setRulesLoading] = useState(false);
 
@@ -271,11 +407,16 @@ export default function App() {
         category: form.category,
         question_summary: form.question,
       });
+      const ctx = { scene: form.scene, category: form.category, question: form.question };
       setResult(response);
-      setResultContext({ scene: form.scene, category: form.category, question: form.question });
+      setResultContext(ctx);
       setActiveTab("overview");
       setServiceOnline(true);
       setMobileInputOpen(false);
+
+      // Auto save to local history
+      saveDeductionHistory(response.task_id, ctx, response);
+
       const calendar = response.module_results.find((item) => item.module === "calendar")?.result;
       if (calendar) setPreview(calendar);
     } catch (requestError) {
@@ -317,9 +458,23 @@ export default function App() {
     }
   };
 
+  const handleLoadHistory = (item) => {
+    setResult(item.result);
+    setResultContext(item.context);
+    setActiveTab("overview");
+    const cal = item.result?.module_results?.find((m) => m.module === "calendar")?.result;
+    if (cal) setPreview(cal);
+  };
+
   return (
     <div className="app-shell">
-      <AppNavigation collapsed={navCollapsed} setCollapsed={setNavCollapsed} openRules={openRules} serviceOnline={serviceOnline} />
+      <AppNavigation
+        collapsed={navCollapsed}
+        setCollapsed={setNavCollapsed}
+        openRules={openRules}
+        openHistory={() => setHistoryOpen(true)}
+        serviceOnline={serviceOnline}
+      />
       <div className="mobile-topbar">
         <div className="brand-mark"><span>☰</span><span>☷</span></div>
         <strong>天机演象</strong>
@@ -341,6 +496,7 @@ export default function App() {
       </div>
       <ResultWorkspace result={result} context={resultContext} activeTab={activeTab} setActiveTab={setActiveTab} />
       <RulesDrawer open={rulesOpen} onClose={() => setRulesOpen(false)} rules={rules} loading={rulesLoading} />
+      <HistoryDrawer open={historyOpen} onClose={() => setHistoryOpen(false)} onLoadHistory={handleLoadHistory} />
     </div>
   );
 }

@@ -1,11 +1,15 @@
+import { useState } from "react";
 import {
   ArrowRight,
   BookOpen,
   CalendarDays,
+  Check,
   CheckCircle2,
   CircleAlert,
   Clock3,
   Compass,
+  Copy,
+  Download,
   FileSearch,
   FileText,
   ExternalLink,
@@ -21,6 +25,7 @@ import {
   Volume2,
   Workflow,
 } from "lucide-react";
+import { generateMarkdownReport, downloadMarkdownFile, copyToClipboard } from "../lib/export";
 
 const TABS = [
   { id: "overview", label: "总览", icon: Layers3 },
@@ -29,6 +34,8 @@ const TABS = [
   { id: "meihua", label: "梅花易数", icon: Compass },
   { id: "liuyao", label: "六爻", icon: Grid3X3 },
   { id: "liuren", label: "大六壬", icon: Workflow },
+  { id: "qimen", label: "奇门遁甲", icon: Compass },
+  { id: "bazi", label: "八字命理", icon: Sparkles },
   { id: "ziwei", label: "紫微斗数", icon: Sparkles },
   { id: "fengshui", label: "阳宅风水", icon: Mountain },
   { id: "comparison", label: "对照分析", icon: GitCompareArrows },
@@ -44,8 +51,26 @@ const CATEGORY_LABELS = {
   study: "学业",
   other: "其他",
 };
-const SCENE_LABELS = { combined: "综合推演", zhouyi: "周易", meihua: "梅花易数", liuyao: "六爻", liuren: "大六壬", ziwei: "紫微斗数", fengshui: "阳宅风水" };
-const IMAGERY_MODULE_LABELS = { zhouyi: "周易", meihua: "梅花", liuyao: "六爻", liuren: "六壬", ziwei: "紫微" };
+const SCENE_LABELS = {
+  combined: "综合推演",
+  zhouyi: "周易",
+  meihua: "梅花易数",
+  liuyao: "六爻",
+  liuren: "大六壬",
+  qimen: "奇门遁甲",
+  bazi: "八字命理",
+  ziwei: "紫微斗数",
+  fengshui: "阳宅风水",
+};
+const IMAGERY_MODULE_LABELS = {
+  zhouyi: "周易",
+  meihua: "梅花",
+  liuyao: "六爻",
+  liuren: "六壬",
+  qimen: "奇门",
+  bazi: "八字",
+  ziwei: "紫微",
+};
 const IMAGERY_STAGE_LABELS = { original: "本盘", changed: "变盘" };
 const CAST_METHOD_LABELS = {
   personalized_three_coin: "个体三枚铜钱",
@@ -57,8 +82,24 @@ const CAST_METHOD_LABELS = {
   two_numbers: "数字排盘",
 };
 const IMAGERY_ROLE_LABELS = {
-  upper_trigram: "上卦", lower_trigram: "下卦", body: "体卦", use: "用卦", changed_use: "变卦之用",
-  palace: "卦宫", month_general: "月将", initial_transmission: "初传", middle_transmission: "中传", final_transmission: "末传",
+  upper_trigram: "上卦",
+  lower_trigram: "下卦",
+  body: "体卦",
+  use: "用卦",
+  changed_use: "变卦之用",
+  palace: "卦宫",
+  month_general: "月将",
+  initial_transmission: "初传",
+  middle_transmission: "中传",
+  final_transmission: "末传",
+};
+
+const ELEMENT_COLORS = {
+  木: "#2e7d32",
+  火: "#c62828",
+  土: "#d87a16",
+  金: "#b78103",
+  水: "#1565c0",
 };
 
 function findModule(result, module) {
@@ -96,12 +137,15 @@ function HexagramLines({ lines, moving = [] }) {
   if (!lines) return null;
   return (
     <div className="hexagram-lines" aria-label="六爻卦象">
-      {[...lines].map((line, index) => ({ line, position: index + 1 })).reverse().map(({ line, position }) => (
-        <div className={`yao ${line ? "yang" : "yin"} ${moving.includes(position) ? "moving" : ""}`} key={position}>
-          {line ? <span /> : <><span /><span /></>}
-          {moving.includes(position) && <i>{position}</i>}
-        </div>
-      ))}
+      {[...lines]
+        .map((line, index) => ({ line, position: index + 1 }))
+        .reverse()
+        .map(({ line, position }) => (
+          <div className={`yao ${line ? "yang" : "yin"} ${moving.includes(position) ? "moving" : ""}`} key={position}>
+            {line ? <span /> : <><span /><span /></>}
+            {moving.includes(position) && <i>{position}</i>}
+          </div>
+        ))}
     </div>
   );
 }
@@ -117,7 +161,10 @@ function HexagramTile({ title, hexagram, moving = [], featured = false }) {
       <div className="hexagram-core">
         <HexagramLines lines={hexagram.lines} moving={moving} />
         <div>
-          <div className="hexagram-name"><span>{hexagram.symbol}</span><strong>{hexagram.name}</strong></div>
+          <div className="hexagram-name">
+            <span>{hexagram.symbol}</span>
+            <strong>{hexagram.name}</strong>
+          </div>
           <p>{hexagram.upper_trigram.name}上 · {hexagram.lower_trigram.name}下</p>
           <div className="element-pair">
             <span>{hexagram.upper_trigram.element}</span>
@@ -146,7 +193,12 @@ function Pillars({ calendar, compact = false }) {
 }
 
 function Notice({ tone = "info", icon: Icon = Info, children }) {
-  return <div className={`notice ${tone}`}><Icon size={17} /><div>{children}</div></div>;
+  return (
+    <div className={`notice ${tone}`}>
+      <Icon size={17} />
+      <div>{children}</div>
+    </div>
+  );
 }
 
 function Steps({ steps = [] }) {
@@ -189,15 +241,14 @@ function Evidence({ items = [] }) {
   );
 }
 
-function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, ziwei, fengshui, onTab }) {
-  const comparison = result.comparison;
+function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, qimen, bazi, ziwei, fengshui, onTab }) {
   return (
     <div className="view-stack">
       <section className="summary-band">
         <div className="summary-copy">
           <span className="eyebrow">{CATEGORY_LABELS[context.category]} · {SCENE_LABELS[context.scene]}</span>
           <h2>{context.question}</h2>
-          <p>本次输出保留盘面事实与计算依据。当前解释规则尚未发布，不生成自动吉凶评分。</p>
+          <p>本次输出保留盘面事实与计算依据。融合周易卦德、梅花体用、六爻纳甲、六壬三传、奇门九宫与子平大运。</p>
         </div>
         <div className="summary-status">
           <CheckCircle2 size={22} />
@@ -256,6 +307,28 @@ function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, z
           </button>
         )}
 
+        {qimen && (
+          <button className="overview-section" onClick={() => onTab("qimen")}>
+            <div className="overview-head"><span><Compass size={16} />奇门遁甲</span><ArrowRight size={15} /></div>
+            <div className="qimen-overview-core">
+              <strong>【{qimen.dun_type}{qimen.ju_number}局·{qimen.yuan_type}】</strong>
+              <span>值符【{qimen.zhi_fu_star}】 · 值使【{qimen.zhi_shi_gate}】</span>
+            </div>
+            <p>吉方：{qimen.favorable_directions?.[0]?.direction}（{qimen.favorable_directions?.[0]?.gate}）</p>
+          </button>
+        )}
+
+        {bazi && (
+          <button className="overview-section" onClick={() => onTab("bazi")}>
+            <div className="overview-head"><span><Sparkles size={16} />八字命理</span><ArrowRight size={15} /></div>
+            <div className="bazi-overview-core">
+              <strong>日元 {bazi.day_master}（{bazi.day_master_strength.element}）</strong>
+              <span>{bazi.day_master_strength.level} · 喜【{bazi.day_master_strength.favorable_elements.join("、")}】</span>
+            </div>
+            <p>四柱：{bazi.facts.pillars.year.ganzhi} {bazi.facts.pillars.month.ganzhi} {bazi.facts.pillars.day.ganzhi} {bazi.facts.pillars.hour.ganzhi}</p>
+          </button>
+        )}
+
         {ziwei && (
           <button className="overview-section" onClick={() => onTab("ziwei")}>
             <div className="overview-head"><span><Sparkles size={16} />紫微斗数</span><ArrowRight size={15} /></div>
@@ -276,15 +349,19 @@ function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, z
             <div className="overview-head"><span><Mountain size={16} />阳宅坐向</span><ArrowRight size={15} /></div>
             {(fengshui.facts.mode === "multiple_measurements" ? fengshui.facts.consensus.aggregate : fengshui.facts) ? (() => {
               const direction = fengshui.facts.mode === "multiple_measurements" ? fengshui.facts.consensus.aggregate : fengshui.facts;
-              return <>
-                <div className="direction-overview-core">
-                  <div><span>坐</span><strong>{direction.sitting.mountain.name}</strong><small>{direction.true_sitting_degree}°</small></div>
-                  <ArrowRight size={22} />
-                  <div><span>向</span><strong>{direction.facing.mountain.name}</strong><small>{direction.true_facing_degree}°</small></div>
-                </div>
-                <p>{direction.classification_stable ? "山向分类稳定" : "测量误差跨界，需复测确认"}</p>
-              </>;
-            })() : <div className="direction-overview-empty"><CircleAlert size={22} /><strong>读数不一致</strong><span>未生成合并山向</span></div>}
+              return (
+                <>
+                  <div className="direction-overview-core">
+                    <div><span>坐</span><strong>{direction.sitting.mountain.name}</strong><small>{direction.true_sitting_degree}°</small></div>
+                    <ArrowRight size={22} />
+                    <div><span>向</span><strong>{direction.facing.mountain.name}</strong><small>{direction.true_facing_degree}°</small></div>
+                  </div>
+                  <p>{direction.classification_stable ? "山向分类稳定" : "测量误差跨界，需复测确认"}</p>
+                </>
+              );
+            })() : (
+              <div className="direction-overview-empty"><CircleAlert size={22} /><strong>读数不一致</strong><span>未生成合并山向</span></div>
+            )}
           </button>
         )}
       </section>
@@ -298,81 +375,69 @@ function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, z
           <p>{result.advisory.conclusion.text}</p>
           <div className="advisory-quick-actions">
             {result.advisory.recommendations.slice(0, 2).map((recommendation) => (
-              <div key={recommendation.priority}><b>{recommendation.priority}</b><span>{recommendation.title}</span></div>
+              <div key={recommendation.title}>
+                <strong>{recommendation.title}</strong>
+                <span>{recommendation.detail}</span>
+              </div>
             ))}
           </div>
         </section>
       )}
-
-      <section className="data-band result-explanation-summary">
-        <div className="band-heading">
-          <div><span className="band-icon"><FileText size={16} /></span><div><h3>推演结果</h3><p>确定性模板说明 · {result.explanation.review_status}</p></div></div>
-          <button className="text-button" onClick={() => onTab("explanation")}>详细说明 <ArrowRight size={14} /></button>
-        </div>
-        <p className="result-summary-text">{result.explanation.summary}</p>
-        <div className="module-summary-list">
-          {result.explanation.modules.filter((module) => module.module !== "calendar").map((module) => (
-            <div key={module.module}>
-              <strong>{module.title}</strong>
-              <span>{module.summary}</span>
-            </div>
-          ))}
-        </div>
-        <Notice tone="neutral" icon={ShieldCheck}>{result.explanation.conclusion.text}</Notice>
-      </section>
-
-      <section className="data-band">
-        <div className="band-heading">
-          <div><span className="band-icon"><GitCompareArrows size={16} /></span><div><h3>对照分析</h3><p>只比较引用已发布规则的结构化判断</p></div></div>
-          <button className="text-button" onClick={() => onTab("comparison")}>查看详情 <ArrowRight size={14} /></button>
-        </div>
-        <div className="comparison-counts">
-          <DataState label="一致" value={comparison.counts.consistent} />
-          <DataState label="互补" value={comparison.counts.complementary} />
-          <DataState label="冲突" value={comparison.counts.conflicts} />
-          <DataState label="可比较判断" value={comparison.comparable_judgement_count} />
-        </div>
-        {comparison.notices.map((notice) => <Notice key={notice}>{notice}</Notice>)}
-      </section>
     </div>
   );
 }
 
 function CalendarView({ calendar }) {
   if (!calendar) return <MissingModule name="历法" />;
-  const correction = calendar.time.correction;
+  const { input, solar, lunar, pillars, zodiac, xun, solar_term, time } = calendar;
   return (
     <div className="view-stack">
       <section className="view-heading">
-        <div><span className="section-kicker">CALENDAR BASELINE</span><h2>输入与历法</h2><p>原始时间、时区转换、节气位置和四柱边界完整保留。</p></div>
-        <span className="version-badge">{calendar.rule_version}</span>
+        <div>
+          <span className="section-kicker">CHINESE CALENDAR ENGINE</span>
+          <h2>历法基准与干支四柱</h2>
+          <p>定气法、节令边界、真太阳时与干支纪时严格对齐。</p>
+        </div>
+        <span className="version-badge">{calendar.engine_version}</span>
       </section>
-      <section className="data-band pillar-band">
-        <div className="band-heading"><div><span className="band-icon"><CalendarDays size={16} /></span><div><h3>四柱</h3><p>立春换年 · 节令换月 · 子初23时换日</p></div></div></div>
+
+      <section className="data-band">
+        <div className="band-heading">
+          <div><span className="band-icon"><CalendarDays size={16} /></span><div><h3>四柱干支</h3><p>年依立春 · 月依节令 · 日依子初（23:00）</p></div></div>
+        </div>
         <Pillars calendar={calendar} />
       </section>
+
       <section className="two-column-data">
         <div className="data-band">
-          <div className="band-heading"><div><span className="band-icon"><Clock3 size={16} /></span><div><h3>时间转换</h3><p>{calendar.input.timezone}</p></div></div></div>
+          <div className="band-heading">
+            <div><span className="band-icon"><Clock3 size={16} /></span><div><h3>时间基准与修正</h3><p>真太阳时与标准时区转换</p></div></div>
+          </div>
           <div className="key-value-list">
-            <DataState label="原始本地时间" value={calendar.time.original_local_datetime} mono />
-            <DataState label="UTC时间" value={calendar.time.utc_datetime} mono />
-            <DataState label="有效计算时间" value={calendar.time.effective_local_datetime} mono />
-            <DataState label="总修正" value={`${correction.total_correction_minutes} 分钟`} />
+            <DataState label="输入本地时间" value={input.local_datetime} />
+            <DataState label="所在时区" value={input.timezone} />
+            <DataState label="真太阳时修正" value={time.correction?.enabled ? `${time.correction.total_correction_minutes} 分钟` : "未启用"} />
+            <DataState label="有效计算时间" value={time.effective_local_datetime} />
           </div>
         </div>
+
         <div className="data-band">
-          <div className="band-heading"><div><span className="band-icon"><Compass size={16} /></span><div><h3>农历与节气</h3><p>{calendar.lunar.year}年</p></div></div></div>
+          <div className="band-heading">
+            <div><span className="band-icon"><Compass size={16} /></span><div><h3>农历与节气</h3><p>二十四节气定气法时刻</p></div></div>
+          </div>
           <div className="key-value-list">
-            <DataState label="农历" value={`${calendar.lunar.is_leap_month ? "闰" : ""}${calendar.lunar.month_name}月${calendar.lunar.day_name}`} />
-            <DataState label="上一节气" value={calendar.solar_terms.previous ? `${calendar.solar_terms.previous.name} · ${calendar.solar_terms.previous.datetime}` : "—"} />
-            <DataState label="当前节气" value={calendar.solar_terms.current?.name || "非交节时刻"} />
-            <DataState label="下一节气" value={calendar.solar_terms.next ? `${calendar.solar_terms.next.name} · ${calendar.solar_terms.next.datetime}` : "—"} />
+            <DataState label="农历日期" value={`${lunar.year}年 ${lunar.is_leap_month ? "闰" : ""}${lunar.month_name}月${lunar.day_name}`} />
+            <DataState label="年生肖" value={`${zodiac.name}（${zodiac.branch}）`} />
+            <DataState label="旬空（日柱）" value={xun.empty_branches.join("、")} />
+            <DataState label="相邻节气" value={`${solar_term.previous_month_boundary?.name || "前节"} → ${solar_term.next_month_boundary?.name || "后节"}`} />
           </div>
         </div>
       </section>
+
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算过程</h3><p>{calendar.engine_version}</p></div></div></div>
+        <div className="band-heading">
+          <div><span className="band-icon"><ListTree size={16} /></span><div><h3>推演步骤</h3><p>{calendar.engine_version}</p></div></div>
+        </div>
         <Steps steps={calendar.steps} />
       </section>
     </div>
@@ -385,28 +450,34 @@ function ZhouyiView({ result }) {
   return (
     <div className="view-stack">
       <section className="view-heading">
-        <div><span className="section-kicker">ZHOUYI</span><h2>周易卦盘</h2><p>六爻自下而上排列，动爻位置在卦线右侧标记。</p></div>
+        <div><span className="section-kicker">ZHOU YI CORE</span><h2>周易本变卦象</h2><p>本卦、变卦、互卦、错卦与综卦结构全景对照。</p></div>
         <span className="version-badge">{result.rule_version}</span>
       </section>
       <section className="hexagram-primary-grid">
         <HexagramTile title="本卦" hexagram={facts.original} moving={facts.moving_lines} featured />
-        <div className="change-arrow"><ArrowRight size={22} /><span>{facts.moving_lines.length ? `第 ${facts.moving_lines.join("、")} 爻动` : "无动爻"}</span></div>
+        <div className="change-arrow">
+          <ArrowRight size={22} />
+          <span>{facts.moving_lines.length ? `第 ${facts.moving_lines.join("、")} 爻动` : "静卦无动爻"}</span>
+        </div>
         <HexagramTile title="变卦" hexagram={facts.changed} featured />
       </section>
       <CastingIdentity facts={facts} />
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><Layers3 size={16} /></span><div><h3>关联卦</h3><p>互卦、错卦与综卦仅作为结构事实展示</p></div></div></div>
-        <div className="related-hexagrams">
+        <div className="band-heading">
+          <div><span className="band-icon"><Layers3 size={16} /></span><div><h3>四象演变对照</h3><p>互卦 · 错卦 · 综卦</p></div></div>
+        </div>
+        <div className="hexagram-secondary-grid">
           <HexagramTile title="互卦" hexagram={facts.mutual} />
           <HexagramTile title="错卦" hexagram={facts.opposite} />
           <HexagramTile title="综卦" hexagram={facts.reversed} />
         </div>
       </section>
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <div className="band-heading">
+          <div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div>
+        </div>
         <Steps steps={result.steps} />
       </section>
-      {result.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
     </div>
   );
 }
@@ -418,7 +489,7 @@ function MeihuaView({ result }) {
   return (
     <div className="view-stack">
       <section className="view-heading">
-        <div><span className="section-kicker">MEIHUA YISHU</span><h2>梅花易数</h2><p>起卦、动爻、体用与五行关系分层展示。</p></div>
+        <div><span className="section-kicker">MEIHUA YISHU</span><h2>梅花易数</h2><p>起卦、动爻、体用生克与五行关系分层展示。</p></div>
         <span className="version-badge">{result.rule_version}</span>
       </section>
       <section className="hexagram-primary-grid">
@@ -429,24 +500,29 @@ function MeihuaView({ result }) {
       <CastingIdentity facts={facts} />
       <section className="body-use-band">
         <div className="body-use-item body">
-          <span>体卦</span><strong>{bodyUse.body_trigram.symbol} {bodyUse.body_trigram.name}</strong><p>{bodyUse.body_trigram.element} · {bodyUse.body_position === "upper" ? "上卦" : "下卦"}</p>
+          <span>体卦</span><strong>{bodyUse.body_trigram.symbol} {bodyUse.body_trigram.name}</strong>
+          <p>{bodyUse.body_trigram.element} · {bodyUse.body_position === "upper" ? "上卦" : "下卦"}</p>
         </div>
         <div className="body-use-relation">
           <span>{result.evidence[0]?.label}</span><ArrowRight size={20} />
         </div>
         <div className="body-use-item use">
-          <span>用卦</span><strong>{bodyUse.use_trigram.symbol} {bodyUse.use_trigram.name}</strong><p>{bodyUse.use_trigram.element} · {bodyUse.use_position === "upper" ? "上卦" : "下卦"}</p>
+          <span>用卦</span><strong>{bodyUse.use_trigram.symbol} {bodyUse.use_trigram.name}</strong>
+          <p>{bodyUse.use_trigram.element} · {bodyUse.use_position === "upper" ? "上卦" : "下卦"}</p>
         </div>
       </section>
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>关系证据</h3><p>关系事实不直接映射吉凶</p></div></div></div>
+        <div className="band-heading">
+          <div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>关系证据</h3><p>关系事实不直接映射吉凶</p></div></div>
+        </div>
         <Evidence items={result.evidence} />
       </section>
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <div className="band-heading">
+          <div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div>
+        </div>
         <Steps steps={result.steps} />
       </section>
-      {result.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
     </div>
   );
 }
@@ -454,38 +530,80 @@ function MeihuaView({ result }) {
 function LiuyaoView({ result }) {
   if (!result) return <MissingModule name="六爻" />;
   const { facts } = result;
+  const [selectedPos, setSelectedPos] = useState(facts.palace.host_line || 1);
+
   return (
     <div className="view-stack">
       <section className="view-heading">
-        <div><span className="section-kicker">LIU YAO NA JIA</span><h2>六爻纳甲盘</h2><p>卦象、八宫世应、纳甲六亲、六神与旬空按爻位对齐。</p></div>
+        <div>
+          <span className="section-kicker">LIU YAO NA JIA</span>
+          <h2>六爻纳甲盘</h2>
+          <p>八宫世应、纳甲六亲、六神与动变爻位立体交互排盘。</p>
+        </div>
         <span className="version-badge">{result.rule_version}</span>
       </section>
+
       <section className="hexagram-primary-grid">
         <HexagramTile title="本卦" hexagram={facts.original} moving={facts.moving_lines} featured />
         <div className="change-arrow"><ArrowRight size={22} /><span>第 {facts.moving_lines.join("、")} 爻动</span></div>
         <HexagramTile title="变卦" hexagram={facts.changed} featured />
       </section>
+
       <CastingIdentity facts={facts} />
+
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><Grid3X3 size={16} /></span><div><h3>{facts.palace.name}宫 · {facts.palace.stage}</h3><p>世爻 {facts.palace.host_line} · 应爻 {facts.palace.response_line} · {facts.xun.name}空 {facts.xun.empty_branches.join("、")}</p></div></div></div>
+        <div className="band-heading">
+          <div>
+            <span className="band-icon"><Grid3X3 size={16} /></span>
+            <div>
+              <h3>{facts.palace.name}宫 · {facts.palace.stage}</h3>
+              <p>世爻 {facts.palace.host_line} · 应爻 {facts.palace.response_line} · {facts.xun.name}空 {facts.xun.empty_branches.join("、")}</p>
+            </div>
+          </div>
+        </div>
         <div className="liuyao-table-wrap">
           <table className="liuyao-table">
-            <thead><tr><th>爻位</th><th>六神</th><th>六亲</th><th>纳甲</th><th>五行</th><th>世应</th><th>状态</th></tr></thead>
-            <tbody>{[...facts.line_chart].reverse().map((line) => (
-              <tr key={line.position} className={line.is_moving ? "moving-line" : ""}>
-                <td>{line.position === 6 ? "上爻" : line.position === 1 ? "初爻" : `${line.position}爻`}</td>
-                <td>{line.six_spirit}</td><td>{line.six_relative}</td><td>{line.najia_stem}{line.najia_branch}</td><td>{line.element}</td>
-                <td>{line.roles.join("、") || "—"}</td><td>{line.is_moving ? "动" : "静"}{line.is_void ? " · 空" : ""}</td>
+            <thead>
+              <tr>
+                <th>爻位</th>
+                <th>六神</th>
+                <th>六亲</th>
+                <th>纳甲</th>
+                <th>五行</th>
+                <th>世应</th>
+                <th>状态</th>
+                <th>详情</th>
               </tr>
-            ))}</tbody>
+            </thead>
+            <tbody>
+              {[...facts.line_chart].reverse().map((line) => (
+                <tr
+                  key={line.position}
+                  className={`${line.is_moving ? "moving-line" : ""} ${selectedPos === line.position ? "selected-line" : ""}`}
+                  onClick={() => setSelectedPos(line.position)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <td><strong>{line.position === 6 ? "上爻" : line.position === 1 ? "初爻" : `${line.position}爻`}</strong></td>
+                  <td><span className="spirit-badge">{line.six_spirit}</span></td>
+                  <td><strong>{line.six_relative}</strong></td>
+                  <td>{line.najia_stem}{line.najia_branch}</td>
+                  <td><span style={{ color: ELEMENT_COLORS[line.element] || "inherit" }}>{line.element}</span></td>
+                  <td>{line.roles.includes("世爻") ? <span className="shi-badge">世</span> : line.roles.includes("应爻") ? <span className="ying-badge">应</span> : "—"}</td>
+                  <td>{line.is_moving ? <span className="moving-badge">发动 ○</span> : "静爻"}{line.is_void ? " · 旬空" : ""}</td>
+                  <td><small className="inspect-link">点击对齐</small></td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       </section>
+
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <div className="band-heading">
+          <div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div>
+        </div>
         <Steps steps={result.steps} />
       </section>
-      {result.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
     </div>
   );
 }
@@ -494,169 +612,496 @@ function LiurenView({ result }) {
   if (!result) return <MissingModule name="大六壬" />;
   const { facts } = result;
   const transmission = facts.three_transmissions;
+  const [hoverBranch, setHoverBranch] = useState(null);
+
   return (
     <div className="view-stack">
       <section className="view-heading">
-        <div><span className="section-kicker">DA LIU REN</span><h2>大六壬盘</h2><p>月将、占时、天地盘、四课、三传、天将与旬空分层展示。</p></div>
+        <div>
+          <span className="section-kicker">DA LIU REN</span>
+          <h2>大六壬盘</h2>
+          <p>月将、占时、天地盘、四课、三传、天将乘神与时空交互网络。</p>
+        </div>
         <span className="version-badge">{result.rule_version}</span>
       </section>
+
       <section className="liuren-facts-band">
         <DataState label="占日" value={facts.day_pillar} />
         <DataState label="占时" value={facts.occupation_time.branch} />
         <DataState label="月将" value={`${facts.month_general.name} · ${facts.month_general.branch}`} />
         <DataState label="旬空" value={facts.xun.empty_branches.join("、")} />
       </section>
+
       <CastingIdentity facts={facts} />
+
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><Workflow size={16} /></span><div><h3>天地盘与十二天将</h3><p>{facts.month_general.boundary_term}后月将 · {facts.heavenly_generals.distribution_direction}</p></div></div></div>
+        <div className="band-heading">
+          <div>
+            <span className="band-icon"><Workflow size={16} /></span>
+            <div>
+              <h3>天地盘与十二天将乘神</h3>
+              <p>{facts.month_general.boundary_term}后月将 · {facts.heavenly_generals.distribution_direction}</p>
+            </div>
+          </div>
+        </div>
         <div className="liuren-plate-wrap">
-          <div className="liuren-plate-row row-label"><b>地盘</b>{facts.earth_plate.map((branch) => <span key={branch}>{branch}</span>)}</div>
-          <div className="liuren-plate-row"><b>天盘</b>{facts.earth_plate.map((branch) => <strong key={branch}>{facts.heaven_plate[branch]}</strong>)}</div>
-          <div className="liuren-plate-row generals"><b>天将</b>{facts.earth_plate.map((branch) => <span key={branch}>{facts.heavenly_generals.by_ground[branch]}</span>)}</div>
+          <div className="liuren-plate-row row-label">
+            <b>地盘</b>
+            {facts.earth_plate.map((branch) => (
+              <span
+                key={branch}
+                className={hoverBranch === branch ? "branch-active" : ""}
+                onMouseEnter={() => setHoverBranch(branch)}
+                onMouseLeave={() => setHoverBranch(null)}
+              >
+                {branch}
+              </span>
+            ))}
+          </div>
+          <div className="liuren-plate-row">
+            <b>天盘</b>
+            {facts.earth_plate.map((branch) => (
+              <strong
+                key={branch}
+                className={hoverBranch === branch ? "branch-active" : ""}
+                onMouseEnter={() => setHoverBranch(branch)}
+                onMouseLeave={() => setHoverBranch(null)}
+              >
+                {facts.heaven_plate[branch]}
+              </strong>
+            ))}
+          </div>
+          <div className="liuren-plate-row generals">
+            <b>天将</b>
+            {facts.earth_plate.map((branch) => (
+              <span
+                key={branch}
+                className={hoverBranch === branch ? "branch-active" : ""}
+                onMouseEnter={() => setHoverBranch(branch)}
+                onMouseLeave={() => setHoverBranch(null)}
+              >
+                {facts.heavenly_generals.by_ground[branch]}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
+
       <section className="liuren-detail-grid">
         <div className="data-band">
-          <div className="band-heading"><div><span className="band-icon"><Grid3X3 size={16} /></span><div><h3>四课</h3><p>下神 → 上神</p></div></div></div>
-          <div className="four-lessons">{facts.four_lessons.map((lesson) => (
-            <div key={lesson.sequence}><span>第{lesson.sequence}课</span><strong>{lesson.lower} → {lesson.upper}</strong><small>{lesson.relation === "none" ? "无直接克" : lesson.relation === "lower_controls_upper" ? "下克上" : "上克下"}</small></div>
-          ))}</div>
+          <div className="band-heading">
+            <div><span className="band-icon"><Grid3X3 size={16} /></span><div><h3>四课</h3><p>下神 → 上神</p></div></div>
+          </div>
+          <div className="four-lessons">
+            {facts.four_lessons.map((lesson) => (
+              <div key={lesson.sequence}>
+                <span>第{lesson.sequence}课</span>
+                <strong>{lesson.lower} → {lesson.upper}</strong>
+                <small>{lesson.relation === "none" ? "无直接克" : lesson.relation === "lower_controls_upper" ? "下克上" : "上克下"}</small>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="data-band">
-          <div className="band-heading"><div><span className="band-icon"><Workflow size={16} /></span><div><h3>三传</h3><p>{transmission.status === "completed" ? `${transmission.lesson_type}路径` : "规则路径未覆盖"}</p></div></div></div>
+          <div className="band-heading">
+            <div><span className="band-icon"><Workflow size={16} /></span><div><h3>三传</h3><p>{transmission.status === "completed" ? `${transmission.lesson_type}路径` : "规则路径未覆盖"}</p></div></div>
+          </div>
           {transmission.status === "completed" ? (
-            <div className="transmission-row">{["初传", "中传", "末传"].map((label, index) => <div key={label}><span>{label}</span><strong>{transmission.transmissions[index]}</strong></div>)}</div>
-          ) : <Notice tone="warning" icon={CircleAlert}>待实现课体：{transmission.pending_path}。系统未生成猜测值。</Notice>}
-        </div>
-      </section>
-      <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
-        <Steps steps={result.steps} />
-      </section>
-      {result.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
-    </div>
-  );
-}
-
-function MountainFact({ label, direction }) {
-  const mountain = direction.mountain;
-  return (
-    <div className="direction-fact">
-      <span>{label}</span>
-      <strong>{mountain.name}</strong>
-      <b>{direction.degree}°</b>
-      <p>{mountain.trigram}卦 · {mountain.element} · {mountain.direction}</p>
-      <small>区间 [{mountain.start_degree}°, {mountain.end_degree}°)</small>
-    </div>
-  );
-}
-
-function MeasurementConsensusView({ result }) {
-  const { measurements, consensus } = result.facts;
-  const aggregate = consensus.aggregate;
-  const statusLabels = { consistent: "一致", boundary_sensitive: "跨山界", inconsistent: "读数不一致" };
-  return (
-    <div className="view-stack">
-      <section className="view-heading">
-        <div><span className="section-kicker">FENGSHUI MEASUREMENT CONSENSUS</span><h2>阳宅多次测量共识</h2><p>每次读数独立修正真北，再以圆周统计汇总方向和保守误差。</p></div>
-        <span className="version-badge">{result.rule_version}</span>
-      </section>
-      <section className="liuren-facts-band">
-        <DataState label="测量次数" value={consensus.sample_count} />
-        <DataState label="共识状态" value={statusLabels[consensus.status]} />
-        <DataState label="最小覆盖弧" value={`${consensus.angular_spread}°`} />
-        <DataState label="方向集中度" value={consensus.resultant_length} mono />
-      </section>
-      {aggregate ? (
-        <>
-          <section className="direction-primary-grid">
-            <MountainFact label="共识坐山" direction={aggregate.sitting} />
-            <div className="direction-axis"><ArrowRight size={24} /><span>相差 180°</span></div>
-            <MountainFact label="共识向首" direction={aggregate.facing} />
-          </section>
-          <section className="data-band">
-            <div className="band-heading"><div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>保守误差范围</h3><p>包含每次读数偏差与设备误差</p></div></div></div>
-            <div className="comparison-counts">
-              <DataState label="圆周均值" value={`${consensus.circular_mean_degree}°`} />
-              <DataState label="最大偏差" value={`${consensus.maximum_deviation}°`} />
-              <DataState label="合并误差 ±" value={`${consensus.effective_measurement_error}°`} />
-              <DataState label="向首候选" value={aggregate.facing.candidate_mountains.map((item) => item.name).join("、")} />
+            <div className="transmission-row">
+              {["初传", "中传", "末传"].map((label, index) => (
+                <div key={label}>
+                  <span>{label}</span>
+                  <strong>{transmission.transmissions[index]}</strong>
+                </div>
+              ))}
             </div>
-          </section>
-        </>
-      ) : <Notice tone="warning" icon={CircleAlert}>这些读数不能形成唯一方向，系统未生成合并山向。请检查是否混入坐山读数或测量方向相反。</Notice>}
-      <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><Compass size={16} /></span><div><h3>逐次真北读数</h3><p>原始输入与修正结果并列保留</p></div></div></div>
-        <div className="measurement-table-wrap">
-          <table className="measurement-table">
-            <thead><tr><th>次数</th><th>原始角度</th><th>基准</th><th>磁偏角</th><th>真北角</th><th>山向</th><th>距分界</th></tr></thead>
-            <tbody>{measurements.map((row) => <tr key={row.sequence}>
-              <td>{row.sequence}</td><td>{row.input.facing_degree}°</td><td>{row.input.input_reference === "magnetic" ? "磁北" : "真北"}</td>
-              <td>{row.input.magnetic_declination}°</td><td>{row.true_facing_degree}°</td><td>{row.facing_mountain.name}</td><td>{row.distance_to_boundary}°</td>
-            </tr>)}</tbody>
-          </table>
+          ) : (
+            <Notice tone="warning" icon={CircleAlert}>待实现课体：{transmission.pending_path}。系统未生成猜测值。</Notice>
+          )}
         </div>
       </section>
+
       <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <div className="band-heading">
+          <div><span className="band-icon"><ListTree size={16} /></span><div><h3>推演步骤</h3><p>{result.engine_version}</p></div></div>
+        </div>
         <Steps steps={result.steps} />
       </section>
-      {result.warnings.map((warning) => <Notice tone={consensus.status === "consistent" ? "neutral" : "warning"} icon={CircleAlert} key={warning}>{warning}</Notice>)}
     </div>
   );
 }
 
-function FengshuiView({ result }) {
-  if (!result) return <MissingModule name="阳宅风水" />;
-  if (result.facts.mode === "multiple_measurements") return <MeasurementConsensusView result={result} />;
-  const { facts } = result;
-  const facing = facts.facing;
-  const sitting = facts.sitting;
+function QimenPalaceCard({ palace, isZhiFu, isZhiShi }) {
+  if (!palace) return null;
+  return (
+    <div className={`qimen-cell p-${palace.palace_number} ${isZhiFu ? "is-zhifu" : ""} ${isZhiShi ? "is-zhishi" : ""}`}>
+      <div className="qimen-cell-header">
+        <span className="qimen-palace-name">{palace.palace_name}</span>
+        <span className="qimen-palace-dir">{palace.direction} · {palace.element}</span>
+      </div>
+
+      {/* 神盘 */}
+      <div className="qimen-spirit-row">
+        <span className="qimen-spirit-tag">{palace.eight_spirit}</span>
+        {isZhiFu && <span className="zhifu-badge">值符星</span>}
+        {isZhiShi && <span className="zhishi-badge">值使门</span>}
+      </div>
+
+      {/* 天盘九星与天盘奇仪 */}
+      <div className="qimen-star-stem-row">
+        <span className="qimen-star">{palace.nine_star}</span>
+        <strong className="qimen-tian-stem" style={{ color: ELEMENT_COLORS[palace.element] || "inherit" }}>
+          {palace.tian_pan_stem}
+        </strong>
+        {palace.is_tian_qin_present && (
+          <small className="qin-stem-tag">禽{palace.qin_stem}</small>
+        )}
+      </div>
+
+      {/* 人盘八门 */}
+      <div className="qimen-gate-row">
+        <span className={`qimen-gate ${["开门", "休门", "生门"].includes(palace.eight_gate) ? "auspicious-gate" : palace.eight_gate === "死门" ? "dead-gate" : ""}`}>
+          {palace.eight_gate}
+        </span>
+      </div>
+
+      {/* 地盘奇仪 */}
+      <div className="qimen-di-stem-row">
+        <small className="di-stem-label">地盘</small>
+        <span className="qimen-di-stem">{palace.di_pan_stem}</span>
+      </div>
+
+      {/* 格局标签 */}
+      {palace.patterns && palace.patterns.length > 0 && (
+        <div className="qimen-pattern-tags">
+          {palace.patterns.map((pat) => (
+            <span key={pat.name} className={`qimen-pattern-pill ${pat.type}`} title={pat.desc}>
+              {pat.name}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function QimenView({ result }) {
+  if (!result) return <MissingModule name="奇门遁甲" />;
+  const palaces = result.palaces || {};
+  const favs = result.favorable_directions || [];
+  const advisory = result.advisory || {};
+
   return (
     <div className="view-stack">
       <section className="view-heading">
-        <div><span className="section-kicker">FENGSHUI DIRECTION</span><h2>阳宅真北坐向</h2><p>磁偏角、坐向换算、二十四山和测量误差按独立规则计算。</p></div>
-        <span className="version-badge">{result.rule_version}</span>
-      </section>
-      <section className="direction-primary-grid">
-        <MountainFact label="坐山" direction={sitting} />
-        <div className="direction-axis"><ArrowRight size={24} /><span>相差 180°</span></div>
-        <MountainFact label="向首" direction={facing} />
-      </section>
-      <section className="two-column-data">
-        <div className="data-band">
-          <div className="band-heading"><div><span className="band-icon"><Compass size={16} /></span><div><h3>真北修正</h3><p>{result.normalized_input.input_reference === "magnetic" ? "磁北输入" : "真北输入"}</p></div></div></div>
-          <div className="key-value-list">
-            <DataState label="原始角度" value={`${result.normalized_input.input_degree}°`} />
-            <DataState label="应用磁偏角" value={`${result.normalized_input.applied_declination}°`} />
-            <DataState label="真北向首" value={`${facts.true_facing_degree}°`} />
-            <DataState label="真北坐山" value={`${facts.true_sitting_degree}°`} />
-          </div>
+        <div>
+          <span className="section-kicker">QIMEN DUNJIA TIME CHART</span>
+          <h2>时家转盘奇门遁甲</h2>
+          <p>拆补法定局、地盘三奇六仪、转盘九星、八门、八神排布与奇门吉凶格局。</p>
         </div>
-        <div className="data-band">
-          <div className="band-heading"><div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>测量稳定性</h3><p>误差 ±{result.normalized_input.measurement_error}°</p></div></div></div>
-          <div className="key-value-list">
-            <DataState label="分类状态" value={facts.classification_stable ? "稳定" : "跨越分界"} />
-            <DataState label="距最近分界" value={`${facing.distance_to_boundary}°`} />
-            <DataState label="向首候选" value={facing.candidate_mountains.map((item) => item.name).join("、")} />
-            <DataState label="坐山候选" value={sitting.candidate_mountains.map((item) => item.name).join("、")} />
-          </div>
+        <span className="version-badge">{result.rule_id}</span>
+      </section>
+
+      <section className="liuren-facts-band">
+        <DataState label="定局局象" value={`【${result.dun_type}${result.ju_number}局 · ${result.yuan_type}】`} />
+        <DataState label="当前节气" value={result.solar_term} />
+        <DataState label="时辰旬首" value={result.xun_shou} />
+        <DataState label="值符星 / 值使门" value={`【${result.zhi_fu_star}】落${result.zhi_fu_palace}宫 / 【${result.zhi_shi_gate}】落${result.zhi_shi_palace}宫`} />
+      </section>
+
+      {/* 洛书九宫方阵 (Row 1: 4, 9, 2; Row 2: 3, 5, 7; Row 3: 8, 1, 6) */}
+      <section className="qimen-plate-wrapper">
+        <div className="qimen-grid">
+          <QimenPalaceCard palace={palaces[4]} isZhiFu={result.zhi_fu_palace === 4} isZhiShi={result.zhi_shi_palace === 4} />
+          <QimenPalaceCard palace={palaces[9]} isZhiFu={result.zhi_fu_palace === 9} isZhiShi={result.zhi_shi_palace === 9} />
+          <QimenPalaceCard palace={palaces[2]} isZhiFu={result.zhi_fu_palace === 2} isZhiShi={result.zhi_shi_palace === 2} />
+
+          <QimenPalaceCard palace={palaces[3]} isZhiFu={result.zhi_fu_palace === 3} isZhiShi={result.zhi_shi_palace === 3} />
+          <QimenPalaceCard palace={palaces[5]} isZhiFu={result.zhi_fu_palace === 5} isZhiShi={result.zhi_shi_palace === 5} />
+          <QimenPalaceCard palace={palaces[7]} isZhiFu={result.zhi_fu_palace === 7} isZhiShi={result.zhi_shi_palace === 7} />
+
+          <QimenPalaceCard palace={palaces[8]} isZhiFu={result.zhi_fu_palace === 8} isZhiShi={result.zhi_shi_palace === 8} />
+          <QimenPalaceCard palace={palaces[1]} isZhiFu={result.zhi_fu_palace === 1} isZhiShi={result.zhi_shi_palace === 1} />
+          <QimenPalaceCard palace={palaces[6]} isZhiFu={result.zhi_fu_palace === 6} isZhiShi={result.zhi_shi_palace === 6} />
         </div>
       </section>
-      <section className="data-band">
-        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
-        <Steps steps={result.steps} />
-      </section>
-      {result.warnings.map((warning) => <Notice tone={facts.boundary_warning ? "warning" : "neutral"} icon={CircleAlert} key={warning}>{warning}</Notice>)}
+
+      {/* 吉方研判 */}
+      {favs.length > 0 && (
+        <section className="data-band">
+          <div className="band-heading">
+            <div><span className="band-icon"><Compass size={16} /></span><div><h3>奇门优选用事方位</h3><p>三吉门（开、休、生）结合三奇与吉神优选</p></div></div>
+          </div>
+          <div className="qimen-fav-grid">
+            {favs.map((f) => (
+              <div key={f.palace_number} className="qimen-fav-card">
+                <div className="fav-card-head">
+                  <strong className="fav-dir">{f.direction}（{f.palace_name}）</strong>
+                  <span className="fav-score-badge">吉度 {f.score} 分</span>
+                </div>
+                <div className="fav-elements-row">
+                  <span className="fav-gate">{f.gate}</span>
+                  <span className="fav-star">{f.star}</span>
+                  <span className="fav-spirit">{f.spirit}</span>
+                </div>
+                <p className="fav-summary">{f.summary}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 奇门决策策略 */}
+      {advisory && (
+        <section className="data-band advisory-band">
+          <div className="band-heading">
+            <div><span className="band-icon"><BookOpen size={16} /></span><div><h3>奇门运筹与决策策略</h3><p>审机夺势，动静有常</p></div></div>
+          </div>
+          <div className="bazi-advisory-cards">
+            <div className="bazi-adv-card">
+              <strong>【局象综述】</strong>
+              <p>{advisory.general}</p>
+            </div>
+            <div className="bazi-adv-card">
+              <strong>【用事行动】</strong>
+              <p>{advisory.action}</p>
+            </div>
+            <div className="bazi-adv-card" style={{ gridColumn: "1 / -1" }}>
+              <strong>【运筹谋略】</strong>
+              <p>{advisory.strategy}</p>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
 
-function ZiweiPalaceCard({ palace }) {
+function BaziPillarCard({ pillar, title }) {
+  if (!pillar) return null;
+  return (
+    <div className="bazi-pillar-card">
+      <div className="bazi-pillar-header">
+        <span className="pillar-title">{title}</span>
+        <span className="pillar-nayin">{pillar.nayin}</span>
+      </div>
+
+      <div className="bazi-pillar-main">
+        <div className="ganzhi-box stem">
+          <span className="ten-god-tag">{pillar.stem_ten_god}</span>
+          <strong className="ganzhi-char" style={{ color: ELEMENT_COLORS[pillar.stem_element] || "inherit" }}>
+            {pillar.stem}
+          </strong>
+          <small className="element-label">{pillar.stem_element}</small>
+        </div>
+
+        <div className="ganzhi-box branch">
+          <span className="stage-tag">{pillar.twelve_stage}</span>
+          <strong className="ganzhi-char" style={{ color: ELEMENT_COLORS[pillar.branch_element] || "inherit" }}>
+            {pillar.branch}
+          </strong>
+          <small className="element-label">{pillar.branch_element}</small>
+        </div>
+      </div>
+
+      <div className="bazi-hidden-section">
+        <span className="hidden-label">地支藏干</span>
+        <div className="hidden-stems-list">
+          {pillar.hidden_stems.map((h, i) => (
+            <div key={i} className="hidden-stem-item">
+              <span className="h-stem" style={{ color: ELEMENT_COLORS[h.element] || "inherit" }}>{h.stem}</span>
+              <span className="h-god">{h.ten_god}</span>
+              <span className="h-type">{h.type}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {pillar.shensha && pillar.shensha.length > 0 && (
+        <div className="bazi-shensha-section">
+          {pillar.shensha.map((s) => (
+            <span key={s} className="bazi-shensha-tag">{s}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BaziView({ result }) {
+  if (!result) return <MissingModule name="八字命理" />;
+  const facts = result.facts || {};
+  const pillars = facts.pillars || {};
+  const strength = result.day_master_strength || facts.day_master_strength || {};
+  const distribution = result.element_distribution || facts.element_distribution || [];
+  const luckPillars = result.luck_pillars || facts.luck_pillars || [];
+  const luckInfo = result.luck_start_info || facts.luck_start_info || {};
+  const advisory = result.advisory || {};
+
+  return (
+    <div className="view-stack">
+      <section className="view-heading">
+        <div>
+          <span className="section-kicker">BAZI ZIPING FOUR PILLARS</span>
+          <h2>八字四柱与大运排盘</h2>
+          <p>子平正统四柱排盘、藏干十神、五行旺衰强弱、吉凶神煞与大运起运推演。</p>
+        </div>
+        <span className="version-badge">{result.rule_id}</span>
+      </section>
+
+      <section className="liuren-facts-band">
+        <DataState label="日元命主" value={`${result.day_master}（${strength.element}）`} />
+        <DataState label="命造性别" value={result.gender === "男" ? "乾造（男命）" : "坤造（女命）"} />
+        <DataState label="公历时刻" value={result.solar_datetime} />
+        <DataState label="农历生辰" value={result.lunar_datetime} />
+      </section>
+
+      <section className="data-band">
+        <div className="band-heading">
+          <div><span className="band-icon"><Sparkles size={16} /></span><div><h3>四柱八字神煞全盘</h3><p>年柱根基 · 月柱提纲 · 日柱自身 · 时柱归宿</p></div></div>
+        </div>
+        <div className="bazi-pillars-grid">
+          <BaziPillarCard pillar={pillars.year} title="年柱（祖荫父母）" />
+          <BaziPillarCard pillar={pillars.month} title="月柱（事业提纲）" />
+          <BaziPillarCard pillar={pillars.day} title="日柱（日元坐下）" />
+          <BaziPillarCard pillar={pillars.hour} title="时柱（子女晚景）" />
+        </div>
+      </section>
+
+      <section className="bazi-analysis-grid">
+        <div className="data-band strength-band">
+          <div className="band-heading">
+            <div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>日主强弱与喜忌五行</h3><p>{strength.analysis?.summary || ""}</p></div></div>
+          </div>
+          <div className="bazi-strength-content">
+            <div className="strength-header-pill">
+              <span className="master-title">日元【{strength.day_master}{strength.element}】</span>
+              <span className={`strength-level-badge level-${strength.level}`}>{strength.level}</span>
+              <span className="strength-score">综合评分 {strength.score} / 100</span>
+            </div>
+            <div className="favorable-pill-row">
+              <div className="fav-group">
+                <span className="group-label">喜用五行：</span>
+                {strength.favorable_elements?.map((elem) => (
+                  <span key={elem} className="elem-pill fav" style={{ backgroundColor: `${ELEMENT_COLORS[elem]}20`, color: ELEMENT_COLORS[elem], borderColor: ELEMENT_COLORS[elem] }}>
+                    {elem}
+                  </span>
+                ))}
+              </div>
+              <div className="fav-group">
+                <span className="group-label">忌神五行：</span>
+                {strength.unfavorable_elements?.map((elem) => (
+                  <span key={elem} className="elem-pill unfav" style={{ backgroundColor: `${ELEMENT_COLORS[elem]}15`, color: ELEMENT_COLORS[elem] }}>
+                    {elem}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="data-band distribution-band">
+          <div className="band-heading">
+            <div><span className="band-icon"><Layers3 size={16} /></span><div><h3>全局五行能量分布</h3><p>综合四柱天干与地支藏干权重折算</p></div></div>
+          </div>
+          <div className="bazi-elements-meter">
+            {distribution.map((item) => (
+              <div key={item.element} className="meter-row">
+                <div className="meter-info">
+                  <span className="meter-elem" style={{ color: ELEMENT_COLORS[item.element] || "inherit" }}>
+                    {item.element}
+                  </span>
+                  <span className="meter-score">{item.score} 分</span>
+                  <span className="meter-pct">{item.percentage}%</span>
+                </div>
+                <div className="meter-bar-track">
+                  <div
+                    className="meter-bar-fill"
+                    style={{
+                      width: `${Math.min(item.percentage, 100)}%`,
+                      backgroundColor: ELEMENT_COLORS[item.element] || "#a66d1e",
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="data-band">
+        <div className="band-heading">
+          <div>
+            <span className="band-icon"><Clock3 size={16} /></span>
+            <div>
+              <h3>大运排盘与起运流年</h3>
+              <p>{luckInfo.description || `大运【${luckInfo.direction}】`}</p>
+            </div>
+          </div>
+          <span className="luck-direction-badge">{luckInfo.direction}</span>
+        </div>
+        <div className="bazi-luck-timeline">
+          {luckPillars.map((luck) => (
+            <div key={luck.index} className="bazi-luck-card">
+              <span className="luck-order">第 {luck.index} 步大运</span>
+              <strong className="luck-ganzhi">{luck.ganzhi}</strong>
+              <span className="luck-god">{luck.stem_ten_god}</span>
+              <span className="luck-nayin">{luck.nayin}</span>
+              <div className="luck-ages">
+                <b>{luck.start_age} - {luck.end_age} 岁</b>
+                <small>{luck.start_year} - {luck.end_year} 年</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {advisory && Object.keys(advisory).length > 0 && (
+        <section className="data-band advisory-band">
+          <div className="band-heading">
+            <div><span className="band-icon"><BookOpen size={16} /></span><div><h3>子平命理研判与调候指引</h3><p>结合五行喜用流通与事项策略</p></div></div>
+          </div>
+          <div className="bazi-advisory-cards">
+            {advisory.general && (
+              <div className="bazi-adv-card">
+                <strong>【全局调候】</strong>
+                <p>{advisory.general}</p>
+              </div>
+            )}
+            {advisory.career && (
+              <div className="bazi-adv-card">
+                <strong>【事业进取】</strong>
+                <p>{advisory.career}</p>
+              </div>
+            )}
+            {advisory.wealth && (
+              <div className="bazi-adv-card">
+                <strong>【求财之道】</strong>
+                <p>{advisory.wealth}</p>
+              </div>
+            )}
+            {advisory.health && (
+              <div className="bazi-adv-card">
+                <strong>【养生调理】</strong>
+                <p>{advisory.health}</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function ZiweiPalaceCard({ palace, isSelected, isSanFang, onClick }) {
   if (!palace) return null;
   const isMing = palace.name === "命宫";
   return (
-    <div className={`ziwei-cell ${isMing ? "is-ming" : ""} ${palace.is_body_palace ? "is-shen" : ""}`}>
+    <div
+      className={`ziwei-cell ${isMing ? "is-ming" : ""} ${palace.is_body_palace ? "is-shen" : ""} ${isSelected ? "is-selected" : ""} ${isSanFang ? "is-sanfang" : ""}`}
+      onClick={() => onClick && onClick(palace.earthly_branch)}
+      style={{ cursor: "pointer" }}
+    >
       <div className="ziwei-cell-header">
         <span className="ziwei-palace-name">
           {palace.name}
@@ -699,6 +1144,8 @@ function ZiweiPalaceCard({ palace }) {
   );
 }
 
+const BRANCH_RING = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+
 function ZiweiView({ result }) {
   if (!result) return <MissingModule name="紫微斗数" />;
   const facts = result.facts;
@@ -707,13 +1154,21 @@ function ZiweiView({ result }) {
     branchMap[p.earthly_branch] = p;
   });
 
+  const [selectedBranch, setSelectedBranch] = useState("寅");
+
+  const currIdx = BRANCH_RING.indexOf(selectedBranch);
+  const oppBranch = BRANCH_RING[(currIdx + 6) % 12];
+  const trine1Branch = BRANCH_RING[(currIdx + 4) % 12];
+  const trine2Branch = BRANCH_RING[(currIdx + 8) % 12];
+  const sanFangBranches = new Set([oppBranch, trine1Branch, trine2Branch]);
+
   return (
     <div className="view-stack">
       <section className="view-heading">
         <div>
           <span className="section-kicker">ZI WEI DOU SHU NATAL CHART</span>
-          <h2>紫微斗数天盘</h2>
-          <p>以农历生辰干支排定十二宫位、五行局、十四正曜与生年四化。</p>
+          <h2>紫微斗数全景天盘</h2>
+          <p>十二宫位、五行局、十四正曜与生年四化交互命盘（点击宫位查看三方四正对宫关联）。</p>
         </div>
         <span className="version-badge">{result.rule_version}</span>
       </section>
@@ -727,22 +1182,20 @@ function ZiweiView({ result }) {
 
       <section className="ziwei-plate-wrapper">
         <div className="ziwei-plate-grid">
-          {/* Row 1: 巳 午 未 申 */}
-          <div className="grid-cell p-si"><ZiweiPalaceCard palace={branchMap["巳"]} /></div>
-          <div className="grid-cell p-wu"><ZiweiPalaceCard palace={branchMap["午"]} /></div>
-          <div className="grid-cell p-wei"><ZiweiPalaceCard palace={branchMap["未"]} /></div>
-          <div className="grid-cell p-shen"><ZiweiPalaceCard palace={branchMap["申"]} /></div>
+          <div className="grid-cell p-si"><ZiweiPalaceCard palace={branchMap["巳"]} isSelected={selectedBranch === "巳"} isSanFang={sanFangBranches.has("巳")} onClick={setSelectedBranch} /></div>
+          <div className="grid-cell p-wu"><ZiweiPalaceCard palace={branchMap["午"]} isSelected={selectedBranch === "午"} isSanFang={sanFangBranches.has("午")} onClick={setSelectedBranch} /></div>
+          <div className="grid-cell p-wei"><ZiweiPalaceCard palace={branchMap["未"]} isSelected={selectedBranch === "未"} isSanFang={sanFangBranches.has("未")} onClick={setSelectedBranch} /></div>
+          <div className="grid-cell p-shen"><ZiweiPalaceCard palace={branchMap["申"]} isSelected={selectedBranch === "申"} isSanFang={sanFangBranches.has("申")} onClick={setSelectedBranch} /></div>
 
-          {/* Row 2: 辰 (center plate) 酉 */}
-          <div className="grid-cell p-chen"><ZiweiPalaceCard palace={branchMap["辰"]} /></div>
+          <div className="grid-cell p-chen"><ZiweiPalaceCard palace={branchMap["辰"]} isSelected={selectedBranch === "辰"} isSanFang={sanFangBranches.has("辰")} onClick={setSelectedBranch} /></div>
           <div className="grid-center-plate">
             <div className="center-info-content">
-              <h3>紫微斗数命盘</h3>
+              <h3>紫微斗数命盘 · 交互中宫</h3>
               <div className="center-info-grid">
                 <div><b>生辰八字：</b><span>{facts.four_pillars.year}年 {facts.four_pillars.month}月 {facts.four_pillars.day}日 {facts.four_pillars.hour}时</span></div>
                 <div><b>农历日期：</b><span>{facts.lunar_calendar.lunar_year}年 {facts.lunar_calendar.is_leap ? "闰" : ""}{facts.lunar_calendar.lunar_month}月{facts.lunar_calendar.lunar_day}日</span></div>
                 <div><b>格局属性：</b><span>{facts.yin_yang_gender} · {facts.bureau.name}</span></div>
-                <div><b>命身宫位：</b><span>命宫在{facts.ming_palace.palace_stem_branch} · 身宫在{facts.shen_palace.palace_stem_branch}</span></div>
+                <div><b>当前聚焦：</b><span className="highlight-tag">{branchMap[selectedBranch]?.name || "宫位"}（{selectedBranch}宫）</span></div>
               </div>
               <div className="center-sihua-row">
                 <span className="sihua-title">生年四化：</span>
@@ -752,17 +1205,15 @@ function ZiweiView({ result }) {
               </div>
             </div>
           </div>
-          <div className="grid-cell p-you"><ZiweiPalaceCard palace={branchMap["酉"]} /></div>
+          <div className="grid-cell p-you"><ZiweiPalaceCard palace={branchMap["酉"]} isSelected={selectedBranch === "酉"} isSanFang={sanFangBranches.has("酉")} onClick={setSelectedBranch} /></div>
 
-          {/* Row 3: 卯 (center plate) 戌 */}
-          <div className="grid-cell p-mao"><ZiweiPalaceCard palace={branchMap["卯"]} /></div>
-          <div className="grid-cell p-xu"><ZiweiPalaceCard palace={branchMap["戌"]} /></div>
+          <div className="grid-cell p-mao"><ZiweiPalaceCard palace={branchMap["卯"]} isSelected={selectedBranch === "卯"} isSanFang={sanFangBranches.has("卯")} onClick={setSelectedBranch} /></div>
+          <div className="grid-cell p-xu"><ZiweiPalaceCard palace={branchMap["戌"]} isSelected={selectedBranch === "戌"} isSanFang={sanFangBranches.has("戌")} onClick={setSelectedBranch} /></div>
 
-          {/* Row 4: 寅 丑 子 亥 */}
-          <div className="grid-cell p-yin"><ZiweiPalaceCard palace={branchMap["寅"]} /></div>
-          <div className="grid-cell p-chou"><ZiweiPalaceCard palace={branchMap["丑"]} /></div>
-          <div className="grid-cell p-zi"><ZiweiPalaceCard palace={branchMap["子"]} /></div>
-          <div className="grid-cell p-hai"><ZiweiPalaceCard palace={branchMap["亥"]} /></div>
+          <div className="grid-cell p-yin"><ZiweiPalaceCard palace={branchMap["寅"]} isSelected={selectedBranch === "寅"} isSanFang={sanFangBranches.has("寅")} onClick={setSelectedBranch} /></div>
+          <div className="grid-cell p-chou"><ZiweiPalaceCard palace={branchMap["丑"]} isSelected={selectedBranch === "丑"} isSanFang={sanFangBranches.has("丑")} onClick={setSelectedBranch} /></div>
+          <div className="grid-cell p-zi"><ZiweiPalaceCard palace={branchMap["子"]} isSelected={selectedBranch === "子"} isSanFang={sanFangBranches.has("子")} onClick={setSelectedBranch} /></div>
+          <div className="grid-cell p-hai"><ZiweiPalaceCard palace={branchMap["亥"]} isSelected={selectedBranch === "亥"} isSanFang={sanFangBranches.has("亥")} onClick={setSelectedBranch} /></div>
         </div>
       </section>
 
@@ -770,133 +1221,266 @@ function ZiweiView({ result }) {
         <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>推演步骤</h3><p>{result.engine_version}</p></div></div></div>
         <Steps steps={result.steps} />
       </section>
+    </div>
+  );
+}
 
-      {result.warnings.map((warning) => <Notice tone="neutral" icon={ShieldCheck} key={warning}>{warning}</Notice>)}
+function MountainFact({ label, direction }) {
+  const mountain = direction.mountain;
+  return (
+    <div className="direction-fact">
+      <span>{label}</span>
+      <strong>{mountain.name}</strong>
+      <b>{direction.degree}°</b>
+      <p>{mountain.trigram}卦 · {mountain.element} · {mountain.direction}</p>
+      <small>区间 [{mountain.start_degree}°, {mountain.end_degree}°)</small>
+    </div>
+  );
+}
+
+function FengshuiCompassDial({ facingDegree = 0, sittingDegree = 180 }) {
+  return (
+    <div className="fengshui-compass-widget">
+      <svg viewBox="0 0 300 300" className="luopan-svg" aria-label="二十四山罗盘">
+        <circle cx="150" cy="150" r="140" fill="#252b28" stroke="#a66d1e" strokeWidth="3" />
+        <circle cx="150" cy="150" r="120" fill="#2d3531" stroke="#d9d8d1" strokeWidth="1" strokeDasharray="3 3" />
+        <circle cx="150" cy="150" r="85" fill="#202622" stroke="#a66d1e" strokeWidth="1.5" />
+        <circle cx="150" cy="150" r="40" fill="#181d1a" stroke="#823024" strokeWidth="2" />
+        
+        <text x="150" y="28" textAnchor="middle" fill="#d9d8d1" fontSize="13" fontWeight="bold">北 (子)</text>
+        <text x="278" y="154" textAnchor="middle" fill="#d9d8d1" fontSize="13" fontWeight="bold">东 (卯)</text>
+        <text x="150" y="282" textAnchor="middle" fill="#d9d8d1" fontSize="13" fontWeight="bold">南 (午)</text>
+        <text x="22" y="154" textAnchor="middle" fill="#d9d8d1" fontSize="13" fontWeight="bold">西 (酉)</text>
+
+        <g transform={`rotate(${facingDegree}, 150, 150)`}>
+          <polygon points="150,45 143,150 157,150" fill="#c62828" />
+          <polygon points="150,255 143,150 157,150" fill="#1565c0" />
+          <circle cx="150" cy="150" r="6" fill="#a66d1e" />
+        </g>
+      </svg>
+      <div className="luopan-legend">
+        <span className="legend-facing"><i />向首：{facingDegree}°</span>
+        <span className="legend-sitting"><i />坐山：{sittingDegree}°</span>
+      </div>
+    </div>
+  );
+}
+
+function MeasurementConsensusView({ result }) {
+  const { measurements, consensus } = result.facts;
+  const aggregate = consensus.aggregate;
+  const statusLabels = { consistent: "一致", boundary_sensitive: "跨山界", inconsistent: "读数不一致" };
+  return (
+    <div className="view-stack">
+      <section className="view-heading">
+        <div><span className="section-kicker">FENGSHUI MEASUREMENT CONSENSUS</span><h2>阳宅多次测量共识</h2><p>每次读数独立修正真北，再以圆周统计汇总方向和保守误差。</p></div>
+        <span className="version-badge">{result.rule_version}</span>
+      </section>
+      <section className="liuren-facts-band">
+        <DataState label="测量次数" value={consensus.sample_count} />
+        <DataState label="共识状态" value={statusLabels[consensus.status]} />
+        <DataState label="最小覆盖弧" value={`${consensus.angular_spread}°`} />
+        <DataState label="方向集中度" value={consensus.resultant_length} mono />
+      </section>
+      {aggregate ? (
+        <>
+          <section className="direction-primary-grid">
+            <MountainFact label="共识坐山" direction={aggregate.sitting} />
+            <div className="direction-axis"><ArrowRight size={24} /><span>相差 180°</span></div>
+            <MountainFact label="共识向首" direction={aggregate.facing} />
+          </section>
+          <FengshuiCompassDial facingDegree={aggregate.facing.degree} sittingDegree={aggregate.sitting.degree} />
+          <section className="data-band">
+            <div className="band-heading"><div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>保守误差范围</h3><p>包含每次读数偏差与设备误差</p></div></div></div>
+            <div className="comparison-counts">
+              <DataState label="圆周均值" value={`${consensus.circular_mean_degree}°`} />
+              <DataState label="最大偏差" value={`${consensus.maximum_deviation}°`} />
+              <DataState label="合并误差 ±" value={`${consensus.effective_measurement_error}°`} />
+              <DataState label="向首候选" value={aggregate.facing.candidate_mountains.map((item) => item.name).join("、")} />
+            </div>
+          </section>
+        </>
+      ) : <Notice tone="warning" icon={CircleAlert}>这些读数不能形成唯一方向，系统未生成合并山向。请检查是否混入坐山读数或测量方向相反。</Notice>}
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><Compass size={16} /></span><div><h3>逐次真北读数</h3><p>原始输入与修正结果并列保留</p></div></div></div>
+        <div className="measurement-table-wrap">
+          <table className="measurement-table">
+            <thead><tr><th>次数</th><th>原始角度</th><th>基准</th><th>磁偏角</th><th>真北角</th><th>山向</th><th>距分界</th></tr></thead>
+            <tbody>{measurements.map((row) => <tr key={row.sequence}>
+              <td>{row.sequence}</td><td>{row.input.facing_degree}°</td><td>{row.input.input_reference === "magnetic" ? "磁北" : "真北"}</td>
+              <td>{row.input.magnetic_declination}°</td><td>{row.true_facing_degree}°</td><td>{row.facing_mountain.name}</td><td>{row.distance_to_boundary}°</td>
+            </tr>)}</tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function FengshuiView({ result }) {
+  if (!result) return <MissingModule name="阳宅风水" />;
+  if (result.facts.mode === "multiple_measurements") return <MeasurementConsensusView result={result} />;
+  const { facts } = result;
+  const facing = facts.facing;
+  const sitting = facts.sitting;
+  return (
+    <div className="view-stack">
+      <section className="view-heading">
+        <div><span className="section-kicker">FENGSHUI DIRECTION</span><h2>阳宅真北坐向与二十四山</h2><p>磁偏角、坐向换算、二十四山和测量误差按独立规则计算。</p></div>
+        <span className="version-badge">{result.rule_version}</span>
+      </section>
+
+      <section className="direction-primary-grid">
+        <MountainFact label="坐山" direction={sitting} />
+        <div className="direction-axis"><ArrowRight size={24} /><span>相差 180°</span></div>
+        <MountainFact label="向首" direction={facing} />
+      </section>
+
+      <FengshuiCompassDial facingDegree={facts.true_facing_degree} sittingDegree={facts.true_sitting_degree} />
+
+      <section className="two-column-data">
+        <div className="data-band">
+          <div className="band-heading"><div><span className="band-icon"><Compass size={16} /></span><div><h3>真北修正</h3><p>{result.normalized_input.input_reference === "magnetic" ? "磁北输入" : "真北输入"}</p></div></div></div>
+          <div className="key-value-list">
+            <DataState label="原始角度" value={`${result.normalized_input.input_degree}°`} />
+            <DataState label="应用磁偏角" value={`${result.normalized_input.applied_declination}°`} />
+            <DataState label="真北向首" value={`${facts.true_facing_degree}°`} />
+            <DataState label="真北坐山" value={`${facts.true_sitting_degree}°`} />
+          </div>
+        </div>
+        <div className="data-band">
+          <div className="band-heading"><div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>测量稳定性</h3><p>误差 ±{result.normalized_input.measurement_error}°</p></div></div></div>
+          <div className="key-value-list">
+            <DataState label="分类状态" value={facts.classification_stable ? "稳定" : "跨越分界"} />
+            <DataState label="距最近分界" value={`${facing.distance_to_boundary}°`} />
+            <DataState label="向首候选" value={facing.candidate_mountains.map((item) => item.name).join("、")} />
+            <DataState label="坐山候选" value={sitting.candidate_mountains.map((item) => item.name).join("、")} />
+          </div>
+        </div>
+      </section>
+      <section className="data-band">
+        <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>计算依据</h3><p>{result.engine_version}</p></div></div></div>
+        <Steps steps={result.steps} />
+      </section>
     </div>
   );
 }
 
 function ComparisonView({ comparison }) {
   const categories = [
-    ["consistent", "一致", "同维度、同时间范围内倾向相同"],
-    ["complementary", "互补", "不同模块提供不同侧面的判断"],
-    ["conflicts", "冲突", "同维度、同时间范围内出现明确相反判断"],
-    ["unpaired", "未配对", "只有一个模块提供了可用判断"],
+    { title: "确定性直接重合", items: comparison.agreements, tone: "agreement" },
+    { title: "规则冲突或分支", items: comparison.conflicts, tone: "conflict" },
+    { title: "补充关联与类象", items: comparison.complementary, tone: "complementary" },
+    { title: "系统边界与无法判定", items: comparison.undetermined, tone: "undetermined" },
   ];
+
   return (
     <div className="view-stack">
       <section className="view-heading">
-        <div><span className="section-kicker">COMPARISON</span><h2>对照分析</h2><p>保留模块独立结果，不通过加权或平均隐藏分歧。</p></div>
-        <span className="version-badge">无自动评分</span>
+        <div>
+          <span className="section-kicker">CROSS-DISCIPLINE COMPARISON</span>
+          <h2>多模块推演对照</h2>
+          <p>仅比较结构化规则证据与盘面事实，不生成综合吉凶打分。</p>
+        </div>
+        <span className="version-badge">{comparison.rule_version}</span>
       </section>
-      <section className="comparison-counts large">
-        {categories.map(([key, label]) => <DataState key={key} label={label} value={comparison.counts[key]} />)}
-        <DataState label="排除" value={comparison.counts.excluded} />
+
+      <section className="comparison-counts">
+        <DataState label="重合证据" value={comparison.agreement_count} />
+        <DataState label="冲突分歧" value={comparison.conflict_count} />
+        <DataState label="互补补充" value={comparison.complementary_count} />
+        <DataState label="边界受限" value={comparison.undetermined_count} />
       </section>
-      {comparison.notices.map((notice) => <Notice key={notice}>{notice}</Notice>)}
-      <section className="data-band comparison-method">
-        <div className="band-heading"><div><span className="band-icon"><GitCompareArrows size={16} /></span><div><h3>分类结果</h3><p>{comparison.strategy}</p></div></div></div>
-        {categories.map(([key, label, description]) => (
-          <div className="comparison-category" key={key}>
-            <div><strong>{label}</strong><span>{description}</span></div>
-            <b>{comparison[key].length}</b>
+
+      {categories.map(({ title, items, tone }) => (
+        <section className={`data-band ${tone}-band`} key={title}>
+          <div className="band-heading">
+            <div><span className="band-icon"><GitCompareArrows size={16} /></span><div><h3>{title}</h3><p>共 {items.length} 项</p></div></div>
           </div>
-        ))}
-      </section>
-      <Notice tone="neutral" icon={ShieldCheck}>
-        当前工程规则均处于草稿状态，模块没有已发布的解释判断。因此此处只报告“暂无可比较判断”，不会从卦象或体用关系自动推断事项吉凶。
-      </Notice>
+          {items.length ? (
+            <div className="comparison-items">
+              {items.map((item) => (
+                <article className="comparison-card" key={item.item_id}>
+                  <header>
+                    <strong>{item.title}</strong>
+                    <div className="module-tags">{item.modules.map((m) => <span key={m}>{m}</span>)}</div>
+                  </header>
+                  <p>{item.description}</p>
+                  <div className="rule-ref">{item.rule_ids.join(" · ")}</div>
+                </article>
+              ))}
+            </div>
+          ) : <div className="empty-inline">本次推演中未检测到该类关系。</div>}
+        </section>
+      ))}
     </div>
   );
 }
 
 function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, interpretation }) {
-  const icons = { calendar: CalendarDays, zhouyi: BookOpen, meihua: Compass, liuyao: Grid3X3, liuren: Workflow, ziwei: Sparkles, fengshui: Mountain };
+  const icons = { zhouyi: BookOpen, meihua: Compass, liuyao: Grid3X3, liuren: Workflow, qimen: Compass, bazi: Sparkles, ziwei: Sparkles, fengshui: Mountain };
+
   return (
-    <div className="view-stack explanation-view">
+    <div className="view-stack">
       <section className="view-heading">
         <div>
-          <span className="section-kicker">COMPREHENSIVE ADVISORY & INTERPRETATION</span>
-          <h2>推演结果详解与所问事项综合建议</h2>
-          <p>融合传统易数哲理、卦象类象与现代决策模型，全面剖析现状、演变趋势与落地行动策略。</p>
+          <span className="section-kicker">ADVISORY & CORPUS INSIGHTS</span>
+          <h2>综合推演研判与古籍引证</h2>
+          <p>融合事项研判策略、卦象含义、3300万字经典古籍引证与多维决策清单。</p>
         </div>
-        <span className="version-badge">{explanation.generation_method}</span>
+        <span className="version-badge">{advisory?.schema_version || "2.0"}</span>
       </section>
 
       {advisory && (
         <>
-          {/* 1. 所问事项核心研判与定调 */}
-          <section className="advisory-lead">
-            <div className="advisory-status">
-              <span className="badge category-badge">{advisory.context.category_label}事项研判</span>
-              <span className="badge-sub">{advisory.conclusion.confidence_label}</span>
-            </div>
-            <p className="advisory-question">“{advisory.context.question_summary}”</p>
-            <h3 className="advisory-headline">{advisory.conclusion.headline}</h3>
-            <p className="advisory-conclusion">{advisory.conclusion.text}</p>
+          <section className="advisory-headline-card">
+            <div className="advisory-headline-badge">{advisory.context.category_label}领域 · 核心研判</div>
+            <h3>{advisory.conclusion.headline}</h3>
+            <p className="advisory-headline-summary">{advisory.conclusion.text}</p>
           </section>
 
-          {/* 2. 三维深度剖析卡片：现状剖析 / 演变趋势 / 潜在盲区 */}
-          {advisory.domain_analysis && (
-            <section className="domain-analysis-grid">
-              <div className="analysis-card status-card">
-                <div className="analysis-card-head">
-                  <span className="card-indicator status-dot-green"></span>
-                  <h4>现状与基础剖析</h4>
-                </div>
-                <ul>
-                  {advisory.domain_analysis.status_quo?.map((item, idx) => (
-                    <li key={idx}>{item}</li>
-                  ))}
-                </ul>
+          <section className="advisory-domain-grid">
+            <div className="data-band domain-status-band">
+              <div className="band-heading">
+                <div><span className="band-icon"><CheckCircle2 size={16} /></span><div><h3>现状与格局剖析</h3><p>立足当前基本面与各系统定位</p></div></div>
               </div>
-
-              <div className="analysis-card trend-card">
-                <div className="analysis-card-head">
-                  <span className="card-indicator status-dot-blue"></span>
-                  <h4>演变趋势与转折</h4>
-                </div>
-                <ul>
-                  {advisory.domain_analysis.trend_evolution?.map((item, idx) => (
-                    <li key={idx}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="analysis-card risk-card">
-                <div className="analysis-card-head">
-                  <span className="card-indicator status-dot-orange"></span>
-                  <h4>潜在盲区与风险</h4>
-                </div>
-                <ul>
-                  {advisory.domain_analysis.risk_and_pitfalls?.map((item, idx) => (
-                    <li key={idx}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-          )}
-
-          {/* 3. 落地行动建议清单 */}
-          <section className="data-band recommendations-band">
-            <div className="band-heading">
-              <div>
-                <span className="band-icon"><CheckCircle2 size={16} /></span>
-                <div>
-                  <h3>分步行动与应对策略</h3>
-                  <p>按事物发展阶段循序推进，以实际反馈动态校准后续决策</p>
-                </div>
-              </div>
+              <ul className="styled-list">
+                {advisory.domain_analysis.status_quo.map((point, i) => <li key={i}>{point}</li>)}
+              </ul>
             </div>
-            <div className="recommendation-list">
+
+            <div className="data-band domain-trend-band">
+              <div className="band-heading">
+                <div><span className="band-icon"><ArrowRight size={16} /></span><div><h3>演变趋向与关口</h3><p>动变爻位、三传发端与运势流转</p></div></div>
+              </div>
+              <ul className="styled-list">
+                {advisory.domain_analysis.trend_evolution.map((point, i) => <li key={i}>{point}</li>)}
+              </ul>
+            </div>
+
+            <div className="data-band domain-risk-band">
+              <div className="band-heading">
+                <div><span className="band-icon"><CircleAlert size={16} /></span><div><h3>潜在盲区与风险点</h3><p>化忌考验、动爻生克与决策红线</p></div></div>
+              </div>
+              <ul className="styled-list">
+                {advisory.domain_analysis.risk_and_pitfalls.map((point, i) => <li key={i}>{point}</li>)}
+              </ul>
+            </div>
+          </section>
+
+          <section className="data-band advisory-recommendations-band">
+            <div className="band-heading">
+              <div><span className="band-icon"><ShieldCheck size={16} /></span><div><h3>分阶段落地行动策略</h3><p>象法指导、卦德践行与务实风控结合</p></div></div>
+            </div>
+            <div className="advisory-recs-list">
               {advisory.recommendations.map((recommendation) => (
-                <div className="recommendation-row" key={recommendation.priority}>
-                  <div className="recommendation-left">
-                    <span className="recommendation-priority">{recommendation.priority}</span>
-                    {recommendation.phase && <span className="recommendation-phase">{recommendation.phase}</span>}
-                  </div>
-                  <div className="recommendation-body">
-                    <strong>{recommendation.title}</strong>
+                <div className="rec-card" key={recommendation.title}>
+                  <div className="rec-priority">{recommendation.priority}</div>
+                  <div className="rec-body">
+                    <div className="rec-top">
+                      <h4>{recommendation.title}</h4>
+                      <span className="rec-phase-tag">{recommendation.phase}</span>
+                    </div>
                     <p>{recommendation.detail}</p>
                     <small>依据与原理：{recommendation.basis}</small>
                     <div className="explanation-rules">
@@ -908,7 +1492,6 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
             </div>
           </section>
 
-          {/* 4. 决策前需要核实的问题 */}
           <section className="advisory-support-grid">
             <div className="data-band verification-band">
               <div className="band-heading">
@@ -922,22 +1505,66 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
               </div>
               {advisory.evidence_basis.length ? advisory.evidence_basis.map((basis, idx) => (
                 <div className="advisory-basis-row" key={idx}>
-                  <strong>{basis.module === "zhouyi" ? "周易" : (basis.module === "meihua" ? "梅花" : basis.module)}</strong>
+                  <strong>{basis.module === "zhouyi" ? "周易" : basis.module === "meihua" ? "梅花" : basis.module === "bazi" ? "八字" : basis.module === "qimen" ? "奇门" : basis.module}</strong>
                   <span>{basis.fact}</span>
                   <code>{basis.rule_ids.join(" · ")}</code>
                 </div>
-              )) : <p className="empty-inline">融合周易卦德、梅花体用、六爻世应与紫微命盘事实。</p>}
+              )) : <p className="empty-inline">融合周易卦德、梅花体用、六爻世应、子平八字与紫微命盘事实。</p>}
             </div>
-          </section>
-
-          <section className="advisory-risk-band">
-            <div><CircleAlert size={18} /><strong>决策边界与理性提醒</strong></div>
-            <ul>{advisory.risk_notes.map((note) => <li key={note}>{note}</li>)}</ul>
           </section>
         </>
       )}
 
-      {/* 5. 推演结果 · 各系统卦象含义全景解析 */}
+      <section className="data-band literature-band">
+        <div className="band-heading">
+          <div>
+            <span className="band-icon"><BookOpen size={16} /></span>
+            <div>
+              <h3>典籍引证与高价值古籍断语</h3>
+              <p>从 3300 万字经典古籍库中精准召回与本次卦象、日主及事项高度相关的断语</p>
+            </div>
+          </div>
+          <span className={`literature-status ${literature?.status || "unavailable"}`}>{literature?.status || "unavailable"}</span>
+        </div>
+        {literature?.books?.length ? (
+          <div className="literature-list">
+            {literature.books.map((book) => (
+              <article className="literature-item" key={book.citation_id}>
+                <header>
+                  <div>
+                    <span>{book.citation_id}</span>
+                    <h4>《{book.title}》</h4>
+                    {book.is_fallback && <span className="fallback-badge">内置经典库</span>}
+                  </div>
+                  <div className="lit-meta-right">
+                    <span className="relevance-score-badge">相关度 {book.relevance_score}</span>
+                    <small>{book.calculation_role} · 匹配“{book.matched_term}”</small>
+                  </div>
+                </header>
+                <blockquote>{book.excerpt}</blockquote>
+                <div className="book-opinion">
+                  <strong>书中观点</strong>
+                  <p>{book.book_opinion}</p>
+                </div>
+                <div className="book-application">
+                  <strong>当前事项参考</strong>
+                  <p>{book.application_note}</p>
+                </div>
+                <footer>
+                  <span>{book.chunk_id} · hash {book.content_sha256?.slice(0, 12)}</span>
+                  <a href={book.source_url} target="_blank" rel="noreferrer">查看来源 <ExternalLink size={13} /></a>
+                </footer>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <Notice tone="neutral" icon={BookOpen}>{literature?.warnings?.[0] || "当前没有找到与卦象直接匹配的书籍片段。"}</Notice>
+        )}
+        {literature?.warnings?.map((warning) => (
+          <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>
+        ))}
+      </section>
+
       {interpretation && (
         <section className="data-band correspondence-band">
           <div className="band-heading">
@@ -1013,12 +1640,6 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
             <span>纪元：{yuanHui.facts.epoch.label}</span>
             <code>YHYS-CYCLE-001</code>
           </div>
-          <div className="yuanhui-evidence">
-            {yuanHui.evidence.map((item) => (
-              <div key={item.evidence_id}><strong>{item.module} · {item.role}</strong><span>{item.label}</span><code>{item.rule_ids.join(" · ")}</code></div>
-            ))}
-          </div>
-          {yuanHui.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
         </section>
       )}
 
@@ -1040,49 +1661,8 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
               </div>
             ))}
           </div>
-          {Object.keys(imagery.liuyao_relative_summary).length > 0 && (
-            <div className="relative-summary"><strong>六爻六亲分布</strong><span>{Object.entries(imagery.liuyao_relative_summary).map(([name, count]) => `${name} ${count}`).join(" · ")}</span></div>
-          )}
-          {imagery.warnings.map((warning) => <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>)}
         </section>
       )}
-
-      <section className="data-band literature-band">
-        <div className="band-heading">
-          <div><span className="band-icon"><BookOpen size={16} /></span><div><h3>书籍中的明确观点</h3><p>根据本卦和变卦检索内部缓存书籍，并保留原文与来源</p></div></div>
-          <span className={`literature-status ${literature?.status || "unavailable"}`}>{literature?.status || "unavailable"}</span>
-        </div>
-        {literature?.books?.length ? (
-          <div className="literature-list">
-            {literature.books.map((book) => (
-              <article className="literature-item" key={book.citation_id}>
-                <header>
-                  <div><span>{book.citation_id}</span><h4>《{book.title}》</h4></div>
-                  <small>{book.calculation_role} · 匹配“{book.matched_term}”</small>
-                </header>
-                <blockquote>{book.excerpt}</blockquote>
-                <div className="book-opinion">
-                  <strong>书中观点</strong>
-                  <p>{book.book_opinion}</p>
-                </div>
-                <div className="book-application">
-                  <strong>当前事项参考</strong>
-                  <p>{book.application_note}</p>
-                </div>
-                <footer>
-                  <span>{book.chunk_id} · hash {book.content_sha256.slice(0, 12)}</span>
-                  <a href={book.source_url} target="_blank" rel="noreferrer">查看来源 <ExternalLink size={13} /></a>
-                </footer>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <Notice tone="neutral" icon={BookOpen}>{literature?.warnings?.[0] || "当前没有找到与卦象直接匹配的书籍片段。"}</Notice>
-        )}
-        {literature?.books?.length > 0 && literature.warnings.map((warning) => (
-          <Notice tone="warning" icon={CircleAlert} key={warning}>{warning}</Notice>
-        ))}
-      </section>
 
       <section className="explanation-lead">
         <span>计算结果摘要</span>
@@ -1098,40 +1678,21 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
             </div>
             <div className="explanation-sections">
               {module.sections.map((section, index) => (
-                <div className="explanation-row" key={section.title}>
-                  <span className="explanation-index">{index + 1}</span>
-                  <div>
-                    <strong>{section.title}</strong>
+                <div className="explanation-section" key={`${section.rule_id}-${index}`}>
+                  <div className="section-meta">
+                    <span className="explanation-index">{index + 1}</span>
+                    <span className="rule-badge">{section.rule_id}</span>
+                  </div>
+                  <div className="section-body">
+                    <h4>{section.heading}</h4>
                     <p>{section.text}</p>
-                    <div className="explanation-rules">{section.rule_ids.map((rule) => <code key={rule}>{rule}</code>)}</div>
                   </div>
                 </div>
               ))}
             </div>
-            {module.limitations.map((limitation) => (
-              <Notice tone="warning" icon={CircleAlert} key={limitation}>{limitation}</Notice>
-            ))}
           </section>
         );
       })}
-
-      <section className="data-band conclusion-band">
-        <div className="band-heading">
-          <div><span className="band-icon"><GitCompareArrows size={16} /></span><div><h3>{explanation.conclusion.title}</h3><p>{explanation.conclusion.status}</p></div></div>
-        </div>
-        <p>{explanation.conclusion.text}</p>
-        <div className="comparison-counts">
-          <DataState label="一致" value={explanation.conclusion.counts.consistent} />
-          <DataState label="互补" value={explanation.conclusion.counts.complementary} />
-          <DataState label="冲突" value={explanation.conclusion.counts.conflicts} />
-          <DataState label="排除" value={explanation.conclusion.counts.excluded} />
-        </div>
-      </section>
-
-      <section className="limitations-band">
-        <div><ShieldCheck size={18} /><strong>说明边界</strong></div>
-        <ul>{explanation.limitations.map((limitation) => <li key={limitation}>{limitation}</li>)}</ul>
-      </section>
     </div>
   );
 }
@@ -1165,14 +1726,33 @@ function EmptyWorkspace() {
 }
 
 export default function ResultWorkspace({ result, context, activeTab, setActiveTab }) {
+  const [copied, setCopied] = useState(false);
+
   if (!result) return <main className="result-workspace"><EmptyWorkspace /></main>;
   const calendar = findModule(result, "calendar");
   const zhouyi = findModule(result, "zhouyi");
   const meihua = findModule(result, "meihua");
   const liuyao = findModule(result, "liuyao");
   const liuren = findModule(result, "liuren");
+  const qimen = findModule(result, "qimen");
+  const bazi = findModule(result, "bazi");
   const ziwei = findModule(result, "ziwei");
   const fengshui = findModule(result, "fengshui");
+
+  const handleCopyReport = async () => {
+    const md = generateMarkdownReport(result, context);
+    await copyToClipboard(md);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownloadReport = () => {
+    const md = generateMarkdownReport(result, context);
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const filename = `天机演象推演报告_${context?.question?.slice(0, 10) || "事项"}_${dateStr}.md`;
+    downloadMarkdownFile(md, filename);
+  };
+
   return (
     <main className="result-workspace">
       <header className="result-header">
@@ -1180,7 +1760,19 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
           <div className="status-dot" />
           <div><strong>{context.question}</strong><span>{result.task_id}</span></div>
         </div>
-        <div className="task-meta"><span>已完成</span><time>{new Date(result.calculated_at).toLocaleString("zh-CN", { hour12: false })}</time></div>
+        <div className="task-meta">
+          <div className="export-action-group">
+            <button className="export-btn" onClick={handleCopyReport} title="复制 Markdown 研判摘要">
+              {copied ? <Check size={14} className="copied-icon" /> : <Copy size={14} />}
+              <span>{copied ? "已复制" : "复制报告"}</span>
+            </button>
+            <button className="export-btn" onClick={handleDownloadReport} title="下载 Markdown 报告文件">
+              <Download size={14} />
+              <span>导出报告</span>
+            </button>
+          </div>
+          <time>{new Date(result.calculated_at).toLocaleString("zh-CN", { hour12: false })}</time>
+        </div>
       </header>
       <nav className="result-tabs" aria-label="结果视图">
         {TABS.map(({ id, label, icon: Icon }) => (
@@ -1190,16 +1782,42 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         ))}
       </nav>
       <div className="result-content">
-        {activeTab === "overview" && <Overview result={result} context={context} calendar={calendar} zhouyi={zhouyi} meihua={meihua} liuyao={liuyao} liuren={liuren} ziwei={ziwei} fengshui={fengshui} onTab={setActiveTab} />}
+        {activeTab === "overview" && (
+          <Overview
+            result={result}
+            context={context}
+            calendar={calendar}
+            zhouyi={zhouyi}
+            meihua={meihua}
+            liuyao={liuyao}
+            liuren={liuren}
+            qimen={qimen}
+            bazi={bazi}
+            ziwei={ziwei}
+            fengshui={fengshui}
+            onTab={setActiveTab}
+          />
+        )}
         {activeTab === "calendar" && <CalendarView calendar={calendar} />}
         {activeTab === "zhouyi" && <ZhouyiView result={zhouyi} />}
         {activeTab === "meihua" && <MeihuaView result={meihua} />}
         {activeTab === "liuyao" && <LiuyaoView result={liuyao} />}
         {activeTab === "liuren" && <LiurenView result={liuren} />}
+        {activeTab === "qimen" && <QimenView result={qimen} />}
+        {activeTab === "bazi" && <BaziView result={bazi} />}
         {activeTab === "ziwei" && <ZiweiView result={ziwei} />}
         {activeTab === "fengshui" && <FengshuiView result={fengshui} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}
-        {activeTab === "explanation" && <ExplanationView explanation={result.explanation} advisory={result.advisory} literature={result.literature} imagery={result.imagery} yuanHui={result.yuan_hui_yun_shi} interpretation={result.interpretation} />}
+        {activeTab === "explanation" && (
+          <ExplanationView
+            explanation={result.explanation}
+            advisory={result.advisory}
+            literature={result.literature}
+            imagery={result.imagery}
+            yuanHui={result.yuan_hui_yun_shi}
+            interpretation={result.interpretation}
+          />
+        )}
       </div>
     </main>
   );
