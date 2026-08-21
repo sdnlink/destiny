@@ -70,5 +70,41 @@
     "license": "unknown",
     "access_status": "blocked_license_unknown",
     "notes": "文件名含非官方电子书来源标识，未确认授权前禁止解析和入库"
+  },
+  {
+    "source_id": "calendar-source-lifasuyuan",
+    "name": "《历法溯源》（周鹏、张振翔著）",
+    "category": "canonical_calendar",
+    "url": "local://数据/历法/2024最新《历法溯源》周鹏、张振翔著.pdf",
+    "license": "academic-reference-internal",
+    "access_status": "available",
+    "notes": "历法起源、河图生成数理、圭表测影、八卦与地支斗建、二十八宿古度、阴阳合历与金文历谱"
+  },
+  {
+    "source_id": "calendar-source-xingkongdiguo",
+    "name": "《星空帝国——中国古代星宿揭秘》",
+    "category": "canonical_astronomy",
+    "url": "local://数据/历法/pdg  星空帝国  中国古代星宿揭秘.pdf",
+    "license": "academic-reference-internal",
+    "access_status": "available",
+    "notes": "三垣二十八宿星官系统、步天歌、四象七政五行禽星、距星与星象分野"
+  },
+  {
+    "source_id": "calendar-source-manbuzhongguoxingkong",
+    "name": "《漫步中国星空》（齐锐、万昊宜著）",
+    "category": "canonical_astronomy",
+    "url": "local://数据/历法/漫步中国星空.pdf",
+    "license": "academic-reference-internal",
+    "access_status": "available",
+    "notes": "宋代皇祐星象、步天歌全文及星官索引、中西对照星官坐标"
+  },
+  {
+    "source_id": "calendar-source-tianticeliang",
+    "name": "《中国古代天体测量学及天文仪器》（薄树人等著）",
+    "category": "canonical_astronomy",
+    "url": "local://数据/历法/中国古代天体测量学及天文仪器.pdf",
+    "license": "academic-reference-internal",
+    "access_status": "available",
+    "notes": "中国古代历代历法（古六历、太初历、四分历、大明历、皇极历、大衍历、授时历、时宪历等）天体测量常数与算法体系"
   }
 ]

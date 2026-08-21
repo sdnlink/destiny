@@ -408,3 +408,100 @@ CREATE TABLE IF NOT EXISTS destiny.corpus_ingestion_runs
 )
 ENGINE = ReplacingMergeTree(created_at)
 ORDER BY run_id;
+
+CREATE TABLE IF NOT EXISTS destiny.twenty_eight_mansions
+(
+    ordinal UInt8,
+    name String,
+    quadrant LowCardinality(String),
+    beast_spirit String,
+    seven_governor LowCardinality(String),
+    animal String,
+    element LowCardinality(String),
+    ancient_degrees Float32,
+    song_degrees Float32,
+    determinative_star String,
+    star_count UInt16,
+    earthly_branch LowCardinality(String),
+    solar_longitude_range String,
+    luck_nature LowCardinality(String),
+    song_lyrics String,
+    imagery_meanings Array(String),
+    source_id String,
+    rule_version String
+)
+ENGINE = ReplacingMergeTree
+ORDER BY ordinal;
+
+CREATE TABLE IF NOT EXISTS destiny.three_enclosures
+(
+    ordinal UInt8,
+    name String,
+    alias String,
+    star_count UInt16,
+    official_count UInt16,
+    symbolism String,
+    song_lyrics String,
+    key_officials Array(String),
+    source_id String,
+    rule_version String
+)
+ENGINE = ReplacingMergeTree
+ORDER BY ordinal;
+
+CREATE TABLE IF NOT EXISTS destiny.historical_calendars
+(
+    ordinal UInt8,
+    calendar_id String,
+    name String,
+    dynasty LowCardinality(String),
+    author String,
+    year_created String,
+    tropical_year_days Float64,
+    synodic_month_days Float64,
+    intercalary_cycle String,
+    precession_constant String,
+    epoch_baseline String,
+    innovations Array(String),
+    historical_significance String,
+    source_id String,
+    rule_version String
+)
+ENGINE = ReplacingMergeTree
+ORDER BY ordinal;
+
+CREATE TABLE IF NOT EXISTS destiny.hetu_numerology
+(
+    pair_id UInt8,
+    generating_number UInt8,
+    forming_number UInt8,
+    element LowCardinality(String),
+    direction LowCardinality(String),
+    season LowCardinality(String),
+    trigram_earlier String,
+    trigram_later String,
+    principle String,
+    yinyang_formula String,
+    imagery_items Array(String),
+    source_id String,
+    rule_version String
+)
+ENGINE = ReplacingMergeTree
+ORDER BY pair_id;
+
+CREATE TABLE IF NOT EXISTS destiny.lunar_phase_regimes
+(
+    ordinal UInt8,
+    phase_code LowCardinality(String),
+    name String,
+    lunar_day_start UInt8,
+    lunar_day_end UInt8,
+    astronomical_phase String,
+    bronze_inscription_usage String,
+    cultural_implication String,
+    source_id String,
+    rule_version String
+)
+ENGINE = ReplacingMergeTree
+ORDER BY ordinal;
+

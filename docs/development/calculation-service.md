@@ -76,6 +76,11 @@ APP_API_BIND=0.0.0.0 APP_API_TOKEN='replace-me' ./scripts/run_mvp_api.sh
 | `GET` | `/v1/constants/sexagenary-cycle` | 六十甲子与纳音五行常量（自数据库读取） |
 | `GET` | `/v1/constants/fengshui-mountains` | 风水二十四山度数与八卦归属常量（自数据库读取） |
 | `GET` | `/v1/constants/luoshu-palaces` | 洛书九宫五行方位常量（自数据库读取） |
+| `GET` | `/v1/constants/twenty-eight-mansions` | 二十八宿四象、禽星、古宿度与类象常量（自数据库读取，支持`quadrant`筛选） |
+| `GET` | `/v1/constants/three-enclosures` | 三垣星官体系与步天歌总诀常量（自数据库读取） |
+| `GET` | `/v1/constants/historical-calendars` | 中国历代代表性历法（太初/大明/大衍/授时/时宪等）参数与算法常量（自数据库读取，支持`dynasty`筛选） |
+| `GET` | `/v1/constants/hetu-numerology` | 河图五行生成数理与干支化气常量（自数据库读取，支持`element`筛选） |
+| `GET` | `/v1/constants/lunar-phases` | 西周金文四分月相（初吉/既生霸/既望/既死霸）定义与历谱常量（自数据库读取） |
 | `GET` | `/v1/database/stats` | ClickHouse 数据库连接状态与表行数统计 |
 | `GET` | `/v1/rules` | 规则目录，可按`system`、`status`筛选 |
 | `GET` | `/v1/validation-cases` | 工程案例，可按`system`筛选 |

@@ -140,6 +140,32 @@ class CalendarEngine:
             except Exception:
                 pass
 
+        # 28宿与四象对应
+        xiu_name = reference_lunar.getXiu()
+        mansion_beast_map = {
+            "角": "角木蛟", "亢": "亢金龙", "氐": "氐土貉", "房": "房日兔", "心": "心月狐", "尾": "尾火虎", "箕": "箕水豹",
+            "斗": "斗木獬", "牛": "牛金牛", "女": "女土蝠", "虚": "虚日鼠", "危": "危月燕", "室": "室火猪", "壁": "壁水貐",
+            "奎": "奎木狼", "娄": "娄金狗", "胃": "胃土雉", "昴": "昴日鸡", "毕": "毕月乌", "觜": "觜火猴", "参": "参水猿",
+            "井": "井木犴", "鬼": "鬼金羊", "柳": "柳土獐", "星": "星日马", "张": "张月鹿", "翼": "翼火蛇", "轸": "轸水蚓",
+        }
+        mansion_quad_map = {
+            "角": "东方苍龙", "亢": "东方苍龙", "氐": "东方苍龙", "房": "东方苍龙", "心": "东方苍龙", "尾": "东方苍龙", "箕": "东方苍龙",
+            "斗": "北方玄武", "牛": "北方玄武", "女": "北方玄武", "虚": "北方玄武", "危": "北方玄武", "室": "北方玄武", "壁": "北方玄武",
+            "奎": "西方白虎", "娄": "西方白虎", "胃": "西方白虎", "昴": "西方白虎", "毕": "西方白虎", "觜": "西方白虎", "参": "西方白虎",
+            "井": "南方朱雀", "鬼": "南方朱雀", "柳": "南方朱雀", "星": "南方朱雀", "张": "南方朱雀", "翼": "南方朱雀", "轸": "南方朱雀",
+        }
+
+        # 西周金文四分月相
+        lunar_day = reference_lunar.getDay()
+        if lunar_day <= 8:
+            lunar_phase_regime = {"code": "chuji", "name": "初吉", "description": "新月至上弦，月牙始苏，阳德初升"}
+        elif lunar_day <= 15:
+            lunar_phase_regime = {"code": "jishengba", "name": "既生霸", "description": "上弦至满月，月魄渐生，光明充盈"}
+        elif lunar_day <= 23:
+            lunar_phase_regime = {"code": "jiwang", "name": "既望", "description": "满月至下弦，月华极盛，圆满始亏"}
+        else:
+            lunar_phase_regime = {"code": "jisiba", "name": "既死霸", "description": "下弦至晦日，月魄渐隐，归息敛藏"}
+
         return {
             "schema_version": "2.0",
             "system": "calendar",
@@ -178,10 +204,13 @@ class CalendarEngine:
             "almanac": {
                 "duty_officer": reference_lunar.getZhiXing(),
                 "twenty_eight_mansion": {
-                    "name": reference_lunar.getXiu(),
+                    "name": xiu_name,
+                    "beast_spirit": mansion_beast_map.get(xiu_name, xiu_name),
+                    "quadrant": mansion_quad_map.get(xiu_name, ""),
                     "luck": reference_lunar.getXiuLuck(),
                     "song": reference_lunar.getXiuSong(),
                 },
+                "lunar_phase_regime": lunar_phase_regime,
                 "day_tian_shen": {
                     "name": reference_lunar.getDayTianShen(),
                     "type": reference_lunar.getDayTianShenType(),

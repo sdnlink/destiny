@@ -52,6 +52,11 @@ def main():
         ("sexagenary_cycle", "六十甲子与纳音表"),
         ("fengshui_mountains", "二十四山方位表"),
         ("luoshu_palaces", "洛书九宫属性表"),
+        ("twenty_eight_mansions", "二十八宿全维度表"),
+        ("three_enclosures", "三垣星官体系表"),
+        ("historical_calendars", "历代代表性历法表"),
+        ("hetu_numerology", "河图五行生成数理表"),
+        ("lunar_phase_regimes", "西周金文四分月相表"),
     ]
 
     print(f"  {'数据表名称':<24} | {'中文名称':<18} | {'文件行数':<10} | {'库中行数':<10} | {'校验结果'}")
@@ -76,6 +81,7 @@ def main():
     corpus_dirs = [
         ("wikisource-corpus", "中文维基文库开放经典古籍 (周易/梅花/六爻/命理/堪舆/奇门/六壬)"),
         ("corpus", "道门典籍参考语料 (道藏诸部文献)"),
+        ("calendar-corpus", "历法天文学专著语料 (历法溯源/星空帝国/漫步中国星空/天体测量学)"),
     ]
 
     total_expected_docs = 0
@@ -113,22 +119,21 @@ def main():
             all_passed = False
         print(f"  {table:<24} | {desc:<12} | {exp:<12,} | {str(act):<12} | [{status}]")
 
-    # 3. Domain Document Check for Wikisource
-    print("\n【3. 本次重点搜集典籍覆盖率检查 (53部经典)】:")
+    # 3. Domain Document Check for Wikisource & Calendar
+    print("\n【3. 本次重点搜集典籍覆盖率检查 (53部经典 + 历法天象专著)】:")
     categories_res = query_ch("""
         SELECT category_id, category_name, count() as doc_count, sum(character_count) as total_chars, sum(subcontent_count) as total_sections
         FROM destiny.corpus_documents
-        WHERE source_id = 'zh-wikisource-open'
         GROUP BY category_id, category_name
         ORDER BY total_chars DESC
     """)
-    for cat in categories_res["data"]:
+    for cat in categories_res["data"][:15]:
         print(f"  - 分类: {cat['category_name']} ({cat['category_id']}) -> 文献: {cat['doc_count']} 部, 章节: {cat['total_sections']} 卷, 字数: {int(cat['total_chars']):,} 字")
 
     # 4. Summary result
     print("\n" + "=" * 80)
     if all_passed:
-        print("  【检查结论】: 全部 16 张数据表、所有基础常量及 53 部经典语料共 29,202 条切片已全部 100% 入库无遗漏！")
+        print("  【检查结论】: 全部 21 张数据表、所有基础常量及历法天文学/经典古籍语料已全部 100% 入库无遗漏！")
     else:
         print("  【检查结论】: 部分数据存在不匹配，请检查上述标记为 FAILED 的条目。")
     print("=" * 80)

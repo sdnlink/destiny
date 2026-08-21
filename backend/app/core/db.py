@@ -112,6 +112,27 @@ class ClickHouseRepository:
     def get_luoshu_palaces(self):
         return self.query("SELECT * FROM destiny.luoshu_palaces ORDER BY palace_number FORMAT JSON")
 
+    def get_twenty_eight_mansions(self, quadrant=None):
+        if quadrant:
+            return self.query("SELECT * FROM destiny.twenty_eight_mansions WHERE quadrant = {quadrant:String} ORDER BY ordinal FORMAT JSON", {"quadrant": quadrant})
+        return self.query("SELECT * FROM destiny.twenty_eight_mansions ORDER BY ordinal FORMAT JSON")
+
+    def get_three_enclosures(self):
+        return self.query("SELECT * FROM destiny.three_enclosures ORDER BY ordinal FORMAT JSON")
+
+    def get_historical_calendars(self, dynasty=None):
+        if dynasty:
+            return self.query("SELECT * FROM destiny.historical_calendars WHERE dynasty = {dynasty:String} ORDER BY ordinal FORMAT JSON", {"dynasty": dynasty})
+        return self.query("SELECT * FROM destiny.historical_calendars ORDER BY ordinal FORMAT JSON")
+
+    def get_hetu_numerology(self, element=None):
+        if element:
+            return self.query("SELECT * FROM destiny.hetu_numerology WHERE element = {element:String} ORDER BY pair_id FORMAT JSON", {"element": element})
+        return self.query("SELECT * FROM destiny.hetu_numerology ORDER BY pair_id FORMAT JSON")
+
+    def get_lunar_phase_regimes(self):
+        return self.query("SELECT * FROM destiny.lunar_phase_regimes ORDER BY ordinal FORMAT JSON")
+
     def get_database_stats(self):
         return self.query("""
             SELECT table, sum(rows) AS rows
@@ -125,3 +146,4 @@ class ClickHouseRepository:
 
 # Global repository instance
 db_repository = ClickHouseRepository()
+

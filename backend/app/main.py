@@ -454,6 +454,36 @@ def luoshu_palaces():
     return {"data": db_rows or [], "source": "clickhouse_database"}
 
 
+@app.get("/v1/constants/twenty-eight-mansions")
+def twenty_eight_mansions(quadrant: Optional[str] = None):
+    db_rows = db_repository.get_twenty_eight_mansions(quadrant=quadrant)
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/three-enclosures")
+def three_enclosures():
+    db_rows = db_repository.get_three_enclosures()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/historical-calendars")
+def historical_calendars(dynasty: Optional[str] = None):
+    db_rows = db_repository.get_historical_calendars(dynasty=dynasty)
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/hetu-numerology")
+def hetu_numerology(element: Optional[str] = None):
+    db_rows = db_repository.get_hetu_numerology(element=element)
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
+@app.get("/v1/constants/lunar-phases")
+def lunar_phases():
+    db_rows = db_repository.get_lunar_phase_regimes()
+    return {"data": db_rows or [], "source": "clickhouse_database"}
+
+
 @app.get("/v1/database/stats")
 def database_stats():
     rows = db_repository.get_database_stats()

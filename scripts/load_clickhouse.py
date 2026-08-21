@@ -31,6 +31,11 @@ TABLES = [
     "sexagenary_cycle",
     "fengshui_mountains",
     "luoshu_palaces",
+    "twenty_eight_mansions",
+    "three_enclosures",
+    "historical_calendars",
+    "hetu_numerology",
+    "lunar_phase_regimes",
 ]
 
 
@@ -107,6 +112,7 @@ def load_corpus():
     corpus_dirs = [
         ROOT / "data" / "generated" / "corpus",
         ROOT / "data" / "generated" / "wikisource-corpus",
+        ROOT / "data" / "generated" / "calendar-corpus",
     ]
     for table in ["corpus_documents", "corpus_chunks", "corpus_ingestion_runs"]:
         truncate_sql = f"TRUNCATE TABLE destiny.{table}"
