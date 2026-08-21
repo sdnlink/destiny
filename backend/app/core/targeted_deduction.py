@@ -143,6 +143,50 @@ TRIGRAM_ITEM_PROFILES = {
     },
 }
 
+TRIGRAM_ACCESSORY_PROFILES = {
+    "乾": {"accessories": "金表、金属戒指、高档名牌手袋、高品质圆形眼镜、硬币或金属钥匙", "style": "高贵精致、金属质感、品质考究"},
+    "坤": {"accessories": "棉麻布包、皮质钱包、陶瓷手串、质朴发带、日常环保袋", "style": "质朴低调、实用百搭、天然材质"},
+    "震": {"accessories": "运动手环/智能手表、带金属声响钥匙扣、耳机、运动发带、电子手柄", "style": "动感时尚、带有科技或运动属性"},
+    "巽": {"accessories": "丝巾飘带、细链首饰、风衣腰带、长款皮夹、文件手提袋、香囊", "style": "轻柔飘逸、长条形设计、文雅风尚"},
+    "坎": {"accessories": "深色折叠雨伞、保温水杯、黑色墨镜、防水包、暗色耳机、水系配饰", "style": "深沉低调、防风防水、收纳防护"},
+    "离": {"accessories": "红色手绳、亮眼项链、彩框眼镜、发光/屏幕数码配件、美妆镜盒、亮色卡包", "style": "鲜艳抓眼、发光发热、视觉焦点"},
+    "艮": {"accessories": "沉香/木质文玩手串、玉石吊坠、厚重指环、工装/双肩登山背包", "style": "厚重文玩、天然石木、坚实耐用"},
+    "兑": {"accessories": "亮银耳钉、带拉链精致零钱包、口红美妆、金属挂件、开口时尚手镯", "style": "小巧精致、带有开口/金属光泽"},
+}
+
+TRIGRAM_TRANSPORT_PROFILES = {
+    "乾": {"mode": "高级轿车、自驾商务车、高铁一等座、飞机商务舱", "feature": "稳重高效、掌控感强、高档舒适"},
+    "坤": {"mode": "步行、公共大巴、慢速平稳交通工具、地面交通", "feature": "平稳安全、不急不躁、随遇而安"},
+    "震": {"mode": "高铁动车、自驾快车、越野车、快跑运动出行", "feature": "速度极快、动力充沛、充满动能"},
+    "巽": {"mode": "自行车、电动车、轻便骑行、顺风漫步、航班飞机", "feature": "顺风而行、灵活穿梭、轻盈机动"},
+    "坎": {"mode": "地下铁道（地铁）、轮船渡轮、临水涉水、雨中出行", "feature": "地下或暗道穿行、深水涉水、隐秘行进"},
+    "离": {"mode": "新能源纯电汽车、带有明显视觉标识的车辆、夜间灯光出行", "feature": "动力明快、视觉醒目、电能驱动"},
+    "艮": {"mode": "徒步登山、越野车、止步等待换乘、山道行车", "feature": "稳健缓行、逢山过坎、安全第一"},
+    "兑": {"mode": "与朋友拼车、敞篷休闲车、游船观光车、欢快同行", "feature": "气氛欢悦、结伴同行、互动畅快"},
+}
+
+TRIGRAM_BODY_PROFILES = {
+    "乾": {"organs": "头部、大脑、骨骼、肺部与中枢神经", "guidance": "注意头部血液循环、防止劳心过度与思虑耗神。"},
+    "坤": {"organs": "脾胃、腹部、肌肉组织、消化系统", "guidance": "注意饮食规律、健脾和胃、防止湿气困脾。"},
+    "震": {"organs": "足部、腿部、肝脏、神经系统", "guidance": "注意运动拉伤、舒肝理气、保持作息规律防虚火。"},
+    "巽": {"organs": "股部、大腿、呼吸道、气管与神经", "guidance": "注意防风防凉、保持呼吸道通畅、适度拉伸放松。"},
+    "坎": {"organs": "耳部、肾脏、泌尿系统、血液循环与水液代谢", "guidance": "注意保暖避寒、适量饮水、防范肾经虚耗与熬夜。"},
+    "离": {"organs": "眼睛、视力、心脏、心血管与面部", "guidance": "注意用眼疲劳、远离长时间强光屏幕、静心安神。"},
+    "艮": {"organs": "手部、手指、背部、脊椎、脾胃与关节", "guidance": "注意颈椎腰椎保护、避免久坐久站、适度活动关节。"},
+    "兑": {"organs": "口齿、咽喉、舌部、呼吸系统与肺气", "guidance": "多饮温水润喉、注意用嗓节制、防范呼吸道干燥。"},
+}
+
+QIMEN_GATE_ACTIVITIES = {
+    "开门": "正在正规公司、政府机构或核心岗位处理公职工作、主持全局或开业拓展",
+    "休门": "正在休假调养、拜访贵人、聚会饮宴、安享闲暇或家庭团聚",
+    "生门": "正在开展商务经营、求财投资、采购生产、买卖房产或推进增值业务",
+    "伤门": "正在外出奔波、运动捕猎、索要账目、处理突发竞争或承受身体劳碌",
+    "杜门": "正在闭门潜修、保密谋划、躲避烦扰、技术研发或处于隐秘堵塞状态",
+    "景门": "正在阅读文书合同、设计视觉美化、使用手机电脑屏幕、参加宴会或发布信息",
+    "死门": "正在处理不动产物业、执着坚守固有方案、探望旧物或处于停滞胶着状态",
+    "惊门": "正在与人辩论沟通、法律咨询、演说谈判、受惊疑虑或防范口舌是非",
+}
+
 SIX_RELATIVE_ACTIVITIES = {
     "父母": "正在研读文书书籍、接打电话、发送短信邮件、处理合同资质或与长辈上级沟通",
     "官鬼": "正在应对工作考核、处理紧急公务、承受压力攻坚、管理规范或奔波履职",
@@ -231,6 +275,24 @@ def generate_targeted_deduction(
         if transmissions:
             liuren_initial_branch = transmissions[0]
 
+    # Qimen facts
+    qimen_gate = ""
+    qimen_star = ""
+    if qimen and "facts" in qimen:
+        qimen_gate = qimen["facts"].get("zhi_shi_gate", "")
+        qimen_star = qimen["facts"].get("zhi_fu_star", "")
+
+    # Ziwei facts
+    ziwei_main_stars = []
+    ziwei_sihua_str = ""
+    if ziwei and "facts" in ziwei:
+        ming_p = next((p for p in ziwei["facts"].get("palaces_by_order", []) if p.get("name") == "命宫"), None)
+        if ming_p:
+            ziwei_main_stars = [s["name"] for s in ming_p.get("main_stars", [])]
+        sihua = ziwei["facts"].get("si_hua", {})
+        if sihua:
+            ziwei_sihua_str = "、".join(f"{v}{k}" for k, v in sihua.items())
+
     findings: List[Dict[str, Any]] = []
 
     # 1. Clothing & Color Deduction
@@ -271,8 +333,11 @@ def generate_targeted_deduction(
 
         rel_nuance = SIX_RELATIVE_ACTIVITIES.get(moving_line_six_rel, "")
         spirit_nuance = SIX_SPIRIT_NUANCES.get(moving_line_six_spirit, "")
+        qimen_nuance = QIMEN_GATE_ACTIVITIES.get(qimen_gate, "")
 
         act_parts = [f"【核心动态】{use_act['activity']}。"]
+        if qimen_nuance:
+            act_parts.append(f"【时空奇门格局】值使临【{qimen_gate}】，提示{qimen_nuance}。")
         if rel_nuance:
             act_parts.append(f"【所涉具体事项】六爻动爻临{moving_line_six_rel}，指向{rel_nuance}。")
         if spirit_nuance:
@@ -282,6 +347,7 @@ def generate_targeted_deduction(
         act_conclusion = "".join(act_parts)
         evidence_chain = (
             f"依据用卦【{use_tri_name}】八卦万物类象之行为特征"
+            f"{f'，奇门遁甲值使【{qimen_gate}】' if qimen_gate else ''}"
             f"{f'，结合六爻第{moving_line}爻动爻六亲【{moving_line_six_rel}】与六神【{moving_line_six_spirit}】' if moving_line_six_rel else ''}"
             f"{f'，大六壬初传【{liuren_initial_branch}】发端事由' if liuren_initial_branch else ''}交叉印证。"
         )
@@ -292,8 +358,8 @@ def generate_targeted_deduction(
             "conclusion": act_conclusion,
             "highlight": use_act["activity"],
             "evidence": evidence_chain,
-            "confidence": "依据八卦行为类象、六亲动变与六神情态交叉印证推导",
-            "rules": ["XIANG-TRIGRAM-001", "LY-RELATIVE-001", "LY-SPIRIT-001"],
+            "confidence": "依据八卦行为类象、奇门八门、六亲动变与六神情态交叉印证推导",
+            "rules": ["XIANG-TRIGRAM-001", "QM-GATE-001", "LY-RELATIVE-001", "LY-SPIRIT-001"],
         })
 
     # 3. Location & Direction Deduction
@@ -326,8 +392,11 @@ def generate_targeted_deduction(
             "body_controls_use": "体克用（主体掌控，自信果决，占据主导地位）",
         }
         rel_desc = relation_labels.get(relation_code, "气机交织")
-        char_conclusion = f"【当前心境气场】体用呈现{rel_desc}；【体质神情】{body_act['state']}。"
-        evidence_chain = f"依据体卦【{body_tri_name}】与用卦【{use_tri_name}】五行生克格局分析。"
+        char_parts = [f"【当前心境气场】体用呈现{rel_desc}；【体质神情】{body_act['state']}。"]
+        if ziwei_main_stars:
+            char_parts.append(f"【紫微命盘主星】命坐【{'、'.join(ziwei_main_stars)}】" + (f"，生年四化【{ziwei_sihua_str}】" if ziwei_sihua_str else "") + "，呈现自主进取与稳重兼备之格。")
+        char_conclusion = "".join(char_parts)
+        evidence_chain = f"依据体卦【{body_tri_name}】与用卦【{use_tri_name}】五行生克格局" + (f"，紫微主星【{'、'.join(ziwei_main_stars)}】" if ziwei_main_stars else "") + "分析。"
 
         findings.append({
             "key": "character_state",
@@ -336,10 +405,70 @@ def generate_targeted_deduction(
             "highlight": rel_desc,
             "evidence": evidence_chain,
             "confidence": "依据体用生克与体卦本质气机推导",
-            "rules": ["MH-BODYUSE-001", "MH-FIVE-ELEMENT-001"],
+            "rules": ["MH-BODYUSE-001", "MH-FIVE-ELEMENT-001", "ZW-STARS-001"],
         })
 
-    # 5. Item Nature / Lost Item Deduction (射覆与寻物推演)
+    # 5. Accessories & Items Carried (随身配饰与携带物)
+    if intent_data["has_accessories_items"] or "accessories_items" in intent_data["intents"]:
+        use_acc = TRIGRAM_ACCESSORY_PROFILES.get(use_tri_name, TRIGRAM_ACCESSORY_PROFILES["乾"])
+        body_acc = TRIGRAM_ACCESSORY_PROFILES.get(body_tri_name, TRIGRAM_ACCESSORY_PROFILES["乾"])
+        acc_conclusion = (
+            f"【随身携带物与配饰】多带有 **{use_acc['accessories']}**；"
+            f"【配饰风格特征】{use_acc['style']}（主体底蕴搭配：{body_acc['accessories'][:15]}...）。"
+        )
+        evidence_chain = f"依据用卦【{use_tri_name}】器物类象与体卦【{body_tri_name}】贴身饰物象数推导。"
+
+        findings.append({
+            "key": "accessories_items",
+            "title": f"💍 推算【{subject}】随身配饰与携带物品",
+            "conclusion": acc_conclusion,
+            "highlight": f"特征配饰：{use_acc['accessories'][:16]}...",
+            "evidence": evidence_chain,
+            "confidence": "依据八卦器物配饰类象确定性推导",
+            "rules": ["XIANG-TRIGRAM-001", "XIANG-ACCESSORY-001"],
+        })
+
+    # 6. Transport & Travel Mode (出行方式与交通工具)
+    if intent_data["has_transport_travel"] or "transport_travel" in intent_data["intents"]:
+        use_trans = TRIGRAM_TRANSPORT_PROFILES.get(use_tri_name, TRIGRAM_TRANSPORT_PROFILES["乾"])
+        trans_conclusion = (
+            f"【出行方式倾向】主要采用 **{use_trans['mode']}**；"
+            f"【行程特征】{use_trans['feature']}。"
+        )
+        evidence_chain = f"依据用卦【{use_tri_name}】动象、交通与行路万物类象推导。"
+
+        findings.append({
+            "key": "transport_travel",
+            "title": f"🚗 推算【{subject}】出行方式与交通工具",
+            "conclusion": trans_conclusion,
+            "highlight": f"出行方式：{use_trans['mode'][:14]}...",
+            "evidence": evidence_chain,
+            "confidence": "依据八卦动象与交通工具类象推导",
+            "rules": ["XIANG-TRIGRAM-001", "XIANG-TRANSPORT-001"],
+        })
+
+    # 7. Health & Body Parts (身体部位与脏腑健康)
+    if intent_data["has_health_body"] or "health_body" in intent_data["intents"]:
+        body_health = TRIGRAM_BODY_PROFILES.get(body_tri_name, TRIGRAM_BODY_PROFILES["乾"])
+        use_health = TRIGRAM_BODY_PROFILES.get(use_tri_name, TRIGRAM_BODY_PROFILES["乾"])
+        health_conclusion = (
+            f"【主体气血对应部位】体卦【{body_tri_name}】主 **{body_health['organs']}**；"
+            f"【外界影响与互动】用卦【{use_tri_name}】牵引 **{use_health['organs']}**；"
+            f"【养生调理指引】{body_health['guidance']}"
+        )
+        evidence_chain = f"依据体卦【{body_tri_name}】人体脏腑部位对应与生克平衡模型推导。"
+
+        findings.append({
+            "key": "health_body",
+            "title": f"🌿 推算【{subject}】身体部位与脏腑气机",
+            "conclusion": health_conclusion,
+            "highlight": f"核心对应：{body_health['organs']}",
+            "evidence": evidence_chain,
+            "confidence": "依据中医五行藏象与八卦人体部位模型推导",
+            "rules": ["XIANG-TRIGRAM-001", "TCM-BODY-001"],
+        })
+
+    # 8. Item Nature / Lost Item Deduction (射覆与寻物推演)
     if intent_data["has_item_nature"] or "item_nature" in intent_data["intents"]:
         use_item = TRIGRAM_ITEM_PROFILES.get(use_tri_name, TRIGRAM_ITEM_PROFILES["乾"])
         chg_item = TRIGRAM_ITEM_PROFILES.get(changed_use_tri_name, use_item)
@@ -365,7 +494,7 @@ def generate_targeted_deduction(
             "rules": ["XIANG-TRIGRAM-001", "XIANG-ITEM-001", "YI-DIRECTION-001"],
         })
 
-    # 6. Outcome & Timing / General Development
+    # 9. Outcome & Timing / General Development
     if intent_data["has_outcome_timing"] or not findings:
         relation_guidance = {
             "same_element": ("顺遂平稳", "内外和合，阻力极小，适合稳步推进与团队协作。"),

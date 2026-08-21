@@ -101,3 +101,94 @@ def test_explain_correspondences_includes_targeted_findings():
     assert res is not None
     assert "targeted_findings" in res
     assert res["targeted_findings"]["findings_count"] >= 2
+
+
+def test_targeted_deduction_accessories_and_transport():
+    module_results = [
+        {
+            "module": "meihua",
+            "result": {
+                "facts": {
+                    "body_use": {
+                        "body_trigram": {"name": "乾", "element": "金"},
+                        "use_trigram": {"name": "震", "element": "木"},
+                        "changed_use_trigram": {"name": "离", "element": "火"},
+                    },
+                    "moving_line": 3,
+                },
+                "evidence": [{"stage": "original", "code": "body_controls_use"}],
+            },
+        },
+        {
+            "module": "qimen",
+            "result": {
+                "facts": {
+                    "zhi_shi_gate": "开门",
+                    "zhi_fu_star": "天心",
+                }
+            },
+        },
+        {
+            "module": "ziwei",
+            "result": {
+                "facts": {
+                    "palaces_by_order": [
+                        {
+                            "name": "命宫",
+                            "main_stars": [{"name": "紫微"}, {"name": "天府"}],
+                        }
+                    ],
+                    "si_hua": {"禄": "廉贞", "权": "破军", "科": "武曲", "忌": "太阳"},
+                }
+            },
+        },
+    ]
+    context = {
+        "category": "travel",
+        "question_summary": "推算李笑身上带了什么配饰，怎么坐车出行，他正在干什么",
+    }
+    res = generate_targeted_deduction(module_results, context)
+    assert res["findings_count"] >= 3
+    assert res["subject"] == "李笑"
+
+    keys = [f["key"] for f in res["findings"]]
+    assert "accessories_items" in keys
+    assert "transport_travel" in keys
+    assert "current_activity" in keys
+
+    acc_finding = next(f for f in res["findings"] if f["key"] == "accessories_items")
+    assert "手表" in acc_finding["conclusion"] or "手环" in acc_finding["conclusion"] or "钥匙" in acc_finding["conclusion"]
+
+    trans_finding = next(f for f in res["findings"] if f["key"] == "transport_travel")
+    assert "车" in trans_finding["conclusion"] or "动车" in trans_finding["conclusion"]
+
+    act_finding = next(f for f in res["findings"] if f["key"] == "current_activity")
+    assert "开门" in act_finding["conclusion"]
+
+
+def test_targeted_deduction_health():
+    module_results = [
+        {
+            "module": "meihua",
+            "result": {
+                "facts": {
+                    "body_use": {
+                        "body_trigram": {"name": "坎", "element": "水"},
+                        "use_trigram": {"name": "离", "element": "火"},
+                    },
+                    "moving_line": 2,
+                },
+                "evidence": [{"stage": "original", "code": "body_controls_use"}],
+            },
+        }
+    ]
+    context = {
+        "category": "other",
+        "question_summary": "推算王五最近身体健康怎么样，哪个部位需要注意",
+    }
+    res = generate_targeted_deduction(module_results, context)
+    keys = [f["key"] for f in res["findings"]]
+    assert "health_body" in keys
+    health_finding = next(f for f in res["findings"] if f["key"] == "health_body")
+    assert "肾" in health_finding["conclusion"] or "耳" in health_finding["conclusion"] or "泌尿" in health_finding["conclusion"]
+

@@ -32,11 +32,13 @@ const SCENES = [
 ];
 
 const QUESTION_PRESETS = [
+  { category: "other", question: "推算李笑穿的是什么颜色的衣服，他正在做什么事情" },
+  { category: "other", question: "遗失的钱包钥匙在什么方位，物品特征如何" },
+  { category: "travel", question: "推算对方随身带了什么配饰，采用何种出行方式" },
+  { category: "other", question: "推算身体哪个部位需要注意调理与保养" },
   { category: "career", question: "是否接受新的工作机会与团队邀请" },
   { category: "finance", question: "近期重大项目投资与资金布局可行性" },
   { category: "relationship", question: "跨团队商务合作与关键人际沟通走势" },
-  { category: "study", question: "专业深造与关键学术资质评审前景" },
-  { category: "travel", question: "重要商务差旅与异地业务拓展吉凶" },
 ];
 
 const LINE_OPTIONS = [

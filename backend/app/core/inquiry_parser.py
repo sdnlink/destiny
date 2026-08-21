@@ -8,19 +8,28 @@ INTENT_KEYWORDS = {
         "衣服", "颜色", "穿", "着装", "服饰", "色彩", "上衣", "裤子", "裙子", "外套", "穿戴", "色系", "何色", "什么色"
     ],
     "current_activity": [
-        "在做什么", "做什么事情", "做什么事", "干什么", "正在做", "活动", "动态", "举动", "行为", "在干嘛", "在忙什么", "当前状态", "正在", "动作", "事由"
+        "在做什么", "做什么事情", "做什么事", "干什么", "正在做", "活动", "动态", "举动", "行为", "在干嘛", "在忙什么", "当前状态", "正在", "动作", "事由", "干啥"
     ],
     "location_direction": [
-        "在哪里", "在何处", "哪儿", "去向", "方位", "地点", "场所", "环境", "位置", "方向", "哪个方向", "何方", "所处"
+        "在哪里", "在何处", "哪儿", "去向", "方位", "地点", "场所", "环境", "位置", "方向", "哪个方向", "何方", "所处", "哪边", "何地"
     ],
     "character_state": [
-        "状态", "心情", "情绪", "性格", "相貌", "长相", "外貌", "心思", "态度", "想法", "健康", "精神"
+        "状态", "心情", "情绪", "性格", "相貌", "长相", "外貌", "心思", "态度", "想法", "精神", "气场", "表情"
+    ],
+    "accessories_items": [
+        "配饰", "饰品", "随身物品", "戴什么", "首饰", "手表", "包包", "眼镜", "项链", "手串", "戒指", "佩戴", "带什么", "挂件"
+    ],
+    "transport_travel": [
+        "交通工具", "出行方式", "怎么去", "坐车", "开车", "自驾", "骑车", "步行", "高铁", "飞机", "交通", "走哪条路", "乘车"
     ],
     "item_nature": [
-        "什么东西", "物品", "材质", "形状", "丢了", "寻找", "失物", "钱包", "钥匙", "文件", "射覆", "何物"
+        "什么东西", "物品", "材质", "形状", "丢了", "寻找", "失物", "钱包", "钥匙", "文件", "射覆", "何物", "失物在何处"
+    ],
+    "health_body": [
+        "健康", "身体", "疾病", "部位", "哪个部位", "头痛", "胃痛", "睡眠", "骨骼", "气血", "脏腑"
     ],
     "outcome_timing": [
-        "吉凶", "成败", "结果", "如何", "能否", "可否", "应期", "何时", "什么时候", "顺利吗", "前景", "走势", "合作", "投资", "工作"
+        "吉凶", "成败", "结果", "如何", "能否", "可否", "应期", "何时", "什么时候", "顺利吗", "前景", "走势", "合作", "投资", "工作", "几点", "多久"
     ],
 }
 
@@ -42,10 +51,10 @@ def parse_inquiry_intent(question: str, category: str = "other") -> Dict[str, An
 
     # Extract subject entity if present (e.g. "推算李笑穿的是什么..." -> "李笑")
     subject = ""
-    match = re.search(r"(?:推算|测|算|问|看|占)?([\u4e00-\u9fa5]{2,4}?)(?:穿|在|去|的|是否|能否|现在|今天)", text)
+    match = re.search(r"^(?:推算|测|算|问|看|占)?([\u4e00-\u9fa5]{2,4}?)(?:穿|在|去|的|是否|能否|现在|今天|目前|身上|带|坐|有|最近|近期|何时|何处)", text)
     if match:
         candidate = match.group(1).strip()
-        noise = {"什么", "对方", "自己", "我们", "他们", "关于", "近期", "本次", "项目", "工作", "公司"}
+        noise = {"什么", "对方", "自己", "我们", "他们", "关于", "近期", "本次", "项目", "工作", "公司", "当前", "如何", "失物", "钱包"}
         if candidate and candidate not in noise:
             subject = candidate
 
@@ -57,7 +66,10 @@ def parse_inquiry_intent(question: str, category: str = "other") -> Dict[str, An
         "has_current_activity": "current_activity" in detected_intents,
         "has_location_direction": "location_direction" in detected_intents,
         "has_character_state": "character_state" in detected_intents,
+        "has_accessories_items": "accessories_items" in detected_intents,
+        "has_transport_travel": "transport_travel" in detected_intents,
         "has_item_nature": "item_nature" in detected_intents,
+        "has_health_body": "health_body" in detected_intents,
         "has_outcome_timing": "outcome_timing" in detected_intents,
         "subject": subject or "求问主体",
     }
