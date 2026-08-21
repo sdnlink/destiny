@@ -242,7 +242,62 @@ function Evidence({ items = [] }) {
   );
 }
 
+function TargetedFindings({ targeted }) {
+  if (!targeted || !targeted.findings || targeted.findings.length === 0) return null;
+  return (
+    <section className="data-band targeted-findings-band">
+      <div className="band-heading">
+        <div>
+          <span className="band-icon"><Sparkles size={16} /></span>
+          <div>
+            <h3>针对所问事项 · 象数精准推断结论</h3>
+            <p>基于八卦万物类象、梅花体用生克、六爻纳甲神煞与六壬神课，直接推演回答具体问题</p>
+          </div>
+        </div>
+        <span className="version-badge">象数专项推演</span>
+      </div>
+      <div className="targeted-findings-lead">
+        <p>{targeted.summary}</p>
+      </div>
+      <div className="targeted-findings-grid">
+        {targeted.findings.map((item, idx) => (
+          <article key={item.key || idx} className="targeted-card">
+            <div className="targeted-card-header">
+              <h4>{item.title}</h4>
+              {item.highlight && <span className="targeted-pill">{item.highlight}</span>}
+            </div>
+            <div className="targeted-card-body">
+              <div className="targeted-conclusion-text">
+                <p>{item.conclusion}</p>
+              </div>
+              {item.palette && item.palette.length > 0 && (
+                <div className="targeted-palette-row">
+                  <span className="palette-label">推算色系：</span>
+                  <div className="palette-chips">
+                    {item.palette.map((color) => (
+                      <span key={color} className="color-chip">{color}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="targeted-evidence-box">
+                <strong>推导依据：</strong>
+                <span>{item.evidence}</span>
+              </div>
+              <div className="targeted-rules">
+                <span className="confidence-tag">{item.confidence}</span>
+                {item.rules && item.rules.map((rule) => <code key={rule}>{rule}</code>)}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, qimen, bazi, ziwei, fengshui, onTab }) {
+  const targeted = result?.targeted_deduction || result?.interpretation?.targeted_findings;
   return (
     <div className="view-stack">
       <section className="summary-band">
@@ -256,6 +311,8 @@ function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, q
           <div><strong>计算完成</strong><span>{result.module_results.length} 个模块</span></div>
         </div>
       </section>
+
+      {targeted && <TargetedFindings targeted={targeted} />}
 
       <section className="overview-grid">
         <button className="overview-section calendar-overview" onClick={() => onTab("calendar")}>
@@ -1716,6 +1773,8 @@ function ComparisonView({ comparison }) {
 function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, interpretation }) {
   const icons = { zhouyi: BookOpen, meihua: Compass, liuyao: Grid3X3, liuren: Workflow, qimen: Compass, bazi: Sparkles, ziwei: Sparkles, fengshui: Mountain };
 
+  const targeted = interpretation?.targeted_findings;
+
   return (
     <div className="view-stack">
       <section className="view-heading">
@@ -1726,6 +1785,8 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
         </div>
         <span className="version-badge">{advisory?.schema_version || "2.0"}</span>
       </section>
+
+      {targeted && <TargetedFindings targeted={targeted} />}
 
       {advisory && (
         <>

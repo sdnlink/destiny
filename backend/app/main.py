@@ -312,6 +312,7 @@ def comparison_envelope(calculations, context=None):
     comparison = synthesize(results)
     imagery = collect_imagery(module_results, normalized_context)
     yuan_hui = analyze_yuan_hui_yun_shi(module_results)
+    interp_result = explain_correspondences(module_results, normalized_context, imagery, yuan_hui)
     return {
         "task_id": "compare_{}".format(input_hash[:24]),
         "status": "completed",
@@ -323,7 +324,8 @@ def comparison_envelope(calculations, context=None):
         "literature": collect_literature_opinions(module_results, context=normalized_context),
         "imagery": imagery,
         "yuan_hui_yun_shi": yuan_hui,
-        "interpretation": explain_correspondences(module_results, normalized_context, imagery, yuan_hui),
+        "interpretation": interp_result,
+        "targeted_deduction": interp_result.get("targeted_findings") if interp_result else None,
         "calculated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
     }
 

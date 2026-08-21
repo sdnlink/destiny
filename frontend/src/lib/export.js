@@ -16,6 +16,23 @@ export function generateMarkdownReport(result, context) {
   md += `> **任务编号**：\`${result.task_id || "N/A"}\`  \n\n`;
   md += `---\n\n`;
 
+  // 0. 针对所问事项 · 象数专项推断结论
+  const targeted = result.targeted_deduction || result.interpretation?.targeted_findings;
+  if (targeted && targeted.findings?.length) {
+    md += `## 🎯 针对所问事项 · 象数精准推断结论\n\n`;
+    md += `> ${targeted.summary}\n\n`;
+    targeted.findings.forEach((f) => {
+      md += `### ${f.title}\n\n`;
+      md += `${f.conclusion}\n\n`;
+      if (f.palette?.length) {
+        md += `- **推算色系**：${f.palette.join("、")}\n`;
+      }
+      md += `- **推导依据**：${f.evidence}\n`;
+      md += `- **依据规则**：\`${f.rules?.join(" · ")}\` (${f.confidence})\n\n`;
+    });
+    md += `---\n\n`;
+  }
+
   // 1. 历法与时空背景
   const cal = result.module_results?.find((m) => m.module === "calendar")?.result;
   if (cal) {

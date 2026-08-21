@@ -2,6 +2,7 @@
 
 from typing import Any, Dict, List, Optional
 from app.core.hexagram_service import get_hexagram_explanation
+from app.core.targeted_deduction import generate_targeted_deduction
 
 MODULE_LABELS = {
     "zhouyi": "周易",
@@ -292,6 +293,8 @@ def explain_correspondences(
             "rule_ids": ["INTERP-INTEGRATE-001", "YHYS-CYCLE-001", "YHYS-RELATION-001"],
         })
 
+    targeted = generate_targeted_deduction(module_results, context)
+
     return {
         "schema_version": "1.0",
         "status": "provisional_correspondence_explanation",
@@ -301,6 +304,7 @@ def explain_correspondences(
             "category_label": CATEGORY_LABELS.get(category, "当前事项"),
             "question_summary": question,
         },
+        "targeted_findings": targeted,
         "headline": "卦象本质解析与所问事项全景映射",
         "summary": f"针对“{question}”（{CATEGORY_LABELS.get(category, '当前事项')}），系统综合{len(modules)}个推演系统（易经卦意、梅花体用、六爻世应、大六壬三传、紫微命局），从现状根基、动态演变、关键转折与潜在盲区多维度进行深度解析，提供清晰的研判结论与实践策略。",
         "modules": modules,
