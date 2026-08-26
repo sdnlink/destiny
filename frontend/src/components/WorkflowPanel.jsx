@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+﻿import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Sparkles,
   Play,
@@ -34,6 +34,9 @@ import {
   listSessions,
   deleteSession,
 } from "../lib/sessionApi";
+import HexagramView from "./HexagramView";
+import StructuredDisplay from "./StructuredDisplay";
+import InteractionResultDisplay from "./InteractionResultDisplay";
 
 const CATEGORIES = [
   { id: "career", label: "事业" },
@@ -143,6 +146,8 @@ export default function WorkflowPanel() {
   const [sessionList, setSessionList] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyFilter, setHistoryFilter] = useState("all");
   const resultRef = useRef(null);
   const errorTimer = useRef(null);
   const DRAFT_KEY = "destiny_workflow_draft";
@@ -170,6 +175,24 @@ export default function WorkflowPanel() {
       }
     }
   }, [form, phase]);
+
+  // 键盘快捷键
+  useEffect(() => {
+    if (phase !== "result") return;
+    const handler = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
+      if (e.key >= "1" && e.key <= "4") {
+        const tabs = ["overview", "structured", "interact", "history"];
+        setActiveTab(tabs[parseInt(e.key, 10) - 1]);
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "p") {
+        e.preventDefault();
+        window.print();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [phase]);
 
   const isLoading = (type) => loadingType === type;
   const anyLoading = loadingType !== null;
@@ -453,6 +476,50 @@ export default function WorkflowPanel() {
     }
   };
 
+  const handleExportSessionsJSON = () => {
+    const data = JSON.stringify(sessionList, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `推演会话备份_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportSessionsJSON = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        if (Array.isArray(imported)) {
+          setSessionList((prev) => {
+            const existing = new Set(prev.map((s) => s.session_id));
+            const merged = [...prev];
+            for (const item of imported) {
+              if (item.session_id && !existing.has(item.session_id)) {
+                merged.push(item);
+                existing.add(item.session_id);
+              }
+            }
+            return merged;
+          });
+          showError(`已导入 ${imported.length} 条会话记录（仅列表，完整数据需后端支持）`);
+        } else {
+          showError("导入文件格式不正确");
+        }
+      } catch {
+        showError("JSON 解析失败");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
   const handleCopyResult = async () => {
     const formatted = result?.formatted_text || "";
     if (!formatted) return;
@@ -534,41 +601,79 @@ export default function WorkflowPanel() {
           <div className="session-history-panel">
             <div className="history-panel-header">
               <h4><History size={16} />最近推演会话</h4>
-              <button className="btn-small btn-secondary" onClick={loadSessionList} disabled={loadingHistory}>
-                {loadingHistory ? <RefreshCw size={12} className="spin" /> : <RefreshCw size={12} />}刷新
-              </button>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button className="btn-small btn-secondary" onClick={handleExportSessionsJSON} title="导出全部会话为JSON">
+                  <Download size={12} />导出
+                </button>
+                <button className="btn-small btn-secondary" onClick={() => document.getElementById("session-import-input")?.click()} title="从JSON导入会话">
+                  <FolderOpen size={12} />导入
+                </button>
+                <input
+                  id="session-import-input"
+                  type="file"
+                  accept=".json"
+                  style={{ display: "none" }}
+                  onChange={handleImportSessionsJSON}
+                />
+                <button className="btn-small btn-secondary" onClick={loadSessionList} disabled={loadingHistory}>
+                  {loadingHistory ? <RefreshCw size={12} className="spin" /> : <RefreshCw size={12} />}刷新
+                </button>
+              </div>
+            </div>
+            <div className="history-search-row">
+              <input
+                type="text"
+                value={historySearch}
+                onChange={(e) => setHistorySearch(e.target.value)}
+                placeholder="搜索求测问题..."
+              />
+              <select value={historyFilter} onChange={(e) => setHistoryFilter(e.target.value)}>
+                <option value="all">全部状态</option>
+                <option value="casted">已排盘</option>
+                <option value="interacting">交互中</option>
+                <option value="reviewed">已复盘</option>
+                <option value="draft">待排盘</option>
+              </select>
             </div>
             {loadingHistory ? (
               <p className="history-loading">加载中...</p>
-            ) : sessionList.length === 0 ? (
-              <p className="empty-hint">暂无历史会话。创建第一个推演会话后会显示在这里。</p>
-            ) : (
-              <div className="session-list">
-                {sessionList.map((s) => (
-                  <div
-                    key={s.session_id}
-                    className="session-list-item"
-                    onClick={() => handleRestoreFromList(s.session_id)}
-                  >
-                    <div className="session-item-main">
-                      <span className="session-question">{s.question || "(无标题)"}</span>
-                      <div className="session-item-meta">
-                        <span className="session-category">{categoryLabel(s.category)}</span>
-                        <span className="session-status status-badge">{statusLabel(s.status)}</span>
-                        <span className="session-date">{formatDate(s.created_at)}</span>
-                      </div>
-                    </div>
-                    <button
-                      className="session-delete-btn"
-                      onClick={(e) => handleDeleteSession(s.session_id, e)}
-                      title="删除会话"
+            ) : (() => {
+              const filtered = sessionList.filter((s) => {
+                const matchSearch = !historySearch || (s.question || "").toLowerCase().includes(historySearch.toLowerCase());
+                const matchFilter = historyFilter === "all" || s.status === historyFilter;
+                return matchSearch && matchFilter;
+              });
+              if (filtered.length === 0) {
+                return <p className="empty-hint">暂无匹配的会话。</p>;
+              }
+              return (
+                <div className="session-list">
+                  {filtered.map((s) => (
+                    <div
+                      key={s.session_id}
+                      className="session-list-item"
+                      onClick={() => handleRestoreFromList(s.session_id)}
                     >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+                      <div className="session-item-main">
+                        <span className="session-question">{s.question || "(无标题)"}</span>
+                        <div className="session-item-meta">
+                          <span className="session-category">{categoryLabel(s.category)}</span>
+                          <span className="session-status status-badge">{statusLabel(s.status)}</span>
+                          <span className="session-date">{formatDate(s.created_at)}</span>
+                        </div>
+                      </div>
+                      <button
+                        className="session-delete-btn"
+                        onClick={(e) => handleDeleteSession(s.session_id, e)}
+                        title="删除会话"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -798,6 +903,9 @@ export default function WorkflowPanel() {
             </p>
           </div>
           <div className="result-actions">
+            <button className="btn-secondary btn-small" onClick={() => window.print()} title="打印推演报告 (Ctrl+P)">
+              <Download size={14} />打印
+            </button>
             <button className="btn-secondary btn-small" onClick={handleExportResult} title="导出为 Markdown 文件">
               <Download size={14} />导出
             </button>
@@ -989,7 +1097,7 @@ export default function WorkflowPanel() {
                     <span className="history-type">{item.label}</span>
                     <span className="history-time">{item.time}</span>
                   </div>
-                  <InteractionResultDisplay data={item.data} />
+                  <InteractionResultDisplay data={item.data} showCopy={true} />
                 </div>
               ))
             )}
@@ -1016,209 +1124,3 @@ function CollapsibleSection({ title, collapsed, onToggle, children, defaultOpen 
   );
 }
 
-// ========== 结构化数据展示 ==========
-function StructuredDisplay({ workflow }) {
-  const steps = [
-    { key: "step1", label: "信息校验", icon: "📋" },
-    { key: "step2", label: "完整排盘", icon: "☯️" },
-    { key: "step3", label: "用神定位", icon: "🎯" },
-    { key: "step4", label: "旺衰分析", icon: "⚖️" },
-    { key: "step5", label: "象义解读", icon: "🔮" },
-    { key: "step6", label: "综合推演", icon: "📊" },
-    { key: "step7", label: "趋吉避凶", icon: "🧭" },
-  ];
-
-  return (
-    <div className="structured-display">
-      {steps.map((s) => {
-        const data = workflow[s.key];
-        if (!data) return null;
-        return (
-          <div key={s.key} className="structured-step">
-            <h4>{s.icon} 步骤{s.key.slice(-1)}：{s.label}</h4>
-            <StructuredStepContent stepKey={s.key} data={data} />
-          </div>
-        );
-      })}
-      {workflow.reference_library && (
-        <div className="structured-step">
-          <h4>📚 拓展参考资料库</h4>
-          <pre>{JSON.stringify(workflow.reference_library, null, 2)}</pre>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function StructuredStepContent({ stepKey, data }) {
-  // 对特定步骤做友好展示
-  if (stepKey === "step3") {
-    return (
-      <div className="structured-friendly">
-        {data.primary_yongshen && <div className="friendly-row"><span className="friendly-label">主用神：</span><span>{data.primary_yongshen}</span></div>}
-        {data.auxiliary_yongshen && <div className="friendly-row"><span className="friendly-label">辅助用神：</span><span>{data.auxiliary_yongshen}</span></div>}
-        {data.yongshen_logic && <div className="friendly-row"><span className="friendly-label">取用逻辑：</span><span>{data.yongshen_logic}</span></div>}
-        {data.multi_party_yongshen && (
-          <div className="friendly-row">
-            <span className="friendly-label">多方用神：</span>
-            <ul>{Object.entries(data.multi_party_yongshen).map(([k, v]) => <li key={k}>{k}：{v}</li>)}</ul>
-          </div>
-        )}
-      </div>
-    );
-  }
-  if (stepKey === "step4") {
-    return (
-      <div className="structured-friendly">
-        {data.yongshen_wangshuai && (
-          <div className="friendly-row">
-            <span className="friendly-label">用神旺衰：</span>
-            <span>{data.yongshen_wangshuai.level || "未知"}</span>
-            {data.yongshen_wangshuai.details && <span className="friendly-sub">（{data.yongshen_wangshuai.details}）</span>}
-          </div>
-        )}
-        {data.ti_yong_relation && <div className="friendly-row"><span className="friendly-label">体用关系：</span><span>{data.ti_yong_relation}</span></div>}
-        {data.shengke_chain && Array.isArray(data.shengke_chain) && (
-          <div className="friendly-row">
-            <span className="friendly-label">生克链条：</span>
-            <ul>{data.shengke_chain.map((c, i) => <li key={i}>{c}</li>)}</ul>
-          </div>
-        )}
-      </div>
-    );
-  }
-  if (stepKey === "step6") {
-    return (
-      <div className="structured-friendly">
-        {data.fortune_level && <div className="friendly-row"><span className="friendly-label">吉凶等级：</span><span className="fortune-inline">{data.fortune_level}</span></div>}
-        {data.current_status && <div className="friendly-row"><span className="friendly-label">当前现状：</span><span>{data.current_status}</span></div>}
-        {data.trend && <div className="friendly-row"><span className="friendly-label">发展趋势：</span><span>{data.trend}</span></div>}
-        {data.timing && <div className="friendly-row"><span className="friendly-label">参考应期：</span><span>{data.timing}</span></div>}
-        {data.favorable && Array.isArray(data.favorable) && data.favorable.length > 0 && (
-          <div className="friendly-row"><span className="friendly-label">有利因素：</span><ul>{data.favorable.map((f, i) => <li key={i}>{f}</li>)}</ul></div>
-        )}
-        {data.obstacles && Array.isArray(data.obstacles) && data.obstacles.length > 0 && (
-          <div className="friendly-row"><span className="friendly-label">阻碍因素：</span><ul>{data.obstacles.map((o, i) => <li key={i}>{o}</li>)}</ul></div>
-        )}
-        {data.fortune_basis && Array.isArray(data.fortune_basis) && (
-          <div className="friendly-row"><span className="friendly-label">判定依据：</span><span>{data.fortune_basis.join("；")}</span></div>
-        )}
-      </div>
-    );
-  }
-  // 默认：JSON 展示
-  return <pre>{JSON.stringify(data, null, 2)}</pre>;
-}
-
-// ========== 交互结果展示 ==========
-function InteractionResultDisplay({ data }) {
-  if (!data) return null;
-
-  // 深度追问结果
-  if (data.type === "deep_question" && data.analysis) {
-    return (
-      <div className="interaction-result deep-question-result">
-        <p><strong>追问：</strong>{data.question}</p>
-        {data.detected_symbols && data.detected_symbols.length > 0 && (
-          <p className="result-meta-line">检测到符号类型：{data.detected_symbols.join("、")}</p>
-        )}
-        <pre className="deep-analysis">{data.analysis}</pre>
-      </div>
-    );
-  }
-
-  // 换角度结果
-  if (data.type === "angle_shift" && data.reinterpretation) {
-    return (
-      <div className="interaction-result angle-shift-result">
-        <p><strong>新角度：</strong>{data.new_angle}</p>
-        {data.matched_preset && <p className="result-meta-line">匹配预设：{data.matched_preset}</p>}
-        {data.shift_focus && <p className="result-meta-line"><em>{data.shift_focus}</em></p>}
-        <pre className="deep-analysis">{data.reinterpretation}</pre>
-        {data.suggested_angles && data.suggested_angles.length > 0 && (
-          <div className="suggested-angles">
-            <strong>其他建议角度：</strong>
-            {data.suggested_angles.map((a, i) => <span key={i} className="angle-tag">{a}</span>)}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (data.description) {
-    return (
-      <div className="interaction-result">
-        <p>{data.description}</p>
-        {data.options && (
-          <ul>{data.options.map((o, i) => <li key={i}>{o}</li>)}</ul>
-        )}
-        {data.interpretation_shift && (
-          <div className="interpretation-shift">
-            <strong>解读视角调整：</strong>
-            <p>{data.interpretation_shift.note}</p>
-            {data.interpretation_shift.suggested_angles && (
-              <ul>{data.interpretation_shift.suggested_angles.map((a, i) => <li key={i}>{a}</li>)}</ul>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  }
-  if (data.parties) {
-    return (
-      <div className="interaction-result">
-        {data.parties.map((p, i) => (
-          <div key={i} className="party-card">
-            <strong>{p.party}</strong>
-            <p>用神：{p.yongshen}</p>
-            <p>立场：{p.position}</p>
-            <p>心态：{p.mindset}</p>
-            <p>诉求：{p.demands}</p>
-            {p.deep_analysis && <pre className="deep-analysis">{p.deep_analysis}</pre>}
-          </div>
-        ))}
-        {data.focus_party && (
-          <div className="focus-party">
-            <h5>聚焦人物深化</h5>
-            <pre>{JSON.stringify(data.focus_party, null, 2)}</pre>
-          </div>
-        )}
-      </div>
-    );
-  }
-  if (data.choices) {
-    return (
-      <div className="interaction-result">
-        {data.choices.map((c, i) => (
-          <div key={i} className="choice-card">
-            <strong>{c.choice}</strong>
-            <p>分析角度：{c.analysis_angle}</p>
-            <p>风险等级：{c.risk_level}</p>
-            <p>趋势：{c.trend}</p>
-            <p>利：{c.pros.join("；")}</p>
-            <p>弊：{c.cons.join("；")}</p>
-          </div>
-        ))}
-        {data.recommendation && <p className="recommendation"><strong>综合建议：</strong>{data.recommendation}</p>}
-      </div>
-    );
-  }
-  if (data.verified !== undefined) {
-    return (
-      <div className="interaction-result review-result">
-        <p><strong>现实结果：</strong>{data.actual_outcome}</p>
-        <p><strong>应验象：</strong></p>
-        <ul>{data.verified.map((v, i) => <li key={i}>{v}</li>)}</ul>
-        <p><strong>未应验象：</strong></p>
-        <ul>{data.unverified.map((v, i) => <li key={i}>{v}</li>)}</ul>
-        <p><strong>多角度分析：</strong></p>
-        {Object.entries(data.analysis || {}).map(([k, v]) => (
-          <p key={k}><em>{k}：</em>{v}</p>
-        ))}
-        <p><strong>经验教训：</strong></p>
-        <ul>{data.lessons.map((l, i) => <li key={i}>{l}</li>)}</ul>
-      </div>
-    );
-  }
-  return <pre className="interaction-result">{JSON.stringify(data, null, 2)}</pre>;
-}

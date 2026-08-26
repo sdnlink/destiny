@@ -510,9 +510,9 @@ def step6_synthesis_judgement(
     if not obstacles:
         obstacles.append("当前无明显阻碍，但需注意细节变化")
 
-    # 趋势与应期
-    trend = "事态将随用神旺衰变化而演变，当前阶段宜根据用神力量决定进退。"
-    timing = "参考应期：近则7日内（动爻逢值逢冲），远则按月令节气交接前后观察变化。具体应期需结合动爻地支与日辰冲合确定。"
+    # 趋势与应期（基于动爻地支、日辰冲合、月令的专业推算）
+    trend = _calculate_trend(category, wangshuai_level, tiyong_type, fortune_level)
+    timing = _calculate_timing(plate_data, wangshuai_data, yongshen_data, fortune_level)
 
     return {
         "step": 6,
@@ -530,6 +530,153 @@ def step6_synthesis_judgement(
         "yuanhui": yuanhui_result,
         "literature": literature_result,
     }
+
+
+# ============================================================
+# 应期推算辅助函数（术数专业性深化）
+# ============================================================
+
+# 十二地支顺序
+EARTHLY_BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
+
+# 六冲关系
+LIU_CHONG = {"子": "午", "午": "子", "丑": "未", "未": "丑", "寅": "申", "申": "寅",
+             "卯": "酉", "酉": "卯", "辰": "戌", "戌": "辰", "巳": "亥", "亥": "巳"}
+
+# 六合关系
+LIU_HE = {"子": "丑", "丑": "子", "寅": "亥", "亥": "寅", "卯": "戌", "戌": "卯",
+          "辰": "酉", "酉": "辰", "巳": "申", "申": "巳", "午": "未", "未": "午"}
+
+# 三合局
+SAN_HE = {
+    "申子辰": "水", "亥卯未": "木", "寅午戌": "火", "巳酉丑": "金",
+}
+
+# 地支五行
+BRANCH_ELEMENT = {"子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土", "巳": "火",
+                  "午": "火", "未": "土", "申": "金", "酉": "金", "戌": "土", "亥": "水"}
+
+# 月令对应节气（近似）
+MONTH_BRANCH = {"寅": "立春", "卯": "惊蛰", "辰": "清明", "巳": "立夏", "午": "芒种", "未": "小暑",
+                "申": "立秋", "酉": "白露", "戌": "寒露", "亥": "立冬", "子": "大雪", "丑": "小寒"}
+
+
+def _calculate_trend(category, wangshuai_level, tiyong_type, fortune_level):
+    """基于用神旺衰、体用关系、吉凶等级推算发展趋势。"""
+    parts = []
+    if "旺" in wangshuai_level or "相" in wangshuai_level:
+        parts.append("当前用神旺相，事态处于上升期，具备主动推进的力量基础")
+    elif "休" in wangshuai_level:
+        parts.append("用神休囚，事态处于平稳期，宜积蓄力量等待时机")
+    elif "囚" in wangshuai_level or "死" in wangshuai_level:
+        parts.append("用神囚死，事态处于下降期，阻力较大，宜守不宜攻")
+    else:
+        parts.append("用神力量中等，事态处于胶着期，需视具体变化决定进退")
+
+    if tiyong_type == "用生体":
+        parts.append("用生体格局，外部环境持续滋养自身，长期趋势向好")
+    elif tiyong_type == "体生用":
+        parts.append("体生用格局，自身持续消耗于外，需注意资源透支风险")
+    elif tiyong_type == "用克体":
+        parts.append("用克体格局，外部压力较大，需防范突发阻碍")
+    elif tiyong_type == "体克用":
+        parts.append("体克用格局，自身可掌控局面，但需付出较大努力")
+    elif tiyong_type == "比和":
+        parts.append("体用比和，内外同频，事态平稳发展")
+
+    if fortune_level in ("大吉", "小吉"):
+        parts.append("综合判断趋势偏吉，关键节点把握得当则可获有利结果")
+    elif fortune_level in ("大凶", "小凶"):
+        parts.append("综合判断趋势偏凶，需重点防范风险，必要时调整策略")
+    else:
+        parts.append("综合判断吉凶参半，宜稳扎稳打，不宜冒进也不宜过度保守")
+
+    return "。".join(parts) + "。"
+
+
+def _calculate_timing(plate_data, wangshuai_data, yongshen_data, fortune_level):
+    """基于动爻地支、日辰冲合、月令推算具体应期时间窗口。
+
+    应期法则：
+    1. 动爻逢值（值日）、逢冲（对冲日）为近期应期
+    2. 用神旺相则应期近，休囚则应期远
+    3. 动爻化合则待冲开之时，动爻化冲则待合住之时
+    4. 远应年月，近应日时
+    """
+    plates = plate_data.get("plates", {})
+    calendar = plate_data.get("calendar", {})
+    ganzhi = calendar.get("ganzhi", {})
+    day_branch = ganzhi.get("day", "")
+    if isinstance(day_branch, dict):
+        day_branch = day_branch.get("branch", "")
+    month_branch = ganzhi.get("month", "")
+    if isinstance(month_branch, dict):
+        month_branch = month_branch.get("branch", "")
+
+    # 提取动爻地支
+    moving_branches = []
+    for key in ("liuyao", "meihua", "zhouyi"):
+        plate = plates.get(key, {})
+        facts = plate.get("facts", {})
+        # 六爻动爻地支
+        yao_list = facts.get("yao_list") or facts.get("yaos") or []
+        if isinstance(yao_list, list):
+            for yao in yao_list:
+                if isinstance(yao, dict) and yao.get("moving"):
+                    branch = yao.get("branch") or yao.get("earthly_branch", "")
+                    if branch:
+                        moving_branches.append(branch)
+        # 梅花动爻
+        moving_line = facts.get("moving_line")
+        if moving_line and not moving_branches:
+            # 梅花易数动爻对应地支需结合卦象，此处用日辰推算
+            pass
+
+    wangshuai_level = wangshuai_data.get("yongshen_wangshuai", {}).get("level", "平")
+    primary_yongshen = yongshen_data.get("primary_yongshen", "")
+
+    timing_parts = []
+
+    # 近期应期（日）
+    if moving_branches:
+        for mb in moving_branches[:2]:
+            chong = LIU_CHONG.get(mb, "")
+            he = LIU_HE.get(mb, "")
+            timing_parts.append(f"动爻临「{mb}」，逢值（{mb}日）或逢冲（{chong}日）为近期应期")
+            if day_branch:
+                day_idx = EARTHLY_BRANCHES.index(day_branch) if day_branch in EARTHLY_BRANCHES else 0
+                mb_idx = EARTHLY_BRANCHES.index(mb) if mb in EARTHLY_BRANCHES else 0
+                days_to_value = (mb_idx - day_idx) % 12
+                chong_idx = EARTHLY_BRANCHES.index(chong) if chong in EARTHLY_BRANCHES else 0
+                days_to_chong = (chong_idx - day_idx) % 12
+                timing_parts.append(f"  距今日约{days_to_value}日逢值，约{days_to_chong}日逢冲")
+    elif day_branch:
+        timing_parts.append(f"无明确动爻，以日辰「{day_branch}」为基准，逢用神旺相之日应事")
+
+    # 中期应期（月/节气）
+    if month_branch:
+        next_jieqi = MONTH_BRANCH.get(month_branch, "")
+        timing_parts.append(f"月令「{month_branch}」（{next_jieqi}），月内用神得令则应期在本月，失令则待下月")
+
+    # 旺衰决定应期远近
+    if "旺" in wangshuai_level or "相" in wangshuai_level:
+        timing_parts.append("用神旺相，应期偏近，重点关注7日内的变化")
+    elif "休" in wangshuai_level:
+        timing_parts.append("用神休囚，应期偏中，关注本月内节气交接前后")
+    elif "囚" in wangshuai_level or "死" in wangshuai_level:
+        timing_parts.append("用神囚死，应期偏远，需待用神得令之月（可能跨月或跨季）")
+    else:
+        timing_parts.append("用神力量中等，应期在近中远之间，需持续观察")
+
+    # 吉凶对应期的影响
+    if fortune_level in ("大凶", "小凶"):
+        timing_parts.append("凶卦应期多为突发，需警惕近期（3日内）的意外变化")
+    elif fortune_level in ("大吉", "小吉"):
+        timing_parts.append("吉卦应期多为渐进，利好逐步兑现，不宜操之过急")
+
+    timing_parts.append("注：应期为传统术数推算的参考时间窗口，实际兑现受人为决策与外部因素影响")
+
+    return "\n".join(timing_parts)
 
 
 # ============================================================

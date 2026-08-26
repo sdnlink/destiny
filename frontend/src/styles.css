@@ -7008,3 +7008,409 @@ select:focus {
   background: rgba(165, 62, 45, 0.1);
   color: var(--vermilion, #a53e2d);
 }
+
+/* ==========================================================================
+   Hexagram View (卦象可视化)
+   ========================================================================== */
+
+.hexagram-view {
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+
+.hexagram-view.compact {
+  padding: 10px 14px;
+}
+
+.hexagram-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.hexagram-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+}
+
+.hexagram-trigrams {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.trigram-sep {
+  font-size: 11px;
+  color: var(--muted, #69716c);
+  margin: 0 2px;
+}
+
+.hexagram-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hex-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.line-position {
+  font-size: 12px;
+  color: var(--muted, #69716c);
+  width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.line-visual {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  max-width: 200px;
+}
+
+.yao-solid {
+  width: 100%;
+  height: 10px;
+  background: var(--ink, #202622);
+  border-radius: 2px;
+}
+
+.yao-broken {
+  display: flex;
+  width: 100%;
+  gap: 0;
+}
+
+.yao-half {
+  flex: 1;
+  height: 10px;
+  background: var(--ink, #202622);
+  border-radius: 2px;
+}
+
+.yao-gap {
+  width: 16px;
+  flex-shrink: 0;
+}
+
+.hex-line.moving .yao-solid,
+.hex-line.moving .yao-half {
+  background: var(--vermilion, #a53e2d);
+}
+
+.moving-mark {
+  color: var(--vermilion, #a53e2d);
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.line-spirit {
+  font-size: 12px;
+  font-weight: 600;
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.line-liuqin {
+  font-size: 12px;
+  color: var(--muted, #69716c);
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.hexagram-moving-info {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--vermilion, #a53e2d);
+  font-weight: 600;
+}
+
+/* 打印样式 */
+@media print {
+  .workflow-container {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+  .btn-primary, .btn-secondary, .header-actions, .result-actions,
+  .interact-view, .result-tabs, .collapsible-header, .session-history-panel,
+  .recover-panel, .workflow-notice, .form-hint {
+    display: none !important;
+  }
+  .result-content {
+    display: block !important;
+  }
+  .formatted-result {
+    max-height: none !important;
+    overflow: visible !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  .fortune-banner {
+    break-inside: avoid;
+  }
+  .hexagram-view {
+    break-inside: avoid;
+  }
+}
+
+/* 搜索过滤 */
+.history-search-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.history-search-row input,
+.history-search-row select {
+  padding: 6px 10px;
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.history-search-row input {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* 交互结果复制按钮 */
+.interaction-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.copy-interaction-btn {
+  background: none;
+  border: none;
+  color: var(--muted, #69716c);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.copy-interaction-btn:hover {
+  background: var(--paper-deep, #f3f1ea);
+  color: var(--jade, #297267);
+}
+
+/* JSON 导入导出 */
+.io-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.io-actions button {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+/* ==========================================================================
+   Mobile Optimization (移动端深度适配)
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .workflow-container {
+    padding: 10px 12px !important;
+  }
+
+  .workflow-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .header-actions .btn-small {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  .numbers-row {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px;
+  }
+
+  .manual-row {
+    grid-template-columns: 1fr !important;
+    gap: 6px;
+  }
+
+  .result-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .result-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .result-actions .btn-small {
+    flex: 1;
+    min-width: 70px;
+    justify-content: center;
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  .fortune-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px 14px;
+  }
+
+  .fortune-value {
+    font-size: 20px;
+  }
+
+  .result-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .result-tabs button {
+    padding: 8px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .formatted-result {
+    font-size: 11px;
+    padding: 10px 12px;
+    max-height: 60vh;
+  }
+
+  .interact-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .interact-row input,
+  .interact-row select {
+    width: 100%;
+  }
+
+  .interact-row .btn-small {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hexagram-view {
+    padding: 12px;
+  }
+
+  .line-position {
+    width: 28px;
+    font-size: 11px;
+  }
+
+  .line-spirit,
+  .line-liuqin {
+    width: 28px;
+    font-size: 11px;
+  }
+
+  .session-list-item {
+    padding: 8px 10px;
+  }
+
+  .session-question {
+    font-size: 12px;
+  }
+
+  .session-item-meta {
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  .history-search-row {
+    flex-direction: column;
+  }
+
+  .history-search-row input,
+  .history-search-row select {
+    width: 100%;
+  }
+
+  .collapsible-header {
+    padding: 10px 12px;
+  }
+
+  .collapsible-body {
+    padding: 0 12px 12px;
+  }
+
+  .structured-step {
+    padding: 10px 12px;
+  }
+
+  .friendly-label {
+    min-width: 60px;
+    font-size: 12px;
+  }
+
+  .party-card,
+  .choice-card {
+    padding: 8px 10px;
+  }
+
+  .workflow-form {
+    padding: 14px 16px;
+  }
+
+  .btn-large {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .result-actions .btn-small {
+    font-size: 11px;
+    padding: 5px 6px;
+  }
+
+  .result-tabs button {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .hexagram-title {
+    font-size: 14px;
+  }
+
+  .hexagram-name {
+    font-size: 16px;
+  }
+}
