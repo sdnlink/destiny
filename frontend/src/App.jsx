@@ -17,6 +17,7 @@ import {
   Search,
   Settings,
   ShieldCheck,
+  Sparkles,
   Sun,
   Trash2,
   Upload,
@@ -24,6 +25,7 @@ import {
 } from "lucide-react";
 import InputPanel from "./components/InputPanel";
 import ResultWorkspace from "./components/ResultWorkspace";
+import WorkflowPanel from "./components/WorkflowPanel";
 import { analyzeCalendar, checkHealth, compareCalculations, loadRules } from "./lib/api";
 import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
 import { GLOSSARY_CATEGORIES, GLOSSARY_ITEMS } from "./lib/glossary";
@@ -195,7 +197,7 @@ function buildCalculations(form) {
   return calculations;
 }
 
-function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGlossary, serviceOnline, theme, setTheme }) {
+function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGlossary, serviceOnline, theme, setTheme, viewMode, setViewMode }) {
   const nextTheme = theme === "paper" ? "dark" : theme === "dark" ? "jade" : "paper";
   const themeLabel = theme === "paper" ? "宣纸素雅" : theme === "dark" ? "玄墨深邃" : "青铜古韵";
   const ThemeIcon = theme === "paper" ? Sun : theme === "dark" ? Moon : Palette;
@@ -207,7 +209,8 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGl
         {!collapsed && <div><strong>天机演象</strong><span>推演工作台</span></div>}
       </div>
       <div className="nav-items">
-        <button className="active" title="新建推演"><Plus size={18} /><span>新建推演</span></button>
+        <button className={viewMode === "classic" ? "active" : ""} onClick={() => setViewMode("classic")} title="经典推演模式"><Plus size={18} /><span>经典推演</span></button>
+        <button className={viewMode === "workflow" ? "active" : ""} onClick={() => setViewMode("workflow")} title="交互式推演工作流（7步标准化）"><Sparkles size={18} /><span>交互推演</span></button>
         <button onClick={openHistory} title="历史推演记录与案例库"><Archive size={18} /><span>案例库</span></button>
         <button onClick={openRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
         <button onClick={openGlossary} title="术数典籍与核心概念速查"><BookOpen size={18} /><span>概念速查</span></button>
@@ -534,6 +537,7 @@ export default function App() {
   const [rules, setRules] = useState([]);
   const [rulesLoading, setRulesLoading] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("tianji_theme") || "paper");
+  const [viewMode, setViewMode] = useState("classic"); // classic / workflow
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -642,27 +646,37 @@ export default function App() {
         serviceOnline={serviceOnline}
         theme={theme}
         setTheme={setTheme}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
       />
       <div className="mobile-topbar">
         <div className="brand-mark"><span>☰</span><span>☷</span></div>
         <strong>天机演象</strong>
         <button className="icon-button" onClick={() => setMobileInputOpen(!mobileInputOpen)} aria-label="切换输入面板"><Menu size={20} /></button>
       </div>
-      <div className={`input-column ${mobileInputOpen ? "mobile-open" : ""}`}>
-        <InputPanel
-          form={form}
-          setForm={setForm}
-          onSubmit={handleSubmit}
-          onPreview={handlePreview}
-          onReset={handleReset}
-          onRecast={handleRecast}
-          loading={loading}
-          previewLoading={previewLoading}
-          preview={preview}
-          error={error}
-        />
-      </div>
-      <ResultWorkspace result={result} context={resultContext} activeTab={activeTab} setActiveTab={setActiveTab} />
+      {viewMode === "workflow" ? (
+        <div className="workflow-container">
+          <WorkflowPanel />
+        </div>
+      ) : (
+        <>
+          <div className={`input-column ${mobileInputOpen ? "mobile-open" : ""}`}>
+            <InputPanel
+              form={form}
+              setForm={setForm}
+              onSubmit={handleSubmit}
+              onPreview={handlePreview}
+              onReset={handleReset}
+              onRecast={handleRecast}
+              loading={loading}
+              previewLoading={previewLoading}
+              preview={preview}
+              error={error}
+            />
+          </div>
+          <ResultWorkspace result={result} context={resultContext} activeTab={activeTab} setActiveTab={setActiveTab} />
+        </>
+      )}
       <RulesDrawer open={rulesOpen} onClose={() => setRulesOpen(false)} rules={rules} loading={rulesLoading} />
       <HistoryDrawer open={historyOpen} onClose={() => setHistoryOpen(false)} onLoadHistory={handleLoadHistory} />
       <GlossaryDrawer open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />

@@ -1,0 +1,5705 @@
+{
+  "session_id": "sess_3eaeca118b624594a20137e7",
+  "question": "北京国御安全科技有线公司这个月能不能发工资，以及后续经营是否可持续",
+  "category": "career",
+  "system": "auto",
+  "casting_method": "numbers",
+  "casting_source": {
+    "local_datetime": "2026-08-26T11:33",
+    "timezone": "Asia/Shanghai",
+    "cast_nonce": "af04c867c69a43aba96b51b61b12383d",
+    "use_true_solar_time": false,
+    "numbers": [
+      8,
+      8,
+      8
+    ]
+  },
+  "user_profile": {
+    "gender": "男"
+  },
+  "status": "casted",
+  "snapshot": {
+    "snapshot_id": "snap_67c1fc32d68e2cc14eb6237f",
+    "frozen": true,
+    "raw_plate": {
+      "scheduling_note": "未指定门派，默认主用梅花易数起卦，六爻纳甲辅助参断。",
+      "systems_used": [
+        "meihua",
+        "liuyao"
+      ],
+      "calculation_requests": [
+        {
+          "module": "calendar",
+          "method": "analyze",
+          "input": {
+            "local_datetime": "2026-08-26T11:33",
+            "timezone": "Asia/Shanghai",
+            "use_true_solar_time": false
+          }
+        },
+        {
+          "module": "meihua",
+          "method": "numbers",
+          "input": {
+            "upper_number": 8,
+            "lower_number": 8
+          }
+        },
+        {
+          "module": "liuyao",
+          "method": "numbers",
+          "input": {
+            "local_datetime": "2026-08-26T11:33",
+            "timezone": "Asia/Shanghai",
+            "use_true_solar_time": false
+          }
+        }
+      ]
+    },
+    "module_results": [
+      {
+        "module": "calendar",
+        "method": "analyze",
+        "result": {
+          "schema_version": "2.0",
+          "system": "calendar",
+          "school": "mvp-engineering-baseline",
+          "engine_version": "calendar-engine-2.0.0+lunar-python-1.4.8",
+          "rule_version": "calendar-domain-baseline-2.0.0",
+          "input": {
+            "local_datetime": "2026-08-26T11:33",
+            "timezone": "Asia/Shanghai",
+            "longitude": null,
+            "use_true_solar_time": false
+          },
+          "normalized_input": {
+            "local_datetime": "2026-08-26T11:33:00+08:00",
+            "timezone": "Asia/Shanghai",
+            "effective_local_datetime": "2026-08-26T11:33:00+08:00",
+            "solar_term_reference_datetime": "2026-08-26T11:33:00+08:00"
+          },
+          "time": {
+            "original_local_datetime": "2026-08-26T11:33:00+08:00",
+            "utc_datetime": "2026-08-26T03:33:00+00:00",
+            "effective_local_datetime": "2026-08-26T11:33:00+08:00",
+            "solar_term_reference_datetime": "2026-08-26T11:33:00+08:00",
+            "correction": {
+              "enabled": false,
+              "longitude": null,
+              "total_correction_minutes": 0.0,
+              "corrected_local_datetime": "2026-08-26T11:33:00+08:00"
+            }
+          },
+          "solar": {
+            "year": 2026,
+            "month": 8,
+            "day": 26,
+            "hour": 11,
+            "minute": 33,
+            "second": 0
+          },
+          "lunar": {
+            "year": 2026,
+            "month": 7,
+            "day": 14,
+            "is_leap_month": false,
+            "month_name": "七",
+            "day_name": "十四"
+          },
+          "pillars": {
+            "year": "丙午",
+            "month": "丙申",
+            "day": "壬申",
+            "time": "丙午",
+            "year_boundary": "立春",
+            "month_boundary": "节令",
+            "day_boundary": "子初23:00"
+          },
+          "ganzhi": {
+            "year": {
+              "text": "丙午",
+              "stem": "丙",
+              "branch": "午",
+              "stem_element": "火",
+              "branch_element": "火",
+              "polarity": "阳",
+              "sexagenary_number": 43
+            },
+            "month": {
+              "text": "丙申",
+              "stem": "丙",
+              "branch": "申",
+              "stem_element": "火",
+              "branch_element": "金",
+              "polarity": "阳",
+              "sexagenary_number": 33
+            },
+            "day": {
+              "text": "壬申",
+              "stem": "壬",
+              "branch": "申",
+              "stem_element": "水",
+              "branch_element": "金",
+              "polarity": "阳",
+              "sexagenary_number": 9
+            },
+            "hour": {
+              "text": "丙午",
+              "stem": "丙",
+              "branch": "午",
+              "stem_element": "火",
+              "branch_element": "火",
+              "polarity": "阳",
+              "sexagenary_number": 43
+            }
+          },
+          "month_branch": {
+            "name": "申",
+            "number": 9,
+            "boundary_name": "立秋",
+            "boundary_term": {
+              "name": "立秋",
+              "datetime": "2026-08-07 19:42:43",
+              "local_datetime": "2026-08-07T19:42:43+08:00",
+              "reference_datetime": "2026-08-07T19:42:43+08:00",
+              "utc_datetime": "2026-08-07T11:42:43+00:00"
+            },
+            "next_boundary_term": {
+              "name": "白露",
+              "datetime": "2026-09-07 22:41:16",
+              "local_datetime": "2026-09-07T22:41:16+08:00",
+              "reference_datetime": "2026-09-07T22:41:16+08:00",
+              "utc_datetime": "2026-09-07T14:41:16+00:00"
+            }
+          },
+          "zodiac": {
+            "name": "马",
+            "branch": "午",
+            "boundary": "立春"
+          },
+          "time_branch": {
+            "name": "午",
+            "number": 7
+          },
+          "year_branch": {
+            "name": "午",
+            "number": 7
+          },
+          "xun": {
+            "name": "甲子旬",
+            "start_pillar": "甲子",
+            "empty_branches": [
+              "戌",
+              "亥"
+            ],
+            "dun_gan": {
+              "子": "甲",
+              "丑": "乙",
+              "寅": "丙",
+              "卯": "丁",
+              "辰": "戊",
+              "巳": "己",
+              "午": "庚",
+              "未": "辛",
+              "申": "壬",
+              "酉": "癸"
+            }
+          },
+          "xun_kong": [
+            "戌",
+            "亥"
+          ],
+          "solar_term": {
+            "previous": {
+              "name": "处暑",
+              "datetime": "2026-08-23 10:18:49",
+              "local_datetime": "2026-08-23T10:18:49+08:00",
+              "reference_datetime": "2026-08-23T10:18:49+08:00",
+              "utc_datetime": "2026-08-23T02:18:49+00:00"
+            },
+            "current": null,
+            "next": {
+              "name": "白露",
+              "datetime": "2026-09-07 22:41:16",
+              "local_datetime": "2026-09-07T22:41:16+08:00",
+              "reference_datetime": "2026-09-07T22:41:16+08:00",
+              "utc_datetime": "2026-09-07T14:41:16+00:00"
+            },
+            "previous_month_boundary": {
+              "name": "立秋",
+              "datetime": "2026-08-07 19:42:43",
+              "local_datetime": "2026-08-07T19:42:43+08:00",
+              "reference_datetime": "2026-08-07T19:42:43+08:00",
+              "utc_datetime": "2026-08-07T11:42:43+00:00"
+            },
+            "next_month_boundary": {
+              "name": "白露",
+              "datetime": "2026-09-07 22:41:16",
+              "local_datetime": "2026-09-07T22:41:16+08:00",
+              "reference_datetime": "2026-09-07T22:41:16+08:00",
+              "utc_datetime": "2026-09-07T14:41:16+00:00"
+            },
+            "reference_timezone": "Asia/Shanghai",
+            "algorithm": "lunar-python-1.4.8-shouxing-term-table",
+            "precision": "second",
+            "supported_term_count": 24
+          },
+          "solar_terms": {
+            "previous": {
+              "name": "处暑",
+              "datetime": "2026-08-23 10:18:49",
+              "local_datetime": "2026-08-23T10:18:49+08:00",
+              "reference_datetime": "2026-08-23T10:18:49+08:00",
+              "utc_datetime": "2026-08-23T02:18:49+00:00"
+            },
+            "current": null,
+            "next": {
+              "name": "白露",
+              "datetime": "2026-09-07 22:41:16",
+              "local_datetime": "2026-09-07T22:41:16+08:00",
+              "reference_datetime": "2026-09-07T22:41:16+08:00",
+              "utc_datetime": "2026-09-07T14:41:16+00:00"
+            },
+            "previous_month_boundary": {
+              "name": "立秋",
+              "datetime": "2026-08-07 19:42:43",
+              "local_datetime": "2026-08-07T19:42:43+08:00",
+              "reference_datetime": "2026-08-07T19:42:43+08:00",
+              "utc_datetime": "2026-08-07T11:42:43+00:00"
+            },
+            "next_month_boundary": {
+              "name": "白露",
+              "datetime": "2026-09-07 22:41:16",
+              "local_datetime": "2026-09-07T22:41:16+08:00",
+              "reference_datetime": "2026-09-07T22:41:16+08:00",
+              "utc_datetime": "2026-09-07T14:41:16+00:00"
+            },
+            "reference_timezone": "Asia/Shanghai",
+            "algorithm": "lunar-python-1.4.8-shouxing-term-table",
+            "precision": "second",
+            "supported_term_count": 24
+          },
+          "almanac": {
+            "duty_officer": "建",
+            "twenty_eight_mansion": {
+              "name": "箕",
+              "beast_spirit": "箕水豹",
+              "quadrant": "东方苍龙",
+              "luck": "吉",
+              "song": "箕星造作主高强，岁岁年年大吉昌，埋葬修坟大吉利，田蚕牛马遍山岗，开门放水招田宅，箧满金银谷满仓，福荫高官加禄位，六亲丰禄乐安康。"
+            },
+            "lunar_phase_regime": {
+              "code": "jishengba",
+              "name": "既生霸",
+              "description": "上弦至满月，月魄渐生，光明充盈"
+            },
+            "day_tian_shen": {
+              "name": "天牢",
+              "type": "黑道",
+              "luck": "凶"
+            },
+            "day_nine_star": "四绿木天权",
+            "favorable_activities": [
+              "嫁娶",
+              "纳采",
+              "订盟",
+              "祭祀",
+              "祈福",
+              "求嗣",
+              "出行",
+              "解除",
+              "竖柱",
+              "入宅",
+              "移徙",
+              "纳财",
+              "上梁",
+              "纳畜",
+              "入殓",
+              "安葬",
+              "启钻"
+            ],
+            "unfavorable_activities": [
+              "栽种",
+              "掘井",
+              "动土",
+              "安床",
+              "破土",
+              "置产"
+            ],
+            "lucky_directions": {
+              "joy_deity": "正南",
+              "wealth_deity": "正南",
+              "blessing_deity": "东南",
+              "yang_noble": "正东",
+              "yin_noble": "东南"
+            },
+            "auspicious_spirits": [
+              "月德",
+              "月恩",
+              "四相",
+              "王日"
+            ],
+            "inauspicious_spirits": [
+              "月建",
+              "小时",
+              "土符",
+              "五离",
+              "天牢"
+            ],
+            "pengzu": {
+              "gan": "壬不泱水更难提防",
+              "zhi": "申不安床鬼祟入房"
+            },
+            "hourly_timeline": [
+              {
+                "hour": 0,
+                "branch": "子",
+                "time_range": "23:00 - 01:00",
+                "ganzhi": "庚子",
+                "tian_shen": {
+                  "name": "青龙",
+                  "type": "黄道",
+                  "luck": "吉"
+                },
+                "clash": {
+                  "animal": "马",
+                  "direction": "南"
+                },
+                "favorable_activities": [
+                  "祈福",
+                  "求嗣",
+                  "订婚",
+                  "嫁娶",
+                  "出行",
+                  "求财"
+                ],
+                "unfavorable_activities": [
+                  "修造",
+                  "动土"
+                ]
+              },
+              {
+                "hour": 2,
+                "branch": "丑",
+                "time_range": "01:00 - 03:00",
+                "ganzhi": "辛丑",
+                "tian_shen": {
+                  "name": "明堂",
+                  "type": "黄道",
+                  "luck": "吉"
+                },
+                "clash": {
+                  "animal": "羊",
+                  "direction": "东"
+                },
+                "favorable_activities": [
+                  "祈福",
+                  "嫁娶",
+                  "修造",
+                  "造庙",
+                  "作灶",
+                  "入宅"
+                ],
+                "unfavorable_activities": [
+                  "无"
+                ]
+              },
+              {
+                "hour": 4,
+                "branch": "寅",
+                "time_range": "03:00 - 05:00",
+                "ganzhi": "壬寅",
+                "tian_shen": {
+                  "name": "天刑",
+                  "type": "黑道",
+                  "luck": "凶"
+                },
+                "clash": {
+                  "animal": "猴",
+                  "direction": "北"
+                },
+                "favorable_activities": [
+                  "无"
+                ],
+                "unfavorable_activities": [
+                  "诸事不宜"
+                ]
+              },
+              {
+                "hour": 6,
+                "branch": "卯",
+                "time_range": "05:00 - 07:00",
+                "ganzhi": "癸卯",
+                "tian_shen": {
+                  "name": "朱雀",
+                  "type": "黑道",
+                  "luck": "凶"
+                },
+                "clash": {
+                  "animal": "鸡",
+                  "direction": "西"
+                },
+                "favorable_activities": [
+                  "酬神",
+                  "求财",
+                  "见贵",
+                  "订婚",
+                  "嫁娶",
+                  "修造"
+                ],
+                "unfavorable_activities": [
+                  "祭祀",
+                  "祈福",
+                  "斋醮",
+                  "开光"
+                ]
+              },
+              {
+                "hour": 8,
+                "branch": "辰",
+                "time_range": "07:00 - 09:00",
+                "ganzhi": "甲辰",
+                "tian_shen": {
+                  "name": "金匮",
+                  "type": "黄道",
+                  "luck": "吉"
+                },
+                "clash": {
+                  "animal": "狗",
+                  "direction": "南"
+                },
+                "favorable_activities": [
+                  "祈福",
+                  "求嗣",
+                  "订婚",
+                  "嫁娶",
+                  "出行",
+                  "求财"
+                ],
+                "unfavorable_activities": [
+                  "无"
+                ]
+              },
+              {
+                "hour": 10,
+                "branch": "巳",
+                "time_range": "09:00 - 11:00",
+                "ganzhi": "乙巳",
+                "tian_shen": {
+                  "name": "天德",
+                  "type": "黄道",
+                  "luck": "吉"
+                },
+                "clash": {
+                  "animal": "猪",
+                  "direction": "东"
+                },
+                "favorable_activities": [
+                  "祈福",
+                  "求嗣",
+                  "出行",
+                  "求财",
+                  "嫁娶",
+                  "安葬"
+                ],
+                "unfavorable_activities": [
+                  "无"
+                ]
+              },
+              {
+                "hour": 12,
+                "branch": "午",
+                "time_range": "11:00 - 13:00",
+                "ganzhi": "丙午",
+                "tian_shen": {
+                  "name": "白虎",
+                  "type": "黑道",
+                  "luck": "凶"
+                },
+                "clash": {
+                  "animal": "鼠",
+                  "direction": "北"
+                },
+                "favorable_activities": [
+                  "祈福",
+                  "求嗣",
+                  "订婚",
+                  "嫁娶",
+                  "出行",
+                  "求财"
+                ],
+                "unfavorable_activities": [
+                  "上梁",
+                  "盖屋",
+                  "入殓"
+                ]
+              },
+              {
+                "hour": 14,
+                "branch": "未",
+                "time_range": "13:00 - 15:00",
+                "ganzhi": "丁未",
+                "tian_shen": {
+                  "name": "玉堂",
+                  "type": "黄道",
+                  "luck": "吉"
+                },
+                "clash": {
+                  "animal": "牛",
+                  "direction": "西"
+                },
+                "favorable_activities": [
+                  "修造",
+                  "入宅",
+                  "安葬",
+                  "祭祀",
+                  "祈福",
+                  "求嗣"
+                ],
+                "unfavorable_activities": [
+                  "无"
+                ]
+              },
+              {
+                "hour": 16,
+                "branch": "申",
+                "time_range": "15:00 - 17:00",
+                "ganzhi": "戊申",
+                "tian_shen": {
+                  "name": "天牢",
+                  "type": "黑道",
+                  "luck": "凶"
+                },
+                "clash": {
+                  "animal": "虎",
+                  "direction": "南"
+                },
+                "favorable_activities": [
+                  "嫁娶",
+                  "入宅",
+                  "开市",
+                  "交易",
+                  "安葬"
+                ],
+                "unfavorable_activities": [
+                  "赴任",
+                  "修造",
+                  "移徙",
+                  "出行"
+                ]
+              },
+              {
+                "hour": 18,
+                "branch": "酉",
+                "time_range": "17:00 - 19:00",
+                "ganzhi": "己酉",
+                "tian_shen": {
+                  "name": "玄武",
+                  "type": "黑道",
+                  "luck": "凶"
+                },
+                "clash": {
+                  "animal": "兔",
+                  "direction": "东"
+                },
+                "favorable_activities": [
+                  "祈福",
+                  "求嗣",
+                  "订婚",
+                  "嫁娶",
+                  "入宅",
+                  "求财"
+                ],
+                "unfavorable_activities": [
+                  "赴任",
+                  "出行",
+                  "修造",
+                  "动土"
+                ]
+              },
+              {
+                "hour": 20,
+                "branch": "戌",
+                "time_range": "19:00 - 21:00",
+                "ganzhi": "庚戌",
+                "tian_shen": {
+                  "name": "司命",
+                  "type": "黄道",
+                  "luck": "吉"
+                },
+                "clash": {
+                  "animal": "龙",
+                  "direction": "北"
+                },
+                "favorable_activities": [
+                  "作灶",
+                  "祭祀",
+                  "祈福",
+                  "斋醮",
+                  "酬神"
+                ],
+                "unfavorable_activities": [
+                  "赴任",
+                  "出行",
+                  "求财",
+                  "修造"
+                ]
+              },
+              {
+                "hour": 22,
+                "branch": "亥",
+                "time_range": "21:00 - 23:00",
+                "ganzhi": "辛亥",
+                "tian_shen": {
+                  "name": "勾陈",
+                  "type": "黑道",
+                  "luck": "凶"
+                },
+                "clash": {
+                  "animal": "蛇",
+                  "direction": "西"
+                },
+                "favorable_activities": [
+                  "求财",
+                  "见贵",
+                  "订婚",
+                  "嫁娶",
+                  "入宅",
+                  "开市"
+                ],
+                "unfavorable_activities": [
+                  "赴任",
+                  "出行",
+                  "修造"
+                ]
+              }
+            ]
+          },
+          "calculation_trace": [
+            "normalize local datetime and IANA timezone",
+            "apply configured civil-time or true-solar-time standard",
+            "convert effective instant to Asia/Shanghai solar-term reference time",
+            "derive lunar date and adjacent exact solar-term moments",
+            "derive year/month pillars by solar terms and day/hour pillars by effective local time",
+            "derive month branch, zodiac, xun and empty branches"
+          ],
+          "steps": [
+            {
+              "sequence": 1,
+              "operation": "normalize_local_datetime",
+              "inputs": {
+                "local_datetime": "2026-08-26T11:33",
+                "timezone": "Asia/Shanghai"
+              },
+              "output": {
+                "local_datetime": "2026-08-26T11:33:00+08:00",
+                "utc_datetime": "2026-08-26T03:33:00+00:00"
+              },
+              "rule_ids": [
+                "CAL-NORMALIZE-001"
+              ]
+            },
+            {
+              "sequence": 2,
+              "operation": "apply_time_standard",
+              "inputs": {
+                "use_true_solar_time": false,
+                "longitude": null
+              },
+              "output": {
+                "effective_local_datetime": "2026-08-26T11:33:00+08:00",
+                "correction": {
+                  "enabled": false,
+                  "longitude": null,
+                  "total_correction_minutes": 0.0,
+                  "corrected_local_datetime": "2026-08-26T11:33:00+08:00"
+                }
+              },
+              "rule_ids": [
+                "CAL-SOLAR-TIME-001"
+              ]
+            },
+            {
+              "sequence": 3,
+              "operation": "normalize_solar_term_reference",
+              "inputs": {
+                "effective_local_datetime": "2026-08-26T11:33:00+08:00"
+              },
+              "output": {
+                "reference_datetime": "2026-08-26T11:33:00+08:00"
+              },
+              "rule_ids": [
+                "CAL-TERM-TZ-001"
+              ]
+            },
+            {
+              "sequence": 4,
+              "operation": "derive_lunar_and_solar_terms",
+              "inputs": {
+                "reference_datetime": "2026-08-26T11:33:00+08:00"
+              },
+              "output": {
+                "lunar": {
+                  "year": 2026,
+                  "month": 7,
+                  "day": 14,
+                  "is_leap_month": false,
+                  "month_name": "七",
+                  "day_name": "十四"
+                },
+                "solar_terms": {
+                  "previous": {
+                    "name": "处暑",
+                    "datetime": "2026-08-23 10:18:49",
+                    "local_datetime": "2026-08-23T10:18:49+08:00",
+                    "reference_datetime": "2026-08-23T10:18:49+08:00",
+                    "utc_datetime": "2026-08-23T02:18:49+00:00"
+                  },
+                  "current": null,
+                  "next": {
+                    "name": "白露",
+                    "datetime": "2026-09-07 22:41:16",
+                    "local_datetime": "2026-09-07T22:41:16+08:00",
+                    "reference_datetime": "2026-09-07T22:41:16+08:00",
+                    "utc_datetime": "2026-09-07T14:41:16+00:00"
+                  },
+                  "previous_month_boundary": {
+                    "name": "立秋",
+                    "datetime": "2026-08-07 19:42:43",
+                    "local_datetime": "2026-08-07T19:42:43+08:00",
+                    "reference_datetime": "2026-08-07T19:42:43+08:00",
+                    "utc_datetime": "2026-08-07T11:42:43+00:00"
+                  },
+                  "next_month_boundary": {
+                    "name": "白露",
+                    "datetime": "2026-09-07 22:41:16",
+                    "local_datetime": "2026-09-07T22:41:16+08:00",
+                    "reference_datetime": "2026-09-07T22:41:16+08:00",
+                    "utc_datetime": "2026-09-07T14:41:16+00:00"
+                  },
+                  "reference_timezone": "Asia/Shanghai",
+                  "algorithm": "lunar-python-1.4.8-shouxing-term-table",
+                  "precision": "second",
+                  "supported_term_count": 24
+                }
+              },
+              "rule_ids": [
+                "CAL-CONVERSION-001",
+                "CAL-TERM-001"
+              ]
+            },
+            {
+              "sequence": 5,
+              "operation": "derive_four_pillars",
+              "inputs": {
+                "reference_datetime": "2026-08-26T11:33:00+08:00",
+                "effective_local_datetime": "2026-08-26T11:33:00+08:00"
+              },
+              "output": {
+                "pillars": {
+                  "year": "丙午",
+                  "month": "丙申",
+                  "day": "壬申",
+                  "time": "丙午",
+                  "year_boundary": "立春",
+                  "month_boundary": "节令",
+                  "day_boundary": "子初23:00"
+                },
+                "ganzhi": {
+                  "year": {
+                    "text": "丙午",
+                    "stem": "丙",
+                    "branch": "午",
+                    "stem_element": "火",
+                    "branch_element": "火",
+                    "polarity": "阳",
+                    "sexagenary_number": 43
+                  },
+                  "month": {
+                    "text": "丙申",
+                    "stem": "丙",
+                    "branch": "申",
+                    "stem_element": "火",
+                    "branch_element": "金",
+                    "polarity": "阳",
+                    "sexagenary_number": 33
+                  },
+                  "day": {
+                    "text": "壬申",
+                    "stem": "壬",
+                    "branch": "申",
+                    "stem_element": "水",
+                    "branch_element": "金",
+                    "polarity": "阳",
+                    "sexagenary_number": 9
+                  },
+                  "hour": {
+                    "text": "丙午",
+                    "stem": "丙",
+                    "branch": "午",
+                    "stem_element": "火",
+                    "branch_element": "火",
+                    "polarity": "阳",
+                    "sexagenary_number": 43
+                  }
+                }
+              },
+              "rule_ids": [
+                "CAL-PILLARS-001"
+              ]
+            },
+            {
+              "sequence": 6,
+              "operation": "derive_calendar_cycles",
+              "inputs": {
+                "year_pillar": "丙午",
+                "month_pillar": "丙申",
+                "day_pillar": "壬申"
+              },
+              "output": {
+                "month_branch": {
+                  "name": "申",
+                  "number": 9,
+                  "boundary_name": "立秋",
+                  "boundary_term": {
+                    "name": "立秋",
+                    "datetime": "2026-08-07 19:42:43",
+                    "local_datetime": "2026-08-07T19:42:43+08:00",
+                    "reference_datetime": "2026-08-07T19:42:43+08:00",
+                    "utc_datetime": "2026-08-07T11:42:43+00:00"
+                  },
+                  "next_boundary_term": {
+                    "name": "白露",
+                    "datetime": "2026-09-07 22:41:16",
+                    "local_datetime": "2026-09-07T22:41:16+08:00",
+                    "reference_datetime": "2026-09-07T22:41:16+08:00",
+                    "utc_datetime": "2026-09-07T14:41:16+00:00"
+                  }
+                },
+                "zodiac": {
+                  "name": "马",
+                  "branch": "午",
+                  "boundary": "立春"
+                },
+                "xun": {
+                  "name": "甲子旬",
+                  "start_pillar": "甲子",
+                  "empty_branches": [
+                    "戌",
+                    "亥"
+                  ],
+                  "dun_gan": {
+                    "子": "甲",
+                    "丑": "乙",
+                    "寅": "丙",
+                    "卯": "丁",
+                    "辰": "戊",
+                    "巳": "己",
+                    "午": "庚",
+                    "未": "辛",
+                    "申": "壬",
+                    "酉": "癸"
+                  }
+                },
+                "xun_kong": [
+                  "戌",
+                  "亥"
+                ]
+              },
+              "rule_ids": [
+                "CAL-CYCLE-001",
+                "CYCLE-XUN-001"
+              ]
+            }
+          ],
+          "evidence": [],
+          "judgements": [],
+          "warnings": []
+        }
+      },
+      {
+        "module": "meihua",
+        "method": "numbers",
+        "result": {
+          "schema_version": "2.0",
+          "system": "meihua",
+          "school": "mvp-engineering-baseline",
+          "engine_version": "meihua-engine-2.0.0",
+          "algorithm_version": "meihua-engine-2.0.0",
+          "rule_version": "meihua-mvp-baseline-1.0.0",
+          "input": {
+            "upper_number": 8,
+            "lower_number": 8
+          },
+          "normalized_input": {
+            "upper_source": 8,
+            "lower_source": 8,
+            "moving_source": 16
+          },
+          "facts": {
+            "method": "two_numbers",
+            "input_numbers": {
+              "upper": 8,
+              "lower": 8
+            },
+            "upper_trigram_number": 8,
+            "lower_trigram_number": 8,
+            "upper_trigram": {
+              "number": 8,
+              "name": "坤",
+              "symbol": "☷",
+              "lines": [
+                0,
+                0,
+                0
+              ],
+              "element": "土",
+              "direction": "西南"
+            },
+            "lower_trigram": {
+              "number": 8,
+              "name": "坤",
+              "symbol": "☷",
+              "lines": [
+                0,
+                0,
+                0
+              ],
+              "element": "土",
+              "direction": "西南"
+            },
+            "moving_line": 4,
+            "original": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "changed": {
+              "ordinal": 16,
+              "name": "豫",
+              "symbol": "䷏",
+              "lines": [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 4,
+                "name": "震",
+                "symbol": "☳",
+                "lines": [
+                  1,
+                  0,
+                  0
+                ],
+                "element": "木",
+                "direction": "东"
+              }
+            },
+            "mutual": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "opposite": {
+              "ordinal": 1,
+              "name": "乾",
+              "symbol": "䷀",
+              "lines": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+              ],
+              "lower_trigram": {
+                "number": 1,
+                "name": "乾",
+                "symbol": "☰",
+                "lines": [
+                  1,
+                  1,
+                  1
+                ],
+                "element": "金",
+                "direction": "西北"
+              },
+              "upper_trigram": {
+                "number": 1,
+                "name": "乾",
+                "symbol": "☰",
+                "lines": [
+                  1,
+                  1,
+                  1
+                ],
+                "element": "金",
+                "direction": "西北"
+              }
+            },
+            "reversed": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "moving_lines": [
+              4
+            ],
+            "body_use": {
+              "body_position": "lower",
+              "use_position": "upper",
+              "body_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "use_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "changed_use_trigram": {
+                "number": 4,
+                "name": "震",
+                "symbol": "☳",
+                "lines": [
+                  1,
+                  0,
+                  0
+                ],
+                "element": "木",
+                "direction": "东"
+              }
+            },
+            "body_use_relation": {
+              "original": {
+                "code": "same_element",
+                "label": "体用比和"
+              },
+              "changed": {
+                "code": "use_controls_body",
+                "label": "用克体"
+              }
+            }
+          },
+          "calculation_trace": [
+            "8 % 8 -> upper trigram index 8",
+            "8 % 8 -> lower trigram index 8",
+            "(8 + 8) % 6 -> moving line 4",
+            "combine lower 坤 and upper 坤 -> 坤",
+            "moving line 4 sets upper as use and lower as body",
+            "change line 4 -> 豫"
+          ],
+          "steps": [
+            {
+              "sequence": 1,
+              "operation": "two_numbers_to_trigrams_and_moving_line",
+              "inputs": {
+                "upper": 8,
+                "lower": 8
+              },
+              "output": {
+                "upper_remainder": 8,
+                "lower_remainder": 8,
+                "moving_source": 16,
+                "moving_line": 4
+              },
+              "rule_ids": [
+                "MH-NUMBER-001"
+              ]
+            },
+            {
+              "sequence": 2,
+              "operation": "derive_body_and_use",
+              "inputs": {
+                "moving_line": 4
+              },
+              "output": {
+                "body_position": "lower",
+                "use_position": "upper"
+              },
+              "rule_ids": [
+                "MH-BODYUSE-001"
+              ]
+            }
+          ],
+          "evidence": [
+            {
+              "evidence_id": "MH-EVIDENCE-BODY-USE-ORIGINAL",
+              "stage": "original",
+              "body_element": "土",
+              "use_element": "土",
+              "code": "same_element",
+              "label": "体用比和",
+              "rule_ids": [
+                "MH-FIVE-ELEMENT-001"
+              ]
+            },
+            {
+              "evidence_id": "MH-EVIDENCE-BODY-USE-CHANGED",
+              "stage": "changed",
+              "body_element": "土",
+              "use_element": "木",
+              "code": "use_controls_body",
+              "label": "用克体",
+              "rule_ids": [
+                "MH-FIVE-ELEMENT-001"
+              ]
+            }
+          ],
+          "judgements": [],
+          "warnings": [
+            "旺衰、应期和事项断语尚未经过专家签署，本结果只包含起卦与体用关系事实。"
+          ]
+        }
+      },
+      {
+        "module": "liuyao",
+        "method": "numbers",
+        "result": {
+          "schema_version": "2.0",
+          "system": "liuyao",
+          "school": "jingfang-eight-palace-engineering-baseline",
+          "engine_version": "liuyao-engine-2.0.0",
+          "algorithm_version": "liuyao-engine-2.0.0",
+          "rule_version": "liuyao-engineering-baseline-2.0.0",
+          "input": {},
+          "normalized_input": {},
+          "facts": {
+            "method": "two_numbers",
+            "input_numbers": {
+              "lower": 8,
+              "upper": 8
+            },
+            "original": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "changed": {
+              "ordinal": 16,
+              "name": "豫",
+              "symbol": "䷏",
+              "lines": [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 4,
+                "name": "震",
+                "symbol": "☳",
+                "lines": [
+                  1,
+                  0,
+                  0
+                ],
+                "element": "木",
+                "direction": "东"
+              }
+            },
+            "mutual": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "opposite": {
+              "ordinal": 1,
+              "name": "乾",
+              "symbol": "䷀",
+              "lines": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+              ],
+              "lower_trigram": {
+                "number": 1,
+                "name": "乾",
+                "symbol": "☰",
+                "lines": [
+                  1,
+                  1,
+                  1
+                ],
+                "element": "金",
+                "direction": "西北"
+              },
+              "upper_trigram": {
+                "number": 1,
+                "name": "乾",
+                "symbol": "☰",
+                "lines": [
+                  1,
+                  1,
+                  1
+                ],
+                "element": "金",
+                "direction": "西北"
+              }
+            },
+            "reversed": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "moving_lines": [
+              4
+            ],
+            "day_pillar": "壬申",
+            "month_branch": {
+              "name": "申",
+              "number": 9,
+              "boundary_name": "立秋",
+              "boundary_term": {
+                "name": "立秋",
+                "datetime": "2026-08-07 19:42:43",
+                "local_datetime": "2026-08-07T19:42:43+08:00",
+                "reference_datetime": "2026-08-07T19:42:43+08:00",
+                "utc_datetime": "2026-08-07T11:42:43+00:00"
+              },
+              "next_boundary_term": {
+                "name": "白露",
+                "datetime": "2026-09-07 22:41:16",
+                "local_datetime": "2026-09-07T22:41:16+08:00",
+                "reference_datetime": "2026-09-07T22:41:16+08:00",
+                "utc_datetime": "2026-09-07T14:41:16+00:00"
+              }
+            },
+            "day_branch": {
+              "name": "申",
+              "number": 9
+            },
+            "palace": {
+              "name": "坤",
+              "element": "土",
+              "stage": "本宫",
+              "host_line": 6,
+              "response_line": 3
+            },
+            "xun": {
+              "name": "甲子旬",
+              "start_pillar": "甲子",
+              "empty_branches": [
+                "戌",
+                "亥"
+              ],
+              "dun_gan": {
+                "子": "甲",
+                "丑": "乙",
+                "寅": "丙",
+                "卯": "丁",
+                "辰": "戊",
+                "巳": "己",
+                "午": "庚",
+                "未": "辛",
+                "申": "壬",
+                "酉": "癸"
+              }
+            },
+            "line_chart": [
+              {
+                "position": 1,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "乙",
+                "najia_branch": "未",
+                "element": "土",
+                "six_relative": "兄弟",
+                "six_spirit": "玄武",
+                "is_void": false,
+                "roles": [],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              },
+              {
+                "position": 2,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "乙",
+                "najia_branch": "巳",
+                "element": "火",
+                "six_relative": "父母",
+                "six_spirit": "青龙",
+                "is_void": false,
+                "roles": [],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              },
+              {
+                "position": 3,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "乙",
+                "najia_branch": "卯",
+                "element": "木",
+                "six_relative": "官鬼",
+                "six_spirit": "朱雀",
+                "is_void": false,
+                "roles": [
+                  "应"
+                ],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              },
+              {
+                "position": 4,
+                "yin_yang": "阴",
+                "is_moving": true,
+                "najia_stem": "癸",
+                "najia_branch": "丑",
+                "element": "土",
+                "six_relative": "兄弟",
+                "six_spirit": "勾陈",
+                "is_void": false,
+                "roles": [],
+                "line_value": 6,
+                "line_type": "老阴",
+                "changed_yin_yang": "阳"
+              },
+              {
+                "position": 5,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "癸",
+                "najia_branch": "亥",
+                "element": "水",
+                "six_relative": "妻财",
+                "six_spirit": "螣蛇",
+                "is_void": true,
+                "roles": [],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              },
+              {
+                "position": 6,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "癸",
+                "najia_branch": "酉",
+                "element": "金",
+                "six_relative": "子孙",
+                "six_spirit": "白虎",
+                "is_void": false,
+                "roles": [
+                  "世"
+                ],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              }
+            ],
+            "hidden_flying_spirits": {
+              "status": "pending_rule_selection",
+              "hidden_spirits": [],
+              "flying_spirits": [],
+              "reason": "伏神飞神取法和标准案例尚未完成规则签署"
+            }
+          },
+          "calculation_trace": [
+            "map two numbers to lower 8, upper 8, moving line 4",
+            "map original hexagram to 坤 palace 本宫",
+            "set host line 6 and response line 3",
+            "decorate six lines with Na Jia, relatives and six spirits",
+            "derive 甲子旬 and empty branches 戌、亥"
+          ],
+          "steps": [
+            {
+              "sequence": 1,
+              "operation": "numbers_to_hexagram",
+              "inputs": {
+                "lower": 8,
+                "upper": 8
+              },
+              "output": {
+                "lower_trigram": 8,
+                "upper_trigram": 8,
+                "moving_line": 4
+              },
+              "rule_ids": [
+                "LY-NUMBER-001"
+              ]
+            },
+            {
+              "sequence": 2,
+              "operation": "derive_eight_palace_and_najia",
+              "inputs": {
+                "original_lines": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "output": {
+                "palace": {
+                  "name": "坤",
+                  "element": "土",
+                  "stage": "本宫",
+                  "host_line": 6,
+                  "response_line": 3
+                },
+                "line_chart": [
+                  {
+                    "position": 1,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "乙",
+                    "najia_branch": "未",
+                    "element": "土",
+                    "six_relative": "兄弟",
+                    "six_spirit": "玄武",
+                    "is_void": false,
+                    "roles": [],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  },
+                  {
+                    "position": 2,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "乙",
+                    "najia_branch": "巳",
+                    "element": "火",
+                    "six_relative": "父母",
+                    "six_spirit": "青龙",
+                    "is_void": false,
+                    "roles": [],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  },
+                  {
+                    "position": 3,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "乙",
+                    "najia_branch": "卯",
+                    "element": "木",
+                    "six_relative": "官鬼",
+                    "six_spirit": "朱雀",
+                    "is_void": false,
+                    "roles": [
+                      "应"
+                    ],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  },
+                  {
+                    "position": 4,
+                    "yin_yang": "阴",
+                    "is_moving": true,
+                    "najia_stem": "癸",
+                    "najia_branch": "丑",
+                    "element": "土",
+                    "six_relative": "兄弟",
+                    "six_spirit": "勾陈",
+                    "is_void": false,
+                    "roles": [],
+                    "line_value": 6,
+                    "line_type": "老阴",
+                    "changed_yin_yang": "阳"
+                  },
+                  {
+                    "position": 5,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "癸",
+                    "najia_branch": "亥",
+                    "element": "水",
+                    "six_relative": "妻财",
+                    "six_spirit": "螣蛇",
+                    "is_void": true,
+                    "roles": [],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  },
+                  {
+                    "position": 6,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "癸",
+                    "najia_branch": "酉",
+                    "element": "金",
+                    "six_relative": "子孙",
+                    "six_spirit": "白虎",
+                    "is_void": false,
+                    "roles": [
+                      "世"
+                    ],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  }
+                ]
+              },
+              "rule_ids": [
+                "LY-PALACE-001",
+                "LY-NAJIA-001",
+                "LY-RELATIVE-001"
+              ]
+            },
+            {
+              "sequence": 3,
+              "operation": "derive_month_day_spirits_and_void",
+              "inputs": {
+                "month_branch": {
+                  "name": "申",
+                  "number": 9,
+                  "boundary_name": "立秋",
+                  "boundary_term": {
+                    "name": "立秋",
+                    "datetime": "2026-08-07 19:42:43",
+                    "local_datetime": "2026-08-07T19:42:43+08:00",
+                    "reference_datetime": "2026-08-07T19:42:43+08:00",
+                    "utc_datetime": "2026-08-07T11:42:43+00:00"
+                  },
+                  "next_boundary_term": {
+                    "name": "白露",
+                    "datetime": "2026-09-07 22:41:16",
+                    "local_datetime": "2026-09-07T22:41:16+08:00",
+                    "reference_datetime": "2026-09-07T22:41:16+08:00",
+                    "utc_datetime": "2026-09-07T14:41:16+00:00"
+                  }
+                },
+                "day_pillar": "壬申"
+              },
+              "output": {
+                "month_branch": {
+                  "name": "申",
+                  "number": 9,
+                  "boundary_name": "立秋",
+                  "boundary_term": {
+                    "name": "立秋",
+                    "datetime": "2026-08-07 19:42:43",
+                    "local_datetime": "2026-08-07T19:42:43+08:00",
+                    "reference_datetime": "2026-08-07T19:42:43+08:00",
+                    "utc_datetime": "2026-08-07T11:42:43+00:00"
+                  },
+                  "next_boundary_term": {
+                    "name": "白露",
+                    "datetime": "2026-09-07 22:41:16",
+                    "local_datetime": "2026-09-07T22:41:16+08:00",
+                    "reference_datetime": "2026-09-07T22:41:16+08:00",
+                    "utc_datetime": "2026-09-07T14:41:16+00:00"
+                  }
+                },
+                "xun": {
+                  "name": "甲子旬",
+                  "start_pillar": "甲子",
+                  "empty_branches": [
+                    "戌",
+                    "亥"
+                  ],
+                  "dun_gan": {
+                    "子": "甲",
+                    "丑": "乙",
+                    "寅": "丙",
+                    "卯": "丁",
+                    "辰": "戊",
+                    "巳": "己",
+                    "午": "庚",
+                    "未": "辛",
+                    "申": "壬",
+                    "酉": "癸"
+                  }
+                },
+                "six_spirits": [
+                  "玄武",
+                  "青龙",
+                  "朱雀",
+                  "勾陈",
+                  "螣蛇",
+                  "白虎"
+                ]
+              },
+              "rule_ids": [
+                "LY-SPIRIT-001",
+                "CYCLE-XUN-001",
+                "CAL-CYCLE-001"
+              ]
+            },
+            {
+              "sequence": 4,
+              "operation": "report_hidden_flying_spirit_coverage",
+              "inputs": {
+                "palace": "坤",
+                "line_relatives": [
+                  "兄弟",
+                  "父母",
+                  "官鬼",
+                  "兄弟",
+                  "妻财",
+                  "子孙"
+                ]
+              },
+              "output": {
+                "status": "pending_rule_selection",
+                "hidden_spirits": [],
+                "flying_spirits": [],
+                "reason": "伏神飞神取法和标准案例尚未完成规则签署"
+              },
+              "rule_ids": [
+                "LY-HIDDEN-FLYING-COVERAGE-001"
+              ]
+            }
+          ],
+          "evidence": [],
+          "judgements": [],
+          "warnings": [
+            "六爻纳甲采用京房八宫工程基线，月建日辰旺衰和事项断语尚待专家规则与案例签署。",
+            "伏神飞神规则尚未签署，本结果明确不生成推测值。"
+          ]
+        }
+      }
+    ],
+    "input_hash": "sha256:ca269341d84a773406b953c0de99c557329d8da7d2c0e410ccaa15afa5b65e67",
+    "rule_version": "workflow-engine-1.0.0",
+    "systems_used": [
+      "meihua",
+      "liuyao"
+    ],
+    "casting_method": "numbers",
+    "created_at": "2026-08-26T03:34:13+00:00"
+  },
+  "interactions": [],
+  "workflow_result": {
+    "step1": {
+      "step": 1,
+      "name": "信息校验与起盘数据源确认",
+      "question": "北京国御安全科技有线公司这个月能不能发工资，以及后续经营是否可持续",
+      "category": "career",
+      "category_label": "事业",
+      "casting_method": "numbers",
+      "casting_source": {
+        "local_datetime": "2026-08-26T11:33",
+        "timezone": "Asia/Shanghai",
+        "cast_nonce": "af04c867c69a43aba96b51b61b12383d",
+        "use_true_solar_time": false,
+        "numbers": [
+          8,
+          8,
+          8
+        ]
+      },
+      "system": "auto",
+      "user_profile": {
+        "gender": "男"
+      },
+      "missing_fields": [],
+      "ready": true
+    },
+    "step2": {
+      "step": 2,
+      "name": "完整排盘输出",
+      "systems": [
+        "meihua",
+        "liuyao"
+      ],
+      "plates": {
+        "meihua": {
+          "system_label": "梅花易数",
+          "facts": {
+            "method": "two_numbers",
+            "input_numbers": {
+              "upper": 8,
+              "lower": 8
+            },
+            "upper_trigram_number": 8,
+            "lower_trigram_number": 8,
+            "upper_trigram": {
+              "number": 8,
+              "name": "坤",
+              "symbol": "☷",
+              "lines": [
+                0,
+                0,
+                0
+              ],
+              "element": "土",
+              "direction": "西南"
+            },
+            "lower_trigram": {
+              "number": 8,
+              "name": "坤",
+              "symbol": "☷",
+              "lines": [
+                0,
+                0,
+                0
+              ],
+              "element": "土",
+              "direction": "西南"
+            },
+            "moving_line": 4,
+            "original": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "changed": {
+              "ordinal": 16,
+              "name": "豫",
+              "symbol": "䷏",
+              "lines": [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 4,
+                "name": "震",
+                "symbol": "☳",
+                "lines": [
+                  1,
+                  0,
+                  0
+                ],
+                "element": "木",
+                "direction": "东"
+              }
+            },
+            "mutual": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "opposite": {
+              "ordinal": 1,
+              "name": "乾",
+              "symbol": "䷀",
+              "lines": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+              ],
+              "lower_trigram": {
+                "number": 1,
+                "name": "乾",
+                "symbol": "☰",
+                "lines": [
+                  1,
+                  1,
+                  1
+                ],
+                "element": "金",
+                "direction": "西北"
+              },
+              "upper_trigram": {
+                "number": 1,
+                "name": "乾",
+                "symbol": "☰",
+                "lines": [
+                  1,
+                  1,
+                  1
+                ],
+                "element": "金",
+                "direction": "西北"
+              }
+            },
+            "reversed": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "moving_lines": [
+              4
+            ],
+            "body_use": {
+              "body_position": "lower",
+              "use_position": "upper",
+              "body_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "use_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "changed_use_trigram": {
+                "number": 4,
+                "name": "震",
+                "symbol": "☳",
+                "lines": [
+                  1,
+                  0,
+                  0
+                ],
+                "element": "木",
+                "direction": "东"
+              }
+            },
+            "body_use_relation": {
+              "original": {
+                "code": "same_element",
+                "label": "体用比和"
+              },
+              "changed": {
+                "code": "use_controls_body",
+                "label": "用克体"
+              }
+            }
+          },
+          "calculation_trace": [
+            "8 % 8 -> upper trigram index 8",
+            "8 % 8 -> lower trigram index 8",
+            "(8 + 8) % 6 -> moving line 4",
+            "combine lower 坤 and upper 坤 -> 坤",
+            "moving line 4 sets upper as use and lower as body",
+            "change line 4 -> 豫"
+          ],
+          "steps": [
+            {
+              "sequence": 1,
+              "operation": "two_numbers_to_trigrams_and_moving_line",
+              "inputs": {
+                "upper": 8,
+                "lower": 8
+              },
+              "output": {
+                "upper_remainder": 8,
+                "lower_remainder": 8,
+                "moving_source": 16,
+                "moving_line": 4
+              },
+              "rule_ids": [
+                "MH-NUMBER-001"
+              ]
+            },
+            {
+              "sequence": 2,
+              "operation": "derive_body_and_use",
+              "inputs": {
+                "moving_line": 4
+              },
+              "output": {
+                "body_position": "lower",
+                "use_position": "upper"
+              },
+              "rule_ids": [
+                "MH-BODYUSE-001"
+              ]
+            }
+          ],
+          "warnings": [
+            "旺衰、应期和事项断语尚未经过专家签署，本结果只包含起卦与体用关系事实。"
+          ],
+          "engine_version": "meihua-engine-2.0.0",
+          "rule_version": "meihua-mvp-baseline-1.0.0"
+        },
+        "liuyao": {
+          "system_label": "六爻",
+          "facts": {
+            "method": "two_numbers",
+            "input_numbers": {
+              "lower": 8,
+              "upper": 8
+            },
+            "original": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "changed": {
+              "ordinal": 16,
+              "name": "豫",
+              "symbol": "䷏",
+              "lines": [
+                0,
+                0,
+                0,
+                1,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 4,
+                "name": "震",
+                "symbol": "☳",
+                "lines": [
+                  1,
+                  0,
+                  0
+                ],
+                "element": "木",
+                "direction": "东"
+              }
+            },
+            "mutual": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "opposite": {
+              "ordinal": 1,
+              "name": "乾",
+              "symbol": "䷀",
+              "lines": [
+                1,
+                1,
+                1,
+                1,
+                1,
+                1
+              ],
+              "lower_trigram": {
+                "number": 1,
+                "name": "乾",
+                "symbol": "☰",
+                "lines": [
+                  1,
+                  1,
+                  1
+                ],
+                "element": "金",
+                "direction": "西北"
+              },
+              "upper_trigram": {
+                "number": 1,
+                "name": "乾",
+                "symbol": "☰",
+                "lines": [
+                  1,
+                  1,
+                  1
+                ],
+                "element": "金",
+                "direction": "西北"
+              }
+            },
+            "reversed": {
+              "ordinal": 2,
+              "name": "坤",
+              "symbol": "䷁",
+              "lines": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "lower_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              },
+              "upper_trigram": {
+                "number": 8,
+                "name": "坤",
+                "symbol": "☷",
+                "lines": [
+                  0,
+                  0,
+                  0
+                ],
+                "element": "土",
+                "direction": "西南"
+              }
+            },
+            "moving_lines": [
+              4
+            ],
+            "day_pillar": "壬申",
+            "month_branch": {
+              "name": "申",
+              "number": 9,
+              "boundary_name": "立秋",
+              "boundary_term": {
+                "name": "立秋",
+                "datetime": "2026-08-07 19:42:43",
+                "local_datetime": "2026-08-07T19:42:43+08:00",
+                "reference_datetime": "2026-08-07T19:42:43+08:00",
+                "utc_datetime": "2026-08-07T11:42:43+00:00"
+              },
+              "next_boundary_term": {
+                "name": "白露",
+                "datetime": "2026-09-07 22:41:16",
+                "local_datetime": "2026-09-07T22:41:16+08:00",
+                "reference_datetime": "2026-09-07T22:41:16+08:00",
+                "utc_datetime": "2026-09-07T14:41:16+00:00"
+              }
+            },
+            "day_branch": {
+              "name": "申",
+              "number": 9
+            },
+            "palace": {
+              "name": "坤",
+              "element": "土",
+              "stage": "本宫",
+              "host_line": 6,
+              "response_line": 3
+            },
+            "xun": {
+              "name": "甲子旬",
+              "start_pillar": "甲子",
+              "empty_branches": [
+                "戌",
+                "亥"
+              ],
+              "dun_gan": {
+                "子": "甲",
+                "丑": "乙",
+                "寅": "丙",
+                "卯": "丁",
+                "辰": "戊",
+                "巳": "己",
+                "午": "庚",
+                "未": "辛",
+                "申": "壬",
+                "酉": "癸"
+              }
+            },
+            "line_chart": [
+              {
+                "position": 1,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "乙",
+                "najia_branch": "未",
+                "element": "土",
+                "six_relative": "兄弟",
+                "six_spirit": "玄武",
+                "is_void": false,
+                "roles": [],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              },
+              {
+                "position": 2,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "乙",
+                "najia_branch": "巳",
+                "element": "火",
+                "six_relative": "父母",
+                "six_spirit": "青龙",
+                "is_void": false,
+                "roles": [],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              },
+              {
+                "position": 3,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "乙",
+                "najia_branch": "卯",
+                "element": "木",
+                "six_relative": "官鬼",
+                "six_spirit": "朱雀",
+                "is_void": false,
+                "roles": [
+                  "应"
+                ],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              },
+              {
+                "position": 4,
+                "yin_yang": "阴",
+                "is_moving": true,
+                "najia_stem": "癸",
+                "najia_branch": "丑",
+                "element": "土",
+                "six_relative": "兄弟",
+                "six_spirit": "勾陈",
+                "is_void": false,
+                "roles": [],
+                "line_value": 6,
+                "line_type": "老阴",
+                "changed_yin_yang": "阳"
+              },
+              {
+                "position": 5,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "癸",
+                "najia_branch": "亥",
+                "element": "水",
+                "six_relative": "妻财",
+                "six_spirit": "螣蛇",
+                "is_void": true,
+                "roles": [],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              },
+              {
+                "position": 6,
+                "yin_yang": "阴",
+                "is_moving": false,
+                "najia_stem": "癸",
+                "najia_branch": "酉",
+                "element": "金",
+                "six_relative": "子孙",
+                "six_spirit": "白虎",
+                "is_void": false,
+                "roles": [
+                  "世"
+                ],
+                "line_value": 8,
+                "line_type": "少阴",
+                "changed_yin_yang": "阴"
+              }
+            ],
+            "hidden_flying_spirits": {
+              "status": "pending_rule_selection",
+              "hidden_spirits": [],
+              "flying_spirits": [],
+              "reason": "伏神飞神取法和标准案例尚未完成规则签署"
+            }
+          },
+          "calculation_trace": [
+            "map two numbers to lower 8, upper 8, moving line 4",
+            "map original hexagram to 坤 palace 本宫",
+            "set host line 6 and response line 3",
+            "decorate six lines with Na Jia, relatives and six spirits",
+            "derive 甲子旬 and empty branches 戌、亥"
+          ],
+          "steps": [
+            {
+              "sequence": 1,
+              "operation": "numbers_to_hexagram",
+              "inputs": {
+                "lower": 8,
+                "upper": 8
+              },
+              "output": {
+                "lower_trigram": 8,
+                "upper_trigram": 8,
+                "moving_line": 4
+              },
+              "rule_ids": [
+                "LY-NUMBER-001"
+              ]
+            },
+            {
+              "sequence": 2,
+              "operation": "derive_eight_palace_and_najia",
+              "inputs": {
+                "original_lines": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "output": {
+                "palace": {
+                  "name": "坤",
+                  "element": "土",
+                  "stage": "本宫",
+                  "host_line": 6,
+                  "response_line": 3
+                },
+                "line_chart": [
+                  {
+                    "position": 1,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "乙",
+                    "najia_branch": "未",
+                    "element": "土",
+                    "six_relative": "兄弟",
+                    "six_spirit": "玄武",
+                    "is_void": false,
+                    "roles": [],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  },
+                  {
+                    "position": 2,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "乙",
+                    "najia_branch": "巳",
+                    "element": "火",
+                    "six_relative": "父母",
+                    "six_spirit": "青龙",
+                    "is_void": false,
+                    "roles": [],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  },
+                  {
+                    "position": 3,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "乙",
+                    "najia_branch": "卯",
+                    "element": "木",
+                    "six_relative": "官鬼",
+                    "six_spirit": "朱雀",
+                    "is_void": false,
+                    "roles": [
+                      "应"
+                    ],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  },
+                  {
+                    "position": 4,
+                    "yin_yang": "阴",
+                    "is_moving": true,
+                    "najia_stem": "癸",
+                    "najia_branch": "丑",
+                    "element": "土",
+                    "six_relative": "兄弟",
+                    "six_spirit": "勾陈",
+                    "is_void": false,
+                    "roles": [],
+                    "line_value": 6,
+                    "line_type": "老阴",
+                    "changed_yin_yang": "阳"
+                  },
+                  {
+                    "position": 5,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "癸",
+                    "najia_branch": "亥",
+                    "element": "水",
+                    "six_relative": "妻财",
+                    "six_spirit": "螣蛇",
+                    "is_void": true,
+                    "roles": [],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  },
+                  {
+                    "position": 6,
+                    "yin_yang": "阴",
+                    "is_moving": false,
+                    "najia_stem": "癸",
+                    "najia_branch": "酉",
+                    "element": "金",
+                    "six_relative": "子孙",
+                    "six_spirit": "白虎",
+                    "is_void": false,
+                    "roles": [
+                      "世"
+                    ],
+                    "line_value": 8,
+                    "line_type": "少阴",
+                    "changed_yin_yang": "阴"
+                  }
+                ]
+              },
+              "rule_ids": [
+                "LY-PALACE-001",
+                "LY-NAJIA-001",
+                "LY-RELATIVE-001"
+              ]
+            },
+            {
+              "sequence": 3,
+              "operation": "derive_month_day_spirits_and_void",
+              "inputs": {
+                "month_branch": {
+                  "name": "申",
+                  "number": 9,
+                  "boundary_name": "立秋",
+                  "boundary_term": {
+                    "name": "立秋",
+                    "datetime": "2026-08-07 19:42:43",
+                    "local_datetime": "2026-08-07T19:42:43+08:00",
+                    "reference_datetime": "2026-08-07T19:42:43+08:00",
+                    "utc_datetime": "2026-08-07T11:42:43+00:00"
+                  },
+                  "next_boundary_term": {
+                    "name": "白露",
+                    "datetime": "2026-09-07 22:41:16",
+                    "local_datetime": "2026-09-07T22:41:16+08:00",
+                    "reference_datetime": "2026-09-07T22:41:16+08:00",
+                    "utc_datetime": "2026-09-07T14:41:16+00:00"
+                  }
+                },
+                "day_pillar": "壬申"
+              },
+              "output": {
+                "month_branch": {
+                  "name": "申",
+                  "number": 9,
+                  "boundary_name": "立秋",
+                  "boundary_term": {
+                    "name": "立秋",
+                    "datetime": "2026-08-07 19:42:43",
+                    "local_datetime": "2026-08-07T19:42:43+08:00",
+                    "reference_datetime": "2026-08-07T19:42:43+08:00",
+                    "utc_datetime": "2026-08-07T11:42:43+00:00"
+                  },
+                  "next_boundary_term": {
+                    "name": "白露",
+                    "datetime": "2026-09-07 22:41:16",
+                    "local_datetime": "2026-09-07T22:41:16+08:00",
+                    "reference_datetime": "2026-09-07T22:41:16+08:00",
+                    "utc_datetime": "2026-09-07T14:41:16+00:00"
+                  }
+                },
+                "xun": {
+                  "name": "甲子旬",
+                  "start_pillar": "甲子",
+                  "empty_branches": [
+                    "戌",
+                    "亥"
+                  ],
+                  "dun_gan": {
+                    "子": "甲",
+                    "丑": "乙",
+                    "寅": "丙",
+                    "卯": "丁",
+                    "辰": "戊",
+                    "巳": "己",
+                    "午": "庚",
+                    "未": "辛",
+                    "申": "壬",
+                    "酉": "癸"
+                  }
+                },
+                "six_spirits": [
+                  "玄武",
+                  "青龙",
+                  "朱雀",
+                  "勾陈",
+                  "螣蛇",
+                  "白虎"
+                ]
+              },
+              "rule_ids": [
+                "LY-SPIRIT-001",
+                "CYCLE-XUN-001",
+                "CAL-CYCLE-001"
+              ]
+            },
+            {
+              "sequence": 4,
+              "operation": "report_hidden_flying_spirit_coverage",
+              "inputs": {
+                "palace": "坤",
+                "line_relatives": [
+                  "兄弟",
+                  "父母",
+                  "官鬼",
+                  "兄弟",
+                  "妻财",
+                  "子孙"
+                ]
+              },
+              "output": {
+                "status": "pending_rule_selection",
+                "hidden_spirits": [],
+                "flying_spirits": [],
+                "reason": "伏神飞神取法和标准案例尚未完成规则签署"
+              },
+              "rule_ids": [
+                "LY-HIDDEN-FLYING-COVERAGE-001"
+              ]
+            }
+          ],
+          "warnings": [
+            "六爻纳甲采用京房八宫工程基线，月建日辰旺衰和事项断语尚待专家规则与案例签署。",
+            "伏神飞神规则尚未签署，本结果明确不生成推测值。"
+          ],
+          "engine_version": "liuyao-engine-2.0.0",
+          "rule_version": "liuyao-engineering-baseline-2.0.0"
+        }
+      },
+      "calendar": {
+        "schema_version": "2.0",
+        "system": "calendar",
+        "school": "mvp-engineering-baseline",
+        "engine_version": "calendar-engine-2.0.0+lunar-python-1.4.8",
+        "rule_version": "calendar-domain-baseline-2.0.0",
+        "input": {
+          "local_datetime": "2026-08-26T11:33",
+          "timezone": "Asia/Shanghai",
+          "longitude": null,
+          "use_true_solar_time": false
+        },
+        "normalized_input": {
+          "local_datetime": "2026-08-26T11:33:00+08:00",
+          "timezone": "Asia/Shanghai",
+          "effective_local_datetime": "2026-08-26T11:33:00+08:00",
+          "solar_term_reference_datetime": "2026-08-26T11:33:00+08:00"
+        },
+        "time": {
+          "original_local_datetime": "2026-08-26T11:33:00+08:00",
+          "utc_datetime": "2026-08-26T03:33:00+00:00",
+          "effective_local_datetime": "2026-08-26T11:33:00+08:00",
+          "solar_term_reference_datetime": "2026-08-26T11:33:00+08:00",
+          "correction": {
+            "enabled": false,
+            "longitude": null,
+            "total_correction_minutes": 0.0,
+            "corrected_local_datetime": "2026-08-26T11:33:00+08:00"
+          }
+        },
+        "solar": {
+          "year": 2026,
+          "month": 8,
+          "day": 26,
+          "hour": 11,
+          "minute": 33,
+          "second": 0
+        },
+        "lunar": {
+          "year": 2026,
+          "month": 7,
+          "day": 14,
+          "is_leap_month": false,
+          "month_name": "七",
+          "day_name": "十四"
+        },
+        "pillars": {
+          "year": "丙午",
+          "month": "丙申",
+          "day": "壬申",
+          "time": "丙午",
+          "year_boundary": "立春",
+          "month_boundary": "节令",
+          "day_boundary": "子初23:00"
+        },
+        "ganzhi": {
+          "year": {
+            "text": "丙午",
+            "stem": "丙",
+            "branch": "午",
+            "stem_element": "火",
+            "branch_element": "火",
+            "polarity": "阳",
+            "sexagenary_number": 43
+          },
+          "month": {
+            "text": "丙申",
+            "stem": "丙",
+            "branch": "申",
+            "stem_element": "火",
+            "branch_element": "金",
+            "polarity": "阳",
+            "sexagenary_number": 33
+          },
+          "day": {
+            "text": "壬申",
+            "stem": "壬",
+            "branch": "申",
+            "stem_element": "水",
+            "branch_element": "金",
+            "polarity": "阳",
+            "sexagenary_number": 9
+          },
+          "hour": {
+            "text": "丙午",
+            "stem": "丙",
+            "branch": "午",
+            "stem_element": "火",
+            "branch_element": "火",
+            "polarity": "阳",
+            "sexagenary_number": 43
+          }
+        },
+        "month_branch": {
+          "name": "申",
+          "number": 9,
+          "boundary_name": "立秋",
+          "boundary_term": {
+            "name": "立秋",
+            "datetime": "2026-08-07 19:42:43",
+            "local_datetime": "2026-08-07T19:42:43+08:00",
+            "reference_datetime": "2026-08-07T19:42:43+08:00",
+            "utc_datetime": "2026-08-07T11:42:43+00:00"
+          },
+          "next_boundary_term": {
+            "name": "白露",
+            "datetime": "2026-09-07 22:41:16",
+            "local_datetime": "2026-09-07T22:41:16+08:00",
+            "reference_datetime": "2026-09-07T22:41:16+08:00",
+            "utc_datetime": "2026-09-07T14:41:16+00:00"
+          }
+        },
+        "zodiac": {
+          "name": "马",
+          "branch": "午",
+          "boundary": "立春"
+        },
+        "time_branch": {
+          "name": "午",
+          "number": 7
+        },
+        "year_branch": {
+          "name": "午",
+          "number": 7
+        },
+        "xun": {
+          "name": "甲子旬",
+          "start_pillar": "甲子",
+          "empty_branches": [
+            "戌",
+            "亥"
+          ],
+          "dun_gan": {
+            "子": "甲",
+            "丑": "乙",
+            "寅": "丙",
+            "卯": "丁",
+            "辰": "戊",
+            "巳": "己",
+            "午": "庚",
+            "未": "辛",
+            "申": "壬",
+            "酉": "癸"
+          }
+        },
+        "xun_kong": [
+          "戌",
+          "亥"
+        ],
+        "solar_term": {
+          "previous": {
+            "name": "处暑",
+            "datetime": "2026-08-23 10:18:49",
+            "local_datetime": "2026-08-23T10:18:49+08:00",
+            "reference_datetime": "2026-08-23T10:18:49+08:00",
+            "utc_datetime": "2026-08-23T02:18:49+00:00"
+          },
+          "current": null,
+          "next": {
+            "name": "白露",
+            "datetime": "2026-09-07 22:41:16",
+            "local_datetime": "2026-09-07T22:41:16+08:00",
+            "reference_datetime": "2026-09-07T22:41:16+08:00",
+            "utc_datetime": "2026-09-07T14:41:16+00:00"
+          },
+          "previous_month_boundary": {
+            "name": "立秋",
+            "datetime": "2026-08-07 19:42:43",
+            "local_datetime": "2026-08-07T19:42:43+08:00",
+            "reference_datetime": "2026-08-07T19:42:43+08:00",
+            "utc_datetime": "2026-08-07T11:42:43+00:00"
+          },
+          "next_month_boundary": {
+            "name": "白露",
+            "datetime": "2026-09-07 22:41:16",
+            "local_datetime": "2026-09-07T22:41:16+08:00",
+            "reference_datetime": "2026-09-07T22:41:16+08:00",
+            "utc_datetime": "2026-09-07T14:41:16+00:00"
+          },
+          "reference_timezone": "Asia/Shanghai",
+          "algorithm": "lunar-python-1.4.8-shouxing-term-table",
+          "precision": "second",
+          "supported_term_count": 24
+        },
+        "solar_terms": {
+          "previous": {
+            "name": "处暑",
+            "datetime": "2026-08-23 10:18:49",
+            "local_datetime": "2026-08-23T10:18:49+08:00",
+            "reference_datetime": "2026-08-23T10:18:49+08:00",
+            "utc_datetime": "2026-08-23T02:18:49+00:00"
+          },
+          "current": null,
+          "next": {
+            "name": "白露",
+            "datetime": "2026-09-07 22:41:16",
+            "local_datetime": "2026-09-07T22:41:16+08:00",
+            "reference_datetime": "2026-09-07T22:41:16+08:00",
+            "utc_datetime": "2026-09-07T14:41:16+00:00"
+          },
+          "previous_month_boundary": {
+            "name": "立秋",
+            "datetime": "2026-08-07 19:42:43",
+            "local_datetime": "2026-08-07T19:42:43+08:00",
+            "reference_datetime": "2026-08-07T19:42:43+08:00",
+            "utc_datetime": "2026-08-07T11:42:43+00:00"
+          },
+          "next_month_boundary": {
+            "name": "白露",
+            "datetime": "2026-09-07 22:41:16",
+            "local_datetime": "2026-09-07T22:41:16+08:00",
+            "reference_datetime": "2026-09-07T22:41:16+08:00",
+            "utc_datetime": "2026-09-07T14:41:16+00:00"
+          },
+          "reference_timezone": "Asia/Shanghai",
+          "algorithm": "lunar-python-1.4.8-shouxing-term-table",
+          "precision": "second",
+          "supported_term_count": 24
+        },
+        "almanac": {
+          "duty_officer": "建",
+          "twenty_eight_mansion": {
+            "name": "箕",
+            "beast_spirit": "箕水豹",
+            "quadrant": "东方苍龙",
+            "luck": "吉",
+            "song": "箕星造作主高强，岁岁年年大吉昌，埋葬修坟大吉利，田蚕牛马遍山岗，开门放水招田宅，箧满金银谷满仓，福荫高官加禄位，六亲丰禄乐安康。"
+          },
+          "lunar_phase_regime": {
+            "code": "jishengba",
+            "name": "既生霸",
+            "description": "上弦至满月，月魄渐生，光明充盈"
+          },
+          "day_tian_shen": {
+            "name": "天牢",
+            "type": "黑道",
+            "luck": "凶"
+          },
+          "day_nine_star": "四绿木天权",
+          "favorable_activities": [
+            "嫁娶",
+            "纳采",
+            "订盟",
+            "祭祀",
+            "祈福",
+            "求嗣",
+            "出行",
+            "解除",
+            "竖柱",
+            "入宅",
+            "移徙",
+            "纳财",
+            "上梁",
+            "纳畜",
+            "入殓",
+            "安葬",
+            "启钻"
+          ],
+          "unfavorable_activities": [
+            "栽种",
+            "掘井",
+            "动土",
+            "安床",
+            "破土",
+            "置产"
+          ],
+          "lucky_directions": {
+            "joy_deity": "正南",
+            "wealth_deity": "正南",
+            "blessing_deity": "东南",
+            "yang_noble": "正东",
+            "yin_noble": "东南"
+          },
+          "auspicious_spirits": [
+            "月德",
+            "月恩",
+            "四相",
+            "王日"
+          ],
+          "inauspicious_spirits": [
+            "月建",
+            "小时",
+            "土符",
+            "五离",
+            "天牢"
+          ],
+          "pengzu": {
+            "gan": "壬不泱水更难提防",
+            "zhi": "申不安床鬼祟入房"
+          },
+          "hourly_timeline": [
+            {
+              "hour": 0,
+              "branch": "子",
+              "time_range": "23:00 - 01:00",
+              "ganzhi": "庚子",
+              "tian_shen": {
+                "name": "青龙",
+                "type": "黄道",
+                "luck": "吉"
+              },
+              "clash": {
+                "animal": "马",
+                "direction": "南"
+              },
+              "favorable_activities": [
+                "祈福",
+                "求嗣",
+                "订婚",
+                "嫁娶",
+                "出行",
+                "求财"
+              ],
+              "unfavorable_activities": [
+                "修造",
+                "动土"
+              ]
+            },
+            {
+              "hour": 2,
+              "branch": "丑",
+              "time_range": "01:00 - 03:00",
+              "ganzhi": "辛丑",
+              "tian_shen": {
+                "name": "明堂",
+                "type": "黄道",
+                "luck": "吉"
+              },
+              "clash": {
+                "animal": "羊",
+                "direction": "东"
+              },
+              "favorable_activities": [
+                "祈福",
+                "嫁娶",
+                "修造",
+                "造庙",
+                "作灶",
+                "入宅"
+              ],
+              "unfavorable_activities": [
+                "无"
+              ]
+            },
+            {
+              "hour": 4,
+              "branch": "寅",
+              "time_range": "03:00 - 05:00",
+              "ganzhi": "壬寅",
+              "tian_shen": {
+                "name": "天刑",
+                "type": "黑道",
+                "luck": "凶"
+              },
+              "clash": {
+                "animal": "猴",
+                "direction": "北"
+              },
+              "favorable_activities": [
+                "无"
+              ],
+              "unfavorable_activities": [
+                "诸事不宜"
+              ]
+            },
+            {
+              "hour": 6,
+              "branch": "卯",
+              "time_range": "05:00 - 07:00",
+              "ganzhi": "癸卯",
+              "tian_shen": {
+                "name": "朱雀",
+                "type": "黑道",
+                "luck": "凶"
+              },
+              "clash": {
+                "animal": "鸡",
+                "direction": "西"
+              },
+              "favorable_activities": [
+                "酬神",
+                "求财",
+                "见贵",
+                "订婚",
+                "嫁娶",
+                "修造"
+              ],
+              "unfavorable_activities": [
+                "祭祀",
+                "祈福",
+                "斋醮",
+                "开光"
+              ]
+            },
+            {
+              "hour": 8,
+              "branch": "辰",
+              "time_range": "07:00 - 09:00",
+              "ganzhi": "甲辰",
+              "tian_shen": {
+                "name": "金匮",
+                "type": "黄道",
+                "luck": "吉"
+              },
+              "clash": {
+                "animal": "狗",
+                "direction": "南"
+              },
+              "favorable_activities": [
+                "祈福",
+                "求嗣",
+                "订婚",
+                "嫁娶",
+                "出行",
+                "求财"
+              ],
+              "unfavorable_activities": [
+                "无"
+              ]
+            },
+            {
+              "hour": 10,
+              "branch": "巳",
+              "time_range": "09:00 - 11:00",
+              "ganzhi": "乙巳",
+              "tian_shen": {
+                "name": "天德",
+                "type": "黄道",
+                "luck": "吉"
+              },
+              "clash": {
+                "animal": "猪",
+                "direction": "东"
+              },
+              "favorable_activities": [
+                "祈福",
+                "求嗣",
+                "出行",
+                "求财",
+                "嫁娶",
+                "安葬"
+              ],
+              "unfavorable_activities": [
+                "无"
+              ]
+            },
+            {
+              "hour": 12,
+              "branch": "午",
+              "time_range": "11:00 - 13:00",
+              "ganzhi": "丙午",
+              "tian_shen": {
+                "name": "白虎",
+                "type": "黑道",
+                "luck": "凶"
+              },
+              "clash": {
+                "animal": "鼠",
+                "direction": "北"
+              },
+              "favorable_activities": [
+                "祈福",
+                "求嗣",
+                "订婚",
+                "嫁娶",
+                "出行",
+                "求财"
+              ],
+              "unfavorable_activities": [
+                "上梁",
+                "盖屋",
+                "入殓"
+              ]
+            },
+            {
+              "hour": 14,
+              "branch": "未",
+              "time_range": "13:00 - 15:00",
+              "ganzhi": "丁未",
+              "tian_shen": {
+                "name": "玉堂",
+                "type": "黄道",
+                "luck": "吉"
+              },
+              "clash": {
+                "animal": "牛",
+                "direction": "西"
+              },
+              "favorable_activities": [
+                "修造",
+                "入宅",
+                "安葬",
+                "祭祀",
+                "祈福",
+                "求嗣"
+              ],
+              "unfavorable_activities": [
+                "无"
+              ]
+            },
+            {
+              "hour": 16,
+              "branch": "申",
+              "time_range": "15:00 - 17:00",
+              "ganzhi": "戊申",
+              "tian_shen": {
+                "name": "天牢",
+                "type": "黑道",
+                "luck": "凶"
+              },
+              "clash": {
+                "animal": "虎",
+                "direction": "南"
+              },
+              "favorable_activities": [
+                "嫁娶",
+                "入宅",
+                "开市",
+                "交易",
+                "安葬"
+              ],
+              "unfavorable_activities": [
+                "赴任",
+                "修造",
+                "移徙",
+                "出行"
+              ]
+            },
+            {
+              "hour": 18,
+              "branch": "酉",
+              "time_range": "17:00 - 19:00",
+              "ganzhi": "己酉",
+              "tian_shen": {
+                "name": "玄武",
+                "type": "黑道",
+                "luck": "凶"
+              },
+              "clash": {
+                "animal": "兔",
+                "direction": "东"
+              },
+              "favorable_activities": [
+                "祈福",
+                "求嗣",
+                "订婚",
+                "嫁娶",
+                "入宅",
+                "求财"
+              ],
+              "unfavorable_activities": [
+                "赴任",
+                "出行",
+                "修造",
+                "动土"
+              ]
+            },
+            {
+              "hour": 20,
+              "branch": "戌",
+              "time_range": "19:00 - 21:00",
+              "ganzhi": "庚戌",
+              "tian_shen": {
+                "name": "司命",
+                "type": "黄道",
+                "luck": "吉"
+              },
+              "clash": {
+                "animal": "龙",
+                "direction": "北"
+              },
+              "favorable_activities": [
+                "作灶",
+                "祭祀",
+                "祈福",
+                "斋醮",
+                "酬神"
+              ],
+              "unfavorable_activities": [
+                "赴任",
+                "出行",
+                "求财",
+                "修造"
+              ]
+            },
+            {
+              "hour": 22,
+              "branch": "亥",
+              "time_range": "21:00 - 23:00",
+              "ganzhi": "辛亥",
+              "tian_shen": {
+                "name": "勾陈",
+                "type": "黑道",
+                "luck": "凶"
+              },
+              "clash": {
+                "animal": "蛇",
+                "direction": "西"
+              },
+              "favorable_activities": [
+                "求财",
+                "见贵",
+                "订婚",
+                "嫁娶",
+                "入宅",
+                "开市"
+              ],
+              "unfavorable_activities": [
+                "赴任",
+                "出行",
+                "修造"
+              ]
+            }
+          ]
+        },
+        "calculation_trace": [
+          "normalize local datetime and IANA timezone",
+          "apply configured civil-time or true-solar-time standard",
+          "convert effective instant to Asia/Shanghai solar-term reference time",
+          "derive lunar date and adjacent exact solar-term moments",
+          "derive year/month pillars by solar terms and day/hour pillars by effective local time",
+          "derive month branch, zodiac, xun and empty branches"
+        ],
+        "steps": [
+          {
+            "sequence": 1,
+            "operation": "normalize_local_datetime",
+            "inputs": {
+              "local_datetime": "2026-08-26T11:33",
+              "timezone": "Asia/Shanghai"
+            },
+            "output": {
+              "local_datetime": "2026-08-26T11:33:00+08:00",
+              "utc_datetime": "2026-08-26T03:33:00+00:00"
+            },
+            "rule_ids": [
+              "CAL-NORMALIZE-001"
+            ]
+          },
+          {
+            "sequence": 2,
+            "operation": "apply_time_standard",
+            "inputs": {
+              "use_true_solar_time": false,
+              "longitude": null
+            },
+            "output": {
+              "effective_local_datetime": "2026-08-26T11:33:00+08:00",
+              "correction": {
+                "enabled": false,
+                "longitude": null,
+                "total_correction_minutes": 0.0,
+                "corrected_local_datetime": "2026-08-26T11:33:00+08:00"
+              }
+            },
+            "rule_ids": [
+              "CAL-SOLAR-TIME-001"
+            ]
+          },
+          {
+            "sequence": 3,
+            "operation": "normalize_solar_term_reference",
+            "inputs": {
+              "effective_local_datetime": "2026-08-26T11:33:00+08:00"
+            },
+            "output": {
+              "reference_datetime": "2026-08-26T11:33:00+08:00"
+            },
+            "rule_ids": [
+              "CAL-TERM-TZ-001"
+            ]
+          },
+          {
+            "sequence": 4,
+            "operation": "derive_lunar_and_solar_terms",
+            "inputs": {
+              "reference_datetime": "2026-08-26T11:33:00+08:00"
+            },
+            "output": {
+              "lunar": {
+                "year": 2026,
+                "month": 7,
+                "day": 14,
+                "is_leap_month": false,
+                "month_name": "七",
+                "day_name": "十四"
+              },
+              "solar_terms": {
+                "previous": {
+                  "name": "处暑",
+                  "datetime": "2026-08-23 10:18:49",
+                  "local_datetime": "2026-08-23T10:18:49+08:00",
+                  "reference_datetime": "2026-08-23T10:18:49+08:00",
+                  "utc_datetime": "2026-08-23T02:18:49+00:00"
+                },
+                "current": null,
+                "next": {
+                  "name": "白露",
+                  "datetime": "2026-09-07 22:41:16",
+                  "local_datetime": "2026-09-07T22:41:16+08:00",
+                  "reference_datetime": "2026-09-07T22:41:16+08:00",
+                  "utc_datetime": "2026-09-07T14:41:16+00:00"
+                },
+                "previous_month_boundary": {
+                  "name": "立秋",
+                  "datetime": "2026-08-07 19:42:43",
+                  "local_datetime": "2026-08-07T19:42:43+08:00",
+                  "reference_datetime": "2026-08-07T19:42:43+08:00",
+                  "utc_datetime": "2026-08-07T11:42:43+00:00"
+                },
+                "next_month_boundary": {
+                  "name": "白露",
+                  "datetime": "2026-09-07 22:41:16",
+                  "local_datetime": "2026-09-07T22:41:16+08:00",
+                  "reference_datetime": "2026-09-07T22:41:16+08:00",
+                  "utc_datetime": "2026-09-07T14:41:16+00:00"
+                },
+                "reference_timezone": "Asia/Shanghai",
+                "algorithm": "lunar-python-1.4.8-shouxing-term-table",
+                "precision": "second",
+                "supported_term_count": 24
+              }
+            },
+            "rule_ids": [
+              "CAL-CONVERSION-001",
+              "CAL-TERM-001"
+            ]
+          },
+          {
+            "sequence": 5,
+            "operation": "derive_four_pillars",
+            "inputs": {
+              "reference_datetime": "2026-08-26T11:33:00+08:00",
+              "effective_local_datetime": "2026-08-26T11:33:00+08:00"
+            },
+            "output": {
+              "pillars": {
+                "year": "丙午",
+                "month": "丙申",
+                "day": "壬申",
+                "time": "丙午",
+                "year_boundary": "立春",
+                "month_boundary": "节令",
+                "day_boundary": "子初23:00"
+              },
+              "ganzhi": {
+                "year": {
+                  "text": "丙午",
+                  "stem": "丙",
+                  "branch": "午",
+                  "stem_element": "火",
+                  "branch_element": "火",
+                  "polarity": "阳",
+                  "sexagenary_number": 43
+                },
+                "month": {
+                  "text": "丙申",
+                  "stem": "丙",
+                  "branch": "申",
+                  "stem_element": "火",
+                  "branch_element": "金",
+                  "polarity": "阳",
+                  "sexagenary_number": 33
+                },
+                "day": {
+                  "text": "壬申",
+                  "stem": "壬",
+                  "branch": "申",
+                  "stem_element": "水",
+                  "branch_element": "金",
+                  "polarity": "阳",
+                  "sexagenary_number": 9
+                },
+                "hour": {
+                  "text": "丙午",
+                  "stem": "丙",
+                  "branch": "午",
+                  "stem_element": "火",
+                  "branch_element": "火",
+                  "polarity": "阳",
+                  "sexagenary_number": 43
+                }
+              }
+            },
+            "rule_ids": [
+              "CAL-PILLARS-001"
+            ]
+          },
+          {
+            "sequence": 6,
+            "operation": "derive_calendar_cycles",
+            "inputs": {
+              "year_pillar": "丙午",
+              "month_pillar": "丙申",
+              "day_pillar": "壬申"
+            },
+            "output": {
+              "month_branch": {
+                "name": "申",
+                "number": 9,
+                "boundary_name": "立秋",
+                "boundary_term": {
+                  "name": "立秋",
+                  "datetime": "2026-08-07 19:42:43",
+                  "local_datetime": "2026-08-07T19:42:43+08:00",
+                  "reference_datetime": "2026-08-07T19:42:43+08:00",
+                  "utc_datetime": "2026-08-07T11:42:43+00:00"
+                },
+                "next_boundary_term": {
+                  "name": "白露",
+                  "datetime": "2026-09-07 22:41:16",
+                  "local_datetime": "2026-09-07T22:41:16+08:00",
+                  "reference_datetime": "2026-09-07T22:41:16+08:00",
+                  "utc_datetime": "2026-09-07T14:41:16+00:00"
+                }
+              },
+              "zodiac": {
+                "name": "马",
+                "branch": "午",
+                "boundary": "立春"
+              },
+              "xun": {
+                "name": "甲子旬",
+                "start_pillar": "甲子",
+                "empty_branches": [
+                  "戌",
+                  "亥"
+                ],
+                "dun_gan": {
+                  "子": "甲",
+                  "丑": "乙",
+                  "寅": "丙",
+                  "卯": "丁",
+                  "辰": "戊",
+                  "巳": "己",
+                  "午": "庚",
+                  "未": "辛",
+                  "申": "壬",
+                  "酉": "癸"
+                }
+              },
+              "xun_kong": [
+                "戌",
+                "亥"
+              ]
+            },
+            "rule_ids": [
+              "CAL-CYCLE-001",
+              "CYCLE-XUN-001"
+            ]
+          }
+        ],
+        "evidence": [],
+        "judgements": [],
+        "warnings": []
+      }
+    },
+    "step3": {
+      "step": 3,
+      "name": "用神定位",
+      "category": "career",
+      "category_label": "事业",
+      "primary_yongshen": "官鬼",
+      "secondary_yongshen": "父母",
+      "logic": "事业看官鬼爻（职权、考核、压力），父母爻为文书资质、单位平台",
+      "yongshen_by_system": {
+        "meihua": {
+          "yong": "用卦（官鬼/父母象）",
+          "ti": "体卦",
+          "logic": "梅花以体卦为自身，用卦为事项；事业看用卦是否生体、比和"
+        },
+        "liuyao": {
+          "primary": "官鬼",
+          "secondary": "父母",
+          "logic": "事业看官鬼爻（职权、考核、压力），父母爻为文书资质、单位平台"
+        }
+      },
+      "party_yongshen": []
+    },
+    "step4": {
+      "step": 4,
+      "name": "旺衰与生克分析",
+      "calendar_context": {
+        "month_pillar": {
+          "text": "丙申",
+          "stem": "丙",
+          "branch": "申",
+          "stem_element": "火",
+          "branch_element": "金",
+          "polarity": "阳",
+          "sexagenary_number": 33
+        },
+        "day_pillar": {
+          "text": "壬申",
+          "stem": "壬",
+          "branch": "申",
+          "stem_element": "水",
+          "branch_element": "金",
+          "polarity": "阳",
+          "sexagenary_number": 9
+        },
+        "month_branch": "申",
+        "day_branch": "申",
+        "month_element": "金",
+        "day_element": "金"
+      },
+      "yongshen_wangshuai": {
+        "yongshen": "官鬼",
+        "element": "木",
+        "level": "休（用神生月令）",
+        "reason": "用神木生月令申（金），泄气为休。"
+      },
+      "tiyong_relation": null,
+      "shiying_relation": {
+        "note": "六爻世应关系需从纳甲装卦结果中提取世爻应爻位置与生克关系"
+      },
+      "analysis_chain": [
+        "用神木生月令申（金），泄气为休。",
+        "日辰为申（金），需结合日辰对用神的生克冲合作最终判断。"
+      ]
+    },
+    "step5": {
+      "step": 5,
+      "name": "卦象符号事理解读",
+      "hexagram_name": "坤",
+      "hexagram_explanation": null,
+      "symbol_mappings": []
+    },
+    "step6": {
+      "step": 6,
+      "name": "事态综合推演",
+      "current_status": "事项处于事业范畴，用神官鬼当前休（用神生月令）。",
+      "favorable": [
+        "当前无明显有利因素，需谨慎观望"
+      ],
+      "obstacles": [
+        "用神休囚死，力量不足，推进阻力较大"
+      ],
+      "trend": "事态将随用神旺衰变化而演变，当前阶段宜根据用神力量决定进退。",
+      "timing": "参考应期：近则7日内（动爻逢值逢冲），远则按月令节气交接前后观察变化。具体应期需结合动爻地支与日辰冲合确定。",
+      "fortune_level": "平",
+      "fortune_basis": [
+        "用神休（用神生月令），力量中等"
+      ],
+      "synthesis": {
+        "schema_version": "1.0",
+        "strategy": "parallel-evidence-comparison-no-automatic-score",
+        "comparable_judgement_count": 0,
+        "counts": {
+          "consistent": 0,
+          "complementary": 0,
+          "conflicts": 0,
+          "unpaired": 0,
+          "indeterminate": 0,
+          "excluded": 0
+        },
+        "consistent": [],
+        "complementary": [],
+        "conflicts": [],
+        "unpaired": [],
+        "indeterminate": [],
+        "excluded": [],
+        "notices": [
+          "当前模块没有引用已发布规则的结构化判断，只返回各模块事实，不生成综合倾向。"
+        ]
+      },
+      "advisory": {
+        "schema_version": "1.0",
+        "status": "provisional_research_advice",
+        "review_status": "unreviewed_engineering_template",
+        "context": {
+          "category": "career",
+          "category_label": "事业",
+          "question_summary": "北京国御安全科技有线公司这个月能不能发工资，以及后续经营是否可持续"
+        },
+        "conclusion": {
+          "headline": "体用比和：同舟共济，内和外顺，宜强化共识同频",
+          "text": "针对用户所问事项“北京国御安全科技有线公司这个月能不能发工资，以及后续经营是否可持续”（事业领域），综合卦盘推演，当前核心定调为：【体用比和：同舟共济，内和外顺，宜强化共识同频】。 梅花易数本卦体用同属一行（比和），象征主体与外部环境能量和谐、气机相通。利于寻求共赢合作、凝聚团队力量，只要目标一致便能顺水推舟。 明晰事业发展阶段、核心决策权限与关键推进节点。",
+          "polarity": "indeterminate",
+          "confidence_label": "理象融合研判"
+        },
+        "multi_system_resonance": {
+          "score": 93,
+          "level": "高阶共振 · 多术同向",
+          "description": "周易卦气、时空奇门与干支五行呈现高度利好共振，事态顺畅度高，宜抓紧关键窗口期果断推进。",
+          "matrix": [
+            {
+              "system_id": "meihua",
+              "system_name": "梅花体用",
+              "stance_label": "生体比和 · 大顺",
+              "stance_type": "positive",
+              "key_evidence": "体用比和：同舟共济，内和外顺，宜强化共识同频",
+              "element_focus": "体土 / 用土",
+              "weight": 0.95
+            }
+          ],
+          "synergies": [
+            "梅花体用比和/相生，提示主体能力与外部环境高度同频。"
+          ],
+          "tensions": [
+            "未见显著术数分歧，主要依常理规矩稳健行事。"
+          ]
+        },
+        "domain_analysis": {
+          "status_quo": [
+            "【体用定位】以【坤】（属土）为主体，【坤】（属土）为外部事态。梅花易数本卦体用同属一行（比和），象征主体与外部环境能量和谐、气机相通。利于寻求共赢合作、凝聚团队力量，只要目标一致便能顺水推舟。",
+            "【六爻世应】归于坤宫（本宫），世爻居第6爻代表自身根基，应爻居第3爻代表对方与目标环境，日旬空在【戌、亥】。"
+          ],
+          "trend_evolution": [
+            "【静态持守】当前周易推演六爻均安（无动爻），提示短期内外部基本架构保持稳定，事物处于持续积累和常态运行期，不宜凭空预设剧烈突变。"
+          ],
+          "risk_and_pitfalls": [
+            "【兄弟动爻】盘中兄弟爻发动，提示需防范同行竞争、同伴分歧或利益分流，合作协议应白纸黑字写明利益分配。"
+          ]
+        },
+        "recommendations": [
+          {
+            "priority": 1,
+            "title": "【象法策略】凝聚各方共识，建立同向合力",
+            "detail": "确认相关协作方对目标、交付标准与推进节奏理解一致，避免因细小职责模糊产生摩擦。",
+            "basis": "梅花易数本卦体用同属一行（比和），象征主体与外部环境能量和谐、气机相通。利于寻求共赢合作、凝聚团队力量，只要目标一致便能顺水推舟。",
+            "phase": "第一阶段：立足当下",
+            "rule_ids": [
+              "ADV-MH-RELATION-001",
+              "MH-FIVE-ELEMENT-001"
+            ]
+          },
+          {
+            "priority": 2,
+            "title": "【专业务实】理清核心权责与验收指标",
+            "detail": "明确下一阶段主攻目标与衡量标准，将口头支持落实为明确的资源、团队或预算。",
+            "basis": "事业事项决策原则与风险控制规范",
+            "phase": "第三阶段：落地防守",
+            "rule_ids": [
+              "ADV-CONTEXT-001"
+            ]
+          },
+          {
+            "priority": 3,
+            "title": "【专业务实】小步验证并建立关键人协同",
+            "detail": "对重大变动先做小范围试点验证，加强与核心决策者和跨部门协作方的定期对齐。",
+            "basis": "事业事项决策原则与风险控制规范",
+            "phase": "第三阶段：落地防守",
+            "rule_ids": [
+              "ADV-CONTEXT-001"
+            ]
+          },
+          {
+            "priority": 4,
+            "title": "【专业务实】留足转换缓冲与底线预案",
+            "detail": "在作出不可逆选择前评估最坏承受力，确保个人专业能力与风险备选方案完备。",
+            "basis": "事业事项决策原则与风险控制规范",
+            "phase": "第三阶段：落地防守",
+            "rule_ids": [
+              "ADV-CONTEXT-001"
+            ]
+          }
+        ],
+        "verification_questions": [
+          "谁对该事项拥有最终决策权？",
+          "当前阶段最关键的业务或人脉瓶颈在哪里？",
+          "若推进不如预期，可承受的最大试错成本与退出机制是什么？"
+        ],
+        "evidence_basis": [
+          {
+            "module": "meihua",
+            "fact": "体用关系：体用比和",
+            "rule_ids": [
+              "MH-FIVE-ELEMENT-001"
+            ]
+          }
+        ],
+        "risk_notes": [
+          "建议来自未审核的工程模板，只能作为问题整理和决策检查清单。",
+          "涉及医疗、法律、投资、安全等高影响事项时，应以具备资质的专业意见和可核验数据为准。",
+          "不要仅依据本推演作出不可逆、超出承受范围或影响他人权益的决定。",
+          "卦由心生，事在人为；知进退、明得失、顺天应人方为上上之选。"
+        ],
+        "rule_ids": [
+          "ADV-CONTEXT-001",
+          "ADV-MH-RELATION-001"
+        ]
+      },
+      "imagery": {
+        "schema_version": "1.0",
+        "status": "unreviewed_imagery_candidates",
+        "engine_version": "imagery-engine-1.0.0",
+        "rule_version": "imagery-engineering-baseline-1.0.0",
+        "context": {
+          "category": "career",
+          "priority_dimensions": [
+            "人物",
+            "行为",
+            "场所",
+            "事物"
+          ],
+          "question_summary": "北京国御安全科技有线公司这个月能不能发工资，以及后续经营是否可持续"
+        },
+        "candidates": [
+          {
+            "candidate_id": "meihua-original-body-坤",
+            "module": "meihua",
+            "stage": "original",
+            "role": "body",
+            "symbol_type": "trigram",
+            "symbol": "坤",
+            "element": "土",
+            "direction": "西南",
+            "selected_imagery": {
+              "人物": [
+                "母",
+                "众人",
+                "承事者",
+                "农夫",
+                "妇人",
+                "老妇",
+                "忠厚者",
+                "群众",
+                "顺从者",
+                "后勤人员",
+                "秘书",
+                "辅佐者",
+                "护士",
+                "保育员",
+                "村民",
+                "保姆",
+                "仓管员",
+                "地质人员",
+                "教导员",
+                "慈祥老者",
+                "慈善家",
+                "基层员工",
+                "家庭主妇"
+              ],
+              "行为": [
+                "承载",
+                "配合",
+                "包容",
+                "滋养",
+                "静守",
+                "恭顺",
+                "迟缓",
+                "妥协",
+                "辅助",
+                "服从",
+                "生养",
+                "忍耐",
+                "深藏",
+                "休整",
+                "默默奉献",
+                "守成",
+                "包庇",
+                "调和矛盾",
+                "退让",
+                "安分守己",
+                "厚积薄发",
+                "悉心照料"
+              ],
+              "场所": [
+                "田野",
+                "平地",
+                "仓储处",
+                "平原",
+                "农田",
+                "乡村",
+                "宅院",
+                "老宅",
+                "空旷平旷之地",
+                "农庄",
+                "仓库",
+                "地下停车场",
+                "原野",
+                "菜园",
+                "妇幼保健院",
+                "养殖场",
+                "储藏间",
+                "低矮建筑",
+                "古朴村落",
+                "土壤研究所",
+                "大型集市"
+              ],
+              "事物": [
+                "布帛",
+                "容器",
+                "方形物",
+                "瓦器",
+                "农具",
+                "厚重物",
+                "车舆",
+                "丝绵",
+                "土石制品",
+                "被褥",
+                "粮秣",
+                "粮食",
+                "陶瓷",
+                "泥塑",
+                "布料",
+                "皮包",
+                "箱柜",
+                "储藏室",
+                "砖石",
+                "水泥",
+                "农产品",
+                "大米",
+                "面粉",
+                "地毯",
+                "棉被",
+                "五谷杂粮"
+              ]
+            },
+            "all_imagery": {
+              "象意": [
+                "柔顺",
+                "承载",
+                "包容",
+                "厚德",
+                "滋养",
+                "迟缓",
+                "静守",
+                "广博",
+                "顺从",
+                "谦卑",
+                "生养",
+                "包蓄",
+                "稳定",
+                "暗昧",
+                "厚实",
+                "含蓄",
+                "忠诚",
+                "守信",
+                "容纳",
+                "静穆",
+                "博大",
+                "慈和",
+                "踏实",
+                "孕育",
+                "内敛",
+                "随和"
+              ],
+              "自然": [
+                "地",
+                "阴云",
+                "雾",
+                "露",
+                "冰霜",
+                "阴天",
+                "大雾",
+                "夜空",
+                "大地",
+                "原野",
+                "平川",
+                "浓云",
+                "黄昏",
+                "夜色",
+                "阴霾",
+                "湿润之气",
+                "沃土",
+                "泥沼",
+                "沉静无风",
+                "地热",
+                "广袤土壤",
+                "黄土高坡",
+                "深厚地层"
+              ],
+              "方位": [
+                "西南",
+                "下方",
+                "地表",
+                "平地",
+                "底层",
+                "坤位",
+                "右下"
+              ],
+              "人物": [
+                "母",
+                "众人",
+                "承事者",
+                "农夫",
+                "妇人",
+                "老妇",
+                "忠厚者",
+                "群众",
+                "顺从者",
+                "后勤人员",
+                "秘书",
+                "辅佐者",
+                "护士",
+                "保育员",
+                "村民",
+                "保姆",
+                "仓管员",
+                "地质人员",
+                "教导员",
+                "慈祥老者",
+                "慈善家",
+                "基层员工",
+                "家庭主妇"
+              ],
+              "家庭": [
+                "母亲",
+                "祖母",
+                "主妇",
+                "女主人",
+                "岳母",
+                "继母",
+                "老母",
+                "姑母",
+                "女性长辈"
+              ],
+              "身体": [
+                "腹",
+                "脾",
+                "胃",
+                "肌肉",
+                "右肩",
+                "肉",
+                "消化系统",
+                "女性胞宫",
+                "腹腔",
+                "皮肤",
+                "小腹",
+                "子宫",
+                "乳房",
+                "体毛",
+                "盲肠",
+                "组织器官",
+                "胰腺",
+                "腹肌",
+                "下焦濡养"
+              ],
+              "动物": [
+                "牛",
+                "牝马",
+                "百兽",
+                "夜行动物",
+                "蚂蚁",
+                "母畜",
+                "母牛",
+                "水牛",
+                "牝羊",
+                "雌性动物",
+                "耕牛",
+                "乌鸦",
+                "夜鹰",
+                "土中昆虫",
+                "蚕",
+                "蚯蚓",
+                "骆驼"
+              ],
+              "事物": [
+                "布帛",
+                "容器",
+                "方形物",
+                "瓦器",
+                "农具",
+                "厚重物",
+                "车舆",
+                "丝绵",
+                "土石制品",
+                "被褥",
+                "粮秣",
+                "粮食",
+                "陶瓷",
+                "泥塑",
+                "布料",
+                "皮包",
+                "箱柜",
+                "储藏室",
+                "砖石",
+                "水泥",
+                "农产品",
+                "大米",
+                "面粉",
+                "地毯",
+                "棉被",
+                "五谷杂粮"
+              ],
+              "场所": [
+                "田野",
+                "平地",
+                "仓储处",
+                "平原",
+                "农田",
+                "乡村",
+                "宅院",
+                "老宅",
+                "空旷平旷之地",
+                "农庄",
+                "仓库",
+                "地下停车场",
+                "原野",
+                "菜园",
+                "妇幼保健院",
+                "养殖场",
+                "储藏间",
+                "低矮建筑",
+                "古朴村落",
+                "土壤研究所",
+                "大型集市"
+              ],
+              "行为": [
+                "承载",
+                "配合",
+                "包容",
+                "滋养",
+                "静守",
+                "恭顺",
+                "迟缓",
+                "妥协",
+                "辅助",
+                "服从",
+                "生养",
+                "忍耐",
+                "深藏",
+                "休整",
+                "默默奉献",
+                "守成",
+                "包庇",
+                "调和矛盾",
+                "退让",
+                "安分守己",
+                "厚积薄发",
+                "悉心照料"
+              ],
+              "色彩": [
+                "黄色",
+                "土黄",
+                "黑黄",
+                "棕黑",
+                "深褐",
+                "土色",
+                "赭石色",
+                "米黄",
+                "灰黄",
+                "暗褐"
+              ],
+              "饮食": [
+                "牛肉",
+                "土中物",
+                "面食",
+                "甘味之物",
+                "杂粮",
+                "块茎根类食品",
+                "红薯",
+                "土豆",
+                "山药",
+                "南瓜",
+                "大米",
+                "黄豆",
+                "谷物",
+                "甜品",
+                "糯米",
+                "玉米",
+                "老汤炖菜",
+                "家常便饭"
+              ],
+              "疾病": [
+                "脾胃失调",
+                "腹痛",
+                "消化不良",
+                "慢性病",
+                "郁证",
+                "妇科疾病",
+                "乏力虚损",
+                "腹胀",
+                "腹泻",
+                "胃炎",
+                "胃溃疡",
+                "子宫肌瘤",
+                "贫血",
+                "水肿",
+                "湿气过重",
+                "脂肪肝",
+                "慢性消耗病",
+                "食欲不振",
+                "肌肉萎缩"
+              ]
+            },
+            "rule_ids": [
+              "XIANG-TRIGRAM-001",
+              "XIANG-CONTEXT-001"
+            ]
+          },
+          {
+            "candidate_id": "meihua-original-use-坤",
+            "module": "meihua",
+            "stage": "original",
+            "role": "use",
+            "symbol_type": "trigram",
+            "symbol": "坤",
+            "element": "土",
+            "direction": "西南",
+            "selected_imagery": {
+              "人物": [
+                "母",
+                "众人",
+                "承事者",
+                "农夫",
+                "妇人",
+                "老妇",
+                "忠厚者",
+                "群众",
+                "顺从者",
+                "后勤人员",
+                "秘书",
+                "辅佐者",
+                "护士",
+                "保育员",
+                "村民",
+                "保姆",
+                "仓管员",
+                "地质人员",
+                "教导员",
+                "慈祥老者",
+                "慈善家",
+                "基层员工",
+                "家庭主妇"
+              ],
+              "行为": [
+                "承载",
+                "配合",
+                "包容",
+                "滋养",
+                "静守",
+                "恭顺",
+                "迟缓",
+                "妥协",
+                "辅助",
+                "服从",
+                "生养",
+                "忍耐",
+                "深藏",
+                "休整",
+                "默默奉献",
+                "守成",
+                "包庇",
+                "调和矛盾",
+                "退让",
+                "安分守己",
+                "厚积薄发",
+                "悉心照料"
+              ],
+              "场所": [
+                "田野",
+                "平地",
+                "仓储处",
+                "平原",
+                "农田",
+                "乡村",
+                "宅院",
+                "老宅",
+                "空旷平旷之地",
+                "农庄",
+                "仓库",
+                "地下停车场",
+                "原野",
+                "菜园",
+                "妇幼保健院",
+                "养殖场",
+                "储藏间",
+                "低矮建筑",
+                "古朴村落",
+                "土壤研究所",
+                "大型集市"
+              ],
+              "事物": [
+                "布帛",
+                "容器",
+                "方形物",
+                "瓦器",
+                "农具",
+                "厚重物",
+                "车舆",
+                "丝绵",
+                "土石制品",
+                "被褥",
+                "粮秣",
+                "粮食",
+                "陶瓷",
+                "泥塑",
+                "布料",
+                "皮包",
+                "箱柜",
+                "储藏室",
+                "砖石",
+                "水泥",
+                "农产品",
+                "大米",
+                "面粉",
+                "地毯",
+                "棉被",
+                "五谷杂粮"
+              ]
+            },
+            "all_imagery": {
+              "象意": [
+                "柔顺",
+                "承载",
+                "包容",
+                "厚德",
+                "滋养",
+                "迟缓",
+                "静守",
+                "广博",
+                "顺从",
+                "谦卑",
+                "生养",
+                "包蓄",
+                "稳定",
+                "暗昧",
+                "厚实",
+                "含蓄",
+                "忠诚",
+                "守信",
+                "容纳",
+                "静穆",
+                "博大",
+                "慈和",
+                "踏实",
+                "孕育",
+                "内敛",
+                "随和"
+              ],
+              "自然": [
+                "地",
+                "阴云",
+                "雾",
+                "露",
+                "冰霜",
+                "阴天",
+                "大雾",
+                "夜空",
+                "大地",
+                "原野",
+                "平川",
+                "浓云",
+                "黄昏",
+                "夜色",
+                "阴霾",
+                "湿润之气",
+                "沃土",
+                "泥沼",
+                "沉静无风",
+                "地热",
+                "广袤土壤",
+                "黄土高坡",
+                "深厚地层"
+              ],
+              "方位": [
+                "西南",
+                "下方",
+                "地表",
+                "平地",
+                "底层",
+                "坤位",
+                "右下"
+              ],
+              "人物": [
+                "母",
+                "众人",
+                "承事者",
+                "农夫",
+                "妇人",
+                "老妇",
+                "忠厚者",
+                "群众",
+                "顺从者",
+                "后勤人员",
+                "秘书",
+                "辅佐者",
+                "护士",
+                "保育员",
+                "村民",
+                "保姆",
+                "仓管员",
+                "地质人员",
+                "教导员",
+                "慈祥老者",
+                "慈善家",
+                "基层员工",
+                "家庭主妇"
+              ],
+              "家庭": [
+                "母亲",
+                "祖母",
+                "主妇",
+                "女主人",
+                "岳母",
+                "继母",
+                "老母",
+                "姑母",
+                "女性长辈"
+              ],
+              "身体": [
+                "腹",
+                "脾",
+                "胃",
+                "肌肉",
+                "右肩",
+                "肉",
+                "消化系统",
+                "女性胞宫",
+                "腹腔",
+                "皮肤",
+                "小腹",
+                "子宫",
+                "乳房",
+                "体毛",
+                "盲肠",
+                "组织器官",
+                "胰腺",
+                "腹肌",
+                "下焦濡养"
+              ],
+              "动物": [
+                "牛",
+                "牝马",
+                "百兽",
+                "夜行动物",
+                "蚂蚁",
+                "母畜",
+                "母牛",
+                "水牛",
+                "牝羊",
+                "雌性动物",
+                "耕牛",
+                "乌鸦",
+                "夜鹰",
+                "土中昆虫",
+                "蚕",
+                "蚯蚓",
+                "骆驼"
+              ],
+              "事物": [
+                "布帛",
+                "容器",
+                "方形物",
+                "瓦器",
+                "农具",
+                "厚重物",
+                "车舆",
+                "丝绵",
+                "土石制品",
+                "被褥",
+                "粮秣",
+                "粮食",
+                "陶瓷",
+                "泥塑",
+                "布料",
+                "皮包",
+                "箱柜",
+                "储藏室",
+                "砖石",
+                "水泥",
+                "农产品",
+                "大米",
+                "面粉",
+                "地毯",
+                "棉被",
+                "五谷杂粮"
+              ],
+              "场所": [
+                "田野",
+                "平地",
+                "仓储处",
+                "平原",
+                "农田",
+                "乡村",
+                "宅院",
+                "老宅",
+                "空旷平旷之地",
+                "农庄",
+                "仓库",
+                "地下停车场",
+                "原野",
+                "菜园",
+                "妇幼保健院",
+                "养殖场",
+                "储藏间",
+                "低矮建筑",
+                "古朴村落",
+                "土壤研究所",
+                "大型集市"
+              ],
+              "行为": [
+                "承载",
+                "配合",
+                "包容",
+                "滋养",
+                "静守",
+                "恭顺",
+                "迟缓",
+                "妥协",
+                "辅助",
+                "服从",
+                "生养",
+                "忍耐",
+                "深藏",
+                "休整",
+                "默默奉献",
+                "守成",
+                "包庇",
+                "调和矛盾",
+                "退让",
+                "安分守己",
+                "厚积薄发",
+                "悉心照料"
+              ],
+              "色彩": [
+                "黄色",
+                "土黄",
+                "黑黄",
+                "棕黑",
+                "深褐",
+                "土色",
+                "赭石色",
+                "米黄",
+                "灰黄",
+                "暗褐"
+              ],
+              "饮食": [
+                "牛肉",
+                "土中物",
+                "面食",
+                "甘味之物",
+                "杂粮",
+                "块茎根类食品",
+                "红薯",
+                "土豆",
+                "山药",
+                "南瓜",
+                "大米",
+                "黄豆",
+                "谷物",
+                "甜品",
+                "糯米",
+                "玉米",
+                "老汤炖菜",
+                "家常便饭"
+              ],
+              "疾病": [
+                "脾胃失调",
+                "腹痛",
+                "消化不良",
+                "慢性病",
+                "郁证",
+                "妇科疾病",
+                "乏力虚损",
+                "腹胀",
+                "腹泻",
+                "胃炎",
+                "胃溃疡",
+                "子宫肌瘤",
+                "贫血",
+                "水肿",
+                "湿气过重",
+                "脂肪肝",
+                "慢性消耗病",
+                "食欲不振",
+                "肌肉萎缩"
+              ]
+            },
+            "rule_ids": [
+              "XIANG-TRIGRAM-001",
+              "XIANG-CONTEXT-001"
+            ]
+          },
+          {
+            "candidate_id": "meihua-changed-changed_use-震",
+            "module": "meihua",
+            "stage": "changed",
+            "role": "changed_use",
+            "symbol_type": "trigram",
+            "symbol": "震",
+            "element": "木",
+            "direction": "东",
+            "selected_imagery": {
+              "人物": [
+                "长男",
+                "行动者",
+                "掌权者",
+                "开创者",
+                "运动员",
+                "军人",
+                "警察",
+                "鼓手",
+                "急躁者",
+                "创业团队",
+                "司机",
+                "探险者",
+                "青年领袖",
+                "乐手",
+                "大队长",
+                "指挥官",
+                "播音员",
+                "先锋",
+                "特警",
+                "急先锋",
+                "青年才俊",
+                "发令员",
+                "重型机械师"
+              ],
+              "行为": [
+                "启动",
+                "惊动",
+                "快速推进",
+                "奋起",
+                "发声",
+                "震动",
+                "暴躁",
+                "激扬",
+                "大声疾呼",
+                "突击",
+                "奔跑",
+                "鸣笛",
+                "跳跃",
+                "开拓",
+                "怒吼",
+                "破土而出",
+                "雷厉风行",
+                "果断行动",
+                "敲锣打鼓",
+                "快速反应",
+                "振臂一呼"
+              ],
+              "场所": [
+                "道路",
+                "林地",
+                "闹市",
+                "繁华地",
+                "车站",
+                "机场",
+                "发电厂",
+                "运动场",
+                "乐器行",
+                "大型集会地",
+                "十字路口",
+                "游乐场",
+                "赛车场",
+                "广播电视台",
+                "军营",
+                "繁忙街道",
+                "竹林",
+                "木材厂",
+                "音响厅",
+                "地铁站",
+                "创业孵化园"
+              ],
+              "事物": [
+                "竹木",
+                "车辆",
+                "发声之物",
+                "乐器",
+                "警报器",
+                "电气设备",
+                "枪炮",
+                "运动器材",
+                "木林",
+                "钟鼓",
+                "响箭",
+                "闹钟",
+                "扩音器",
+                "引擎",
+                "高铁",
+                "火箭",
+                "电线",
+                "电池",
+                "架子鼓",
+                "喇叭",
+                "起跑器",
+                "冲击钻",
+                "鞭炮",
+                "雷达"
+              ]
+            },
+            "all_imagery": {
+              "象意": [
+                "奋起",
+                "振动",
+                "惊动",
+                "开创",
+                "萌发",
+                "急躁",
+                "迅疾",
+                "声名",
+                "动荡",
+                "奋进",
+                "发越",
+                "起步",
+                "鸣响",
+                "雷厉风行",
+                "开辟",
+                "警示",
+                "躁动",
+                "怒发",
+                "生发",
+                "突破",
+                "勇往直前",
+                "勃发",
+                "觉醒",
+                "雷动",
+                "跃进"
+              ],
+              "自然": [
+                "雷",
+                "霹雳",
+                "地震",
+                "春雷",
+                "疾风骤雨",
+                "火山喷发",
+                "树林生机",
+                "初春气候",
+                "雷阵雨",
+                "惊蛰之候",
+                "雷电交加",
+                "林间清风",
+                "地动山摇",
+                "晨曦初露",
+                "雷鸣电闪",
+                "惊涛骇浪",
+                "春风化雨",
+                "萌芽初破"
+              ],
+              "方位": [
+                "东",
+                "正东",
+                "左方",
+                "青龙位",
+                "东方木位"
+              ],
+              "人物": [
+                "长男",
+                "行动者",
+                "掌权者",
+                "开创者",
+                "运动员",
+                "军人",
+                "警察",
+                "鼓手",
+                "急躁者",
+                "创业团队",
+                "司机",
+                "探险者",
+                "青年领袖",
+                "乐手",
+                "大队长",
+                "指挥官",
+                "播音员",
+                "先锋",
+                "特警",
+                "急先锋",
+                "青年才俊",
+                "发令员",
+                "重型机械师"
+              ],
+              "家庭": [
+                "长男",
+                "长子",
+                "长兄",
+                "大少爷",
+                "大儿子",
+                "兄长"
+              ],
+              "身体": [
+                "足",
+                "脚",
+                "肝",
+                "胆",
+                "神经",
+                "左肋",
+                "筋",
+                "声音",
+                "头发",
+                "手腕",
+                "声带",
+                "左腿",
+                "脚踝",
+                "脚趾",
+                "筋腱",
+                "左手",
+                "肝经",
+                "气机生发处",
+                "左侧经络"
+              ],
+              "动物": [
+                "龙",
+                "蛇",
+                "百虫",
+                "鸣蝉",
+                "马",
+                "善鸣之兽",
+                "青龙",
+                "雄鹰",
+                "骏马",
+                "善走之兽",
+                "蜂类",
+                "鸣鸟",
+                "蟋蟀",
+                "猎豹",
+                "猛禽",
+                "春蚕",
+                "惊雀"
+              ],
+              "事物": [
+                "竹木",
+                "车辆",
+                "发声之物",
+                "乐器",
+                "警报器",
+                "电气设备",
+                "枪炮",
+                "运动器材",
+                "木林",
+                "钟鼓",
+                "响箭",
+                "闹钟",
+                "扩音器",
+                "引擎",
+                "高铁",
+                "火箭",
+                "电线",
+                "电池",
+                "架子鼓",
+                "喇叭",
+                "起跑器",
+                "冲击钻",
+                "鞭炮",
+                "雷达"
+              ],
+              "场所": [
+                "道路",
+                "林地",
+                "闹市",
+                "繁华地",
+                "车站",
+                "机场",
+                "发电厂",
+                "运动场",
+                "乐器行",
+                "大型集会地",
+                "十字路口",
+                "游乐场",
+                "赛车场",
+                "广播电视台",
+                "军营",
+                "繁忙街道",
+                "竹林",
+                "木材厂",
+                "音响厅",
+                "地铁站",
+                "创业孵化园"
+              ],
+              "行为": [
+                "启动",
+                "惊动",
+                "快速推进",
+                "奋起",
+                "发声",
+                "震动",
+                "暴躁",
+                "激扬",
+                "大声疾呼",
+                "突击",
+                "奔跑",
+                "鸣笛",
+                "跳跃",
+                "开拓",
+                "怒吼",
+                "破土而出",
+                "雷厉风行",
+                "果断行动",
+                "敲锣打鼓",
+                "快速反应",
+                "振臂一呼"
+              ],
+              "色彩": [
+                "青绿",
+                "碧绿",
+                "深绿",
+                "青色",
+                "翠绿",
+                "嫩绿",
+                "竹青色",
+                "墨绿",
+                "青翠"
+              ],
+              "饮食": [
+                "蹄类",
+                "酸味物",
+                "鲜蔬",
+                "野味",
+                "竹笋",
+                "发酵食品",
+                "春令生鲜",
+                "酸菜",
+                "醋",
+                "梅子",
+                "柠檬",
+                "绿茶",
+                "豆芽",
+                "香椿",
+                "野葱",
+                "蹄髈",
+                "生猛海鲜"
+              ],
+              "疾病": [
+                "足疾",
+                "肝病",
+                "神经官能症",
+                "惊吓",
+                "急躁抽搐",
+                "筋骨伤痛",
+                "躁狂",
+                "肝阳上亢",
+                "中风偏瘫",
+                "痉挛",
+                "眩晕",
+                "声带嘶哑",
+                "外伤骨折",
+                "左肋胀痛",
+                "狂躁失眠",
+                "小儿惊风",
+                "多动症",
+                "脚气感染"
+              ]
+            },
+            "rule_ids": [
+              "XIANG-TRIGRAM-001",
+              "XIANG-CONTEXT-001"
+            ]
+          },
+          {
+            "candidate_id": "liuyao-original-palace-坤",
+            "module": "liuyao",
+            "stage": "original",
+            "role": "palace",
+            "symbol_type": "trigram",
+            "symbol": "坤",
+            "element": "土",
+            "direction": "西南",
+            "selected_imagery": {
+              "人物": [
+                "母",
+                "众人",
+                "承事者",
+                "农夫",
+                "妇人",
+                "老妇",
+                "忠厚者",
+                "群众",
+                "顺从者",
+                "后勤人员",
+                "秘书",
+                "辅佐者",
+                "护士",
+                "保育员",
+                "村民",
+                "保姆",
+                "仓管员",
+                "地质人员",
+                "教导员",
+                "慈祥老者",
+                "慈善家",
+                "基层员工",
+                "家庭主妇"
+              ],
+              "行为": [
+                "承载",
+                "配合",
+                "包容",
+                "滋养",
+                "静守",
+                "恭顺",
+                "迟缓",
+                "妥协",
+                "辅助",
+                "服从",
+                "生养",
+                "忍耐",
+                "深藏",
+                "休整",
+                "默默奉献",
+                "守成",
+                "包庇",
+                "调和矛盾",
+                "退让",
+                "安分守己",
+                "厚积薄发",
+                "悉心照料"
+              ],
+              "场所": [
+                "田野",
+                "平地",
+                "仓储处",
+                "平原",
+                "农田",
+                "乡村",
+                "宅院",
+                "老宅",
+                "空旷平旷之地",
+                "农庄",
+                "仓库",
+                "地下停车场",
+                "原野",
+                "菜园",
+                "妇幼保健院",
+                "养殖场",
+                "储藏间",
+                "低矮建筑",
+                "古朴村落",
+                "土壤研究所",
+                "大型集市"
+              ],
+              "事物": [
+                "布帛",
+                "容器",
+                "方形物",
+                "瓦器",
+                "农具",
+                "厚重物",
+                "车舆",
+                "丝绵",
+                "土石制品",
+                "被褥",
+                "粮秣",
+                "粮食",
+                "陶瓷",
+                "泥塑",
+                "布料",
+                "皮包",
+                "箱柜",
+                "储藏室",
+                "砖石",
+                "水泥",
+                "农产品",
+                "大米",
+                "面粉",
+                "地毯",
+                "棉被",
+                "五谷杂粮"
+              ]
+            },
+            "all_imagery": {
+              "象意": [
+                "柔顺",
+                "承载",
+                "包容",
+                "厚德",
+                "滋养",
+                "迟缓",
+                "静守",
+                "广博",
+                "顺从",
+                "谦卑",
+                "生养",
+                "包蓄",
+                "稳定",
+                "暗昧",
+                "厚实",
+                "含蓄",
+                "忠诚",
+                "守信",
+                "容纳",
+                "静穆",
+                "博大",
+                "慈和",
+                "踏实",
+                "孕育",
+                "内敛",
+                "随和"
+              ],
+              "自然": [
+                "地",
+                "阴云",
+                "雾",
+                "露",
+                "冰霜",
+                "阴天",
+                "大雾",
+                "夜空",
+                "大地",
+                "原野",
+                "平川",
+                "浓云",
+                "黄昏",
+                "夜色",
+                "阴霾",
+                "湿润之气",
+                "沃土",
+                "泥沼",
+                "沉静无风",
+                "地热",
+                "广袤土壤",
+                "黄土高坡",
+                "深厚地层"
+              ],
+              "方位": [
+                "西南",
+                "下方",
+                "地表",
+                "平地",
+                "底层",
+                "坤位",
+                "右下"
+              ],
+              "人物": [
+                "母",
+                "众人",
+                "承事者",
+                "农夫",
+                "妇人",
+                "老妇",
+                "忠厚者",
+                "群众",
+                "顺从者",
+                "后勤人员",
+                "秘书",
+                "辅佐者",
+                "护士",
+                "保育员",
+                "村民",
+                "保姆",
+                "仓管员",
+                "地质人员",
+                "教导员",
+                "慈祥老者",
+                "慈善家",
+                "基层员工",
+                "家庭主妇"
+              ],
+              "家庭": [
+                "母亲",
+                "祖母",
+                "主妇",
+                "女主人",
+                "岳母",
+                "继母",
+                "老母",
+                "姑母",
+                "女性长辈"
+              ],
+              "身体": [
+                "腹",
+                "脾",
+                "胃",
+                "肌肉",
+                "右肩",
+                "肉",
+                "消化系统",
+                "女性胞宫",
+                "腹腔",
+                "皮肤",
+                "小腹",
+                "子宫",
+                "乳房",
+                "体毛",
+                "盲肠",
+                "组织器官",
+                "胰腺",
+                "腹肌",
+                "下焦濡养"
+              ],
+              "动物": [
+                "牛",
+                "牝马",
+                "百兽",
+                "夜行动物",
+                "蚂蚁",
+                "母畜",
+                "母牛",
+                "水牛",
+                "牝羊",
+                "雌性动物",
+                "耕牛",
+                "乌鸦",
+                "夜鹰",
+                "土中昆虫",
+                "蚕",
+                "蚯蚓",
+                "骆驼"
+              ],
+              "事物": [
+                "布帛",
+                "容器",
+                "方形物",
+                "瓦器",
+                "农具",
+                "厚重物",
+                "车舆",
+                "丝绵",
+                "土石制品",
+                "被褥",
+                "粮秣",
+                "粮食",
+                "陶瓷",
+                "泥塑",
+                "布料",
+                "皮包",
+                "箱柜",
+                "储藏室",
+                "砖石",
+                "水泥",
+                "农产品",
+                "大米",
+                "面粉",
+                "地毯",
+                "棉被",
+                "五谷杂粮"
+              ],
+              "场所": [
+                "田野",
+                "平地",
+                "仓储处",
+                "平原",
+                "农田",
+                "乡村",
+                "宅院",
+                "老宅",
+                "空旷平旷之地",
+                "农庄",
+                "仓库",
+                "地下停车场",
+                "原野",
+                "菜园",
+                "妇幼保健院",
+                "养殖场",
+                "储藏间",
+                "低矮建筑",
+                "古朴村落",
+                "土壤研究所",
+                "大型集市"
+              ],
+              "行为": [
+                "承载",
+                "配合",
+                "包容",
+                "滋养",
+                "静守",
+                "恭顺",
+                "迟缓",
+                "妥协",
+                "辅助",
+                "服从",
+                "生养",
+                "忍耐",
+                "深藏",
+                "休整",
+                "默默奉献",
+                "守成",
+                "包庇",
+                "调和矛盾",
+                "退让",
+                "安分守己",
+                "厚积薄发",
+                "悉心照料"
+              ],
+              "色彩": [
+                "黄色",
+                "土黄",
+                "黑黄",
+                "棕黑",
+                "深褐",
+                "土色",
+                "赭石色",
+                "米黄",
+                "灰黄",
+                "暗褐"
+              ],
+              "饮食": [
+                "牛肉",
+                "土中物",
+                "面食",
+                "甘味之物",
+                "杂粮",
+                "块茎根类食品",
+                "红薯",
+                "土豆",
+                "山药",
+                "南瓜",
+                "大米",
+                "黄豆",
+                "谷物",
+                "甜品",
+                "糯米",
+                "玉米",
+                "老汤炖菜",
+                "家常便饭"
+              ],
+              "疾病": [
+                "脾胃失调",
+                "腹痛",
+                "消化不良",
+                "慢性病",
+                "郁证",
+                "妇科疾病",
+                "乏力虚损",
+                "腹胀",
+                "腹泻",
+                "胃炎",
+                "胃溃疡",
+                "子宫肌瘤",
+                "贫血",
+                "水肿",
+                "湿气过重",
+                "脂肪肝",
+                "慢性消耗病",
+                "食欲不振",
+                "肌肉萎缩"
+              ]
+            },
+            "rule_ids": [
+              "XIANG-TRIGRAM-001",
+              "XIANG-CONTEXT-001"
+            ]
+          }
+        ],
+        "liuyao_relative_summary": {
+          "兄弟": 2,
+          "妻财": 1,
+          "子孙": 1,
+          "官鬼": 1,
+          "父母": 1
+        },
+        "steps": [
+          {
+            "sequence": 1,
+            "operation": "extract_chart_symbols",
+            "output": {
+              "candidate_count": 4
+            },
+            "rule_ids": [
+              "XIANG-TRIGRAM-001",
+              "XIANG-BRANCH-001"
+            ]
+          },
+          {
+            "sequence": 2,
+            "operation": "prioritize_imagery_by_question_category",
+            "output": {
+              "category": "career",
+              "dimensions": [
+                "人物",
+                "行为",
+                "场所",
+                "事物"
+              ]
+            },
+            "rule_ids": [
+              "XIANG-CONTEXT-001"
+            ]
+          }
+        ],
+        "warnings": [
+          "类象是待核实的对应候选，不表示现实中的特定人物或事件。",
+          "类象未经过专家签署，不自动生成吉凶、应期或概率。"
+        ]
+      },
+      "yuanhui": {
+        "schema_version": "1.0",
+        "status": "engineering_cycle_context_pending_expert_review",
+        "engine_version": "yuanhui-engine-1.0.0",
+        "rule_version": "yuanhui-engineering-baseline-1.0.0",
+        "facts": {
+          "solar_year": 2026,
+          "epoch": {
+            "label": "公元前67017年",
+            "astronomical_year": -67016,
+            "status": "pending_expert_review"
+          },
+          "yuan": {
+            "index": 1,
+            "label": "第1元",
+            "start_year": "公元前67017年",
+            "end_year": "公元62583年"
+          },
+          "hui": {
+            "index": 7,
+            "label": "第7会",
+            "start_year": "公元前2217年",
+            "end_year": "公元8583年",
+            "branch": "午",
+            "element": "火"
+          },
+          "yun": {
+            "index": 12,
+            "label": "第12运",
+            "start_year": "公元1744年",
+            "end_year": "公元2103年"
+          },
+          "shi": {
+            "index": 10,
+            "label": "第10世",
+            "start_year": "公元2014年",
+            "end_year": "公元2043年",
+            "year_in_shi": 13
+          }
+        },
+        "evidence": [
+          {
+            "evidence_id": "YHYS-001",
+            "module": "meihua",
+            "role": "体卦",
+            "background_element": "火",
+            "target_element": "土",
+            "code": "background_generates_target",
+            "label": "会运背景火生盘面土",
+            "rule_ids": [
+              "YHYS-RELATION-001"
+            ]
+          },
+          {
+            "evidence_id": "YHYS-002",
+            "module": "meihua",
+            "role": "用卦",
+            "background_element": "火",
+            "target_element": "土",
+            "code": "background_generates_target",
+            "label": "会运背景火生盘面土",
+            "rule_ids": [
+              "YHYS-RELATION-001"
+            ]
+          },
+          {
+            "evidence_id": "YHYS-003",
+            "module": "liuyao",
+            "role": "卦宫",
+            "background_element": "火",
+            "target_element": "土",
+            "code": "background_generates_target",
+            "label": "会运背景火生盘面土",
+            "rule_ids": [
+              "YHYS-RELATION-001"
+            ]
+          }
+        ],
+        "steps": [
+          {
+            "sequence": 1,
+            "operation": "map_solar_year_to_yuan_hui_yun_shi",
+            "inputs": {
+              "solar_year": 2026,
+              "epoch_astronomical_year": -67016
+            },
+            "output": {
+              "yuan": 1,
+              "hui": 7,
+              "yun": 12,
+              "shi": 10,
+              "year_in_shi": 13
+            },
+            "rule_ids": [
+              "YHYS-CYCLE-001"
+            ]
+          },
+          {
+            "sequence": 2,
+            "operation": "compare_hui_element_with_chart_elements",
+            "inputs": {
+              "hui_branch": "午",
+              "hui_element": "火"
+            },
+            "output": {
+              "evidence_count": 3
+            },
+            "rule_ids": [
+              "YHYS-RELATION-001"
+            ]
+          }
+        ],
+        "warnings": [
+          "元会运世纪元采用待专家审核的工程基线，当前只计算到公历年粒度。",
+          "宏观周期五行关系不直接表示个人吉凶、事件概率或应期。"
+        ]
+      },
+      "literature": {
+        "status": "disabled",
+        "usage_scope": "internal_research",
+        "books": [],
+        "warnings": [
+          "书籍检索未启用。"
+        ]
+      }
+    },
+    "step7": {
+      "step": 7,
+      "name": "趋吉避凶建议",
+      "advice": [
+        "当前吉凶参半，宜稳扎稳打，不宜冒进；先小范围验证再扩大投入。",
+        "理清核心权责与验收指标：明确下一阶段主攻目标与衡量标准，将口头支持落实为明确的资源、团队或预算。",
+        "小步验证并建立关键人协同：对重大变动先做小范围试点验证，加强与核心决策者和跨部门协作方的定期对齐。",
+        "留足转换缓冲与底线预案：在作出不可逆选择前评估最坏承受力，确保个人专业能力与风险备选方案完备。",
+        "核实清单：谁对该事项拥有最终决策权？；当前阶段最关键的业务或人脉瓶颈在哪里？；若推进不如预期，可承受的最大试错成本与退出机制是什么？"
+      ],
+      "disclaimer": "以上为传统易经术数文化推演，仅作参考，现实中请结合自身实际理性判断。推演结果不构成任何决策依据，最终结果取决于个人选择与客观现实。"
+    },
+    "reference_library": {
+      "core_symbols": "本卦「坤」核心象义需结合卦辞爻辞进一步拆解",
+      "risks": "用神休囚死，力量不足，推进阻力较大",
+      "time_window": "适合行动：小范围验证阶段；适合观望：大局未定之时；尽量规避：冲动冒进、孤注一掷",
+      "possibilities": "①顺势发展：若用神得令生扶，事项按有利方向推进，触发条件为关键人支持/资源到位；②阻滞反复：若用神受克休囚，事项出现拖延或反复，触发条件为外部阻力/关键人变动；③意外转变：若动爻逢冲逢值，事项出现意料之外的变化，触发条件为突发因素/时间节点到达。",
+      "misreadings": "①忌仅凭卦名吉凶断事，需结合用神旺衰、体用生克、动爻变化综合判断；②忌将研究性结论当作确定性预言，卦象反映的是趋势与概率，非绝对结果；③忌忽略起盘时间与用神的对应关系，同一卦在不同月令日辰下旺衰不同。"
+    },
+    "reality_check": {
+      "items": [
+        "梅花易数本卦为「坤」，提示当前事项处于坤所象之状态",
+        "动爻在第4爻，提示事项的关键变化点与该爻所象之事相关",
+        "六爻本卦为「坤」，提示当前事项处于坤所象之状态"
+      ]
+    },
+    "followup_menu": {
+      "options": [
+        "①核对上面的卦局现状描述，告诉我是否符合你的现实；",
+        "②针对盘局某一个符号、某一句断语进行深度追问；",
+        "③换角度解读：备选方案、多方人物心态分析；",
+        "④更换术数门派，对此事重新起盘参断；",
+        "⑤代入不同选择，推演不同选择之下事态变化；",
+        "⑥留存本卦，后续反馈现实结果进行复盘对照。"
+      ]
+    },
+    "formatted_text": "【求测事由】：北京国御安全科技有线公司这个月能不能发工资，以及后续经营是否可持续\n【起盘方式】：numbers（{'local_datetime': '2026-08-26T11:33', 'timezone': 'Asia/Shanghai', 'cast_nonce': 'af04c867c69a43aba96b51b61b12383d', 'use_true_solar_time': False, 'numbers': [8, 8, 8]}）\n\n====完整排盘结果====\n【历法基线】\n  年柱：丙午\n  月柱：丙申\n  日柱：壬申\n  时柱：丙午\n  农历：2026年七十四\n\n【梅花易数】\n  本卦：坤（2）\n  变卦：豫（16）\n  动爻：第4爻\n  推演轨迹：\n    - 8 % 8 -> upper trigram index 8\n    - 8 % 8 -> lower trigram index 8\n    - (8 + 8) % 6 -> moving line 4\n    - combine lower 坤 and upper 坤 -> 坤\n    - moving line 4 sets upper as use and lower as body\n  ⚠ 旺衰、应期和事项断语尚未经过专家签署，本结果只包含起卦与体用关系事实。\n\n【六爻】\n  本卦：坤（2）\n  变卦：豫（16）\n  推演轨迹：\n    - map two numbers to lower 8, upper 8, moving line 4\n    - map original hexagram to 坤 palace 本宫\n    - set host line 6 and response line 3\n    - decorate six lines with Na Jia, relatives and six spirits\n    - derive 甲子旬 and empty branches 戌、亥\n  ⚠ 六爻纳甲采用京房八宫工程基线，月建日辰旺衰和事项断语尚待专家规则与案例签署。\n  ⚠ 伏神飞神规则尚未签署，本结果明确不生成推测值。\n\n====用神定位====\n用神：官鬼，取用理由：事业看官鬼爻（职权、考核、压力），父母爻为文书资质、单位平台\n辅助用神：父母\n\n====旺衰与生克分析====\n用神官鬼（木）：休（用神生月令）\n判定：用神木生月令申（金），泄气为休。\n生克链条：\n  - 用神木生月令申（金），泄气为休。\n  - 日辰为申（金），需结合日辰对用神的生克冲合作最终判断。\n\n====卦象符号事理解读====\n（符号象义待结合具体卦爻进一步拆解）\n\n====事态综合推演====\n现状：事项处于事业范畴，用神官鬼当前休（用神生月令）。\n有利点：\n  - 当前无明显有利因素，需谨慎观望\n阻碍点：\n  - 用神休囚死，力量不足，推进阻力较大\n趋势与参考应期：事态将随用神旺衰变化而演变，当前阶段宜根据用神力量决定进退。 参考应期：近则7日内（动爻逢值逢冲），远则按月令节气交接前后观察变化。具体应期需结合动爻地支与日辰冲合确定。\n吉凶定性：平\n判定依据：用神休（用神生月令），力量中等\n\n====趋吉避凶建议====\n1. 当前吉凶参半，宜稳扎稳打，不宜冒进；先小范围验证再扩大投入。\n2. 理清核心权责与验收指标：明确下一阶段主攻目标与衡量标准，将口头支持落实为明确的资源、团队或预算。\n3. 小步验证并建立关键人协同：对重大变动先做小范围试点验证，加强与核心决策者和跨部门协作方的定期对齐。\n4. 留足转换缓冲与底线预案：在作出不可逆选择前评估最坏承受力，确保个人专业能力与风险备选方案完备。\n5. 核实清单：谁对该事项拥有最终决策权？；当前阶段最关键的业务或人脉瓶颈在哪里？；若推进不如预期，可承受的最大试错成本与退出机制是什么？\n\n【文化提示】：以上为传统易经术数文化推演，仅作参考，现实中请结合自身实际理性判断。推演结果不构成任何决策依据，最终结果取决于个人选择与客观现实。\n\n====拓展参考资料库====\n1.核心符号原始象义：本卦「坤」核心象义需结合卦辞爻辞进一步拆解\n2.本卦重点风险隐患：用神休囚死，力量不足，推进阻力较大\n3.参考时间窗口：适合行动：小范围验证阶段；适合观望：大局未定之时；尽量规避：冲动冒进、孤注一掷\n4.事件多发展可能性以及对应触发条件：①顺势发展：若用神得令生扶，事项按有利方向推进，触发条件为关键人支持/资源到位；②阻滞反复：若用神受克休囚，事项出现拖延或反复，触发条件为外部阻力/关键人变动；③意外转变：若动爻逢冲逢值，事项出现意料之外的变化，触发条件为突发因素/时间节点到达。\n5.本卦常见误读误区提醒：①忌仅凭卦名吉凶断事，需结合用神旺衰、体用生克、动爻变化综合判断；②忌将研究性结论当作确定性预言，卦象反映的是趋势与概率，非绝对结果；③忌忽略起盘时间与用神的对应关系，同一卦在不同月令日辰下旺衰不同。\n\n📌卦象现状核对（请对照现实看是否符合，回复\"符合/部分符合/不符合\"，仅调整事理解读视角，绝不修改原始卦盘）\n1、卦局显示：梅花易数本卦为「坤」，提示当前事项处于坤所象之状态\n2、卦局显示：动爻在第4爻，提示事项的关键变化点与该爻所象之事相关\n3、卦局显示：六爻本卦为「坤」，提示当前事项处于坤所象之状态\n\n✨你可以选择下面任意一种方式继续沟通：\n①核对上面的卦局现状描述，告诉我是否符合你的现实；\n②针对盘局某一个符号、某一句断语进行深度追问；\n③换角度解读：备选方案、多方人物心态分析；\n④更换术数门派，对此事重新起盘参断；\n⑤代入不同选择，推演不同选择之下事态变化；\n⑥留存本卦，后续反馈现实结果进行复盘对照。",
+    "scheduling_note": "未指定门派，默认主用梅花易数起卦，六爻纳甲辅助参断。"
+  },
+  "created_at": "2026-08-26T03:33:51+00:00",
+  "updated_at": "2026-08-26T03:34:13+00:00"
+}

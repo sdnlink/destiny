@@ -46,6 +46,18 @@ from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
 from app.core.validation import run_validation_cases
 from app.core.yuanhui import analyze_yuan_hui_yun_shi
+from app.session import create_session, get_store
+from app.workflow import run_workflow
+from app.interaction import (
+    analyze_branches,
+    analyze_multi_party,
+    angle_shift,
+    apply_completion_answers,
+    deep_question,
+    generate_completion_prompt,
+    process_reality_response,
+    review_outcome,
+)
 
 
 APP_VERSION = "0.2.0"
@@ -685,6 +697,197 @@ def evaluate_calculation(request: CalculationRequest):
 @app.post("/v1/calculations/compare")
 def compare_calculations(request: ComparisonRequest):
     return {"data": comparison_envelope(request.calculations, request.context)}
+
+
+# ============================================================
+# 交互式推演会话 API（工作流引擎 + 交互模块A-G）
+# ============================================================
+
+class SessionCreateRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=500, description="求测事由")
+    category: str = Field("other", description="事项类别：career/finance/relationship/study/lawsuit/travel/missing_person/lost_item/health/decision/other")
+    system: str = Field("auto", description="术数门类：auto/meihua/liuyao/qimen/daliuren/bazi/ziwei")
+    casting_method: str = Field("auto", description="起盘方式：auto/time/numbers/manual/coins")
+    casting_source: Dict[str, Any] = Field(default_factory=dict, description="起盘素材：local_datetime/timezone/cast_nonce/numbers/gender等")
+    user_profile: Dict[str, Any] = Field(default_factory=dict, description="用户信息：gender/age/current_stage等")
+
+
+class SessionCastRequest(BaseModel):
+    pass  # 排盘使用会话中已保存的起盘信息
+
+
+class SessionInteractRequest(BaseModel):
+    interaction_type: str = Field(..., description="交互类型：reality_check/multi_party/multi_choice/review/deep_question/angle_shift")
+    payload: Dict[str, Any] = Field(default_factory=dict, description="交互参数")
+
+
+@app.post("/v1/sessions")
+def create_divination_session(request: SessionCreateRequest):
+    """创建推演会话（draft 状态），返回信息补全提示或会话信息。"""
+    session = create_session(
+        question=request.question,
+        category=request.category,
+        system=request.system,
+        casting_method=request.casting_method,
+        casting_source=request.casting_source,
+        user_profile=request.user_profile,
+    )
+    store = get_store()
+    store.save(session)
+    # 信息补全提示（模块A）
+    completion = generate_completion_prompt(session)
+    return {
+        "data": {
+            "session_id": session.session_id,
+            "status": session.status,
+            "question": session.question,
+            "category": session.category,
+            "system": session.system,
+            "casting_method": session.casting_method,
+            "info_completion": completion,
+        }
+    }
+
+
+@app.get("/v1/sessions")
+def list_sessions(limit: int = 50):
+    """列出推演会话列表。"""
+    store = get_store()
+    return {"data": store.list_sessions(limit=limit)}
+
+
+@app.get("/v1/sessions/{session_id}")
+def get_session(session_id: str):
+    """获取推演会话完整状态（含不可变快照、交互记录、工作流结果）。"""
+    store = get_store()
+    session = store.load(session_id)
+    if session is None:
+        return JSONResponse(status_code=404, content={"error": {"code": "SESSION_NOT_FOUND", "message": "会话不存在"}})
+    return {"data": session.to_dict()}
+
+
+@app.delete("/v1/sessions/{session_id}")
+def delete_session(session_id: str):
+    """删除推演会话（含不可变快照与交互记录）。"""
+    store = get_store()
+    session = store.load(session_id)
+    if session is None:
+        return JSONResponse(status_code=404, content={"error": {"code": "SESSION_NOT_FOUND", "message": "会话不存在"}})
+    deleted = store.delete(session_id)
+    return {"data": {"session_id": session_id, "deleted": deleted}}
+
+
+@app.post("/v1/sessions/{session_id}/cast")
+def cast_session(session_id: str, request: Optional[SessionCastRequest] = None):
+    """执行排盘：运行7步工作流，冻结不可变快照，返回完整推演结果。
+
+    铁律：盘面一经生成永久固定，后续交互不得修改原始卦盘。
+    """
+    store = get_store()
+    session = store.load(session_id)
+    if session is None:
+        return JSONResponse(status_code=404, content={"error": {"code": "SESSION_NOT_FOUND", "message": "会话不存在"}})
+    if session.snapshot is not None and session.snapshot.frozen:
+        return JSONResponse(
+            status_code=409,
+            content={"error": {"code": "SNAPSHOT_FROZEN", "message": "盘面已冻结，不可重新排盘。如需重起，请创建新会话或更换术数门派。"}},
+        )
+    try:
+        session, workflow_result = run_workflow(session)
+    except ValueError as exc:
+        return JSONResponse(status_code=422, content={"error": {"code": "INSUFFICIENT_INFO", "message": str(exc)}})
+    return {
+        "data": {
+            "session_id": session.session_id,
+            "status": session.status,
+            "snapshot_id": session.snapshot.snapshot_id if session.snapshot else None,
+            "snapshot_frozen": session.snapshot.frozen if session.snapshot else False,
+            "formatted_text": workflow_result.get("formatted_text", ""),
+            "workflow_result": workflow_result,
+        }
+    }
+
+
+@app.post("/v1/sessions/{session_id}/interact")
+def interact_session(session_id: str, request: SessionInteractRequest):
+    """交互入口：处理现实校验、多方取象、分支推演、事后复盘等交互。
+
+    铁律：所有交互均不得修改已冻结的原始盘面（snapshot）。
+    """
+    store = get_store()
+    session = store.load(session_id)
+    if session is None:
+        return JSONResponse(status_code=404, content={"error": {"code": "SESSION_NOT_FOUND", "message": "会话不存在"}})
+    if session.snapshot is None:
+        return JSONResponse(status_code=409, content={"error": {"code": "NOT_CAST_YET", "message": "请先执行排盘（/cast），再进行交互。"}})
+
+    itype = request.interaction_type
+    payload = request.payload
+
+    try:
+        if itype == "reality_check":
+            # 模块B：现实校验
+            result = process_reality_response(
+                session,
+                response=payload.get("response", ""),
+                details=payload.get("details"),
+            )
+            from app.session import append_interaction
+            session = append_interaction(
+                session, "reality_check",
+                user_input={"response": payload.get("response", ""), "details": payload.get("details", "")},
+                system_response=result,
+                interpretation_shift=result.get("interpretation_shift"),
+            )
+        elif itype == "multi_party":
+            # 模块E：多方人物取象
+            result = analyze_multi_party(
+                session,
+                parties=payload.get("parties"),
+                focus_party=payload.get("focus_party"),
+            )
+            from app.session import append_interaction
+            session = append_interaction(session, "multi_party", user_input=payload, system_response=result)
+        elif itype == "multi_choice":
+            # 模块F：多抉择分支推演
+            result = analyze_branches(session, choices=payload.get("choices", []))
+            from app.session import append_interaction
+            session = append_interaction(session, "multi_choice", user_input=payload, system_response=result)
+        elif itype == "review":
+            # 模块G：事后复盘
+            result = review_outcome(
+                session,
+                actual_outcome=payload.get("actual_outcome", ""),
+                outcome_details=payload.get("outcome_details"),
+            )
+            from app.session import append_interaction
+            session = append_interaction(session, "review", user_input=payload, system_response=result)
+        elif itype == "info_completion":
+            # 模块A：应用信息补全答案
+            session = apply_completion_answers(session, payload.get("answers", {}))
+            store.save(session)
+            result = {"applied": True, "session": session.to_dict()}
+        elif itype == "deep_question":
+            # 模块D②：深度追问（基于已冻结盘面的符号/断语深化解读）
+            result = deep_question(session, question=payload.get("question", ""))
+            from app.session import append_interaction
+            session = append_interaction(session, "deep_question", user_input=payload, system_response=result)
+        elif itype == "angle_shift":
+            # 模块D③：换角度解读（仅调整事理解读视角，原始卦盘不变）
+            result = angle_shift(session, new_angle=payload.get("new_angle", ""))
+            from app.session import append_interaction
+            session = append_interaction(
+                session, "angle_shift",
+                user_input=payload, system_response=result,
+                interpretation_shift={"note": result.get("shift_focus", ""), "suggested_angles": result.get("suggested_angles", [])},
+            )
+        else:
+            return JSONResponse(status_code=400, content={"error": {"code": "UNKNOWN_INTERACTION", "message": f"不支持的交互类型：{itype}"}})
+
+        store.save(session)
+        return {"data": {"session_id": session.session_id, "interaction_result": result, "snapshot_unchanged": True}}
+    except Exception as exc:
+        return JSONResponse(status_code=500, content={"error": {"code": "INTERACTION_ERROR", "message": str(exc)}})
 
 
 if os.environ.get("SERVE_WEB") == "1":
