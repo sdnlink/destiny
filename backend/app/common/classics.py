@@ -24,7 +24,7 @@ SOURCING_BACKLOG = (
     {"title": "沈氏玄空學", "domain": "kanyu", "note": "维基文库缺失；已由 web-classics（中华典藏）补齐卷首至卷六，替卦起星盘仍未实现"},
     {"title": "卜筮正宗", "domain": "liuyao", "note": "维基文库版仅467字符；已由 daozhige-github 全文（约10万字）补充"},
     {"title": "紫微斗數全書", "domain": "ziwei", "note": "维基文库抓取遭限流；已由 web-classics（中华典藏）补齐序文与卷一至卷三，卷四图说暂缺"},
-    {"title": "太極圖說", "domain": "xiangshu", "note": "维基文库现有抓取不完整，待重抓"},
+    {"title": "太極圖說", "domain": "xiangshu", "note": "经逐句核对正文完整（自「自無極而為太極」至「大哉易也，斯其至矣」，原文仅约250字），此前『不完整』为长度启发式误报"},
 )
 
 

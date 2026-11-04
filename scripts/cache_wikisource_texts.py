@@ -263,8 +263,13 @@ def write_json(path, value):
     temporary.replace(path)
 
 
-def cache(manifest_path, output_dir, delay, timeout, retries):
+def cache(manifest_path, output_dir, delay, timeout, retries, only=None):
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    books = manifest["books"]
+    if only:
+        books = [book for book in books if only in book["title"]]
+        if not books:
+            raise ValueError("--only matched no book: {}".format(only))
     client = ApiClient(manifest["api_url"], delay, timeout, retries)
     rights = site_rights(client)
     if rights["license_url"] != manifest["expected_license_url"]:
@@ -273,7 +278,8 @@ def cache(manifest_path, output_dir, delay, timeout, retries):
     text_dir = output_dir / "texts"
     metadata_dir = output_dir / "metadata"
     rows = []
-    for index, book in enumerate(manifest["books"], 1):
+    cached_count = 0
+    for index, book in enumerate(books, 1):
         slug = title_slug(book["title"])
         text_path = text_dir / (slug + ".txt")
         metadata_path = metadata_dir / (slug + ".json")
@@ -283,7 +289,8 @@ def cache(manifest_path, output_dir, delay, timeout, retries):
         if existing and existing.get("status") == "ok" and existing.get("parser_version") == PARSER_VERSION and text_path.exists():
             if hashlib.sha256(text_path.read_bytes()).hexdigest() == existing.get("sha256"):
                 rows.append(existing)
-                print("cached {}/{}: {}".format(index, len(manifest["books"]), book["title"]), flush=True)
+                cached_count += 1
+                print("cached {}/{}: {}".format(index, len(books), book["title"]), flush=True)
                 continue
         try:
             subpages = discover_pages(client, book["title"])
@@ -332,7 +339,23 @@ def cache(manifest_path, output_dir, delay, timeout, retries):
         "characters": sum(row.get("characters", 0) for row in rows),
         "bytes": sum(row.get("bytes", 0) for row in rows),
         "license_name": rights["license_name"], "license_url": rights["license_url"],
+        "partial_run": bool(only),
     }
+    if only:
+        # 单书模式：catalog 必须合并历史行，否则全量构建会丢书
+        catalog_path = output_dir / "catalog.json"
+        if catalog_path.exists():
+            previous = json.loads(catalog_path.read_text(encoding="utf-8"))
+            seen_slugs = {row["slug"] for row in rows}
+            for row in previous.get("books", []):
+                if row.get("slug") not in seen_slugs:
+                    rows.append(row)
+                    cached_count += 1
+        summary["book_count"] = len(rows)
+        summary["cached_books"] = sum(row["status"] == "ok" for row in rows)
+        summary["failed_books"] = sum(row["status"] != "ok" for row in rows)
+        summary["characters"] = sum(row.get("characters", 0) for row in rows)
+        summary["bytes"] = sum(row.get("bytes", 0) for row in rows)
     write_json(output_dir / "catalog.json", {"source": {**manifest, "books": None}, "books": rows})
     write_json(output_dir / "summary.json", summary)
     print(json.dumps(summary, ensure_ascii=False, indent=2))
@@ -347,9 +370,10 @@ def main():
     parser.add_argument("--delay", type=float, default=1.5)
     parser.add_argument("--timeout", type=int, default=60)
     parser.add_argument("--retries", type=int, default=8)
+    parser.add_argument("--only", default=None, help="只处理标题包含该子串的书（catalog 合并历史结果）")
     args = parser.parse_args()
     try:
-        cache(args.manifest.resolve(), args.output.resolve(), args.delay, args.timeout, args.retries)
+        cache(args.manifest.resolve(), args.output.resolve(), args.delay, args.timeout, args.retries, args.only)
     except (OSError, ValueError, RuntimeError, HTTPError, URLError) as exc:
         print("Wikisource cache failed: {}".format(exc))
         raise SystemExit(1)
