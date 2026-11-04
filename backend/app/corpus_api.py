@@ -17,6 +17,26 @@ from urllib.request import Request, urlopen
 DOCUMENT_ID_PATTERN = re.compile(r"^[a-z0-9-]+$")
 USAGE_SCOPE = "source_specific_policy"
 
+try:
+    from zhconv import convert as _zh_convert
+except ImportError:  # 简繁变体为增强能力，缺库时退化为原词匹配
+    _zh_convert = None
+
+
+def term_variants(term):
+    """把检索词展开为原样 + 繁体 + 简体变体（去重、原样优先）。
+
+    语料同时含简体与繁体文本，查询词简繁不定；SQL 侧用 OR 匹配任一变体，
+    snippet 仍展示语料原文。zhconv 缺失时只返回原词。
+    """
+    variants = [term] if term else []
+    if _zh_convert is not None and term:
+        for direction in ("zh-hant", "zh-hans"):
+            converted = _zh_convert(term, direction)
+            if converted and converted not in variants:
+                variants.append(converted)
+    return variants
+
 
 class ApiError(Exception):
     def __init__(self, status, code, message):
@@ -131,8 +151,12 @@ class CorpusRepository:
             filters.append("cache_status = {status:String}")
             params["status"] = status
         if title_query:
-            filters.append("positionCaseInsensitiveUTF8(title, {title_query:String}) > 0")
-            params["title_query"] = title_query
+            title_conditions = []
+            for index, variant in enumerate(term_variants(title_query)):
+                key = f"title_query_{index}"
+                title_conditions.append(f"positionCaseInsensitiveUTF8(title, {{{key}:String}}) > 0")
+                params[key] = variant
+            filters.append("(" + " OR ".join(title_conditions) + ")")
         where = " AND ".join(filters)
         return self.client.query(f"""
             SELECT
@@ -178,8 +202,14 @@ class CorpusRepository:
         """, {"document_id": document_id, "limit": limit, "offset": offset})
 
     def search(self, term, category, limit):
-        filters = ["positionCaseInsensitiveUTF8(c.content, {term:String}) > 0"]
-        params = {"term": term, "limit": limit}
+        variants = term_variants(term)
+        term_conditions = []
+        params = {"limit": limit}
+        for index, variant in enumerate(variants):
+            key = f"term_{index}"
+            term_conditions.append(f"positionCaseInsensitiveUTF8(c.content, {{{key}:String}}) > 0")
+            params[key] = variant
+        filters = ["(" + " OR ".join(term_conditions) + ")"]
         if category:
             filters.append("c.category_id = {category:String}")
             params["category"] = category
@@ -201,7 +231,10 @@ class CorpusRepository:
         """, params)
         results = []
         for row in rows:
-            snippet, position = make_snippet(row.pop("content"), term)
+            content = row.pop("content")
+            # 摘录必须展示语料原文：用第一个实际命中的变体定位，不对正文做转换
+            matched = next((variant for variant in variants if variant in content), variants[0])
+            snippet, position = make_snippet(content, matched)
             row["snippet"] = snippet
             row["match_offset_in_chunk"] = position
             results.append(row)

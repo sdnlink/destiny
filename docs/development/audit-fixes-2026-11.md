@@ -180,6 +180,9 @@
   （原文仅约 250 字），此前"不完整"为 <2000 字符启发式误报；
 - `scripts/cache_wikisource_texts.py` 新增 `--only` 单书参数（catalog 自动合并历史结果），
   限流恢复后可按书增量重抓；
+- 简繁双向检索：`app/common/classics.py` 与 ClickHouse 版语料服务 `app/corpus_api.py`
+  均将查询词/标题过滤展开为原样+繁体+简体变体（后者在 SQL 中以参数化 OR 条件匹配），
+  摘录一律保持语料原文；`zhconv==1.4.3` 已加入 `backend/requirements.txt`，缺库自动降级；
 - 维基文库限流期间不再重试其内容接口，`manifest_not_stored` 字段继续如实展示维基文库侧缺口。
 
 ### 早期来源记录（第四轮）
