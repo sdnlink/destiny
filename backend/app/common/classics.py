@@ -1,15 +1,23 @@
 """本地典籍语料库：加载维基文库存档，为引擎结论提供原文依据。
 
 数据来源：scripts/cache_wikisource_texts.py 按公开许可清单抓取，
-经 scripts/build_wikisource_corpus.py 切块后落盘
+经 scripts/build_classics_corpus.py 多来源切块后落盘
 data/generated/wikisource-corpus/（corpus_documents.jsonl + corpus_chunks.jsonl）。
 本模块只读加载，不重复抓取；引擎通过 search/evidence 把典籍原文
 挂到结果 evidence 字段上，替代未经签署的主观断语。
+
+检索简繁兼容：殆知阁语料为简体、维基文库/网站转录为繁体，查询词先展开
+简繁变体再匹配；摘录始终显示语料原文。zhconv 缺失时自动退化为原样匹配。
 """
 
 import json
 import os
 from pathlib import Path
+
+try:
+    from zhconv import convert as _zh_convert
+except ImportError:  # 简繁转换是增强能力，缺库时降级
+    _zh_convert = None
 
 DEFAULT_CORPUS_DIR = (
     Path(__file__).resolve().parents[3] / "data" / "generated" / "wikisource-corpus"
@@ -38,6 +46,21 @@ def _excerpt(content, query):
     prefix = "…" if start else ""
     suffix = "…" if end < len(content) else ""
     return prefix + content[start:end].replace("\n", " ").strip() + suffix
+
+
+def _query_variants(query):
+    """展开查询词的简繁变体：原样优先，其余方向兜底。
+
+    殆知阁语料为简体、维基文库/网站转录多为繁体；用户与引擎两侧的关键词
+    简繁不定，两侧都要展开。zhconv 缺失时只返回原样。
+    """
+    variants = [query]
+    if _zh_convert is not None and query:
+        for direction in ("zh-hant", "zh-hans"):
+            converted = _zh_convert(query, direction)
+            if converted and converted not in variants:
+                variants.append(converted)
+    return variants
 
 
 class ClassicsLibrary:
@@ -102,30 +125,39 @@ class ClassicsLibrary:
         }
 
     def search(self, query, category=None, title_query=None, limit=5):
-        """按关键词检索原文段落，命中次数多的排前。"""
+        """按关键词检索原文段落，命中次数多的排前。
+
+        查询词与 title_query 自动展开简繁变体；摘录展示语料原文
+        （不显示转换后的文本），保证"原文依据"可逐条回溯。
+        """
         self._ensure_loaded()
         if not query:
             return []
+        variants = _query_variants(query)
+        title_variants = _query_variants(title_query) if title_query else None
         scored = []
         for chunk in self._chunks:
             if category and chunk["category_id"] != category:
                 continue
-            if title_query and title_query not in chunk["title"]:
+            if title_variants and not any(variant in chunk["title"] for variant in title_variants):
                 continue
-            count = chunk["content"].count(query)
-            if count:
-                scored.append((count, chunk))
+            content = chunk["content"]
+            for variant in variants:
+                count = content.count(variant)
+                if count:
+                    scored.append((count, chunk, variant))
+                    break
         scored.sort(key=lambda item: (-item[0], item[1]["document_id"], item[1]["chunk_index"]))
-        return [self._passage(chunk, count, query) for _, chunk in scored[:limit]]
+        return [self._passage(chunk, count, variant) for count, chunk, variant in scored[:limit]]
 
-    def _passage(self, chunk, count, query):
+    def _passage(self, chunk, count, matched_variant):
         return {
             "classic_id": chunk["chunk_id"],
             "document_id": chunk["document_id"],
             "title": chunk["title"],
             "category": chunk["category_id"],
             "chunk_index": chunk["chunk_index"],
-            "excerpt": _excerpt(chunk["content"], query),
+            "excerpt": _excerpt(chunk["content"], matched_variant),
             "match_count": count,
             "source_url": chunk["source_url"],
             "license_name": chunk["license_name"],

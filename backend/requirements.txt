@@ -5,3 +5,5 @@ lunar_python==1.4.8
 pydantic>=1.10.26,<2
 pytz==2025.2
 uvicorn==0.22.0
+# 典籍检索简繁兼容：殆知阁语料为简体、维基文库/网站转录为繁体（纯 Python，无 C 依赖）
+zhconv==1.4.3

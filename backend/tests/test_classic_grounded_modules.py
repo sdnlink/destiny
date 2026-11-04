@@ -38,6 +38,23 @@ class TestClassicsLibrary:
             passages = library.search(query, category=category, limit=2)
             assert passages, "扩库后应能检索到：{}".format(query)
 
+    def test_search_supports_simplified_traditional_variants(self, library):
+        # 殆知阁六壬语料为简体（月将），繁体查询应经变体展开命中
+        traditional = library.search("月將", category="liuren", limit=2)
+        assert traditional, "繁体查询应命中简体语料"
+        assert traditional[0]["match_count"] >= 1
+        # 摘录必须展示语料原文（简体文本保持简体），保证可回溯
+        assert "月將" not in traditional[0]["excerpt"] or "月将" in traditional[0]["excerpt"]
+        # 反方向：维基文库繁体语料用简体查询也应命中
+        simplified = library.search("大游年", category="yangzhai", limit=3)
+        assert any("遊年" in p["excerpt"] or "游年" in p["excerpt"] for p in simplified)
+
+    def test_title_query_accepts_both_scripts(self, library):
+        # 标题为繁体（奇門遁甲統宗），简体 title_query 经变体展开也应命中
+        for title_query in ("奇門遁甲統宗", "奇门遁甲统宗"):
+            passages = library.search("八門", title_query=title_query, limit=1)
+            assert passages, "title_query 应命中：{}".format(title_query)
+
     def test_search_finds_zengshanbuyi_passages(self, library):
         passages = library.search("三合局", category="liuyao", limit=3)
         assert passages

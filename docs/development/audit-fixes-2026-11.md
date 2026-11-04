@@ -146,7 +146,7 @@
 
 | 结论 | 多底本/依据 | 落地位置 | 规则 |
 | --- | --- | --- | --- |
-| 本地典籍库 | 多来源存档 91 部（维基文库 53 + 殆知阁 34 + 公开古籍网站 4：增删卜易、卜筮正宗、黄金策、宅经、地理辨正、沈氏玄空学、紫微斗数全书、三命通会、滴天髓阐微等）；引擎 evidence 字段按关键词检索原文段落（classic_id/摘录/来源链接/许可） | `app/common/classics.py`，端点 `/v1/classics/search`、`/v1/classics/status` | CLS-CORPUS-001 |
+| 本地典籍库 | 多来源存档 91 部（维基文库 53 + 殆知阁 34 + 公开古籍网站 4：增删卜易、卜筮正宗、黄金策、宅经、地理辨正、沈氏玄空学、紫微斗数全书、三命通会、滴天髓阐微等）；引擎 evidence 字段按关键词检索原文段落（classic_id/摘录/来源链接/许可）；检索支持简繁双向变体（zhconv，查询词自动展开繁/简两种形式，摘录仍显示语料原文可回溯） | `app/common/classics.py`，端点 `/v1/classics/search`、`/v1/classics/status` | CLS-CORPUS-001 |
 | 六爻用神候选与元忌仇 | 用神定义引《增删卜易·用神元神忌神仇神章》原文；候选（本卦/伏神/变爻）按动>静、旺>衰、不空破>空破排序，不断吉凶 | `app/liuyao/advanced.py`，请求参数 `focus` | LY-YONGSHEN-001 |
 | 六爻伏神空破出伏 | 伏神空、破、受日月克伤不得出；冲空、暗动、填实反主引出（增删卜易·伏神章口径） | 同上，hidden_spirits 增加 emerge_blockers/can_emerge | 并入 LY-HIDDEN-FLYING-001 输出 |
 | 六爻三合成局条件 | 全动成局、待补凑（虚待用）、空破待填、入墓待冲开（增删卜易·三合局章原文在库） | `app/liuyao/advanced.py` | LY-SANHE-COND-001 |
