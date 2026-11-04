@@ -13,10 +13,10 @@
 - **计算正确、结果可复现**：所有正式计算绑定不可变输入快照与规则版本，同一输入必然得到同一结果。
 - **规则可治理**：每条工程规则独立编号、带来源引用、可审核、可发布/下线，历史结果不随规则变更而失真。
 - **术数领域解耦**：各术数体系为独立领域内核，单个模块失败不影响其他模块。
-- **语料驱动**：基于双来源（Wikisource 开放文本与道人家古籍）构建大规模经典文献语料库，支撑类象检索与文献引证。
+- **语料驱动**：ClickHouse 语料服务基于双来源（Wikisource 开放文本与道人家古籍）构建大规模文献语料；引擎结论另由本地多来源典籍库（91 部：维基文库 53 + 殆知阁 GitHub 存档 34 + 公开古籍网站转录 4，支持简繁双向检索）提供原文依据。
 - **审慎输出**：当前所有规则均为工程草稿，推演结果用于研究参考，不替代经专家签署的专业意见。
 
-> **当前阶段定位**：已完成项目设计、双来源书籍语料与 ClickHouse 检索，以及历法、周易、梅花易数、六爻、大六壬、风水方位、八字、紫微、奇门等确定性工程计算内核。解释、类象、元会运世纪元和专业风水规则仍须按来源、版本和专家案例逐项审核。
+> **当前阶段定位**：已完成项目设计、双来源书籍语料与 ClickHouse 检索、91 部本地典籍库，以及历法、周易、梅花易数、六爻、大六壬、风水方位（含八宅/玄空下卦挨星）、八字（含流年事实序列）、紫微、奇门等确定性工程计算内核。解释、类象、元会运世纪元、玄空替卦盘及规则发布仍须按来源、版本和专家案例逐项审核。
 
 ---
 
@@ -48,7 +48,7 @@
                               │ HTTP / RESTful JSON
 ┌─────────────────────────────▼──────────────────────────────────┐
 │                 API 调度与接入网关（FastAPI main.py）           │
-│  Pydantic 入参校验 · 幂等请求哈希 · 并行计算封装                 │
+│  Pydantic 入参校验 · 幂等请求哈希 · 顺序计算封装                 │
 │  Bearer Token 鉴权 · 统一错误信封 · 常量/规则/验证接口          │
 └─────────────────────────────┬──────────────────────────────────┘
                               │
@@ -149,16 +149,16 @@ FastAPI 应用 `APP_VERSION = "0.2.0"`，提供以下能力：
 - **规则与验证接口**：`GET /v1/rules`、`GET /v1/validation-cases`、`POST /v1/validation-cases/run`。
 - **历法分析**：`POST /v1/calendar/analyze`。
 - **各术数排盘接口**：`/v1/{module}/{method}`，覆盖：
-  - `zhouyi`：manual（六爻手工）、auto（自动）、time（时间）、numbers（两数）、three_numbers（三数）
-  - `meihua`：time / auto / numbers / three_numbers
+  - `zhouyi`：manual（六爻手工）、auto（自动）、time（时间）、numbers（两数）、three-numbers（三数）
+  - `meihua`：time / auto / numbers / three-numbers
   - `liuyao`：time / auto / numbers / lines / coins
   - `liuren`：time / auto / numbers
   - `ziwei`：time / auto（含 gender）
   - `bazi`：time / auto（含 gender）
   - `qimen`：time / auto
-  - `fengshui`：direction（单次朝向）/ measurements（多次测量共识）
-- **综合推演**：`POST /v1/calculations/evaluate`（单模块）+ `POST /v1/calculations/compare`（多模块并行 + 综合研判）。
-- **鉴权与错误**：可选 `APP_API_TOKEN` Bearer 校验；统一错误信封 `{error: {code, message, fields, requestId}}`；`ValueError` 映射为 422。
+  - `fengshui`：direction（单次朝向）/ measurements（多次测量共识）/ bazhai（八宅，GET+POST）/ xuankong（玄空，GET+POST）/ buildings（房屋档案，GET 列表与详情、POST 保存、DELETE 删除）
+- **综合推演**：`POST /v1/calculations/evaluate`（单模块）+ `POST /v1/calculations/compare`（多模块顺序执行 + 综合研判）。
+- **鉴权与错误**：可选 `APP_API_TOKEN` Bearer 校验；统一错误信封 `{error: {code, message}}`；`ValueError` 映射为 422。
 - **静态托管**：设置 `SERVE_WEB=1` 时挂载 `frontend/dist`，实现单端口生产部署。
 
 **计算封装（Calculation Envelope）**：每次计算生成 `task_id = calc_{sha256[:24]}` 与 `input_hash = sha256:...`，保证相同输入幂等可复现。
@@ -208,7 +208,7 @@ FastAPI 应用 `APP_VERSION = "0.2.0"`，提供以下能力：
 | 模块 | 职责 |
 | --- | --- |
 | `synthesis.py` | 多模块结果综合研判（resonance 共振指数、共识矩阵），仅比较已发布规则的结构化判断，不生成自动吉凶总分 |
-| `comparison`（main.py） | 多模块并行计算 + 综合 + 解释 + 建议 + 文献 + 类象 + 元会运世 + 定向推演，统一返回 |
+| `comparison`（main.py） | 多模块顺序计算 + 综合 + 解释 + 建议 + 文献 + 类象 + 元会运世 + 定向推演，统一返回 |
 | `advisory.py` | 按事项类别（职业/财运/感情/学业/出行等）生成研究性结论、优先建议与核实清单 |
 | `interpretation.py` | 事项与卦象的对应解释（explain_correspondences） |
 | `imagery.py` | 万物类象映射：八卦/地支等维度类象候选 |
@@ -269,7 +269,7 @@ FastAPI 应用 `APP_VERSION = "0.2.0"`，提供以下能力：
 
 **固定输出格式**（`format.py`）：渲染为角色规范定义的固定文案格式——求测事由→起盘方式→完整排盘→用神定位→旺衰分析→象义解读→综合推演→趋吉避凶→文化提示→拓展参考资料库→卦象现状核对→后续交互入口。
 
-**排盘执行器**（`casting.py`）：并行调用各领域引擎，复用现有 9 大领域计算内核，不重复实现算法。
+**排盘执行器**（`casting.py`）：按序调用各领域引擎，复用现有 9 大领域计算内核，不重复实现算法。
 
 #### 5.5.3 交互模块A-G（`app/interaction/`）
 
@@ -305,7 +305,7 @@ FastAPI 应用 `APP_VERSION = "0.2.0"`，提供以下能力：
 **核心交互流程**：
 
 1. **输入面板（InputPanel）**：选择推演场景（综合 / 单术数 / 风水）、事项类别与问题；设定本地时间、时区、真太阳时与经度；每种术数可切换起卦方式（自动/时间/数字/手工/铜钱等）；支持历法即时预览与一键"设为当前时间"。
-2. **提交推演**：每次提交自动生成新的 `cast_nonce`，`buildCalculations()` 按场景组装多模块请求，调用 `POST /v1/calculations/compare` 并行计算；结果自动存入本地历史（最近 50 条）。
+2. **提交推演**：每次提交自动生成新的 `cast_nonce`，`buildCalculations()` 按场景组装多模块请求，调用 `POST /v1/calculations/compare` 顺序计算；结果自动存入本地历史（最近 50 条）。
 3. **结果工作台（ResultWorkspace）**：多标签展示——综合概览、历法详情、逐模块结果、综合研判与建议、文献引证、类象候选、元会运世、定向推演；支持导出 Markdown 推演报告。
 4. **辅助抽屉**：
    - **规则目录**：按系统过滤查看规则注册表（标注"工程草稿，未专家签署"）。
@@ -366,8 +366,8 @@ FastAPI 应用 `APP_VERSION = "0.2.0"`，提供以下能力：
 
 ## 8. 规则与验证体系
 
-- **规则注册表**：`data/rules/mvp-engineering-baseline.json`，当前 **73 条可追溯工程规则**，状态均为 `draft`，待专家审核；每条规则独立编号（如 `YI-3NUM-INPUT-001`、`MH-TRIGRAM-001`），含来源引用、前置条件、输入、程序、输出、限制与责任人。
-- **工程回归案例**：`data/validation-cases/mvp-engineering-baseline.json`，当前 **7 个案例全部通过**，代表工程基线而非专家签署案例。
+- **规则注册表**：`data/rules/mvp-engineering-baseline.json`，当前 **84 条可追溯工程规则**（全部纳入 `rule_sets` 引用），状态均为 `draft`，待专家审核；每条规则独立编号（如 `YI-3NUM-INPUT-001`、`MH-THREE-NUMBER-001`），含来源引用、前置条件、输入、程序、输出、限制与责任人。
+- **工程回归案例**：`data/validation-cases/mvp-engineering-baseline.json`，当前 **31 个案例全部通过**，代表工程基线而非专家签署案例。
 - **校验链**：`POST /v1/validation-cases/run` 执行回归；`scripts/run_validation_cases.py` 命令行校验；`test_rule_registry.py` 校验注册表结构（必填字段、唯一性、引用完整性）。
 - **治理目标**：规则发布需审核、绑定来源、案例回归；历史结果通过 `rule_version` 引用还原，即使规则下线也不失真。
 
@@ -422,6 +422,8 @@ cd frontend && npm install && cd ..
 python -m pytest backend/tests
 ./scripts/run_validation_cases.py
 npm --prefix frontend run build
+npm --prefix frontend run test:unit
+npm --prefix frontend run test:node
 npm --prefix frontend run test:browser
 ./scripts/verify_daorenjia_cache.py --report cache/daorenjia/verification.json
 ```
@@ -472,9 +474,9 @@ npm --prefix frontend run test:browser
 
 **计算基线**：
 
-- 73 条可追溯工程规则，状态均为 `draft`，待专家审核。
-- 7 个工程回归案例，当前全部通过（不代表专家签署案例）。
-- 历法、周易和梅花共 13 个健康、常量、规则、案例及计算接口。
+- 84 条可追溯工程规则，状态均为 `draft`，待专家审核。
+- 31 个工程回归案例，当前全部通过（不代表专家签署案例）。
+- 健康、常量、规则、案例、计算、典籍检索与风水档案接口持续增补，机器契约以 `/openapi.json` 为准。
 - 多模块综合只比较引用已发布规则的结构化判断，不生成自动吉凶总分。
 - 推演结果含确定性摘要和逐模块详细说明，每段可回溯规则编号。
 - 输入事项可生成未审核的研究性结论、优先建议和核实清单，不替代正式专业意见。

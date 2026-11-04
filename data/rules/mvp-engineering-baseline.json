@@ -163,6 +163,34 @@
           "version": "1.0.0"
         },
         {
+          "rule_id": "ZW-CAL-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ZW-MING-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ZW-BUREAU-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ZW-STARS-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ZW-SIHUA-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ZW-MINOR-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ZW-DECADE-001",
+          "version": "1.0.0"
+        },
+        {
           "rule_id": "ZW-SIHUA-002",
           "version": "1.0.0"
         },
@@ -3217,7 +3245,8 @@
         "facts.life_match"
       ],
       "source_refs": [
-        "data/generated/wikisource-corpus（宅经）；八宅明镜、阳宅三要未入语料（见待补清单）"
+        "data/generated/wikisource-corpus（宅经、八宅明鏡、陽宅十書，见 data/sources/web-classics-books.json）",
+        "《阳宅三要》暂未收录"
       ],
       "limitations": [
         "大游年歌为通行传本，各派文字一致",
@@ -3250,7 +3279,7 @@
         "运星入中按洛书轨迹顺飞，山向星按坐向三元龙阴阳定顺逆",
         "旺山旺向：山星当运到坐且向星当运到向",
         "上山下水：山星当运到向且向星当运到坐",
-        "每山两侧三度起替；替卦起星表原文未入库，不提供替卦盘"
+        "每山两侧三度起替；替卦起星表尚未工程化、待专家口径签署，不提供替卦盘"
       ],
       "outputs": [
         "facts.grid",
@@ -3258,10 +3287,10 @@
         "facts.ti_pu"
       ],
       "source_refs": [
-        "data/generated/wikisource-corpus（地理辨正、青囊经）；沈氏玄空学未入语料（见待补清单）"
+        "data/generated/wikisource-corpus（地理辨正、青囊经、沈氏玄空學，见 data/sources/web-classics-books.json）"
       ],
       "limitations": [
-        "替卦未实现，落替区间时提示复测或人工起盘",
+        "替卦盘未实现（起星表待工程化/专家口径），落替区间时提示复测或人工起盘",
         "格局条件为确定性判定，不含吉凶断语"
       ],
       "owner": "unassigned",
@@ -3299,7 +3328,7 @@
       ],
       "limitations": [
         "只收录公开许可文本（维基文库 CC BY-SA 与古籍原文公有领域）",
-        "缺书与补齐来源逐项记录在 /v1/classics/status 的 sourcing_backlog"
+        "补齐记录与残余缺口逐项记录在 /v1/classics/status 的 sourcing_backlog；清单已清账"
       ],
       "owner": "unassigned",
       "reviewers": [],

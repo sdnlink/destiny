@@ -26,7 +26,7 @@
 - 阳宅坐向角度归一化、磁偏角真北修正、二十四山、测量误差候选和边界预警。
 - 阳宅三至十二次读数的圆周均值、最小覆盖弧、保守误差包络和一致性状态。
 - 周易、梅花、六爻和六壬个体自动排盘；各模块使用独立派生域并支持凭证重放。
-- 规范输入哈希、幂等任务编号、多模块并行计算。
+- 规范输入哈希、幂等任务编号、多模块顺序计算。
 - 规则登记、来源引用、规则集合校验和工程案例回归。
 - 对已发布结构化判断进行一致、互补、冲突和无法判断分类。
 - 根据本次计算事实生成可追溯的结果摘要和逐模块详细说明。
@@ -42,11 +42,12 @@
 - 任何自动吉凶总分、现实概率或准确率。
 - 专家规则发布工作流及签署后的生产规则。
 - 用户账号、案例档案、持久化任务和正式报告。
-- 八宅、玄空飞星及其他专业风水规则。
+- 专业风水规则的专家签署与正式发布版本：八宅大游年、玄空下卦挨星已实现且规则状态仍为 `draft`，不生成吉凶断语；形势、择日等其他流派规则未实现。
 - 大六壬全部发传规则的专家签署与正式发布版本；当前均为工程草稿。
 - 六爻吉凶断语；用神候选、伏神出伏条件、三合成局条件已按《增删卜易》口径推导并挂典籍原文（请求带 `focus`），最终判断仍须人工复核。
 - 玄空替卦（起星盘）：《沈氏玄空學》原文已在库，但起星表工程化与替卦盘实现待专家口径签署；当前只判替卦区间，下卦挨星已实现。
-- 典籍待补清单已清账：八宅明镜/阳宅十书/沈氏玄空学/紫微斗数全书/卜筮正宗均由公开来源补齐入库（详见 `/v1/classics/status` 的 `sourcing_backlog`）；《紫微斗數全書》卷四图说（站方仅 PDF 扫描）暂缺。
+
+数据边界（非"未实现"，仅记录残余缺口）：典籍待补清单已清账，八宅明镜/阳宅十书/沈氏玄空学/紫微斗数全书/卜筮正宗均由公开来源补齐入库（详见 `/v1/classics/status` 的 `sourcing_backlog`）；《紫微斗數全書》卷四图说（站方仅 PDF 扫描）与《阳宅三要》暂缺。
 
 ## 2. 启动与安全
 
@@ -68,7 +69,11 @@ APP_API_PORT=8091 ./scripts/run_mvp_api.sh
 APP_API_BIND=0.0.0.0 APP_API_TOKEN='replace-me' ./scripts/run_mvp_api.sh
 ```
 
-启用令牌后，所有请求添加`Authorization: Bearer <token>`。当前令牌方案只用于受控内部环境，不能替代正式账号、租户权限、限流、审计和TLS。
+启用令牌后，所有请求添加`Authorization: Bearer <token>`（服务端用常量时间比较）。当前令牌方案只用于受控内部环境，不能替代正式账号、租户权限、限流、审计和TLS：
+
+- 房屋档案的 `tenant_id` 默认由调用方声明，单 token 部署下不构成身份隔离；多租户部署必须设置 `FENGSHUI_TENANT_ID`，此后所有读写强制绑定到该服务端租户、忽略客户端声明。
+- 会话模块尚无归属字段，`/v1/sessions` 会列出全部会话，仅适用于单租户本地环境；接入账号体系前不得部署为共享服务。
+- ClickHouse 口令不再内置默认值，应用与 `scripts/load_*.sh` 均需显式注入 `CLICKHOUSE_PASSWORD`。
 
 ## 3. 接口
 
@@ -114,9 +119,16 @@ APP_API_BIND=0.0.0.0 APP_API_TOKEN='replace-me' ./scripts/run_mvp_api.sh
 | `POST` | `/v1/liuren/numbers` | 大六壬数字占时排盘 |
 | `POST` | `/v1/fengshui/direction` | 阳宅真北坐向、二十四山及误差分析 |
 | `POST` | `/v1/fengshui/measurements` | 阳宅多次坐向测量圆周共识 |
-| `POST` | `/v1/calculations/evaluate` | 统一单模块计算封装 |
-| `POST` | `/v1/calculations/compare` | 最多8个模块并行计算和综合比较 |
+| `POST` | `/v1/calculations/evaluate` | 统一单模块计算封装（含 `bazi/liunian`） |
+| `POST` | `/v1/calculations/compare` | 最多8个模块顺序计算和综合比较 |
+| `POST` | `/v1/bazi/liunian` | 八字流年岁运事实序列（干支/十神/大运区间/冲合刑害/典籍依据） |
+| `GET` | `/v1/classics/status` | 多来源典籍库状态与来源补齐记录 |
+| `GET` | `/v1/classics/search` | 典籍原文段落检索（简繁双向查询） |
+| `GET` `POST` | `/v1/fengshui/bazhai` | 八宅大游年九星与命卦配宅 |
+| `GET` `POST` | `/v1/fengshui/xuankong` | 玄空三元九运下卦挨星与格局条件 |
+| `GET` `POST` `DELETE` | `/v1/fengshui/buildings[/{id}]` | 租户隔离的房屋档案（文件/PostgreSQL 双后端） |
 
+以上接口在设置 `APP_API_TOKEN` 时统一要求 `Authorization: Bearer <token>`；静态页面与 `/health` 探活保持公开。
 OpenAPI文档位于`/docs`，机器契约位于`/openapi.json`。
 
 周易三数示例：
@@ -275,7 +287,7 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 - 只有一条判断进入`unpaired`。
 - 包含`indeterminate`进入`indeterminate`。
 
-当前登记的73条规则均为`draft`工程基线，各模块也没有解释性`judgements`，因此正常综合结果是保留模块事实，并提示没有可比较的已发布判断。两个`ADV-*`规则只产生未审核检查清单，不把五行关系转换为吉凶。
+当前登记的84条规则均为`draft`工程基线，各模块也没有解释性`judgements`，因此正常综合结果是保留模块事实，并提示没有可比较的已发布判断。两个`ADV-*`规则只产生未审核检查清单，不把五行关系转换为吉凶。
 
 ## 5. 规则与案例
 
@@ -289,7 +301,7 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 ./scripts/run_validation_cases.py
 ```
 
-当前7个案例是代码回归基线，不是计划书要求的专家标准案例。案例文件使用`engineering_regression_pending_expert_review`标识，审核人为空。专家签署前不得将其状态改为已批准或对外声称为权威案例。
+当前31个案例是代码回归基线，不是计划书要求的专家标准案例。案例文件使用`engineering_regression_pending_expert_review`标识，审核人为空。专家签署前不得将其状态改为已批准或对外声称为权威案例。
 
 ## 6. 验证
 

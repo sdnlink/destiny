@@ -1,9 +1,5 @@
 """典籍库、六爻进阶推导、四化变体、八宅、玄空、房屋档案存储测试。"""
 
-import json
-import tempfile
-from pathlib import Path
-
 import pytest
 
 from app.common.classics import ClassicsLibrary
@@ -20,7 +16,11 @@ TIMEZONE = "Asia/Shanghai"
 
 @pytest.fixture(scope="module")
 def library():
-    return ClassicsLibrary()
+    instance = ClassicsLibrary()
+    if not instance.available:
+        pytest.skip("本地典籍语料未生成（data/generated/ 与 cache/ 不入库）："
+                    "按 docs/sources/wikisource.md 复现命令生成后再跑真实语料断言")
+    return instance
 
 
 class TestClassicsLibrary:
@@ -91,8 +91,10 @@ class TestLiuyaoAdvanced:
         sequences = [step["sequence"] for step in result["steps"]]
         assert sequences == [1, 2, 3, 4, 5, 6, 7]
         assert result["steps"][6]["rule_ids"] == ["LY-YONGSHEN-001"]
-        assert result["evidence"], "本地语料存在时应给出典籍原文"
-        assert any(item["category"] == "liuyao" for item in result["evidence"])
+        assert isinstance(result["evidence"], list)
+        if ClassicsLibrary().available:
+            assert result["evidence"], "本地语料存在时应给出典籍原文"
+            assert any(item["category"] == "liuyao" for item in result["evidence"])
 
     def test_hidden_emerge_blockers(self):
         result = line_cast([9, 7, 7, 7, 7, 7], MOMENT, TIMEZONE)
@@ -288,7 +290,40 @@ class TestStorage:
         with pytest.raises(ValueError):
             storage.upsert_profile("tenant-a", "b/001", self._profile())
 
-    def test_ddl_contains_tenant_key(self):
-        from app.fengshui.storage import DDL
+    def test_ddl_file_contains_tenant_key(self):
+        from pathlib import Path
 
-        assert "PRIMARY KEY (tenant_id, building_id)" in DDL
+        sql = (Path(__file__).resolve().parents[2] / "scripts" / "sql" /
+               "fengshui_building_profiles.sql").read_text(encoding="utf-8")
+        assert "PRIMARY KEY (tenant_id, building_id)" in sql
+
+    def test_source_and_degree_are_required(self):
+        payload = self._profile()
+        del payload["source"]
+        with pytest.raises(ValueError, match="source"):
+            storage.upsert_profile("tenant-a", "b-001", payload)
+        payload = self._profile()
+        payload["measurements"] = [{"facing_degree": 999}]
+        with pytest.raises(ValueError, match="facing_degree"):
+            storage.upsert_profile("tenant-a", "b-001", payload)
+        payload = self._profile()
+        payload["owner_consent"] = "false"
+        with pytest.raises(ValueError, match="owner_consent"):
+            storage.upsert_profile("tenant-a", "b-001", payload)
+
+    def test_server_bound_tenant_ignores_client_declaration(self, monkeypatch):
+        monkeypatch.setenv("FENGSHUI_TENANT_ID", "server-tenant")
+        row = storage.upsert_profile("client-declared", "b-001", self._profile())
+        assert row["tenant_id"] == "server-tenant"
+        assert storage.get_profile("any-other", "b-001")["tenant_id"] == "server-tenant"
+        assert len(storage.list_profiles("client-declared")) == 1
+        monkeypatch.delenv("FENGSHUI_TENANT_ID")
+
+    def test_record_dto_is_stable(self):
+        from app.fengshui.storage import make_record
+
+        record = storage.upsert_profile("tenant-a", "b-001", self._profile())
+        expected = {"schema_version", "tenant_id", "building_id", "created_at", "updated_at", "profile"}
+        assert set(record) == expected
+        assert set(make_record("t", "b", {})) == expected
+        assert storage.get_profile("tenant-a", "b-001")["building_id"] == "b-001"

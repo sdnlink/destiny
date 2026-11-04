@@ -6,7 +6,8 @@ source "$project_dir/scripts/env_python.sh"
 
 clickhouse_url="${CLICKHOUSE_URL:-http://localhost:18123}"
 clickhouse_user="${CLICKHOUSE_USER:-destiny}"
-clickhouse_password="${CLICKHOUSE_PASSWORD:-destiny_local}"
+: "${CLICKHOUSE_PASSWORD:?CLICKHOUSE_PASSWORD 必须显式注入，脚本不再内置默认口令}"
+clickhouse_password="$CLICKHOUSE_PASSWORD"
 
 "$PYTHON_BIN" "$project_dir/scripts/generate_seed.py"
 

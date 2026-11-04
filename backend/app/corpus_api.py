@@ -3,7 +3,9 @@
 
 import argparse
 import base64
+import hmac
 import json
+import logging
 import os
 import re
 import sys
@@ -14,6 +16,8 @@ from urllib.parse import parse_qs, urlencode, urlparse
 from urllib.request import Request, urlopen
 
 
+logger = logging.getLogger("destiny.corpus_api")
+
 DOCUMENT_ID_PATTERN = re.compile(r"^[a-z0-9-]+$")
 USAGE_SCOPE = "source_specific_policy"
 
@@ -21,6 +25,7 @@ try:
     from zhconv import convert as _zh_convert
 except ImportError:  # 简繁变体为增强能力，缺库时退化为原词匹配
     _zh_convert = None
+    logger.warning("zhconv 未安装：语料检索将退化为原词匹配（跨简繁查询会漏配）")
 
 
 def term_variants(term):
@@ -261,7 +266,8 @@ def create_handler(repository, token=None):
         def require_authorization(self):
             if not token:
                 return
-            if self.headers.get("Authorization") != f"Bearer {token}":
+            supplied = self.headers.get("Authorization", "")
+            if not hmac.compare_digest(supplied, f"Bearer {token}"):
                 raise ApiError(HTTPStatus.UNAUTHORIZED, "UNAUTHORIZED", "valid bearer token required")
 
         def do_GET(self):
@@ -311,6 +317,7 @@ def create_handler(repository, token=None):
             except ApiError as exc:
                 self.send_json(exc.status, {"error": {"code": exc.code, "message": exc.message}})
             except Exception:
+                logger.exception("corpus API internal error: %s", self.path)
                 self.send_json(
                     HTTPStatus.INTERNAL_SERVER_ERROR,
                     {"error": {"code": "INTERNAL_ERROR", "message": "internal server error"}},
@@ -327,10 +334,13 @@ def main():
     token = os.environ.get("CORPUS_API_TOKEN")
     if args.bind not in ("127.0.0.1", "localhost", "::1") and not token:
         parser.error("CORPUS_API_TOKEN is required when binding beyond loopback")
+    password = os.environ.get("CLICKHOUSE_PASSWORD", "")
+    if not password:
+        logger.warning("CLICKHOUSE_PASSWORD 未设置，数据库查询将被拒绝")
     client = ClickHouseClient(
         os.environ.get("CLICKHOUSE_URL", "http://localhost:18123"),
         os.environ.get("CLICKHOUSE_USER", "destiny"),
-        os.environ.get("CLICKHOUSE_PASSWORD", "destiny_local"),
+        password,
     )
     server = ThreadingHTTPServer((args.bind, args.port), create_handler(CorpusRepository(client), token))
     print(f"corpus API listening on http://{args.bind}:{args.port}", flush=True)

@@ -7,7 +7,7 @@
 
 ## 采集边界
 
-“互联网全部书籍”不是可穷尽、可验证的集合。本来源只采集 [开放书目清单](../../data/sources/wikisource-books.json) 中明确登记的17部核心典籍，不抓取许可不明网站、不绕过登录或访问控制，也不下载图片、PDF和扫描件。
+“互联网全部书籍”不是可穷尽、可验证的集合。本来源只采集 [开放书目清单](../../data/sources/wikisource-books.json) 中明确登记的典籍（首版快照为 17 部，现已扩充至 53 部）。其余缺失书目已由 [殆知阁公开存档](../../data/sources/open-source-books.json) 与 [公开古籍网站转录](../../data/sources/web-classics-books.json) 补齐，三源合计 91 部，详见 `docs/development/audit-fixes-2026-11.md` 第五轮。不抓取许可不明网站、不绕过登录或访问控制，也不下载图片、PDF和扫描件。
 
 书目覆盖周易经传、象数、梅花易数、六爻、大六壬、阳宅和堪舆。采集器读取站点官方 `rightsinfo`，只有许可URL与清单预期一致才继续。每个文档保存：
 
@@ -18,7 +18,9 @@
 
 ## 完成状态
 
-| 指标 | 数值 |
+以下为**首版快照（17 部）**的历史统计；现清单为 53 部，且多来源合并语料为 91 部 / 4777 段 / 约 586 万字符。
+
+| 指标（首版快照） | 数值 |
 | --- | ---: |
 | 登记书目 | 17 |
 | 已缓存 | 17 |
@@ -33,8 +35,13 @@
 缓存位于 `cache/wikisource/`，生成数据位于 `data/generated/wikisource-corpus/`，两者均不提交Git。可复现命令：
 
 ```bash
+# 单来源（历史入口）
 ./scripts/cache_wikisource_texts.py --delay 3.0
 ./scripts/build_wikisource_corpus.py
+# 当前多来源合并构建（维基文库 + 殆知阁存档 + 公开古籍网站转录）
+python scripts/cache_open_sources.py
+python scripts/cache_web_classics.py
+python scripts/build_classics_corpus.py --repo-root .
 ./scripts/load_corpus_clickhouse.sh
 ```
 

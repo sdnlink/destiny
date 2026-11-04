@@ -33,8 +33,8 @@
 | 文献引证 | `core/literature.py`，匹配卦象书籍原文 | 中 |
 | 类象/元会运世 | `core/imagery.py`、`core/yuanhui.py` | 中 |
 | 定向推演 | `core/inquiry_parser.py`、`core/targeted_deduction.py` | 中 |
-| 规则注册表 | `core/registry.py`，73条草稿规则，结构校验 | 中 |
-| 验证案例 | `core/validation.py`，7个回归案例 | 低 |
+| 规则注册表 | `core/registry.py`，84条草稿规则，结构校验 | 中 |
+| 验证案例 | `core/validation.py`，31个回归案例 | 低 |
 | 语料检索 | `corpus_api.py` + ClickHouse，1,524书目/3,300万字符 | 高 |
 | Web界面 | React+Vite，输入面板+结果工作台+规则目录+概念速查+历史 | 中 |
 

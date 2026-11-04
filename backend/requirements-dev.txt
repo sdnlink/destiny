@@ -1,5 +1,7 @@
 -r requirements.txt
 pytest==7.4.4
-# FastAPI TestClient 依赖 httpx；httpx 0.28 与 starlette 0.27 不兼容
-# （报 Client.__init__() got an unexpected keyword argument 'app'），必须锁定 <0.28
+# FastAPI TestClient depends on httpx; httpx 0.28 is incompatible with starlette 0.27
+# (fails with Client.__init__() got an unexpected keyword argument 'app'), so it must be pinned to <0.28
 httpx<0.28
+# Used only by offline data-processing scripts such as scripts/extract_all_calendar_books.py.
+numpy>=1.24,<3

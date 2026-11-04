@@ -140,7 +140,7 @@ BUILD_INSTALL_DEPENDENCIES=0 BUILD_RUN_TESTS=0 ./scripts/deploy.sh
 
 | 变量 | 用途 | 缺省行为 |
 | --- | --- | --- |
-| `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令不再有代码内置默认值；缺失时记录警告，数据库相关接口返回 `source: unavailable` |
+| `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令不再有代码内置默认值；缺失时记录警告，数据库相关接口按端点不同降级为 `unavailable` / `in_memory_fallback` / `file_cache`，并在响应的 `source` 字段标注来源 |
 | `APP_API_TOKEN` | `/v1` 接口 Bearer 鉴权 | 未设置时启动即记录「仅本地开发可用」警告 |
 | `SESSION_STORAGE_DIR` | 会话 JSON 目录 | 默认 `data/sessions` |
 

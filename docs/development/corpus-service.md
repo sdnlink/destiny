@@ -72,7 +72,7 @@ curl --get \
   http://127.0.0.1:8088/v1/corpus/search
 ```
 
-搜索词长度为2至100个字符，返回文档、文本块、块内匹配偏移、上下文片段、原始页面和内容哈希。当前检索是确定性子串检索，不包含向量召回和模型生成。
+搜索词长度为2至100个字符，返回文档、文本块、块内匹配偏移、上下文片段、原始页面和内容哈希。当前检索是确定性子串检索，不包含向量召回和模型生成；查询词经 `zhconv` 自动展开简繁变体（SQL 中以参数化 OR 条件匹配，缺库时退化为原词），但片段始终展示语料原文。`/v1/corpus/documents` 的标题过滤同样支持简繁变体。
 
 ## 5. 环境变量
 
@@ -80,12 +80,12 @@ curl --get \
 | --- | --- |
 | `CLICKHOUSE_URL` | `http://localhost:18123` |
 | `CLICKHOUSE_USER` | `destiny` |
-| `CLICKHOUSE_PASSWORD` | `destiny_local` |
+| `CLICKHOUSE_PASSWORD` | 无默认值，必须显式注入（应用/加载脚本一致） |
 | `CORPUS_API_BIND` | `127.0.0.1` |
 | `CORPUS_API_PORT` | `8088` |
 | `CORPUS_API_TOKEN` | 空；仅回环地址允许为空 |
 
-本地默认密码只用于开发环境。共享环境必须使用密钥管理系统，不能将生产凭据提交到Git。
+`docker-compose.yml` 中的 `destiny_local` 仅为本地容器开发环境的示例凭据；应用与 `scripts/load_*.sh` 不再内置该默认值。共享环境必须使用密钥管理系统，不能将生产凭据提交到 Git。
 
 ## 6. 数据边界
 

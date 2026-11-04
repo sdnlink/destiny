@@ -37,7 +37,7 @@ effective_error = max(angular_distance(mean, reading_i) + error_i)
 
 独立接口为`POST /v1/fengshui/measurements`，统一接口使用`module=fengshui`、`method=measurements`。响应保留每次原始输入、真北角、山向、距边界距离、圆周统计、合并误差、步骤和规则编号。
 
-Web工作台支持单次分析与多次共识切换，可增删三至十二个读数。结果页分别展示共识山向、统计质量、候选山向和逐次修正表。任何状态下`judgements`均为空，不生成八宅、玄空或吉凶结论。
+Web工作台支持单次分析与多次共识切换，可增删三至十二个读数。结果页分别展示共识山向、统计质量、候选山向和逐次修正表。任何状态下`judgements`均为空，不生成八宅、玄空或吉凶结论（本 ADR 记录第八阶段时点；后续八宅/玄空已作为独立端点提供确定性事实，仍不生成吉凶断语）。
 
 ## 6. 规则与案例
 

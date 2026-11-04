@@ -40,6 +40,21 @@ fi
 echo "[build] compiling backend Python sources"
 "$PYTHON_BIN" -m compileall -q "$project_dir/backend/app" "$project_dir/backend/tests"
 
+# 典籍语料（cache/ 与 data/generated/ 均不入库）：缓存齐全时离线重建，无需联网；
+# 干净 clone 无缓存时跳过，依赖真实语料的测试会明确 skip（见 test_review_hardening.py）。
+cache_ok=1
+for catalog in wikisource/catalog.json open-sources/catalog.json web-classics/catalog.json; do
+  if [[ ! -f "$project_dir/cache/$catalog" ]]; then
+    cache_ok=0
+  fi
+done
+if [[ "$cache_ok" == "1" ]]; then
+  echo "[build] rebuilding local classics corpus from cached sources"
+  "$PYTHON_BIN" "$project_dir/scripts/build_classics_corpus.py" --repo-root "$project_dir"
+else
+  echo "[build] classics cache missing; skipping corpus rebuild (see docs/sources/wikisource.md)"
+fi
+
 if [[ "$run_tests" == "1" ]]; then
   echo "[build] running backend tests"
   "$PYTHON_BIN" -m pytest "$project_dir/backend/tests"

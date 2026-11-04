@@ -37,6 +37,9 @@ DEFAULT_SOURCES = (
     ("daozhige-github", "cache/open-sources"),
     ("web-classics", "cache/web-classics"),
 )
+# 输出路径必须相对仓库根，不能相对调用时的 CWD（曾误写进 scripts/data/）。
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parent
 
 
 def utc_now():
@@ -85,13 +88,11 @@ def build(cache_root, output_dir, target_size, max_size):
             corpus_digest.update(metadata["document_id"].encode("utf-8"))
             corpus_digest.update(b"\0")
             corpus_digest.update(bytes.fromhex(digest))
-            attribution = metadata["source_url"]
-            if "history_url" in metadata:
-                attribution = metadata["history_url"]
-            elif source.get("api_url", "").startswith("https://github.com"):
-                attribution = metadata["source_url"]
-            else:
+            # 只有 MediaWiki（维基文库）来源存在页面历史；GitHub/网站转录直接用来源链接
+            if source["source_id"] == "zh-wikisource-open":
                 attribution = metadata["source_url"] + "?action=history"
+            else:
+                attribution = metadata["source_url"]
             pages = metadata.get("page_count", 1)
             documents.append({
                 "document_id": metadata["document_id"], "source_id": source["source_id"],
@@ -175,8 +176,8 @@ def build(cache_root, output_dir, target_size, max_size):
 
 def main():
     parser = argparse.ArgumentParser(description="合并构建多来源典籍语料")
-    parser.add_argument("--repo-root", type=Path, default=Path("."))
-    parser.add_argument("--output", type=Path, default=Path("data/generated/wikisource-corpus"))
+    parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
+    parser.add_argument("--output", type=Path, default=REPO_ROOT / "data" / "generated" / "wikisource-corpus")
     parser.add_argument("--target-size", type=int, default=DEFAULT_TARGET_SIZE)
     parser.add_argument("--max-size", type=int, default=DEFAULT_MAX_SIZE)
     args = parser.parse_args()

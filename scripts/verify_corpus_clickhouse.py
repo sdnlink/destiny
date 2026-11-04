@@ -3,16 +3,22 @@
 
 import base64
 import json
+import os
 import urllib.parse
 import urllib.request
 
+CLICKHOUSE_URL = os.environ.get("CLICKHOUSE_URL", "http://localhost:18123")
+CLICKHOUSE_USER = os.environ.get("CLICKHOUSE_USER", "destiny")
+CLICKHOUSE_PASSWORD = os.environ.get("CLICKHOUSE_PASSWORD", "")
+
 
 def query_ch(sql):
-    url = f"http://localhost:18123/?query={urllib.parse.quote(sql)}%20FORMAT%20JSON"
+    url = f"{CLICKHOUSE_URL}/?query={urllib.parse.quote(sql)}%20FORMAT%20JSON"
     req = urllib.request.Request(url)
-    credentials = base64.b64encode(b"destiny:destiny_local").decode("ascii")
+    credentials = base64.b64encode(
+        f"{CLICKHOUSE_USER}:{CLICKHOUSE_PASSWORD}".encode("utf-8")).decode("ascii")
     req.add_header("Authorization", f"Basic {credentials}")
-    with urllib.request.urlopen(req) as resp:
+    with urllib.request.urlopen(req, timeout=10) as resp:
         return json.loads(resp.read().decode("utf-8"))["data"]
 
 

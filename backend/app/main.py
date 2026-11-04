@@ -1,3 +1,4 @@
+import hmac
 import json
 import logging
 import math
@@ -6,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, conint, conlist, constr, validator
@@ -32,7 +33,7 @@ from app.fengshui import analyze_measurements as fengshui_measurements
 from app.fengshui import calculate_direction as fengshui_direction
 from app.fengshui.bazhai import calculate_bazhai
 from app.fengshui.storage import (
-    delete_profile, get_profile, list_profiles, upsert_profile,
+    delete_profile, get_profile, list_profiles, resolve_tenant, upsert_profile,
 )
 from app.fengshui.xuankong import calculate_xuankong
 from app.liuyao import auto_cast as liuyao_auto_cast
@@ -267,6 +268,7 @@ CALCULATION_ENTRIES = {
     ("ziwei", "auto"): (ZiweiAutoRequest, lambda values: ziwei_auto_cast(**values)),
     ("bazi", "time"): (BaZiRequest, lambda values: bazi_time_cast(**values)),
     ("bazi", "auto"): (BaZiAutoRequest, lambda values: bazi_auto_cast(**values)),
+    ("bazi", "liunian"): (BaZiLiunianRequest, lambda values: bazi_liunian_cast(**values)),
     ("qimen", "time"): (CalendarRequest, lambda values: qimen_time_cast(**values)),
     ("qimen", "auto"): (AutoCastRequest, lambda values: qimen_auto_cast(**values)),
     ("fengshui", "direction"): (FengshuiDirectionRequest, lambda values: fengshui_direction(**values)),
@@ -365,7 +367,8 @@ async def internal_token_middleware(request: Request, call_next):
             or path == "/openapi.json"
             or path == "/redoc"
         )
-        if protected and request.headers.get("Authorization") != f"Bearer {API_TOKEN}":
+        supplied = request.headers.get("Authorization", "")
+        if protected and not hmac.compare_digest(supplied, f"Bearer {API_TOKEN}"):
             return JSONResponse(status_code=401, content={"error": {"code": "UNAUTHORIZED", "message": "valid bearer token required"}})
     return await call_next(request)
 
@@ -569,7 +572,7 @@ def rules(system: Optional[str] = None, status: Optional[str] = None):
 
 @app.get("/v1/classics/status")
 def classics_status():
-    """本地典籍库状态：收录书目、字符量与待补来源清单。"""
+    """本地典籍库状态：收录书目、字符量与来源补齐记录/残余缺口。"""
     library = get_classics_library()
     if not library.available:
         return {"data": {"available": False, "corpus_dir": str(library.corpus_dir)}}
@@ -580,13 +583,12 @@ def classics_status():
 
 @app.get("/v1/classics/search")
 def classics_search(
-    q: str,
-    category: Optional[str] = None,
-    title: Optional[str] = None,
-    limit: int = 5,
+    q: str = Query(..., min_length=1, max_length=100),
+    category: Optional[str] = Query(None, max_length=40),
+    title: Optional[str] = Query(None, max_length=100),
+    limit: int = Query(5, ge=1, le=20),
 ):
     """按关键词检索本地典籍原文段落，作为结论依据。"""
-    limit = max(1, min(limit, 20))
     library = get_classics_library()
     if not library.available:
         return {"data": [], "meta": {"available": False}}
@@ -739,7 +741,10 @@ def cast_bazi_auto(request: BaZiAutoRequest):
 
 @app.post("/v1/bazi/liunian")
 def cast_bazi_liunian(request: BaZiLiunianRequest):
-    return {"data": bazi_liunian_cast(**request.dict())}
+    try:
+        return {"data": bazi_liunian_cast(**request.dict())}
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
 
 
 @app.post("/v1/qimen/time")
@@ -769,10 +774,6 @@ class FengshuiProfileRequest(BaseModel):
     tenant_id: str = Field(..., example="tenant-a")
     building_id: str = Field(..., example="building-001")
     profile: dict
-
-
-class FengshuiProfileQuery(BaseModel):
-    tenant_id: str = Field(..., example="tenant-a")
 
 
 @app.get("/v1/fengshui/bazhai")
@@ -808,18 +809,20 @@ def fengshui_xuankong_post(request: XuankongRequest):
 
 
 @app.get("/v1/fengshui/buildings")
-def fengshui_profiles(tenant_id: str):
+def fengshui_profiles(tenant_id: Optional[str] = None):
     try:
-        rows = list_profiles(tenant_id)
+        resolved = resolve_tenant(tenant_id or "")
+        rows = list_profiles(resolved)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
-    return {"data": rows, "meta": {"tenant_id": tenant_id, "count": len(rows)}}
+    return {"data": rows, "meta": {"tenant_id": resolved, "count": len(rows)}}
 
 
 @app.get("/v1/fengshui/buildings/{building_id}")
-def fengshui_profile_detail(building_id: str, tenant_id: str):
+def fengshui_profile_detail(building_id: str, tenant_id: Optional[str] = None):
     try:
-        row = get_profile(tenant_id, building_id)
+        resolved = resolve_tenant(tenant_id or "")
+        row = get_profile(resolved, building_id)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
     if row is None:
@@ -839,14 +842,15 @@ def fengshui_profile_upsert(request: FengshuiProfileRequest):
 
 
 @app.delete("/v1/fengshui/buildings/{building_id}")
-def fengshui_profile_delete(building_id: str, tenant_id: str):
+def fengshui_profile_delete(building_id: str, tenant_id: Optional[str] = None):
     try:
-        deleted = delete_profile(tenant_id, building_id)
+        resolved = resolve_tenant(tenant_id or "")
+        deleted = delete_profile(resolved, building_id)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
     if not deleted:
         raise HTTPException(status_code=404, detail="building profile not found")
-    return {"data": {"deleted": True, "tenant_id": tenant_id, "building_id": building_id}}
+    return {"data": {"deleted": True, "tenant_id": resolved, "building_id": building_id}}
 
 
 @app.post("/v1/fengshui/direction")
@@ -920,7 +924,7 @@ def create_divination_session(request: SessionCreateRequest):
 
 
 @app.get("/v1/sessions")
-def list_sessions(limit: int = 50):
+def list_sessions(limit: int = Query(50, ge=1, le=200)):
     """列出推演会话列表。"""
     store = get_store()
     return {"data": store.list_sessions(limit=limit)}

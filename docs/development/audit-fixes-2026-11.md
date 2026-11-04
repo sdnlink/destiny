@@ -3,6 +3,8 @@
 本文记录上一轮 28 条审计问题的落地情况，供复核与后续排期使用。
 验收标准：后端回归全绿（依赖数据库的用例在无库环境下条件跳过并打印原因）、前端构建通过。
 
+> 注：本文件为历史修复记录，表中规则/案例数字按当时口径保留；当前规则注册表已增至 84 条规则（工程回归案例 31 个）。
+
 ## 验证方式与结果
 
 | 验证项 | 命令 | 结果 |
@@ -40,7 +42,7 @@
 | 21 | localStorage 超配额静默失败 | 已修 | `src/lib/storage.js` 改为字节预算 + 超限降级 + 失败返回 false，App 提示用户 |
 | 22 | 口令双写、鉴权空转、异常外泄 | 部分修 | 代码侧口令只从环境读取（`requirements`/`.env.example` 说明）；500 响应不再回 `str(exc)`，改记日志；`APP_API_TOKEN` 未设时启动打印警告。会话归属校验需要身份体系，未见实现 |
 | 24 | pydantic v1→v2 破坏性迁移 | 已界定 | `requirements.txt` 锁 `pydantic>=1.10.26,<2`，迁移步骤写入 ADR-016，并由测试锁定主版本 |
-| 25 | README 数字过期 | 已修 | 14 条规则/7 个案例 → 73/31，并补工作流规则与吉凶边界说明 |
+| 25 | README 数字过期 | 已修（历史时点） | 当时 14 条规则/7 个案例 → 73/31；现为 84 条规则/31 个案例 |
 | 10 | 转发壳模块 | 保留 | `core/{casting,liuyao,meihua,liuren}.py` 是带 `__all__` 的兼容转出层，非重复实现；删除会破坏既有导入路径 |
 | 11 | 三份 HTTP 客户端与三份 canonical_hash | 部分修 | 摘要统一到 `common/hashing.py`；ClickHouse 客户端仍只有 `core/db.py` 一处，语料检索客户端未合并（依赖不同服务） |
 | 12 | 前端与后端双份体系映射 | 部分修 | 前端抽到 `src/lib/calculationPlan.js` 并单测（8 例）；与后端 `workflow/scheduler.py` 的跨栈单源需要新增计划接口，留待单独一轮 |
@@ -89,7 +91,7 @@
 | --- | --- | --- |
 | 健康检查模块清单漏 ziwei/bazi/qimen | 已修 | `backend/app/main.py` `/health`，由 `test_token_middleware.py` 钉住 |
 | `APP_API_TOKEN` 与 `SERVE_WEB=1` 冲突（整站 401） | 已修 | `backend/app/main.py` 中间件只保护 `/v1/*`、`/docs`、`/openapi.json`、`/redoc`；静态资源与 `/health` 公开 |
-| 规则数量文档口径漂移（14/63/73） | 已修 | `docs/readme.md`、`docs/refactoring-plan.md`、`docs/development/calculation-service.md` 统一为 73 条规则、31 个案例、16 条 ADR |
+| 规则数量文档口径漂移（14/63/73） | 已修（历史时点） | 当时统一为 73 条规则/31 个案例/16 条 ADR；现为 84 条规则（全部纳入 `rule_sets`）/31 个案例 |
 | 旺衰休/囚/死三档判反 | 已修 | `backend/app/workflow/steps.py` 按 ADR-015 / WF-WANGSHUAI-001 口径：用神生月令→休、月令克用→囚、用神克月令→死 |
 | 现实校验把「不太符合」判成「符合」 | 已修 | `backend/app/interaction/reality_check.py`：长关键词优先 + 关键词前缀否定判断 |
 | 复盘把「未通过」判成偏有利 | 已修 | `backend/app/interaction/review.py` `_classify_outcome` 先判不利关键词 |
@@ -138,7 +140,7 @@
 
 验证：后端 **631 passed / 10 skipped / 0 failed**；前端 **45 passed**；`npm run build` 通过。
 
-本轮明确不做（不可仅靠计算解决）：六爻用神旺衰断语、伏神空破、三合局与刑害合成、紫微四化飞星、八宅与玄空飞星（流派口径未签）、风水房屋档案（需持久化与合规设计）。
+本轮明确不做（当时口径，历史时点记录）：六爻用神旺衰断语、伏神空破、三合局与刑害合成、紫微四化飞星、八宅与玄空飞星（流派口径未签）、风水房屋档案（需持久化与合规设计）。其中八宅、玄空下卦挨星、房屋档案及六爻组合事实已在第四轮按"只列事实、不生成吉凶断语"落地；替卦盘仍待专家口径。
 
 ## 第四轮补强（2026-11-04）：多底本计算 + 典籍依据 + 风水档案
 
@@ -155,20 +157,6 @@
 | 八宅大游年 | 大游年歌通行传本（各派一致），命卦通行公式，宅命东西四配法；理论依据引语料《宅经》 | `app/fengshui/bazhai.py`，端点 `/v1/fengshui/bazhai` | FS-BAZHAI-001 |
 | 玄空飞星 | 三元九运 + 二十四山下卦挨星（蒋氏《地理辨正》传承，语料在库）；旺山旺向/上山下水/双星条件判定；替卦区间按实测角度判定但替卦盘未提供 | `app/fengshui/xuankong.py`，端点 `/v1/fengshui/xuankong` | FS-XUANKONG-001 |
 | 风水房屋档案 | 文件后端（默认，租户子目录隔离）+ PostgreSQL 后端（FENGSHUI_STORAGE=postgres，DDL 见 scripts/sql/fengshui_building_profiles.sql）；owner_consent 强制、不含身份信息 | `app/fengshui/storage.py`，端点 `/v1/fengshui/buildings` | 并入 FS-BAZHAI-001 存档 |
-
-### 第六轮（2026-11-04）：八字流年岁运事实序列
-
-| 结论 | 落地位置 | 规则 |
-| --- | --- | --- |
-| 逐年干支（4年甲子锚的60甲子循环）、流年十神/纳音/五行、周岁与虚岁并列、太岁与岁破地支 | `app/bazi/liunian.py`，端点 `/v1/bazi/liunian` | BZ-LIUNIAN-001 |
-| 流年所属大运区间（起运前/八步之后为 null）、流年与四柱的六冲/六合/六害/三刑/自刑/三合局半合/天干五合组合事实 | 同上 | 并入 BZ-LIUNIAN-001 |
-| 典籍依据：检索「流年/太歲/大運/行運」挂《三命通會》《神峰通考》《滴天髓闡微》等原文段落 | `app.common.classics`（简繁变体检索） | CLS-CORPUS-001 |
-
-- 地支刑害/自刑与天干五合表统一收敛到 `app/common/ganzhi.py`，六爻 `app/liuyao/advanced.py` 改为引用同一张表，避免跨模块重复维护；
-- 诚实边界：只列可查证的组合事实，不生成吉凶断语；干支按公历年通行纪年，立春交节精确边界需结合 calendar 模块；三合只列两支半合，不推断成局；
-- 规则注册表同步更新 `CLS-CORPUS-001` 的多来源/简繁检索口径（84 条规则无重复）。
-
-### 典籍来源与待补清单
 
 ## 第五轮（2026-11-04）：全网公开渠道补齐缺失典籍
 
@@ -197,10 +185,55 @@
   摘录一律保持语料原文；`zhconv==1.4.3` 已加入 `backend/requirements.txt`，缺库自动降级；
 - 维基文库限流期间不再重试其内容接口，`manifest_not_stored` 字段继续如实展示维基文库侧缺口。
 
-### 早期来源记录（第四轮）
+### 典籍来源与补齐记录（早期，第四轮）
 
 - 已入库（公开许可）：`data/generated/wikisource-corpus/`；
 - 所有引用均带来源链接与许可信息，便于逐条校对。
+
+## 第六轮（2026-11-04）：八字流年岁运事实序列
+
+| 结论 | 落地位置 | 规则 |
+| --- | --- | --- |
+| 逐年干支（4年甲子锚的60甲子循环）、流年十神/纳音/五行、周岁与虚岁并列、太岁与岁破地支 | `app/bazi/liunian.py`，端点 `/v1/bazi/liunian` | BZ-LIUNIAN-001 |
+| 流年所属大运区间（起运前/八步之后为 null）、流年与四柱的六冲/六合/六害/三刑/自刑/三合局半合/天干五合组合事实 | 同上 | 并入 BZ-LIUNIAN-001 |
+| 典籍依据：检索「流年/太歲/大運/行運」挂《三命通會》《神峰通考》《滴天髓闡微》等原文段落 | `app.common.classics`（简繁变体检索） | CLS-CORPUS-001 |
+
+- 地支刑害/自刑与天干五合表统一收敛到 `app/common/ganzhi.py`，六爻 `app/liuyao/advanced.py` 改为引用同一张表，避免跨模块重复维护；
+- 诚实边界：只列可查证的组合事实，不生成吉凶断语；干支按公历年通行纪年，立春交节精确边界需结合 calendar 模块；三合只列两支半合，不推断成局；
+- 规则注册表同步更新 `CLS-CORPUS-001` 的多来源/简繁检索口径（84 条规则无重复）。
+
+## 第七轮（2026-11-04）：全项目循环审查与加固
+
+两路只读审查（文档口径一致性 / 代码质量与安全）逐项核实后，按"发现问题即修、每轮复验"处理：
+
+**正确性**
+
+- `app/main.py` 补导入 `HTTPException`：此前 4 个房屋档案端点的 422/404/503 分支会抛 `NameError` 变成 500；新增端点层测试覆盖这些分支；
+- `CALCULATION_ENTRIES` 注册 `("bazi","liunian")`，统一计算入口与独立端点一致；
+- `build_classics_corpus.py` 的 `attribution_url` 按 `source_id` 分支，非 MediaWiki 来源不再错误追加 `?action=history`；重建语料验证 38 处链接修正；
+- 构建脚本输出默认改为相对仓库根（此前从 `scripts/` 调用会把语料误写入 `scripts/data/`，已清理副本）；
+- 典籍库 `status()` 比对三个来源清单、`search()` 增加查询长度/limit 边界、损坏 jsonl 时显式降级；流年补齐 `start_year+count` 组合越界与出生年解析失败的显式报错。
+
+**一致性与契约**
+
+- 房屋档案双后端统一 `make_record` DTO、`PostgresBackend` 用 `closing` 关闭连接、文件后端 `mkstemp + os.replace` 原子写并加锁；删除与 SQL 文件重复的 DDL 常量；
+- 兑现合规声明：`source`（测量方式）必填、`owner_consent` 必须布尔真、`facing_degree` 范围校验、payload 64KB 上限；
+- 规则注册补齐 7 条紫微规则的 `rule_sets` 引用，`test_rule_registry.py` 增加双向一致性断言（84 条定义 ↔ 84 条引用）；
+- 玄空/八宅模块及规则表的"原典未入语料/见待补清单"文案全部改为真实边界（替卦盘待专家口径、《阳宅三要》与卷四图说暂缺）；README、计算服务、前端、语料服务、设计文档与 ADR 的历史数字（73/7/17 部）与过时"未实现"条目统一或加历史时点注记。
+
+**安全与健壮性**
+
+- 两处 Bearer 令牌比较改为 `hmac.compare_digest`；`/v1/sessions` 的 `limit` 约束为 1–200；`/v1/classics/search` 的 `q/category/title/limit` 全部加上边界；
+- 房屋档案新增可选 `FENGSHUI_TENANT_ID` 服务端绑定，多租户部署时忽略客户端声明；会话模块无归属字段、仅限单租户本地环境的边界已写入文档；
+- ClickHouse 口令移除全部默认值（应用、`load_*.sh`、`verify_*.py` 等），校验脚本补 10 秒网络超时；`corpus_api.py` 500 分支记录堆栈；
+- 抓取脚本加 URL 白名单（拒绝 `file://`/内网）、下载字节上限、仓库路径穿越防护与 `zhconv` 缺库告警；`app/core/imagery.py` 静默降级改为 debug/警告留痕；`requirements*.txt` 补齐 `starlette`、`psycopg2-binary`、`numpy` 声明。
+
+**可复现性**（干净 clone）
+
+- `cache/` 与 `data/generated/` 均不入库；此前多个测试硬依赖 91 部语料，全新环境会直接失败。现在 `build_all.sh` 在三个缓存 catalog 齐全时离线重建语料，无缓存时明确提示；
+- 依赖真实语料的断言改为"缺失则 skip"，新增合成 jsonl 用例覆盖加载/检索/简繁变体与降级路径；模拟空语料目录验证 **44 passed / 7 skipped / 0 failed**，有语料环境 **51 passed / 0 failed**。
+
+**验证**：后端全量回归、前端 45 项单测 + node 测试 + `npm run build`、新增 `test_review_hardening.py` 端点/边界/脚本契约用例全部通过。
 
 ### 诚实边界（仍然不做）
 

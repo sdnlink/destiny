@@ -1,9 +1,13 @@
 fastapi==0.103.2
 lunar_python==1.4.8
-# 项目使用 pydantic v1 API（constr(regex=)/conlist(min_items=)/validator/.dict()）。
-# 上界锁在 2 之前，避免装到 v2 后所有入参模型静默失效；迁移计划见 ADR-016。
+# Project uses the pydantic v1 API (constr(regex=)/conlist(min_items=)/validator/.dict()).
+# Upper bound pinned below 2: pydantic v2 would silently invalidate every request model. See ADR-016 for the migration plan.
 pydantic>=1.10.26,<2
 pytz==2025.2
 uvicorn==0.22.0
-# 典籍检索简繁兼容：殆知阁语料为简体、维基文库/网站转录为繁体（纯 Python，无 C 依赖）
+# FastAPI/TestClient behaviour depends on starlette 0.27 (see test_dependency_contract.py).
+starlette==0.27.0
+# Driver for the PostgreSQL fengshui building-profile backend; the default file backend does not need it.
+psycopg2-binary>=2.9,<3
+# Simplified/Traditional Chinese compatibility for classic-text search: the daozhige corpus is simplified, Wikisource and web transcripts are traditional (pure Python, no C extensions).
 zhconv==1.4.3

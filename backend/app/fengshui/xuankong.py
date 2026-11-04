@@ -1,8 +1,9 @@
 """玄空飞星：三元九运、二十四山下卦挨星盘与旺衰格局条件。
 
 口径说明：
-- 下卦挨星为蒋大鸿《地理辨正》传承的通行法（本地语料含《地理辨正》《青囊经》《宅经》）；
-- 《沈氏玄空学》维基文库缺失（见待补清单），替卦（起星盘）暂不提供，
+- 下卦挨星为蒋大鸿《地理辨正》传承的通行法（本地多来源典籍库含《地理辨正》《青囊经》《宅经》
+  及《沈氏玄空學》卷首至卷六）；
+- 替卦起星表尚未工程化、替卦盘待专家口径签署，暂不提供；
   坐向落替卦区间时明确提示须复测或人工起盘；
 - 旺山旺向/上山下水/双星到坐到向为确定性格局条件，不含吉凶断语。
 """
@@ -150,7 +151,7 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
     if mountain_at_facing == facing_at_facing:
         conditions.append({"name": "双星到向", "met": True})
 
-    # 替卦区间判定：每山十五度，两侧各三度起替；替卦起星表原文未入库，不作替卦盘。
+    # 替卦区间判定：每山十五度，两侧各三度起替；替卦盘待专家口径签署，不作替卦盘。
     if sitting_degree is not None:
         offset = (float(sitting_degree) + 7.5) % 15.0
         boundary_distance = min(offset, 15.0 - offset)
@@ -158,13 +159,13 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
             "in_ti_pu_region": boundary_distance < TI_PU_REGION_DEGREES,
             "distance_to_boundary": round(boundary_distance, 6),
             "measured_degree": float(sitting_degree),
-            "note": "《沈氏玄空学》未入本地语料，替卦（起星盘）未提供；落入替卦区间时应复测坐向或人工起盘。",
+            "note": "《沈氏玄空學》原文已在库；替卦起星表尚未工程化，替卦盘未提供；落入替卦区间时应复测坐向或人工起盘。",
         }
     else:
         ti_pu = {
             "in_ti_pu_region": None,
             "measured_degree": None,
-            "note": "未提供实测角度，无法判定是否落替卦区间；每山两侧各三度起替。《沈氏玄空学》未入本地语料，替卦盘未提供。",
+            "note": "未提供实测角度，无法判定是否落替卦区间；每山两侧各三度起替。替卦盘待专家口径签署，未提供。",
         }
 
     return {
@@ -191,7 +192,7 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
         },
         "evidence": _classic_evidence(["挨星", "三元", "九宮", "二十四山"]),
         "warnings": [
-            "下卦挨星为通行法；替卦未提供（原典未入语料）。",
+            "下卦挨星为通行法；替卦盘待专家口径签署，未提供。",
             "格局条件为确定性判定，不含吉凶断语。",
         ],
     }

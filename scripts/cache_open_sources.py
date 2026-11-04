@@ -49,7 +49,10 @@ def download(url, timeout, retries):
         try:
             request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
             with urllib.request.urlopen(request, timeout=timeout) as response:
-                return response.read()
+                payload = response.read(20 * 1024 * 1024 + 1)
+                if len(payload) > 20 * 1024 * 1024:
+                    raise ValueError("download exceeds 20MB: {}".format(url))
+                return payload
         except Exception as exc:  # noqa: BLE001 - 下载器需要宽容重试
             last_error = exc
             wait = min(60, 5 * (2 ** attempt))
@@ -91,7 +94,10 @@ def main():
         existing = None
         if metadata_path.exists() and text_path.exists():
             existing = json.loads(metadata_path.read_text(encoding="utf-8"))
-        url = RAW_BASE + urllib.parse.quote(book["repo_path"])
+        repo_path = book["repo_path"]
+        if ".." in repo_path.split("/"):
+            raise ValueError("repo_path must not contain '..': {}".format(repo_path))
+        url = RAW_BASE + urllib.parse.quote(repo_path, safe="")
         try:
             raw = download(url, args.timeout, args.retries)
             text = normalize_text(raw)
@@ -109,7 +115,8 @@ def main():
                     "title": book["title"],
                     "domain": book["domain"],
                     "source_id": manifest["source_id"],
-                    "source_url": "https://github.com/{}/blob/master/{}".format(REPO, book["repo_path"]),
+                    "source_url": "https://github.com/{}/blob/master/{}".format(
+                        REPO, urllib.parse.quote(repo_path, safe="")),
                     "license_name": LICENSE_NAME,
                     "license_url": LICENSE_URL,
                     "usage_scope": USAGE_SCOPE,

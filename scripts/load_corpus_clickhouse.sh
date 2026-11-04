@@ -6,12 +6,14 @@ source "$project_dir/scripts/env_python.sh"
 
 clickhouse_url="${CLICKHOUSE_URL:-http://localhost:18123}"
 clickhouse_user="${CLICKHOUSE_USER:-destiny}"
-clickhouse_password="${CLICKHOUSE_PASSWORD:-destiny_local}"
+: "${CLICKHOUSE_PASSWORD:?CLICKHOUSE_PASSWORD 必须显式注入，脚本不再内置默认口令}"
+clickhouse_password="$CLICKHOUSE_PASSWORD"
 generated_dir="$project_dir/data/generated/corpus"
 open_generated_dir="$project_dir/data/generated/wikisource-corpus"
 
 "$PYTHON_BIN" "$project_dir/scripts/build_corpus.py"
-"$PYTHON_BIN" "$project_dir/scripts/build_wikisource_corpus.py"
+# 多来源典籍库：维基文库 + 殆知阁存档 + 公开古籍网站转录（输出 schema 与旧构建器一致）
+"$PYTHON_BIN" "$project_dir/scripts/build_classics_corpus.py" --repo-root "$project_dir" --output "$open_generated_dir"
 
 for attempt in $(seq 1 30); do
   if curl --silent --fail --user "$clickhouse_user:$clickhouse_password" "$clickhouse_url/ping" >/dev/null; then

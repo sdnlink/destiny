@@ -92,12 +92,14 @@ def calculate_liunian(natal: Dict[str, Any], start_year: Optional[int] = None,
     solar_datetime = str(natal.get("solar_datetime", ""))
     try:
         birth_year = int(solar_datetime[:4])
-    except ValueError:
-        birth_year = 0
+    except (ValueError, TypeError) as exc:
+        raise ValueError("natal result missing valid solar_datetime: {!r}".format(solar_datetime)) from exc
     if start_year is None:
         start_year = natal.get("luck_start_info", {}).get("start_year") or birth_year
     if not 1900 <= start_year <= 2100:
         raise ValueError("start_year must be between 1900 and 2100")
+    if start_year + count - 1 > 2100:
+        raise ValueError("start_year + count - 1 must not exceed 2100")
 
     years = []
     for step in range(count):

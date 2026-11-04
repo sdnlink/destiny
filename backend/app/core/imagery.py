@@ -1,10 +1,13 @@
 import json
+import logging
 from collections import Counter
 from pathlib import Path
 
 from app.common.ganzhi import BRANCH_ELEMENTS
 from .constants import TRIGRAM_BY_NAME
 from .db import db_repository
+
+logger = logging.getLogger("destiny.imagery")
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA_RULES = ROOT / "data" / "rules"
@@ -35,15 +38,17 @@ def load_trigram_imagery():
                 mapped.setdefault(name, {})[dimension] = items
             if len(mapped) == 8:
                 return mapped
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("八卦类象数据库不可用，改用本地规则文件：%s", exc)
 
     fallback_file = DATA_RULES / "trigram-imagery.json"
     if fallback_file.exists():
         try:
             return json.loads(fallback_file.read_text(encoding="utf-8"))["imagery"]
-        except Exception:
-            pass
+        except (OSError, ValueError, KeyError) as exc:
+            logger.warning("八卦类象规则文件损坏：%s (%s)", fallback_file, exc)
+    else:
+        logger.warning("八卦类象规则文件缺失：%s，相关类象将为空", fallback_file)
     return {}
 
 
@@ -60,15 +65,17 @@ def load_branch_imagery():
                 mapped.setdefault(name, {})[dimension] = items
             if len(mapped) == 12:
                 return mapped
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("地支类象数据库不可用，改用本地规则文件：%s", exc)
 
     fallback_file = DATA_RULES / "branch-imagery.json"
     if fallback_file.exists():
         try:
             return json.loads(fallback_file.read_text(encoding="utf-8"))["imagery"]
-        except Exception:
-            pass
+        except (OSError, ValueError, KeyError) as exc:
+            logger.warning("地支类象规则文件损坏：%s (%s)", fallback_file, exc)
+    else:
+        logger.warning("地支类象规则文件缺失：%s，相关类象将为空", fallback_file)
     return {}
 
 

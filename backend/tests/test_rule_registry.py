@@ -26,8 +26,14 @@ class RuleRegistryTests(unittest.TestCase):
         self.assertTrue(registry["checksum"].startswith("sha256:"))
         self.assertEqual(registry["rule_sets"][0]["status"], "draft")
         registered = {(rule["rule_id"], rule["version"]) for rule in registry["rules"]}
-        for ref in registry["rule_sets"][0]["rules"]:
-            self.assertIn((ref["rule_id"], ref["version"]), registered)
+        referenced = set()
+        for rule_set in registry["rule_sets"]:
+            for ref in rule_set["rules"]:
+                referenced.add((ref["rule_id"], ref["version"]))
+                self.assertIn((ref["rule_id"], ref["version"]), registered)
+        # 反向一致性：已定义但未被任何规则集引用的规则会悄悄脱离可追溯体系
+        self.assertEqual(registered - referenced, set(),
+                         "规则定义与 rule_sets 引用必须双向一致")
 
     def test_workflow_rules_are_registered(self):
         """编排层（workflow/interaction）输出的 rule_ids 必须能在注册表里查到。"""

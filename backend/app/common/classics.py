@@ -1,16 +1,18 @@
-"""本地典籍语料库：加载维基文库存档，为引擎结论提供原文依据。
+"""本地多来源典籍语料库，为引擎结论提供原文依据。
 
-数据来源：scripts/cache_wikisource_texts.py 按公开许可清单抓取，
-经 scripts/build_classics_corpus.py 多来源切块后落盘
+数据来源：维基文库（cache_wikisource_texts.py）、殆知阁 GitHub 存档
+（cache_open_sources.py）、公开古籍网站转录（cache_web_classics.py），
+经 scripts/build_classics_corpus.py 合并切块后落盘
 data/generated/wikisource-corpus/（corpus_documents.jsonl + corpus_chunks.jsonl）。
 本模块只读加载，不重复抓取；引擎通过 search/evidence 把典籍原文
 挂到结果 evidence 字段上，替代未经签署的主观断语。
 
 检索简繁兼容：殆知阁语料为简体、维基文库/网站转录为繁体，查询词先展开
-简繁变体再匹配；摘录始终显示语料原文。zhconv 缺失时自动退化为原样匹配。
+简繁变体再匹配；摘录始终显示语料原文。zhconv 缺失时记录一次告警并退化。
 """
 
 import json
+import logging
 import os
 from pathlib import Path
 
@@ -18,6 +20,15 @@ try:
     from zhconv import convert as _zh_convert
 except ImportError:  # 简繁转换是增强能力，缺库时降级
     _zh_convert = None
+    logging.getLogger(__name__).warning("zhconv 未安装：典籍检索将退化为原样匹配（跨简繁查询会漏配）")
+
+MAX_QUERY_LENGTH = 100
+MAX_SEARCH_LIMIT = 100
+SOURCE_MANIFESTS = (
+    "wikisource-books.json",
+    "open-source-books.json",
+    "web-classics-books.json",
+)
 
 DEFAULT_CORPUS_DIR = (
     Path(__file__).resolve().parents[3] / "data" / "generated" / "wikisource-corpus"
@@ -25,7 +36,7 @@ DEFAULT_CORPUS_DIR = (
 DEFAULT_SOURCES_DIR = Path(__file__).resolve().parents[3] / "data" / "sources"
 EXCERPT_RADIUS = 60
 
-# 维基文库缺失或不完整、已由其他公开来源补齐/待补的书目。
+# 维基文库缺失或不完整的书目：逐项记录补齐来源与残余缺口（清单已清账）。
 SOURCING_BACKLOG = (
     {"title": "八宅明鏡", "domain": "yangzhai", "note": "维基文库缺失；已由 web-classics（诗词汇原文转录）补齐全文入库"},
     {"title": "陽宅十書", "domain": "yangzhai", "note": "维基文库缺失；已由 web-classics（王元吉易学网）补齐全文入库"},
@@ -79,17 +90,22 @@ class ClassicsLibrary:
         documents = {}
         documents_path = self.corpus_dir / "corpus_documents.jsonl"
         chunks_path = self.corpus_dir / "corpus_chunks.jsonl"
-        if documents_path.exists():
-            with documents_path.open(encoding="utf-8") as handle:
-                for line in handle:
-                    row = json.loads(line)
-                    documents[row["document_id"]] = row
-        if chunks_path.exists():
-            with chunks_path.open(encoding="utf-8") as handle:
-                for line in handle:
-                    row = json.loads(line)
-                    row["chunk_index"] = int(row["chunk_index"])
-                    chunks.append(row)
+        try:
+            if documents_path.exists():
+                with documents_path.open(encoding="utf-8") as handle:
+                    for line in handle:
+                        row = json.loads(line)
+                        documents[row["document_id"]] = row
+            if chunks_path.exists():
+                with chunks_path.open(encoding="utf-8") as handle:
+                    for line in handle:
+                        row = json.loads(line)
+                        row["chunk_index"] = int(row["chunk_index"])
+                        chunks.append(row)
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            logging.getLogger(__name__).warning(
+                "典籍语料加载失败，本次以空库降级：%s (%s)", self.corpus_dir, exc)
+            chunks, documents = [], {}
         for chunk in chunks:
             document = documents.get(chunk["document_id"], {})
             chunk["source_url"] = document.get("source_url", "")
@@ -106,10 +122,11 @@ class ClassicsLibrary:
     def status(self):
         self._ensure_loaded()
         manifest_titles = []
-        manifest_path = self.sources_dir / "wikisource-books.json"
-        if manifest_path.exists():
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            manifest_titles = [book["title"] for book in manifest.get("books", [])]
+        for name in SOURCE_MANIFESTS:
+            manifest_path = self.sources_dir / name
+            if manifest_path.exists():
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                manifest_titles.extend(book["title"] for book in manifest.get("books", []))
         stored_titles = {document["title"] for document in self._documents.values()}
         return {
             "corpus_dir": str(self.corpus_dir),
@@ -133,6 +150,10 @@ class ClassicsLibrary:
         self._ensure_loaded()
         if not query:
             return []
+        if len(query) > MAX_QUERY_LENGTH:
+            raise ValueError("query exceeds {} characters".format(MAX_QUERY_LENGTH))
+        if not isinstance(limit, int) or not 1 <= limit <= MAX_SEARCH_LIMIT:
+            raise ValueError("limit must be between 1 and {}".format(MAX_SEARCH_LIMIT))
         variants = _query_variants(query)
         title_variants = _query_variants(title_query) if title_query else None
         scored = []

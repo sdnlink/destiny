@@ -15,7 +15,9 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parents[1]
 CLICKHOUSE_URL = os.environ.get("CLICKHOUSE_URL", "http://localhost:18123").rstrip("/")
 CLICKHOUSE_USER = os.environ.get("CLICKHOUSE_USER", "destiny")
-CLICKHOUSE_PASSWORD = os.environ.get("CLICKHOUSE_PASSWORD", "destiny_local")
+CLICKHOUSE_PASSWORD = os.environ.get("CLICKHOUSE_PASSWORD", "")
+if not CLICKHOUSE_PASSWORD:
+    print("CLICKHOUSE_PASSWORD 未设置，数据库查询将被拒绝；请先注入凭据", file=sys.stderr)
 
 TABLES = [
     "data_sources",

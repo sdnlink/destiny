@@ -3,14 +3,15 @@
 
 import base64
 import json
+import os
 from pathlib import Path
 import urllib.parse
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
-CLICKHOUSE_URL = "http://localhost:18123"
-CLICKHOUSE_USER = "destiny"
-CLICKHOUSE_PASSWORD = "destiny_local"
+CLICKHOUSE_URL = os.environ.get("CLICKHOUSE_URL", "http://localhost:18123")
+CLICKHOUSE_USER = os.environ.get("CLICKHOUSE_USER", "destiny")
+CLICKHOUSE_PASSWORD = os.environ.get("CLICKHOUSE_PASSWORD", "")
 
 
 def query_ch(sql):
@@ -18,7 +19,7 @@ def query_ch(sql):
     req = urllib.request.Request(url)
     credentials = base64.b64encode(f"{CLICKHOUSE_USER}:{CLICKHOUSE_PASSWORD}".encode("utf-8")).decode("ascii")
     req.add_header("Authorization", f"Basic {credentials}")
-    with urllib.request.urlopen(req) as resp:
+    with urllib.request.urlopen(req, timeout=10) as resp:
         return json.loads(resp.read().decode("utf-8"))
 
 

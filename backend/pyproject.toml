@@ -11,7 +11,8 @@ description = "天机演象术数推演后端：历法、周易、梅花易数�
 dynamic = ["dependencies"]
 
 [project.optional-dependencies]
-dev = ["pytest==7.4.4", "httpx<0.28"]
+# 与 requirements-dev.txt 保持一致；完整的开发依赖清单仍以该文件为准
+dev = ["pytest==7.4.4", "httpx<0.28", "numpy>=1.24,<3"]
 
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }

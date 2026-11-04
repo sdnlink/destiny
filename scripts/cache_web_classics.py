@@ -10,8 +10,10 @@
 import argparse
 import hashlib
 import json
+import os
 import sys
 import time
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -19,6 +21,12 @@ from pathlib import Path
 
 USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
               "(KHTML, like Gecko) DestinyCorpusBuilder/1.0 Chrome/120 Safari/537.36")
+# 抓取脚本会读取清单里的 URL：白名单防止清单被误改成 file://、内网或任意主机。
+ALLOWED_HOSTS = frozenset({
+    "www.shicihui.com", "www.diancang.xyz", "www.zhonghuadiancang.com",
+    "wangyuanji.com", "www.wangyuanji.com",
+})
+MAX_PAGE_BYTES = 8 * 1024 * 1024
 LICENSE_NAME = "公有领域（古籍原文网页转录）"
 USAGE_SCOPE = "research-attribution-preferred"
 
@@ -69,6 +77,12 @@ def utc_now():
 
 
 def fetch(url, timeout, retries):
+    parsed = urllib.parse.urlparse(url)
+    allowed = ALLOWED_HOSTS | frozenset(
+        host.strip() for host in os.environ.get("WEB_CLASSICS_EXTRA_HOSTS", "").split(",") if host.strip()
+    )
+    if parsed.scheme != "https" or parsed.hostname not in allowed:
+        raise ValueError("URL not allowed (https + host whitelist required): {}".format(url))
     last_error = None
     for attempt in range(retries):
         try:
@@ -78,7 +92,10 @@ def fetch(url, timeout, retries):
                 "Accept-Language": "zh-CN,zh;q=0.9",
             })
             with urllib.request.urlopen(request, timeout=timeout) as response:
-                return response.read().decode("utf-8", errors="replace")
+                payload = response.read(MAX_PAGE_BYTES + 1)
+                if len(payload) > MAX_PAGE_BYTES:
+                    raise ValueError("page exceeds {} bytes: {}".format(MAX_PAGE_BYTES, url))
+                return payload.decode("utf-8", errors="replace")
         except Exception as exc:  # noqa: BLE001 - 下载器需要宽容重试
             last_error = exc
             wait = min(45, 4 * (2 ** attempt))

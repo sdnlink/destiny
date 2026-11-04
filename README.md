@@ -1,6 +1,6 @@
 # 天机演象
 
-天机演象是传统术数数字化研究与辅助分析项目。当前已完成项目设计、双来源书籍语料与ClickHouse检索，以及历法、周易、梅花易数、六爻和大六壬的确定性工程计算内核。推演结果已增加事项相关类象候选和元会运世时间背景。解释、类象、元会运世纪元和专业风水规则仍须按来源、版本和专家案例逐项审核。
+天机演象是传统术数数字化研究与辅助分析项目。当前已完成项目设计、双来源书籍语料与 ClickHouse 检索、91 部本地多来源典籍库（维基文库/殆知阁存档/公开古籍网站转录，支持简繁双向检索），以及历法、周易、梅花易数、六爻、大六壬、奇门、八字（含流年）、紫微与风水方位（八宅/玄空下卦挨星）的确定性工程计算内核。推演结果已增加事项相关类象候选和元会运世时间背景，结论挂典籍原文依据。解释、类象、元会运世纪元、玄空替卦盘与规则发布仍须按来源、版本和专家案例逐项审核。
 
 ## 文档入口
 
@@ -132,7 +132,7 @@ Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在
 
 | 变量 | 用途 | 缺省行为 |
 | --- | --- | --- |
-| `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令缺失时记录警告，数据库相关接口返回 `source: unavailable` |
+| `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令缺失时记录警告；数据库相关接口按端点不同降级为 `unavailable` / `in_memory_fallback` / `file_cache`，并在响应的 `source` 字段标注来源 |
 | `APP_API_TOKEN` | `/v1` 接口 Bearer 鉴权 | 未设置时记录「未鉴权」警告，仅可用于本地开发 |
 | `SESSION_STORAGE_DIR` | 会话 JSON 存储目录 | 默认 `data/sessions` |
 
@@ -143,6 +143,7 @@ python -m pytest backend/tests
 ./scripts/run_validation_cases.py
 npm --prefix frontend run build
 npm --prefix frontend run test:unit
+npm --prefix frontend run test:node
 npm --prefix frontend run test:browser
 ./scripts/verify_daorenjia_cache.py \
   --report cache/daorenjia/verification.json
@@ -161,10 +162,10 @@ npm --prefix frontend run test:browser
 
 ## 当前计算基线
 
-- 73条可追溯工程规则（`data/rules/mvp-engineering-baseline.json`），状态均为`draft`，待专家审核；
+- 84条可追溯工程规则（`data/rules/mvp-engineering-baseline.json`，全部纳入 `rule_sets` 引用），状态均为`draft`，待专家审核；
   其中4条属于七步推理工作流（`WF-YONGSHEN-001`/`WF-WANGSHUAI-001`/`WF-FORTUNE-001`/`WF-TIMING-001`），口径见[ADR-015](./docs/design/decisions/015-workflow-seven-step-rules.md)。
 - 31个工程回归案例，当前全部通过，不代表专家签署案例。
-- 历法、周易和梅花共13个健康、常量、规则、案例及计算接口。
+- 健康、常量、规则、案例、计算、典籍检索与风水档案等接口持续增补，机器契约以 `/openapi.json` 为准。
 - 多模块综合只比较引用已登记规则的结构化判断；工作流会输出五档吉凶与`fortune_basis`逐条依据，但不输出未经规则登记的自动总分，「不生成自动吉凶总分」的边界以此为准。
 - 推演结果包含确定性摘要和逐模块详细说明，每段可回溯规则编号。
 - 输入事项可生成未审核的研究性结论、优先建议和核实清单，不替代正式专业意见。
