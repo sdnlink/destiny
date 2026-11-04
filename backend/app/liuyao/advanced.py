@@ -8,7 +8,9 @@
 """
 
 from app.common.five_elements import FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES
-from app.common.ganzhi import BRANCH_CLASH, BRANCH_ELEMENTS
+from app.common.ganzhi import (
+    BRANCH_CLASH, BRANCH_ELEMENTS, HAI_PAIRS, SELF_XING_BRANCHES, XING_PAIRS,
+)
 
 from .engine import HIDDEN_RELATIVE_ORDER
 
@@ -44,18 +46,6 @@ FOCUS_TARGETS = {
     "兄弟朋友": {"targets": ["兄弟"]},
 }
 FOCUS_ALIASES = {name: name for name in list(FOCUS_TARGETS) + list(HIDDEN_RELATIVE_ORDER) + ["世爻"]}
-
-# 地支三刑（两两成刑）、自刑与六害。
-XING_PAIRS = {
-    frozenset(("寅", "巳")), frozenset(("巳", "申")), frozenset(("寅", "申")),
-    frozenset(("丑", "戌")), frozenset(("戌", "未")), frozenset(("丑", "未")),
-    frozenset(("子", "卯")),
-}
-SELF_XING_BRANCHES = ("辰", "午", "酉", "亥")
-HAI_PAIRS = {
-    frozenset(("子", "未")), frozenset(("丑", "午")), frozenset(("寅", "巳")),
-    frozenset(("卯", "辰")), frozenset(("申", "亥")), frozenset(("酉", "戌")),
-}
 
 # 三合局五行之墓库：局成而局爻入墓者待冲开（引《增删卜易》三合局章）。
 TRINE_TOMB = {"水": "辰", "木": "未", "火": "戌", "金": "丑"}

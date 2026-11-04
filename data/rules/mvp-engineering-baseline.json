@@ -179,6 +179,10 @@
           "version": "1.0.0"
         },
         {
+          "rule_id": "BZ-LIUNIAN-001",
+          "version": "1.0.0"
+        },
+        {
           "rule_id": "LR-MONTH-GENERAL-001",
           "version": "1.0.0"
         },
@@ -3271,9 +3275,9 @@
       "school": "mvp-engineering-baseline",
       "status": "draft",
       "title": "本地典籍库引用",
-      "purpose": "引擎结论的证据字段从本地维基文库存档检索原文段落，保证每个派生结论有可校对的典籍依据",
+      "purpose": "引擎结论的证据字段从本地多来源典籍库检索原文段落，保证每个派生结论有可校对的典籍依据",
       "preconditions": [
-        "data/generated/wikisource-corpus 语料已生成"
+        "data/generated/wikisource-corpus 多来源语料已生成（build_classics_corpus.py）"
       ],
       "inputs": [
         "检索关键词",
@@ -3281,8 +3285,8 @@
       ],
       "procedure": [
         "加载 corpus_documents.jsonl 与 corpus_chunks.jsonl 索引",
-        "按关键词与分类检索段落，命中次数排序",
-        "返回 classic_id、标题、摘录、来源链接与许可信息",
+        "查询词展开简繁变体后按关键词与分类检索段落，命中次数排序",
+        "返回 classic_id、标题、原文摘录、来源链接与许可信息",
         "语料缺失时返回空列表并在结果中注明"
       ],
       "outputs": [
@@ -3290,15 +3294,63 @@
       ],
       "source_refs": [
         "data/sources/wikisource-books.json",
-        "scripts/cache_wikisource_texts.py"
+        "data/sources/open-source-books.json",
+        "data/sources/web-classics-books.json"
       ],
       "limitations": [
-        "只收录公开许可文本（维基文库 CC BY-SA 与公有领域）",
-        "八宅明镜、阳宅十书、沈氏玄空学暂缺，见 sourcing-backlog"
+        "只收录公开许可文本（维基文库 CC BY-SA 与古籍原文公有领域）",
+        "缺书与补齐来源逐项记录在 /v1/classics/status 的 sourcing_backlog"
       ],
       "owner": "unassigned",
       "reviewers": [],
       "implementation": "app.common.classics:ClassicsLibrary"
+    },
+    {
+      "rule_id": "BZ-LIUNIAN-001",
+      "version": "1.0.0",
+      "system": "bazi",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "八字流年岁运事实序列",
+      "purpose": "按公历年生成逐年干支、十神、纳音、太岁岁破与大运区间，并列出流年与四柱之间可查证的干支组合事实，不生成吉凶断语",
+      "preconditions": [
+        "八字四柱排盘结果可用（calculate_bazi）",
+        "本地典籍库语料已生成（检索流年/太岁/大运原文）"
+      ],
+      "inputs": [
+        "local_datetime",
+        "timezone",
+        "gender",
+        "start_year",
+        "count"
+      ],
+      "procedure": [
+        "以公历4年甲子为锚按60甲子循环计算每年干支",
+        "按日干计算流年天干十神，查纳音与地支五行",
+        "按起运年与大运区间定位该年所属大运，未覆盖返回null",
+        "用 app.common.ganzhi 统一关系表列出六冲/六合/六害/三刑/自刑/三合局半合/天干五合",
+        "周岁与虚岁并列标注，太岁与岁破地支同时给出",
+        "从典籍库检索流年/太岁/大运/行运原文段落挂入 evidence"
+      ],
+      "outputs": [
+        "years",
+        "evidence",
+        "natal_summary"
+      ],
+      "source_refs": [
+        "三命通会（太岁/岁运）",
+        "神峰通考（流年/大运）",
+        "滴天髓阐微（行运）"
+      ],
+      "limitations": [
+        "干支按公历年通行纪年，立春交节精确边界需结合 calendar 模块",
+        "只列组合事实，不判断吉凶、不生成断语",
+        "三合仅列两支半合，不推断成局与否",
+        "八步大运之外的年份 luck_pillar 为 null"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.bazi.liunian:liunian_cast"
     }
   ]
 }

@@ -156,6 +156,18 @@
 | 玄空飞星 | 三元九运 + 二十四山下卦挨星（蒋氏《地理辨正》传承，语料在库）；旺山旺向/上山下水/双星条件判定；替卦区间按实测角度判定但替卦盘未提供 | `app/fengshui/xuankong.py`，端点 `/v1/fengshui/xuankong` | FS-XUANKONG-001 |
 | 风水房屋档案 | 文件后端（默认，租户子目录隔离）+ PostgreSQL 后端（FENGSHUI_STORAGE=postgres，DDL 见 scripts/sql/fengshui_building_profiles.sql）；owner_consent 强制、不含身份信息 | `app/fengshui/storage.py`，端点 `/v1/fengshui/buildings` | 并入 FS-BAZHAI-001 存档 |
 
+### 第六轮（2026-11-04）：八字流年岁运事实序列
+
+| 结论 | 落地位置 | 规则 |
+| --- | --- | --- |
+| 逐年干支（4年甲子锚的60甲子循环）、流年十神/纳音/五行、周岁与虚岁并列、太岁与岁破地支 | `app/bazi/liunian.py`，端点 `/v1/bazi/liunian` | BZ-LIUNIAN-001 |
+| 流年所属大运区间（起运前/八步之后为 null）、流年与四柱的六冲/六合/六害/三刑/自刑/三合局半合/天干五合组合事实 | 同上 | 并入 BZ-LIUNIAN-001 |
+| 典籍依据：检索「流年/太歲/大運/行運」挂《三命通會》《神峰通考》《滴天髓闡微》等原文段落 | `app.common.classics`（简繁变体检索） | CLS-CORPUS-001 |
+
+- 地支刑害/自刑与天干五合表统一收敛到 `app/common/ganzhi.py`，六爻 `app/liuyao/advanced.py` 改为引用同一张表，避免跨模块重复维护；
+- 诚实边界：只列可查证的组合事实，不生成吉凶断语；干支按公历年通行纪年，立春交节精确边界需结合 calendar 模块；三合只列两支半合，不推断成局；
+- 规则注册表同步更新 `CLS-CORPUS-001` 的多来源/简繁检索口径（84 条规则无重复）。
+
 ### 典籍来源与待补清单
 
 ## 第五轮（2026-11-04）：全网公开渠道补齐缺失典籍

@@ -45,7 +45,7 @@ from app.meihua import number_cast as meihua_number_cast
 from app.meihua import three_number_cast as meihua_three_number_cast
 from app.meihua import time_cast as meihua_time_cast
 from app.ziwei import time_cast as ziwei_time_cast, auto_cast as ziwei_auto_cast
-from app.bazi import time_cast as bazi_time_cast, auto_cast as bazi_auto_cast
+from app.bazi import time_cast as bazi_time_cast, auto_cast as bazi_auto_cast, liunian_cast as bazi_liunian_cast
 from app.qimen import time_cast as qimen_time_cast, auto_cast as qimen_auto_cast
 from app.core.db import db_repository
 from app.core.registry import load_rule_registry, load_validation_cases
@@ -155,6 +155,12 @@ class BaZiRequest(CalendarRequest):
 
 class BaZiAutoRequest(AutoCastRequest):
     gender: str = Field("男", example="男")
+
+
+class BaZiLiunianRequest(CalendarRequest):
+    gender: str = Field("男", example="男")
+    start_year: Optional[int] = Field(None, ge=1900, le=2100, description="起始公历年，默认起运年")
+    count: int = Field(10, ge=1, le=60, description="流年条数（1-60）")
 
 
 class FengshuiDirectionRequest(BaseModel):
@@ -729,6 +735,11 @@ def cast_bazi_time(request: BaZiRequest):
 @app.post("/v1/bazi/auto")
 def cast_bazi_auto(request: BaZiAutoRequest):
     return {"data": bazi_auto_cast(**request.dict())}
+
+
+@app.post("/v1/bazi/liunian")
+def cast_bazi_liunian(request: BaZiLiunianRequest):
+    return {"data": bazi_liunian_cast(**request.dict())}
 
 
 @app.post("/v1/qimen/time")

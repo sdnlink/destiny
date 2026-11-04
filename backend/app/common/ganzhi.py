@@ -31,6 +31,27 @@ BRANCH_COMBINE = MappingProxyType({
 BRANCH_TRIPLE = MappingProxyType({
     "申子辰": "水", "亥卯未": "木", "寅午戌": "火", "巳酉丑": "金",
 })
+# 地支三刑（两两成刑）：寅巳申、丑戌未、子卯
+XING_PAIRS = frozenset({
+    frozenset(("寅", "巳")), frozenset(("巳", "申")), frozenset(("寅", "申")),
+    frozenset(("丑", "戌")), frozenset(("戌", "未")), frozenset(("丑", "未")),
+    frozenset(("子", "卯")),
+})
+# 自刑：辰午酉亥
+SELF_XING_BRANCHES = ("辰", "午", "酉", "亥")
+# 六害：子未、丑午、寅巳、卯辰、申亥、酉戌
+HAI_PAIRS = frozenset({
+    frozenset(("子", "未")), frozenset(("丑", "午")), frozenset(("寅", "巳")),
+    frozenset(("卯", "辰")), frozenset(("申", "亥")), frozenset(("酉", "戌")),
+})
+# 天干五合：甲己合土、乙庚合金、丙辛合水、丁壬合木、戊癸合火
+STEM_COMBINE = MappingProxyType({
+    "甲": ("己", "土"), "己": ("甲", "土"),
+    "乙": ("庚", "金"), "庚": ("乙", "金"),
+    "丙": ("辛", "水"), "辛": ("丙", "水"),
+    "丁": ("壬", "木"), "壬": ("丁", "木"),
+    "戊": ("癸", "火"), "癸": ("戊", "火"),
+})
 
 
 def triple_group_of(branch: str) -> str:
