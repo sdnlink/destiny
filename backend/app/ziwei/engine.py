@@ -6,6 +6,7 @@ from lunar_python import Solar
 
 from app.calendar.engine import CalendarEngine
 from .rules import (
+    SIHUA_VARIANTS,
     XIAN_CHI_TABLE,
     BRANCH_TO_INDEX,
     EARTHLY_BRANCHES,
@@ -309,7 +310,7 @@ def calculate_ziwei_chart(
     xianchi_branch = XIAN_CHI_TABLE.get(year_branch, "酉")
     branch_to_palace[xianchi_branch]["minor_stars"].append({"name": "咸池", "type": "minor", "element": "水"})
 
-    # 10. 生年四化
+    # 10. 生年四化（底本A标记星盘；两底本变体全部输出并标注分歧）
     sihua_map = SIHUA_TABLE.get(year_stem, {})
     for hua_name, target_star in sihua_map.items():
         # 在全盘寻找 target_star 并打上四化标记
@@ -318,6 +319,16 @@ def calculate_ziwei_chart(
                 if st["name"] == target_star:
                     st["si_hua"] = hua_name
                     p["si_hua"].append(f"{target_star}{hua_name}")
+    sihua_variants = {}
+    for key, variant in SIHUA_VARIANTS.items():
+        sihua_variants[key] = {
+            "label": variant["label"],
+            "si_hua": variant["table"].get(year_stem, {}),
+        }
+    if sihua_variants["quanshu"]["si_hua"] == sihua_variants["bieben"]["si_hua"]:
+        sihua_note = "本年干四化两底本一致"
+    else:
+        sihua_note = "本年干四化两底本存在分歧（化科），全部变体已输出，请按所用底本取用"
 
     # 11. 命主与身主
     ming_zhu = MING_ZHU_TABLE.get(ming_branch, "贪狼")
@@ -365,6 +376,8 @@ def calculate_ziwei_chart(
         "ming_zhu": ming_zhu,
         "shen_zhu": shen_zhu,
         "si_hua": sihua_map,
+        "si_hua_variants": sihua_variants,
+        "si_hua_note": sihua_note,
         "palaces_by_order": palaces,
         "palaces_by_branch": branches_sorted_palaces,
     }
@@ -426,8 +439,9 @@ def time_cast(
             {
                 "sequence": 4,
                 "operation": "arrange_main_and_auxiliary_stars",
-                "output": {"ming_stars": main_stars_str, "si_hua": facts["si_hua"]},
-                "rule_ids": ["ZW-STARS-001", "ZW-SIHUA-001"],
+                "output": {"ming_stars": main_stars_str, "si_hua": facts["si_hua"],
+                           "si_hua_variants": facts["si_hua_variants"], "si_hua_note": facts["si_hua_note"]},
+                "rule_ids": ["ZW-STARS-001", "ZW-SIHUA-001", "ZW-SIHUA-002"],
             },
             {
                 "sequence": 5,

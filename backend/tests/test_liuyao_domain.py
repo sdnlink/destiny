@@ -199,13 +199,18 @@ def test_personalized_auto_cast_is_replayable_and_uses_coin_rounds():
 def test_trace_and_rules_are_complete_without_judgements():
     result = coin_cast([[3, 2, 2]] * 6, **CALENDAR)
     # 6 条投币 + 装卦 4 步 + 月破日破 1 步 + 变卦纳甲 1 步 + 合局 1 步 + 伏神 1 步
-    assert len(result["calculation_trace"]) == 16
+    # + 出伏条件 1 步 + 刑害 1 步 + 三合成局评估 1 步
+    assert len(result["calculation_trace"]) == 19
     assert any("month break" in line for line in result["calculation_trace"])
     assert any("advance or retreat" in line for line in result["calculation_trace"])
     assert any("sanhe" in line for line in result["calculation_trace"])
     assert any("pure hexagram" in line for line in result["calculation_trace"])
-    assert [step["sequence"] for step in result["steps"]] == [1, 2, 3, 4, 5]
+    assert any("emerge blockers" in line for line in result["calculation_trace"])
+    assert any("punishment/harm" in line for line in result["calculation_trace"])
+    assert any("assess sanhe completion" in line for line in result["calculation_trace"])
+    assert [step["sequence"] for step in result["steps"]] == [1, 2, 3, 4, 5, 6]
     assert result["steps"][0]["rule_ids"] == ["LY-COINS-001", "LY-LINES-001"]
     assert result["steps"][3]["rule_ids"] == ["LY-HIDDEN-FLYING-001"]
     assert result["steps"][4]["rule_ids"] == ["LY-BRANCHSTRUCT-001"]
+    assert result["steps"][5]["rule_ids"] == ["LY-XINGHAI-001", "LY-SANHE-COND-001"]
     assert result["judgements"] == []

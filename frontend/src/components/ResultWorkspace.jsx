@@ -930,6 +930,34 @@ function LiuyaoView({ result }) {
         </div>
         <Steps steps={result.steps} />
       </section>
+
+      {(result.evidence || []).length > 0 && (
+        <section className="data-band classics-evidence-band">
+          <div className="band-heading">
+            <div>
+              <span className="band-icon"><BookOpen size={16} /></span>
+              <div>
+                <h3>典籍依据</h3>
+                <p>结论相关原文出自本地维基文库存档，点击链接可逐条校对</p>
+              </div>
+            </div>
+          </div>
+          <div className="evidence-list">
+            {result.evidence.map((item) => (
+              <div key={item.classic_id} className="evidence-item">
+                <div className="evidence-meta">
+                  <b>《{item.title}》</b>
+                  <span>第 {item.chunk_index + 1} 段 · {item.license_name || "公开许可"}</span>
+                  {item.source_url && (
+                    <a href={item.source_url} target="_blank" rel="noreferrer">原文来源</a>
+                  )}
+                </div>
+                <p className="evidence-text">{item.excerpt}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

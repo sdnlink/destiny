@@ -151,6 +151,34 @@
           "version": "1.0.0"
         },
         {
+          "rule_id": "LY-YONGSHEN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-XINGHAI-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-SANHE-COND-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ZW-SIHUA-002",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "FS-BAZHAI-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "FS-XUANKONG-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "CLS-CORPUS-001",
+          "version": "1.0.0"
+        },
+        {
           "rule_id": "LR-MONTH-GENERAL-001",
           "version": "1.0.0"
         },
@@ -3014,6 +3042,263 @@
       "owner": "unassigned",
       "reviewers": [],
       "implementation": "app.workflow.steps:_calculate_timing"
+    },
+    {
+      "rule_id": "LY-YONGSHEN-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "用神候选与元神忌神仇神",
+      "purpose": "按所问事项给出用神候选（本卦爻、伏神、变爻）与元忌仇三神爻位，按动>静、旺>衰、不空破>空破排序，不断吉凶",
+      "preconditions": [
+        "六爻盘面已生成",
+        "请求提供 focus（所问事项）"
+      ],
+      "inputs": [
+        "focus",
+        "line_chart",
+        "changed_line_chart",
+        "hidden_flying_spirits"
+      ],
+      "procedure": [
+        "按用神取法表映射 focus 到六亲或世爻",
+        "收集本卦爻、伏神、变爻中符合目标的候选",
+        "候选按动静旺衰空破打分排序",
+        "按五行生克反查元神忌神仇神对应六亲与本卦爻位"
+      ],
+      "outputs": [
+        "yongshen.candidates",
+        "yongshen.yuan_shen",
+        "yongshen.ji_shen",
+        "yongshen.chou_shen"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus（增删卜易·用神元神忌神仇神章）"
+      ],
+      "limitations": [
+        "取舍排序为候选整理，吉凶须人工复核",
+        "用神多现取舍诸本一致，取动取旺为通行口径"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.advanced:analyze_yongshen"
+    },
+    {
+      "rule_id": "LY-XINGHAI-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六爻刑害组合",
+      "purpose": "列出动爻与月建日辰之间齐备的三刑、自刑、六害组合，仅列组合事实",
+      "preconditions": [
+        "六爻盘面已生成",
+        "历法月建与日辰已确定"
+      ],
+      "inputs": [
+        "moving_branches",
+        "month_branch",
+        "day_branch"
+      ],
+      "procedure": [
+        "三刑表：寅巳申、丑戌未两两成刑，子卯无礼之刑，辰午酉亥自刑",
+        "六害表：子未、丑午、寅巳、卯辰、申亥、酉戌"
+      ],
+      "outputs": [
+        "punishments_harms.marks"
+      ],
+      "source_refs": [
+        "通行地支组合表"
+      ],
+      "limitations": [
+        "不判刑害轻重与吉凶"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.advanced:punishments_harms"
+    },
+    {
+      "rule_id": "LY-SANHE-COND-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "三合局成局条件评估",
+      "purpose": "按增删卜易三合局章口径评估成局条件：全动成局、待补凑（虚待用）、空破待填、入墓待冲开",
+      "preconditions": [
+        "branch_structures.sanhe 已生成"
+      ],
+      "inputs": [
+        "branch_structures.sanhe",
+        "line_chart"
+      ],
+      "procedure": [
+        "统计成员中动爻（含暗动）数量",
+        "三爻全动且无空破入墓为成局",
+        "含静爻或日月支者列为待补凑并逐支注明",
+        "动爻空破注明待填实，局墓注明待冲开"
+      ],
+      "outputs": [
+        "branch_structures.sanhe_assessment"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus（增删卜易·三合局章）"
+      ],
+      "limitations": [
+        "只评估成局条件，不判局之吉凶"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.advanced:assess_sanhe_conditions"
+    },
+    {
+      "rule_id": "ZW-SIHUA-002",
+      "version": "1.0.0",
+      "system": "ziwei",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "四化多底本输出",
+      "purpose": "四化表庚壬两干化科存在版本分歧，同时输出全书通行本与通行别本（化科天府）两套变体并标注分歧",
+      "preconditions": [
+        "生年干已确定"
+      ],
+      "inputs": [
+        "year_stem"
+      ],
+      "procedure": [
+        "底本A：紫微斗数全书通行本",
+        "底本B：通行别本，庚壬化科取天府",
+        "两本一致时说明一致，分歧时全部输出供取用"
+      ],
+      "outputs": [
+        "si_hua_variants",
+        "si_hua_note"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus（紫微斗数全书）"
+      ],
+      "limitations": [
+        "底本B标注为通行别本，未指定具体派别，底本选择由使用者决定",
+        "分歧只出现在化科，禄权忌诸本一致"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.ziwei.rules:SIHUA_VARIANTS"
+    },
+    {
+      "rule_id": "FS-BAZHAI-001",
+      "version": "1.0.0",
+      "system": "fengshui",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "八宅大游年九星与命卦配宅",
+      "purpose": "按坐山卦排大游年九星方位事实，按生年排命卦并给出东西四宅命匹配",
+      "preconditions": [
+        "坐山二十四山已确定"
+      ],
+      "inputs": [
+        "sitting_mountain",
+        "birth_year",
+        "gender"
+      ],
+      "procedure": [
+        "大游年歌（通行传本）从宅卦之后按后天循环排七方九星，本位伏位",
+        "东四宅（坎离震巽）、西四宅（乾坤艮兑）分类",
+        "命卦按通行公式（男距百减、女减四起，逢五男寄坤女寄艮）",
+        "宅命同组为通行配法，吉方取与命同组之吉星方位"
+      ],
+      "outputs": [
+        "facts.directions",
+        "facts.life_match"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus（宅经）；八宅明镜、阳宅三要未入语料（见待补清单）"
+      ],
+      "limitations": [
+        "大游年歌为通行传本，各派文字一致",
+        "不含流年断语与吉凶判断"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.fengshui.bazhai:calculate_bazhai"
+    },
+    {
+      "rule_id": "FS-XUANKONG-001",
+      "version": "1.0.0",
+      "system": "fengshui",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "玄空下卦挨星与格局条件",
+      "purpose": "按三元九运与二十四山下卦挨星排运盘山盘向盘，判定旺山旺向、上山下水、双星到坐到向条件，并按实测角度判替卦区间",
+      "preconditions": [
+        "坐山二十四山已确定",
+        "运别由年份或显式给出"
+      ],
+      "inputs": [
+        "sitting_mountain",
+        "year",
+        "period",
+        "sitting_degree"
+      ],
+      "procedure": [
+        "三元九运按通行划分（一运1864起，九运2024-2043）",
+        "运星入中按洛书轨迹顺飞，山向星按坐向三元龙阴阳定顺逆",
+        "旺山旺向：山星当运到坐且向星当运到向",
+        "上山下水：山星当运到向且向星当运到坐",
+        "每山两侧三度起替；替卦起星表原文未入库，不提供替卦盘"
+      ],
+      "outputs": [
+        "facts.grid",
+        "facts.conditions",
+        "facts.ti_pu"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus（地理辨正、青囊经）；沈氏玄空学未入语料（见待补清单）"
+      ],
+      "limitations": [
+        "替卦未实现，落替区间时提示复测或人工起盘",
+        "格局条件为确定性判定，不含吉凶断语"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.fengshui.xuankong:calculate_xuankong"
+    },
+    {
+      "rule_id": "CLS-CORPUS-001",
+      "version": "1.0.0",
+      "system": "shared",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "本地典籍库引用",
+      "purpose": "引擎结论的证据字段从本地维基文库存档检索原文段落，保证每个派生结论有可校对的典籍依据",
+      "preconditions": [
+        "data/generated/wikisource-corpus 语料已生成"
+      ],
+      "inputs": [
+        "检索关键词",
+        "领域分类"
+      ],
+      "procedure": [
+        "加载 corpus_documents.jsonl 与 corpus_chunks.jsonl 索引",
+        "按关键词与分类检索段落，命中次数排序",
+        "返回 classic_id、标题、摘录、来源链接与许可信息",
+        "语料缺失时返回空列表并在结果中注明"
+      ],
+      "outputs": [
+        "evidence"
+      ],
+      "source_refs": [
+        "data/sources/wikisource-books.json",
+        "scripts/cache_wikisource_texts.py"
+      ],
+      "limitations": [
+        "只收录公开许可文本（维基文库 CC BY-SA 与公有领域）",
+        "八宅明镜、阳宅十书、沈氏玄空学暂缺，见 sourcing-backlog"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.common.classics:ClassicsLibrary"
     }
   ]
 }

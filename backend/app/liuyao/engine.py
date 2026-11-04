@@ -299,6 +299,19 @@ def _decorate(hexagrams, day_pillar, month_branch):
     return palace, xun, lines
 
 
+def _classic_evidence(queries, category="liuyao", limit=6):
+    """从本地典籍库检索原文依据；语料缺失时静默返回空列表。"""
+    try:
+        from app.common.classics import get_library
+
+        library = get_library()
+        if not library.available:
+            return []
+        return library.evidence(queries, category=category, limit=limit)
+    except Exception:
+        return []
+
+
 def _line_bits(line_values):
     request = SixLineInput(tuple(line_values))
     bits = tuple(1 if value in (7, 9) else 0 for value in request.lines)
@@ -306,7 +319,7 @@ def _line_bits(line_values):
     return request, bits, moving_lines
 
 
-def _result(hexagrams, calendar, method, method_facts, method_step, calculation_trace):
+def _result(hexagrams, calendar, method, method_facts, method_step, calculation_trace, focus=None):
     day_pillar = calendar["pillars"]["day"]
     palace, xun, lines = _decorate(hexagrams, day_pillar, calendar["month_branch"]["name"])
     line_values = method_facts.get("input_lines") or [
@@ -333,6 +346,16 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
     moving_branches = [line["najia_branch"] for line in lines if line["is_moving"]]
     structures = _branch_structures(moving_branches, calendar["month_branch"]["name"], day_pillar[1])
     coverage = _hidden_flying_spirits(lines, palace)
+
+    from . import advanced
+
+    month_name = calendar["month_branch"]["name"]
+    month_element = BRANCH_ELEMENTS.get(month_name, "")
+    advanced.annotate_hidden_emerge(coverage, lines, month_name, day_pillar[1], month_element)
+    structures["sanhe_assessment"] = advanced.assess_sanhe_conditions(structures, lines)
+    punishments = advanced.punishments_harms(lines, moving_branches, month_name, day_pillar[1])
+    yongshen = advanced.analyze_yongshen(focus, lines, changed_lines, coverage, palace) if focus else None
+    evidence = _classic_evidence(["用神", "元神", "三合局", "伏神", "月破"])
     return {
         "schema_version": "2.0",
         "system": "liuyao",
@@ -354,7 +377,9 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
             "line_chart": lines,
             "changed_line_chart": changed_lines,
             "branch_structures": structures,
+            "punishments_harms": punishments,
             "hidden_flying_spirits": coverage,
+            "yongshen": yongshen,
         },
         "calculation_trace": calculation_trace + [
             "map original hexagram to {} palace {}".format(palace["name"], palace["stage"]),
@@ -370,7 +395,26 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
             "fill missing relatives from {} palace pure hexagram: {}".format(
                 palace["name"], "、".join(item["six_relative"] for item in coverage["hidden_spirits"]) or "无缺"
             ),
-        ],
+            "annotate hidden spirit emerge blockers: {}".format(
+                "、".join(
+                    "{}({})".format(item["six_relative"],
+                                    "、".join(blocker["type"] for blocker in item["emerge_blockers"]) or "无碍")
+                    for item in coverage["hidden_spirits"]
+                ) or "无伏神"
+            ),
+            "mark {} punishment/harm combinations among moving lines, month and day".format(len(punishments["marks"])),
+            "assess sanhe completion: {}".format(
+                "、".join("{}{}".format(item["element"], item["status"]) for item in structures["sanhe_assessment"])
+                or "无三合局"
+            ),
+        ] + ([
+            "collect yongshen candidates for focus {}: {}".format(
+                focus, "、".join(
+                    "{}第{}爻{}".format(item["source"], item["position"], item["branch"])
+                    for item in yongshen["candidates"]
+                ) or "无候选"
+            ),
+        ] if yongshen else []),
         "steps": [
             method_step,
             {
@@ -405,17 +449,33 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
                 "output": structures,
                 "rule_ids": ["LY-BRANCHSTRUCT-001"],
             },
-        ],
-        "evidence": [],
+            {
+                "sequence": 6, "operation": "mark_punishments_harms_and_sanhe_conditions",
+                "inputs": {"moving_branches": moving_branches,
+                           "month_branch": month_name, "day_branch": day_pillar[1]},
+                "output": {"punishments_harms": punishments,
+                           "sanhe_assessment": structures["sanhe_assessment"]},
+                "rule_ids": ["LY-XINGHAI-001", "LY-SANHE-COND-001"],
+            },
+        ] + ([
+            {
+                "sequence": 7, "operation": "collect_yongshen_candidates",
+                "inputs": {"focus": focus, "targets": yongshen["targets"]},
+                "output": yongshen,
+                "rule_ids": ["LY-YONGSHEN-001"],
+            },
+        ] if yongshen else []),
+        "evidence": evidence,
         "judgements": [],
         "warnings": [
-            "六爻纳甲采用京房八宫工程基线，月建日辰旺衰和事项断语尚待专家规则与案例签署。",
-            "伏神按本宫首卦（八纯卦）同位纳甲六亲补缺推导，取法为标准工程基线，断语仍待案例签署。",
+            "六爻纳甲采用京房八宫工程基线；旺衰、空破、刑害、合局均为确定性推导，evidence 字段挂《增删卜易》等典籍原文。",
+            "伏神按本宫首卦（八纯卦）同位纳甲六亲补缺推导；出伏条件（空破、日月克伤）按《增删卜易》伏神章口径标注。",
+            "用神候选与取舍排序仅为候选整理，吉凶判断须结合问事语境人工复核。",
         ],
     }
 
 
-def line_cast(lines, local_datetime, timezone, longitude=None, use_true_solar_time=False):
+def line_cast(lines, local_datetime, timezone, longitude=None, use_true_solar_time=False, focus=None):
     request, bits, moving_lines = _line_bits(lines)
     calendar = calendar_analysis(local_datetime, timezone, longitude, use_true_solar_time)
     return _result(
@@ -440,13 +500,14 @@ def line_cast(lines, local_datetime, timezone, longitude=None, use_true_solar_ti
             "map 6/8 to yin, 7/9 to yang: {}".format(list(bits)),
             "mark 6 and 9 as moving lines: {}".format(moving_lines),
         ],
+        focus=focus,
     )
 
 
-def coin_cast(rounds, local_datetime, timezone, longitude=None, use_true_solar_time=False):
+def coin_cast(rounds, local_datetime, timezone, longitude=None, use_true_solar_time=False, focus=None):
     request = ThreeCoinInput(tuple(tuple(coins) for coins in rounds))
     line_values = request.line_values
-    result = line_cast(line_values, local_datetime, timezone, longitude, use_true_solar_time)
+    result = line_cast(line_values, local_datetime, timezone, longitude, use_true_solar_time, focus=focus)
     coin_rounds = [
         {"line": position, "coins": list(coins), "value": value}
         for position, (coins, value) in enumerate(zip(request.rounds, line_values), 1)
@@ -470,7 +531,7 @@ def coin_cast(rounds, local_datetime, timezone, longitude=None, use_true_solar_t
     return result
 
 
-def number_cast(lower_number, upper_number, local_datetime, timezone, longitude=None, use_true_solar_time=False):
+def number_cast(lower_number, upper_number, local_datetime, timezone, longitude=None, use_true_solar_time=False, focus=None):
     lower_source, upper_source = int(lower_number), int(upper_number)
     lower_index, upper_index = trigram_number(lower_source), trigram_number(upper_source)
     moving_line = moving_line_number(lower_source + upper_source)
@@ -484,10 +545,11 @@ def number_cast(lower_number, upper_number, local_datetime, timezone, longitude=
          "output": {"lower_trigram": lower_index, "upper_trigram": upper_index, "moving_line": moving_line},
          "rule_ids": ["LY-NUMBER-001"]},
         ["map two numbers to lower {}, upper {}, moving line {}".format(lower_index, upper_index, moving_line)],
+        focus=focus,
     )
 
 
-def time_cast(local_datetime, timezone, longitude=None, use_true_solar_time=False):
+def time_cast(local_datetime, timezone, longitude=None, use_true_solar_time=False, focus=None):
     calendar = calendar_analysis(local_datetime, timezone, longitude, use_true_solar_time)
     upper_source = calendar["year_branch"]["number"] + calendar["lunar"]["month"] + calendar["lunar"]["day"]
     lower_source = upper_source + calendar["time_branch"]["number"]
@@ -503,13 +565,14 @@ def time_cast(local_datetime, timezone, longitude=None, use_true_solar_time=Fals
          "output": {"upper_trigram": upper_index, "lower_trigram": lower_index, "moving_line": moving_line},
          "rule_ids": ["LY-TIME-001"]},
         ["calendar numbers -> upper {}, lower {}, moving line {}".format(upper_source, lower_source, moving_line)],
+        focus=focus,
     )
 
 
-def auto_cast(cast_nonce, local_datetime, timezone, longitude=None, use_true_solar_time=False):
+def auto_cast(cast_nonce, local_datetime, timezone, longitude=None, use_true_solar_time=False, focus=None):
     line_values, coin_rows = derive_coin_lines("liuyao-auto-coins-v1", cast_nonce)
     rounds = [row["coins"] for row in coin_rows]
-    result = coin_cast(rounds, local_datetime, timezone, longitude, use_true_solar_time)
+    result = coin_cast(rounds, local_datetime, timezone, longitude, use_true_solar_time, focus=focus)
     result["facts"]["method"] = "personalized_three_coin"
     result["facts"]["cast_nonce_hash"] = nonce_hash(cast_nonce)
     result["input"] = {"cast_nonce_hash": nonce_hash(cast_nonce), "local_datetime": local_datetime,

@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, conint, conlist, constr, validator
 
+from app.common.classics import get_library as get_classics_library
 from app.common.hashing import canonical_hash
 from app.core.advisory import CATEGORY_PROFILES, generate_advisory
 from app.calendar import calendar_analysis
@@ -29,6 +30,11 @@ from app.daliuren import number_cast as liuren_number_cast
 from app.daliuren import time_cast as liuren_time_cast
 from app.fengshui import analyze_measurements as fengshui_measurements
 from app.fengshui import calculate_direction as fengshui_direction
+from app.fengshui.bazhai import calculate_bazhai
+from app.fengshui.storage import (
+    delete_profile, get_profile, list_profiles, upsert_profile,
+)
+from app.fengshui.xuankong import calculate_xuankong
 from app.liuyao import auto_cast as liuyao_auto_cast
 from app.liuyao import number_cast as liuyao_number_cast
 from app.liuyao import coin_cast as liuyao_coin_cast
@@ -107,19 +113,27 @@ class MeihuaThreeNumberRequest(BaseModel):
     numbers: conlist(conint(strict=True), min_items=3, max_items=3)
 
 
-class LiuyaoNumberRequest(CalendarRequest):
+class LiuyaoCalendarRequest(CalendarRequest):
+    focus: Optional[str] = Field(None, example="求财买卖")
+
+
+class LiuyaoAutoRequest(AutoCastRequest):
+    focus: Optional[str] = Field(None, example="求财买卖")
+
+
+class LiuyaoNumberRequest(LiuyaoCalendarRequest):
     lower_number: int
     upper_number: int
 
 
-class LiuyaoLineRequest(CalendarRequest):
+class LiuyaoLineRequest(LiuyaoCalendarRequest):
     lines: conlist(conint(strict=True, ge=6, le=9), min_items=6, max_items=6)
 
 
 CoinRound = conlist(conint(strict=True, ge=2, le=3), min_items=3, max_items=3)
 
 
-class LiuyaoCoinRequest(CalendarRequest):
+class LiuyaoCoinRequest(LiuyaoCalendarRequest):
     coins: conlist(CoinRound, min_items=6, max_items=6)
 
 
@@ -547,6 +561,35 @@ def rules(system: Optional[str] = None, status: Optional[str] = None):
     }
 
 
+@app.get("/v1/classics/status")
+def classics_status():
+    """本地典籍库状态：收录书目、字符量与待补来源清单。"""
+    library = get_classics_library()
+    if not library.available:
+        return {"data": {"available": False, "corpus_dir": str(library.corpus_dir)}}
+    status = library.status()
+    status["available"] = True
+    return {"data": status}
+
+
+@app.get("/v1/classics/search")
+def classics_search(
+    q: str,
+    category: Optional[str] = None,
+    title: Optional[str] = None,
+    limit: int = 5,
+):
+    """按关键词检索本地典籍原文段落，作为结论依据。"""
+    limit = max(1, min(limit, 20))
+    library = get_classics_library()
+    if not library.available:
+        return {"data": [], "meta": {"available": False}}
+    return {
+        "data": library.search(q, category=category, title_query=title, limit=limit),
+        "meta": {"available": True, "query": q},
+    }
+
+
 @app.get("/v1/validation-cases")
 def validation_cases(system: Optional[str] = None):
     document = load_validation_cases()
@@ -620,12 +663,12 @@ def cast_meihua_three_numbers(request: MeihuaThreeNumberRequest):
 
 
 @app.post("/v1/liuyao/time")
-def cast_liuyao_time(request: CalendarRequest):
+def cast_liuyao_time(request: LiuyaoCalendarRequest):
     return {"data": liuyao_time_cast(**request.dict())}
 
 
 @app.post("/v1/liuyao/auto")
-def cast_liuyao_auto(request: AutoCastRequest):
+def cast_liuyao_auto(request: LiuyaoAutoRequest):
     return {"data": liuyao_auto_cast(**request.dict())}
 
 
@@ -696,6 +739,103 @@ def cast_qimen_time(request: CalendarRequest):
 @app.post("/v1/qimen/auto")
 def cast_qimen_auto(request: AutoCastRequest):
     return {"data": qimen_auto_cast(**request.dict())}
+
+
+class BazhaiRequest(BaseModel):
+    sitting_mountain: str = Field(..., example="午")
+    birth_year: Optional[int] = Field(None, ge=1864, le=2100)
+    gender: str = Field("男", example="男")
+
+
+class XuankongRequest(BaseModel):
+    sitting_mountain: str = Field(..., example="午")
+    year: Optional[int] = Field(None, ge=1864, le=2100)
+    period: Optional[int] = Field(None, ge=1, le=9)
+    sitting_degree: Optional[float] = Field(None, ge=0, le=360)
+
+
+class FengshuiProfileRequest(BaseModel):
+    tenant_id: str = Field(..., example="tenant-a")
+    building_id: str = Field(..., example="building-001")
+    profile: dict
+
+
+class FengshuiProfileQuery(BaseModel):
+    tenant_id: str = Field(..., example="tenant-a")
+
+
+@app.get("/v1/fengshui/bazhai")
+def fengshui_bazhai(
+    sitting_mountain: str,
+    birth_year: Optional[int] = None,
+    gender: str = "男",
+):
+    return {"data": calculate_bazhai(sitting_mountain, birth_year=birth_year, gender=gender)}
+
+
+@app.post("/v1/fengshui/bazhai")
+def fengshui_bazhai_post(request: BazhaiRequest):
+    return {"data": calculate_bazhai(request.sitting_mountain, birth_year=request.birth_year, gender=request.gender)}
+
+
+@app.get("/v1/fengshui/xuankong")
+def fengshui_xuankong(
+    sitting_mountain: str,
+    year: Optional[int] = None,
+    period: Optional[int] = None,
+    sitting_degree: Optional[float] = None,
+):
+    return {"data": calculate_xuankong(sitting_mountain, year=year, period=period, sitting_degree=sitting_degree)}
+
+
+@app.post("/v1/fengshui/xuankong")
+def fengshui_xuankong_post(request: XuankongRequest):
+    return {"data": calculate_xuankong(
+        request.sitting_mountain, year=request.year, period=request.period,
+        sitting_degree=request.sitting_degree,
+    )}
+
+
+@app.get("/v1/fengshui/buildings")
+def fengshui_profiles(tenant_id: str):
+    try:
+        rows = list_profiles(tenant_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {"data": rows, "meta": {"tenant_id": tenant_id, "count": len(rows)}}
+
+
+@app.get("/v1/fengshui/buildings/{building_id}")
+def fengshui_profile_detail(building_id: str, tenant_id: str):
+    try:
+        row = get_profile(tenant_id, building_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    if row is None:
+        raise HTTPException(status_code=404, detail="building profile not found")
+    return {"data": row}
+
+
+@app.post("/v1/fengshui/buildings")
+def fengshui_profile_upsert(request: FengshuiProfileRequest):
+    try:
+        row = upsert_profile(request.tenant_id, request.building_id, request.profile)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    return {"data": row}
+
+
+@app.delete("/v1/fengshui/buildings/{building_id}")
+def fengshui_profile_delete(building_id: str, tenant_id: str):
+    try:
+        deleted = delete_profile(tenant_id, building_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    if not deleted:
+        raise HTTPException(status_code=404, detail="building profile not found")
+    return {"data": {"deleted": True, "tenant_id": tenant_id, "building_id": building_id}}
 
 
 @app.post("/v1/fengshui/direction")

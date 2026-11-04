@@ -139,3 +139,35 @@
 验证：后端 **631 passed / 10 skipped / 0 failed**；前端 **45 passed**；`npm run build` 通过。
 
 本轮明确不做（不可仅靠计算解决）：六爻用神旺衰断语、伏神空破、三合局与刑害合成、紫微四化飞星、八宅与玄空飞星（流派口径未签）、风水房屋档案（需持久化与合规设计）。
+
+## 第四轮补强（2026-11-04）：多底本计算 + 典籍依据 + 风水档案
+
+针对"不同流派取法全部计算、以历史典籍为依据、缺典籍从公开渠道补"的要求：
+
+| 结论 | 多底本/依据 | 落地位置 | 规则 |
+| --- | --- | --- | --- |
+| 本地典籍库 | 维基文库存档 53 部（增删卜易、卜筮正宗、宅经、地理辨正、青囊经、紫微斗数、三命通会、滴天髓阐微等），新增《紫微斗数全书》书目并增量抓取；引擎 evidence 字段按关键词检索原文段落（classic_id/摘录/来源链接/许可） | `app/common/classics.py`，端点 `/v1/classics/search`、`/v1/classics/status` | CLS-CORPUS-001 |
+| 六爻用神候选与元忌仇 | 用神定义引《增删卜易·用神元神忌神仇神章》原文；候选（本卦/伏神/变爻）按动>静、旺>衰、不空破>空破排序，不断吉凶 | `app/liuyao/advanced.py`，请求参数 `focus` | LY-YONGSHEN-001 |
+| 六爻伏神空破出伏 | 伏神空、破、受日月克伤不得出；冲空、暗动、填实反主引出（增删卜易·伏神章口径） | 同上，hidden_spirits 增加 emerge_blockers/can_emerge | 并入 LY-HIDDEN-FLYING-001 输出 |
+| 六爻三合成局条件 | 全动成局、待补凑（虚待用）、空破待填、入墓待冲开（增删卜易·三合局章原文在库） | `app/liuyao/advanced.py` | LY-SANHE-COND-001 |
+| 六爻刑害 | 三刑/自刑/六害通行地支表，动爻与日月齐备组合 | 同上 | LY-XINGHAI-001 |
+| 紫微四化多底本 | 庚壬两干化科分歧：全书通行本 vs 通行别本（化科天府），两套变体同时输出并标注 | `app/ziwei/rules.py` SIHUA_VARIANTS | ZW-SIHUA-002 |
+| 八宅大游年 | 大游年歌通行传本（各派一致），命卦通行公式，宅命东西四配法；理论依据引语料《宅经》 | `app/fengshui/bazhai.py`，端点 `/v1/fengshui/bazhai` | FS-BAZHAI-001 |
+| 玄空飞星 | 三元九运 + 二十四山下卦挨星（蒋氏《地理辨正》传承，语料在库）；旺山旺向/上山下水/双星条件判定；替卦区间按实测角度判定但替卦盘未提供 | `app/fengshui/xuankong.py`，端点 `/v1/fengshui/xuankong` | FS-XUANKONG-001 |
+| 风水房屋档案 | 文件后端（默认，租户子目录隔离）+ PostgreSQL 后端（FENGSHUI_STORAGE=postgres，DDL 见 scripts/sql/fengshui_building_profiles.sql）；owner_consent 强制、不含身份信息 | `app/fengshui/storage.py`，端点 `/v1/fengshui/buildings` | 并入 FS-BAZHAI-001 存档 |
+
+### 典籍来源与待补清单
+
+- 已入库（公开许可）：`data/generated/wikisource-corpus/`，53 部；
+- 《紫微斗數全書》已列入抓取清单（manifest），2026-11-04 抓取遭维基文库限流（HTTP 429）中断，
+  待限流解除后重跑 `scripts/cache_wikisource_texts.py` 即可入库；期间 `/v1/classics/status`
+  的 `manifest_not_stored` 字段如实展示该缺口，四化多底本在语料入库前以底本表本身为依据；
+- 维基文库确认缺失、待另寻公版来源：`八宅明镜`、`陽宅十書`、`沈氏玄空學`（记录在 `app/common/classics.py` SOURCING_BACKLOG 与 `/v1/classics/status`）；
+- `卜筮正宗` 现有抓取不完整（467 字符），列入待重抓；
+- 所有引用均带 wikisource 来源链接与许可信息，便于逐条校对。
+
+### 诚实边界（仍然不做）
+
+1. 六爻吉凶断语仍不生成——用神候选给出的是"候选+排序+典籍原文"，最终判断留给人；
+2. 玄空替卦盘未提供——起星表原文未入库，宁可标注缺失不杜撰；
+3. 四化别本仅收录可查证的庚壬化科分歧，其余诸干诸本一致，不虚构更多"派别"。

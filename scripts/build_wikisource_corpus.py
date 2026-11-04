@@ -16,7 +16,7 @@ BUILDER_VERSION = "wikisource-builder-1.0.0"
 DOMAIN_NAMES = {
     "zhouyi": "周易经传", "xiangshu": "象数", "meihua": "梅花易数", "liuyao": "六爻",
     "liuren": "大六壬", "qimen": "奇门遁甲", "mingli": "命理", "xiangshu_ming": "相术",
-    "yangzhai": "阳宅", "kanyu": "堪舆",
+    "yangzhai": "阳宅", "kanyu": "堪舆", "ziwei": "紫微斗数",
 }
 DOMAIN_TERMS = [
     "周易", "易傳", "八卦", "六十四卦", "陰陽", "五行", "河圖", "洛書", "元會運世",
