@@ -58,7 +58,7 @@ class ZiweiTests(unittest.TestCase):
         cast = time_cast("2026-08-15T16:00:00", gender="女")
         self.assertEqual(cast["status"], "deterministic_derivation_complete")
         self.assertEqual(cast["engine_version"], "ziwei-engine-1.0.0")
-        self.assertEqual(len(cast["steps"]), 4)
+        self.assertEqual(len(cast["steps"]), 5)
         self.assertIn("ZW-STARS-001", cast["rule_ids"])
         self.assertIn("palaces_by_branch", cast["facts"])
 

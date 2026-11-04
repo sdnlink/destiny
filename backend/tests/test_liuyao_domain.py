@@ -111,6 +111,36 @@ def test_pure_hexagram_has_no_missing_relatives():
     assert len(coverage["present_relatives"]) == 5
 
 
+def test_branch_structures_need_all_members_from_pool():
+    from app.liuyao.engine import _branch_structures
+
+    # 动爻子、申 + 月建辰 + 日辰子 → 申子辰水局齐备
+    result = _branch_structures(["子", "申"], "辰", "子")
+    assert len(result["sanhe"]) == 1
+    structure = result["sanhe"][0]
+    assert structure["element"] == "水"
+    assert structure["branches"] == ["申", "子", "辰"]
+    sources = {item["branch"]: item["sources"] for item in structure["members"]}
+    assert sources["申"] == ["动爻"]
+    assert sources["辰"] == ["月建"]
+    assert sources["子"] == ["动爻", "日辰"]
+    # 池内没有六合对时为空
+    assert result["liuhe"] == []
+
+    # 动爻丑 + 月建子 + 日辰午 → 子丑六合，不成三合局
+    result2 = _branch_structures(["丑"], "子", "午")
+    assert result2["sanhe"] == []
+    assert len(result2["liuhe"]) == 1
+    pair = result2["liuhe"][0]
+    assert pair["branches"] == ["丑", "子"]
+    pair_sources = {item["branch"]: item["sources"] for item in pair["members"]}
+    assert pair_sources["子"] == ["月建"]
+    assert pair_sources["丑"] == ["动爻"]
+
+    # 只有部分成员时不成局
+    assert _branch_structures(["子"], "申", "午")["sanhe"] == []
+
+
 def test_changed_hexagram_gets_najia_and_advance_retreat_flags():
     from app.common.ganzhi import BRANCH_ELEMENTS
     from app.liuyao.engine import ADVANCE_BRANCH, RETREAT_BRANCH, _advance_retreat
@@ -168,12 +198,14 @@ def test_personalized_auto_cast_is_replayable_and_uses_coin_rounds():
 
 def test_trace_and_rules_are_complete_without_judgements():
     result = coin_cast([[3, 2, 2]] * 6, **CALENDAR)
-    # 6 条投币 + 装卦 4 步 + 月破日破 1 步 + 变卦纳甲 1 步 + 伏神 1 步
-    assert len(result["calculation_trace"]) == 15
+    # 6 条投币 + 装卦 4 步 + 月破日破 1 步 + 变卦纳甲 1 步 + 合局 1 步 + 伏神 1 步
+    assert len(result["calculation_trace"]) == 16
     assert any("month break" in line for line in result["calculation_trace"])
     assert any("advance or retreat" in line for line in result["calculation_trace"])
+    assert any("sanhe" in line for line in result["calculation_trace"])
     assert any("pure hexagram" in line for line in result["calculation_trace"])
-    assert [step["sequence"] for step in result["steps"]] == [1, 2, 3, 4]
+    assert [step["sequence"] for step in result["steps"]] == [1, 2, 3, 4, 5]
     assert result["steps"][0]["rule_ids"] == ["LY-COINS-001", "LY-LINES-001"]
     assert result["steps"][3]["rule_ids"] == ["LY-HIDDEN-FLYING-001"]
+    assert result["steps"][4]["rule_ids"] == ["LY-BRANCHSTRUCT-001"]
     assert result["judgements"] == []

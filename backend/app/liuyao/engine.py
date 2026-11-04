@@ -2,7 +2,8 @@ from app.calendar import calendar_analysis
 from app.common.casting import derive_coin_lines, nonce_hash
 from app.common.five_elements import FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES
 from app.common.ganzhi import (
-    BRANCH_CLASH, BRANCH_COMBINE, BRANCH_ELEMENTS, EARTHLY_BRANCHES, xun_info,
+    BRANCH_CLASH, BRANCH_COMBINE, BRANCH_ELEMENTS, BRANCH_TRIPLE,
+    EARTHLY_BRANCHES, xun_info,
 )
 from app.common.serialization import derive_hexagram_facts
 from app.common.trigrams import get_trigram_by_number, trigram_to_bits
@@ -143,6 +144,44 @@ def _decorate_changed(hexagrams, palace):
         }
         for index, (stem, branch) in enumerate(zip(stems, branches), 1)
     ]
+
+
+def _branch_structures(moving_branches, month_branch, day_branch):
+    """动爻与月建、日辰之间可确定判定的三合局与六合。
+
+    三合局要求三支齐备且每一支都来自动爻或月建日辰；
+    六合取池内任意两支成六合者，来源写明月建/日辰/动爻。
+    """
+    pool = {}
+    for branch in moving_branches:
+        pool.setdefault(branch, []).append("动爻")
+    for branch, source in ((month_branch, "月建"), (day_branch, "日辰")):
+        if branch in BRANCH_ELEMENTS:
+            pool.setdefault(branch, []).append(source)
+    sanhe = []
+    for group, element in BRANCH_TRIPLE.items():
+        members = [
+            {"branch": branch, "sources": sorted(set(pool[branch]))}
+            for branch in group if branch in pool
+        ]
+        if len(members) == 3:
+            sanhe.append({"branches": list(group), "element": element, "members": members})
+    liuhe = []
+    seen = set()
+    for first in BRANCH_ELEMENTS:
+        second = BRANCH_COMBINE[first]
+        key = tuple(sorted((first, second)))
+        if key in seen or first not in pool or second not in pool:
+            continue
+        seen.add(key)
+        liuhe.append({
+            "branches": sorted((first, second)),
+            "members": [
+                {"branch": branch, "sources": sorted(set(pool[branch]))}
+                for branch in sorted((first, second))
+            ],
+        })
+    return {"sanhe": sanhe, "liuhe": liuhe}
 
 
 def _flying_hidden_relation(flying_element, hidden_element):
@@ -291,6 +330,8 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
             _advance_retreat(line["najia_branch"], changed_line["najia_branch"])
             if line["is_moving"] else ""
         )
+    moving_branches = [line["najia_branch"] for line in lines if line["is_moving"]]
+    structures = _branch_structures(moving_branches, calendar["month_branch"]["name"], day_pillar[1])
     coverage = _hidden_flying_spirits(lines, palace)
     return {
         "schema_version": "2.0",
@@ -312,6 +353,7 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
             "xun": xun,
             "line_chart": lines,
             "changed_line_chart": changed_lines,
+            "branch_structures": structures,
             "hidden_flying_spirits": coverage,
         },
         "calculation_trace": calculation_trace + [
@@ -321,6 +363,10 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
             "derive {} and empty branches {}".format(xun["name"], "、".join(xun["empty_branches"])),
             "mark month break, day clash, dark move and day break per line",
             "decorate changed hexagram with Na Jia and mark advance or retreat branches",
+            "collect sanhe and liuhe among moving lines, month and day: {}".format(
+                "、".join("{}局".format(item["element"]) for item in structures["sanhe"])
+                or "无三合局"
+            ),
             "fill missing relatives from {} palace pure hexagram: {}".format(
                 palace["name"], "、".join(item["six_relative"] for item in coverage["hidden_spirits"]) or "无缺"
             ),
@@ -348,6 +394,16 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
                 "inputs": {"palace": palace["name"], "line_relatives": [line["six_relative"] for line in lines]},
                 "output": coverage,
                 "rule_ids": ["LY-HIDDEN-FLYING-001"],
+            },
+            {
+                "sequence": 5, "operation": "collect_branch_structures",
+                "inputs": {
+                    "moving_branches": moving_branches,
+                    "month_branch": calendar["month_branch"]["name"],
+                    "day_branch": day_pillar[1],
+                },
+                "output": structures,
+                "rule_ids": ["LY-BRANCHSTRUCT-001"],
             },
         ],
         "evidence": [],

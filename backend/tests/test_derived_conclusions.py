@@ -16,6 +16,7 @@ from app.common.ganzhi import EARTHLY_BRANCHES, triple_group_of
 from app.qimen.engine import calculate_qimen_chart
 from app.qimen.rules import HORSE_STAR, PALACE_BRANCHES
 from app.ziwei.engine import calculate_ziwei_chart
+from app.ziwei.rules import XIAN_CHI_TABLE
 
 
 MOMENT = "2026-08-15T16:00:00"
@@ -79,6 +80,32 @@ class ZiweiDerivedConclusionTests(unittest.TestCase):
         for palace in self.palaces:
             self.assertEqual(palace["san_fang_branches"].count(palace["earthly_branch"]), 1)
             self.assertEqual(len(set(palace["si_zheng_branches"])), 4)
+
+
+class ZiweiMinorStarTests(unittest.TestCase):
+    def setUp(self):
+        self.result = calculate_ziwei_chart(MOMENT, TIMEZONE, "男")
+        self.star_branch = {}
+        for palace in self.result["palaces_by_branch"]:
+            for star in palace["minor_stars"]:
+                self.star_branch[star["name"]] = palace["earthly_branch"]
+        self.year_branch = self.result["four_pillars"]["year"][1]
+        self.lunar_month = abs(self.result["lunar_calendar"]["lunar_month"])
+
+    def test_five_minor_stars_follow_standard_formulas(self):
+        year_index = EARTHLY_BRANCHES.index(self.year_branch)
+        expected = {
+            "红鸾": EARTHLY_BRANCHES[(3 - year_index) % 12],
+            "天喜": EARTHLY_BRANCHES[(3 - year_index + 6) % 12],
+            "天刑": EARTHLY_BRANCHES[(9 + self.lunar_month - 1) % 12],
+            "天姚": EARTHLY_BRANCHES[(1 + self.lunar_month - 1) % 12],
+            "咸池": XIAN_CHI_TABLE[self.year_branch],
+        }
+        self.assertEqual(self.star_branch, expected)
+
+    def test_tianxi_is_opposite_palace_of_hongluan(self):
+        index = EARTHLY_BRANCHES.index(self.star_branch["红鸾"])
+        self.assertEqual(EARTHLY_BRANCHES[(index + 6) % 12], self.star_branch["天喜"])
 
 
 class BaziDerivedConclusionTests(unittest.TestCase):

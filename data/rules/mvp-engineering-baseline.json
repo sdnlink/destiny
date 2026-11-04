@@ -147,6 +147,10 @@
           "version": "1.0.0"
         },
         {
+          "rule_id": "LY-BRANCHSTRUCT-001",
+          "version": "1.0.0"
+        },
+        {
           "rule_id": "LR-MONTH-GENERAL-001",
           "version": "1.0.0"
         },
@@ -1517,12 +1521,48 @@
         "docs/design/decisions/011-liuyao-domain-phase-five.md"
       ],
       "limitations": [
-        "只做单爻旺衰，不合成三合局与刑害",
-        "不涉及变爻进退神"
+        "只做单爻旺衰，不合成三合局与刑害"
       ],
       "owner": "unassigned",
       "reviewers": [],
       "implementation": "app.liuyao.engine:_decorate"
+    },
+    {
+      "rule_id": "LY-BRANCHSTRUCT-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六爻合局组合推导",
+      "purpose": "从动爻、月建、日辰的爻支池中推导齐备的三合局与六合组合",
+      "preconditions": [
+        "六爻盘面已生成",
+        "历法月建与日辰已确定"
+      ],
+      "inputs": [
+        "moving_branches",
+        "month_branch",
+        "day_branch"
+      ],
+      "procedure": [
+        "以动爻、月建、日辰爻支构成组合池，来源逐支标注",
+        "三合局要求申子辰、亥卯未、寅午戌、巳酉丑三支齐备",
+        "六合取池内成六合的任意两支"
+      ],
+      "outputs": [
+        "branch_structures.sanhe",
+        "branch_structures.liuhe"
+      ],
+      "source_refs": [
+        "docs/design/decisions/011-liuyao-domain-phase-five.md"
+      ],
+      "limitations": [
+        "只判齐备组合，不做局之真假旺衰权衡",
+        "不处理刑害与半合"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:_branch_structures"
     },
     {
       "rule_id": "LR-MONTH-GENERAL-001",
@@ -2735,6 +2775,48 @@
       ],
       "limitations": [
         "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-MINOR-001",
+      "version": "1.0.0",
+      "system": "ziwei",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "紫微斗数杂曜安星",
+      "purpose": "按生年支与生月安红鸾、天喜、天刑、天姚、咸池五颗杂曜",
+      "preconditions": [
+        "生年支与农历生月已确定",
+        "十二宫已排布"
+      ],
+      "inputs": [
+        "year_branch",
+        "lunar_month"
+      ],
+      "procedure": [
+        "红鸾卯宫起子年逆数生年支",
+        "天喜取红鸾对宫",
+        "天刑酉宫起正月顺数生月",
+        "天姚丑宫起正月顺数生月",
+        "咸池按生年支三合局取（申子辰酉、寅午戌卯、巳酉丑午、亥卯未子）"
+      ],
+      "outputs": [
+        "hongluan_branch",
+        "tianxi_branch",
+        "tianxing_branch",
+        "tianyao_branch",
+        "xianchi_branch",
+        "minor_stars"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md"
+      ],
+      "limitations": [
+        "闰月按月序本身处理，不另作调节",
+        "杂曜权重与吉凶断语待专家签署"
       ],
       "owner": "unassigned",
       "reviewers": [],

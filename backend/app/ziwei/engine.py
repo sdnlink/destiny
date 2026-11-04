@@ -6,6 +6,7 @@ from lunar_python import Solar
 
 from app.calendar.engine import CalendarEngine
 from .rules import (
+    XIAN_CHI_TABLE,
     BRANCH_TO_INDEX,
     EARTHLY_BRANCHES,
     HEAVENLY_STEMS,
@@ -291,6 +292,23 @@ def calculate_ziwei_chart(
     branch_to_palace[dijie_branch]["bad_stars"].append({"name": "地劫", "type": "bad", "element": "火"})
     branch_to_palace[dikong_branch]["bad_stars"].append({"name": "地空", "type": "bad", "element": "火"})
 
+    # 9.1 安杂曜：红鸾、天喜、天刑、天姚、咸池
+    # 红鸾卯起子年逆数生年支；天喜居红鸾对宫
+    year_branch_idx = BRANCH_TO_INDEX[year_branch]
+    hongluan_branch = EARTHLY_BRANCHES[(3 - year_branch_idx) % 12]
+    tianxi_branch = EARTHLY_BRANCHES[(3 - year_branch_idx + 6) % 12]
+    branch_to_palace[hongluan_branch]["minor_stars"].append({"name": "红鸾", "type": "minor", "element": "水"})
+    branch_to_palace[tianxi_branch]["minor_stars"].append({"name": "天喜", "type": "minor", "element": "水"})
+    # 天刑酉起正月顺数生月；天姚丑起正月顺数生月（闰月按月序本身）
+    lunar_month_num = abs(cal_res["lunar"]["month"])
+    tianxing_branch = EARTHLY_BRANCHES[(9 + lunar_month_num - 1) % 12]
+    tianyao_branch = EARTHLY_BRANCHES[(1 + lunar_month_num - 1) % 12]
+    branch_to_palace[tianxing_branch]["minor_stars"].append({"name": "天刑", "type": "minor", "element": "火"})
+    branch_to_palace[tianyao_branch]["minor_stars"].append({"name": "天姚", "type": "minor", "element": "水"})
+    # 咸池按生年支三合局取
+    xianchi_branch = XIAN_CHI_TABLE.get(year_branch, "酉")
+    branch_to_palace[xianchi_branch]["minor_stars"].append({"name": "咸池", "type": "minor", "element": "水"})
+
     # 10. 生年四化
     sihua_map = SIHUA_TABLE.get(year_stem, {})
     for hua_name, target_star in sihua_map.items():
@@ -352,6 +370,21 @@ def calculate_ziwei_chart(
     }
 
 
+def _minor_star_summary(facts):
+    """从排盘结果中汇总五颗杂曜的落宫，供步骤足迹引用。"""
+    positions = {}
+    for palace in facts["palaces_by_branch"]:
+        for star in palace["minor_stars"]:
+            positions[star["name"]] = palace["earthly_branch"]
+    return {
+        "hongluan": positions.get("红鸾", ""),
+        "tianxi": positions.get("天喜", ""),
+        "tianxing": positions.get("天刑", ""),
+        "tianyao": positions.get("天姚", ""),
+        "xianchi": positions.get("咸池", ""),
+    }
+
+
 def time_cast(
     local_datetime: str,
     timezone: str = "Asia/Shanghai",
@@ -396,6 +429,12 @@ def time_cast(
                 "output": {"ming_stars": main_stars_str, "si_hua": facts["si_hua"]},
                 "rule_ids": ["ZW-STARS-001", "ZW-SIHUA-001"],
             },
+            {
+                "sequence": 5,
+                "operation": "arrange_minor_stars",
+                "output": _minor_star_summary(facts),
+                "rule_ids": ["ZW-MINOR-001"],
+            },
         ],
         "rule_ids": [
             "ZW-CAL-001",
@@ -403,6 +442,7 @@ def time_cast(
             "ZW-BUREAU-001",
             "ZW-STARS-001",
             "ZW-SIHUA-001",
+            "ZW-MINOR-001",
             "ZW-DECADE-001",
         ],
         "warnings": [

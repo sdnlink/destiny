@@ -758,6 +758,8 @@ function LiuyaoView({ result }) {
 
   // 伏神优先采用后端推导（本宫首卦同位补缺），旧会话缺该字段时回退本地计算
   const hiddenSpirits = buildHiddenSpirits(facts);
+  const palaceName = facts.palace.name;
+  const missingRelatives = hiddenSpirits.map((h) => h.relative);
 
   const activeLine = facts.line_chart.find((l) => l.position === selectedPos) || facts.line_chart[0];
   const activeHidden = hiddenSpirits.find((h) => h.position === selectedPos);
@@ -890,6 +892,34 @@ function LiuyaoView({ result }) {
                 </div>
               );
             })}
+          </div>
+        </section>
+      )}
+
+      {facts.branch_structures && (facts.branch_structures.sanhe.length > 0 || facts.branch_structures.liuhe.length > 0) && (
+        <section className="data-band branch-structures-band">
+          <div className="band-heading">
+            <div>
+              <span className="band-icon"><Sparkles size={16} /></span>
+              <div>
+                <h3>三合局与六合</h3>
+                <p>动爻、月建、日辰爻支构成的齐备组合，来源逐支标注</p>
+              </div>
+            </div>
+          </div>
+          <div className="structure-list">
+            {facts.branch_structures.sanhe.map((s) => (
+              <p key={s.element + s.branches.join("")} className="structure-line">
+                <b>{s.branches.join("")}{s.element}局</b>
+                {" "}（{s.members.map((m) => `${m.branch}：${m.sources.join("、")}`).join("；")}）
+              </p>
+            ))}
+            {facts.branch_structures.liuhe.map((p) => (
+              <p key={p.branches.join("")} className="structure-line">
+                <b>{p.branches.join("")}六合</b>
+                {" "}（{p.members.map((m) => `${m.branch}：${m.sources.join("、")}`).join("；")}）
+              </p>
+            ))}
           </div>
         </section>
       )}
@@ -1430,6 +1460,14 @@ function ZiweiPalaceCard({ palace, isSelected, isSanFang, onClick }) {
             <span key={star.name} className="ziwei-star bad">{star.name}</span>
           ))}
         </div>
+
+        {(palace.minor_stars || []).length > 0 && (
+          <div className="ziwei-minor-stars">
+            {palace.minor_stars.map((star) => (
+              <span key={star.name} className="ziwei-star minor">{star.name}</span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="ziwei-cell-footer">
