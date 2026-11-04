@@ -27,9 +27,16 @@ class TestClassicsLibrary:
     def test_corpus_is_available_and_traceable(self, library):
         assert library.available
         status = library.status()
-        assert status["documents"] >= 50
-        assert status["chunks"] >= 2000
-        assert any("八宅明鏡" in item["title"] for item in status["sourcing_backlog"])
+        assert status["documents"] >= 85
+        assert status["chunks"] >= 4000
+        backlog = {item["title"]: item["note"] for item in status["sourcing_backlog"]}
+        assert "已由" in backlog["八宅明鏡"], "八宅明鏡应由公开来源补齐"
+        assert "daozhige" in backlog["卜筮正宗"]
+
+    def test_multi_source_coverage_for_new_books(self, library):
+        for query, category in (("游年歌", "yangzhai"), ("挨星", "kanyu"), ("太微赋", "ziwei"), ("黄金策", "liuyao")):
+            passages = library.search(query, category=category, limit=2)
+            assert passages, "扩库后应能检索到：{}".format(query)
 
     def test_search_finds_zengshanbuyi_passages(self, library):
         passages = library.search("三合局", category="liuyao", limit=3)

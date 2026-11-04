@@ -17,13 +17,14 @@ DEFAULT_CORPUS_DIR = (
 DEFAULT_SOURCES_DIR = Path(__file__).resolve().parents[3] / "data" / "sources"
 EXCERPT_RADIUS = 60
 
-# 维基文库确认缺失、需要另行寻找公版来源的书目。
+# 维基文库缺失或不完整、已由其他公开来源补齐/待补的书目。
 SOURCING_BACKLOG = (
-    {"title": "八宅明鏡", "domain": "yangzhai", "note": "维基文库缺失，大游年歌暂以通行传本整理并在结果中标注"},
-    {"title": "陽宅十書", "domain": "yangzhai", "note": "维基文库缺失，待补公版来源"},
-    {"title": "沈氏玄空學", "domain": "kanyu", "note": "维基文库缺失，玄空下卦盘以《地理辨正》传承通行法计算，替卦未提供"},
-    {"title": "卜筮正宗", "domain": "liuyao", "note": "现有抓取仅467字符不完整，待重抓"},
-    {"title": "紫微斗數全書", "domain": "ziwei", "note": "已列入抓取清单；2026-11-04 抓取遭维基文库限流(429)中断，待限流解除后重跑 scripts/cache_wikisource_texts.py"},
+    {"title": "八宅明鏡", "domain": "yangzhai", "note": "维基文库缺失；已由 web-classics（诗词汇原文转录）补齐全文入库"},
+    {"title": "陽宅十書", "domain": "yangzhai", "note": "维基文库缺失；已由 web-classics（王元吉易学网）补齐全文入库"},
+    {"title": "沈氏玄空學", "domain": "kanyu", "note": "维基文库缺失；已由 web-classics（中华典藏）补齐卷首至卷六，替卦起星盘仍未实现"},
+    {"title": "卜筮正宗", "domain": "liuyao", "note": "维基文库版仅467字符；已由 daozhige-github 全文（约10万字）补充"},
+    {"title": "紫微斗數全書", "domain": "ziwei", "note": "维基文库抓取遭限流；已由 web-classics（中华典藏）补齐序文与卷一至卷三，卷四图说暂缺"},
+    {"title": "太極圖說", "domain": "xiangshu", "note": "维基文库现有抓取不完整，待重抓"},
 )
 
 

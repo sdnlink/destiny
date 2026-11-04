@@ -1,0 +1,58 @@
+{
+  "source_id": "web-classics",
+  "display_name": "公开古籍网站原文转录（诗词汇、中华典藏、王元吉易学网）",
+  "usage_scope": "research-attribution-preferred",
+  "books": [
+    {
+      "title": "八宅明鏡",
+      "domain": "yangzhai",
+      "pages": [
+        {"title": "簡介", "url": "https://www.shicihui.com/zh-tw/book/bazhaimingjing/212092"},
+        {"title": "序", "url": "https://www.shicihui.com/zh-tw/book/bazhaimingjing/212093"},
+        {"title": "上卷", "url": "https://www.shicihui.com/zh-tw/book/bazhaimingjing/212094"},
+        {"title": "下卷", "url": "https://www.shicihui.com/zh-tw/book/bazhaimingjing/212095"}
+      ]
+    },
+    {
+      "title": "陽宅十書",
+      "domain": "yangzhai",
+      "pages": [
+        {"title": "首页", "url": "https://wangyuanji.com/archives/932.html"},
+        {"title": "第2页", "url": "https://wangyuanji.com/archives/932.html/2"},
+        {"title": "第3页", "url": "https://wangyuanji.com/archives/932.html/3"},
+        {"title": "第4页", "url": "https://wangyuanji.com/archives/932.html/4"},
+        {"title": "第5页", "url": "https://wangyuanji.com/archives/932.html/5"},
+        {"title": "第6页", "url": "https://wangyuanji.com/archives/932.html/6"},
+        {"title": "第7页", "url": "https://wangyuanji.com/archives/932.html/7"},
+        {"title": "第8页", "url": "https://wangyuanji.com/archives/932.html/8"},
+        {"title": "第9页", "url": "https://wangyuanji.com/archives/932.html/9"},
+        {"title": "第10页", "url": "https://wangyuanji.com/archives/932.html/10"},
+        {"title": "第11页", "url": "https://wangyuanji.com/archives/932.html/11"}
+      ]
+    },
+    {
+      "title": "紫微斗數全書",
+      "domain": "ziwei",
+      "pages": [
+        {"title": "序文", "url": "https://www.diancang.xyz/xuanxuewushu/20296/369512.html"},
+        {"title": "卷一", "url": "https://www.diancang.xyz/xuanxuewushu/20296/369513.html"},
+        {"title": "卷二", "url": "https://www.diancang.xyz/xuanxuewushu/20296/369514.html"},
+        {"title": "卷三", "url": "https://www.diancang.xyz/xuanxuewushu/20296/369515.html"}
+      ]
+    },
+    {
+      "title": "沈氏玄空學",
+      "domain": "kanyu",
+      "pages": [
+        {"title": "卷首", "url": "https://www.diancang.xyz/xuanxuewushu/20693/375881.html"},
+        {"title": "卷一", "url": "https://www.diancang.xyz/xuanxuewushu/20693/375882.html"},
+        {"title": "卷二", "url": "https://www.diancang.xyz/xuanxuewushu/20693/375883.html"},
+        {"title": "卷三", "url": "https://www.diancang.xyz/xuanxuewushu/20693/375884.html"},
+        {"title": "卷四", "url": "https://www.diancang.xyz/xuanxuewushu/20693/375885.html"},
+        {"title": "卷五", "url": "https://www.diancang.xyz/xuanxuewushu/20693/375886.html"},
+        {"title": "卷六", "url": "https://www.diancang.xyz/xuanxuewushu/20693/375887.html"},
+        {"title": "跋", "url": "https://www.diancang.xyz/xuanxuewushu/20693/375888.html"}
+      ]
+    }
+  ]
+}
