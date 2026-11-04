@@ -8,8 +8,8 @@
 | --- | --- | --- |
 | `scripts/build_all.sh` | `scripts/build_all.bat` / `scripts/build_all.ps1` (根目录快捷: `build_all.bat`) | 在一个脚本中完成后端依赖、Python编译、后端测试、前端依赖和生产构建 |
 | `scripts/start_all.sh` | `scripts/start_all.bat` / `scripts/start_all.ps1` (根目录快捷: `start_all.bat`) | 启动生产服务，由FastAPI同源提供API和已编译Web文件 |
-| `scripts/deploy.sh` | - | 一键执行统一构建并启动生产服务 |
-| - | `scripts/start_dev.bat` / `scripts/start_dev.ps1` (根目录快捷: `start_dev.bat`) | Windows开发模式：一键同时启动后端API与前端Vite并打开浏览器 |
+| `scripts/deploy.sh` | `scripts/deploy.ps1` / `scripts/deploy.bat` | 一键执行统一构建并启动生产服务 |
+| `scripts/start_dev.sh` | `scripts/start_dev.bat` / `scripts/start_dev.ps1` (根目录快捷: `start_dev.bat`) | 开发模式：一键同时启动后端API与前端Vite并打开浏览器 |
 | `scripts/run_mvp_api.sh` | `scripts/run_mvp_api.bat` / `scripts/run_mvp_api.ps1` | 只启动FastAPI计算服务 |
 | `scripts/run_web.sh` | `scripts/run_web.bat` / `scripts/run_web.ps1` | 只启动Vite开发服务 |
 | `scripts/run_corpus_api.sh` | `scripts/run_corpus_api.bat` / `scripts/run_corpus_api.ps1` | 独立启动内部语料只读服务 |
@@ -117,7 +117,14 @@ BUILD_INSTALL_DEPENDENCIES=0 BUILD_RUN_TESTS=0 ./scripts/deploy.sh
 
 ## 5. 开发模式
 
-开发时使用两个终端：
+一键启动（后端 `--reload` + 前端 Vite，退出时清理两个进程）：
+
+```bash
+./scripts/start_dev.sh        # Linux / macOS
+.\scripts\start_dev.ps1       # Windows PowerShell
+```
+
+或分开启动两个终端：
 
 ```bash
 # 终端一
@@ -129,9 +136,21 @@ BUILD_INSTALL_DEPENDENCIES=0 BUILD_RUN_TESTS=0 ./scripts/deploy.sh
 
 此时Web位于`5173`，Vite把`/api`代理到`8090`，并提供热更新。不要使用Vite开发服务承担生产流量。
 
+### 环境变量
+
+| 变量 | 用途 | 缺省行为 |
+| --- | --- | --- |
+| `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令不再有代码内置默认值；缺失时记录警告，数据库相关接口返回 `source: unavailable` |
+| `APP_API_TOKEN` | `/v1` 接口 Bearer 鉴权 | 未设置时启动即记录「仅本地开发可用」警告 |
+| `SESSION_STORAGE_DIR` | 会话 JSON 目录 | 默认 `data/sessions` |
+
+参考 `.env.example`。
+
 ## 6. 安全边界
 
 当前Web界面没有登录和令牌输入能力。生产服务应继续监听`127.0.0.1`，由同机反向代理负责TLS、身份认证、访问控制和限流，再转发到`8090`。
+
+设置`APP_API_TOKEN`后，鉴权覆盖`/v1/*`、`/docs`、`/openapi.json`和`/redoc`；`/health`探活与`SERVE_WEB=1`挂载的静态页面保持公开（浏览器无法携带Bearer头，整站401属于配置冲突，中间件已按此边界放行）。因此Token只保护数据与计算接口，页面本身仍需反向代理层面的访问控制。
 
 不要把`APP_API_TOKEN`编译进前端，也不要为了直接公网监听而关闭非回环绑定保护。若部署在容器网络并必须监听`0.0.0.0`，应先完成统一身份认证设计，或由受保护的内部网络和反向代理注入服务端认证。
 

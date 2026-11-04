@@ -4,7 +4,7 @@
 用户回复"直接起盘，不用多问"则跳过询问，使用默认起盘。
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 # 补全问题模板

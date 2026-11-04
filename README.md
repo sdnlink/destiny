@@ -109,13 +109,32 @@ Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在
 .\scripts\start_all.bat
 ```
 
-一键构建并部署：
+一键构建并部署（三平台脚本齐全）：
 
 ```bash
-./scripts/deploy.sh
+./scripts/deploy.sh                    # Linux / macOS
+.\scripts\deploy.ps1                   # Windows PowerShell
+.\scripts\deploy.bat                   # Windows cmd
+```
+
+开发模式（后端热重载 + 前端 Vite）：
+
+```bash
+./scripts/start_dev.sh                 # Linux / macOS
+.\scripts\start_dev.ps1                # Windows
 ```
 
 生产模式的Web界面和API均位于`http://127.0.0.1:8090`。完整参数和安全要求见[部署说明](./docs/development/deployment.md)。
+
+### 环境变量
+
+后端不再内置数据库口令，启动前按需配置：
+
+| 变量 | 用途 | 缺省行为 |
+| --- | --- | --- |
+| `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令缺失时记录警告，数据库相关接口返回 `source: unavailable` |
+| `APP_API_TOKEN` | `/v1` 接口 Bearer 鉴权 | 未设置时记录「未鉴权」警告，仅可用于本地开发 |
+| `SESSION_STORAGE_DIR` | 会话 JSON 存储目录 | 默认 `data/sessions` |
 
 验证：
 
@@ -123,6 +142,7 @@ Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在
 python -m pytest backend/tests
 ./scripts/run_validation_cases.py
 npm --prefix frontend run build
+npm --prefix frontend run test:unit
 npm --prefix frontend run test:browser
 ./scripts/verify_daorenjia_cache.py \
   --report cache/daorenjia/verification.json
@@ -141,10 +161,11 @@ npm --prefix frontend run test:browser
 
 ## 当前计算基线
 
-- 14条可追溯工程规则，状态均为`draft`，待专家审核。
-- 7个工程回归案例，当前全部通过，不代表专家签署案例。
+- 73条可追溯工程规则（`data/rules/mvp-engineering-baseline.json`），状态均为`draft`，待专家审核；
+  其中4条属于七步推理工作流（`WF-YONGSHEN-001`/`WF-WANGSHUAI-001`/`WF-FORTUNE-001`/`WF-TIMING-001`），口径见[ADR-015](./docs/design/decisions/015-workflow-seven-step-rules.md)。
+- 31个工程回归案例，当前全部通过，不代表专家签署案例。
 - 历法、周易和梅花共13个健康、常量、规则、案例及计算接口。
-- 多模块综合只比较引用已发布规则的结构化判断，不生成自动吉凶总分。
+- 多模块综合只比较引用已登记规则的结构化判断；工作流会输出五档吉凶与`fortune_basis`逐条依据，但不输出未经规则登记的自动总分，「不生成自动吉凶总分」的边界以此为准。
 - 推演结果包含确定性摘要和逐模块详细说明，每段可回溯规则编号。
 - 输入事项可生成未审核的研究性结论、优先建议和核实清单，不替代正式专业意见。
 - 结果可引用匹配卦象的书籍原文，明确展示书中观点、事项参考、来源链接和未审核状态。

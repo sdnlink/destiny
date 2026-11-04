@@ -10,486 +10,2873 @@
       "school": "mvp-engineering-baseline",
       "status": "draft",
       "rules": [
-        {"rule_id": "CAL-NORMALIZE-001", "version": "1.0.0"},
-        {"rule_id": "CAL-SOLAR-TIME-001", "version": "1.0.0"},
-        {"rule_id": "CAL-CONVERSION-001", "version": "1.0.0"},
-        {"rule_id": "CAL-PILLARS-001", "version": "1.0.0"},
-        {"rule_id": "CAL-TERM-TZ-001", "version": "1.0.0"},
-        {"rule_id": "CAL-TERM-001", "version": "1.0.0"},
-        {"rule_id": "CAL-CYCLE-001", "version": "1.0.0"},
-        {"rule_id": "YI-MANUAL-001", "version": "1.0.0"},
-        {"rule_id": "YI-RELATION-001", "version": "1.0.0"},
-        {"rule_id": "YI-NUMBER-001", "version": "1.0.0"},
-        {"rule_id": "YI-NUMBER-002", "version": "1.0.0"},
-        {"rule_id": "YI-3NUM-INPUT-001", "version": "1.0.0"},
-        {"rule_id": "YI-3NUM-MAPPING-001", "version": "1.0.0"},
-        {"rule_id": "YI-3NUM-MOVING-001", "version": "1.0.0"},
-        {"rule_id": "YI-TIME-001", "version": "1.0.0"},
-        {"rule_id": "YI-AUTO-COIN-001", "version": "1.0.0"},
-        {"rule_id": "MH-TIME-001", "version": "1.0.0"},
-        {"rule_id": "MH-AUTO-PERSONAL-001", "version": "1.0.0"},
-        {"rule_id": "MH-NUMBER-001", "version": "1.0.0"},
-        {"rule_id": "MH-THREE-NUMBER-001", "version": "1.0.0"},
-        {"rule_id": "MH-BODYUSE-001", "version": "1.0.0"},
-        {"rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0"},
-        {"rule_id": "CYCLE-XUN-001", "version": "1.0.0"},
-        {"rule_id": "LY-LINES-001", "version": "1.0.0"},
-        {"rule_id": "LY-COINS-001", "version": "1.0.0"},
-        {"rule_id": "LY-TIME-001", "version": "1.0.0"},
-        {"rule_id": "LY-AUTO-COIN-001", "version": "1.0.0"},
-        {"rule_id": "LY-NUMBER-001", "version": "1.0.0"},
-        {"rule_id": "LY-PALACE-001", "version": "1.0.0"},
-        {"rule_id": "LY-NAJIA-001", "version": "1.0.0"},
-        {"rule_id": "LY-RELATIVE-001", "version": "1.0.0"},
-        {"rule_id": "LY-SPIRIT-001", "version": "1.0.0"},
-        {"rule_id": "LY-HIDDEN-FLYING-COVERAGE-001", "version": "1.0.0"},
-        {"rule_id": "LR-MONTH-GENERAL-001", "version": "1.0.0"},
-        {"rule_id": "LR-HOUR-001", "version": "1.0.0"},
-        {"rule_id": "LR-NUMBER-001", "version": "1.0.0"},
-        {"rule_id": "LR-AUTO-REPORT-001", "version": "1.0.0"},
-        {"rule_id": "LR-PLATE-001", "version": "1.0.0"},
-        {"rule_id": "LR-LESSON-001", "version": "1.0.0"},
-        {"rule_id": "LR-TRANSMISSION-001", "version": "1.0.0"},
-        {"rule_id": "LR-REMOTE-001", "version": "1.0.0"},
-        {"rule_id": "LR-STAR-001", "version": "1.0.0"},
-        {"rule_id": "LR-COVERAGE-001", "version": "1.0.0"},
-        {"rule_id": "LR-SHEHAI-001", "version": "1.0.0"},
-        {"rule_id": "LR-BIEZE-001", "version": "1.0.0"},
-        {"rule_id": "LR-BAZHUAN-001", "version": "1.0.0"},
-        {"rule_id": "LR-FUYIN-001", "version": "1.0.0"},
-        {"rule_id": "LR-FANYIN-001", "version": "1.0.0"},
-        {"rule_id": "LR-GENERAL-001", "version": "1.0.0"},
-        {"rule_id": "XIANG-TRIGRAM-001", "version": "1.0.0"},
-        {"rule_id": "XIANG-BRANCH-001", "version": "1.0.0"},
-        {"rule_id": "XIANG-CONTEXT-001", "version": "1.0.0"},
-        {"rule_id": "YHYS-CYCLE-001", "version": "1.0.0"},
-        {"rule_id": "YHYS-RELATION-001", "version": "1.0.0"},
-        {"rule_id": "INTERP-CORRESPONDENCE-001", "version": "1.0.0"},
-        {"rule_id": "INTERP-INTEGRATE-001", "version": "1.0.0"},
-        {"rule_id": "ADV-CONTEXT-001", "version": "1.0.0"},
-        {"rule_id": "ADV-MH-RELATION-001", "version": "1.0.0"},
-        {"rule_id": "FS-DIRECTION-NORMALIZE-001", "version": "1.0.0"},
-        {"rule_id": "FS-DECLINATION-001", "version": "1.0.0"},
-        {"rule_id": "FS-24MOUNTAIN-001", "version": "1.0.0"},
-        {"rule_id": "FS-UNCERTAINTY-001", "version": "1.0.0"},
-        {"rule_id": "FS-MEASUREMENT-CONSENSUS-001", "version": "1.0.0"}
+        {
+          "rule_id": "CAL-NORMALIZE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "CAL-SOLAR-TIME-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "CAL-CONVERSION-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "CAL-PILLARS-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "CAL-TERM-TZ-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "CAL-TERM-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "CAL-CYCLE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-MANUAL-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-RELATION-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-NUMBER-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-NUMBER-002",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-3NUM-INPUT-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-3NUM-MAPPING-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-3NUM-MOVING-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-TIME-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YI-AUTO-COIN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "MH-TIME-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "MH-AUTO-PERSONAL-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "MH-NUMBER-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "MH-THREE-NUMBER-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "MH-BODYUSE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "MH-FIVE-ELEMENT-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "CYCLE-XUN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-LINES-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-COINS-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-TIME-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-AUTO-COIN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-NUMBER-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-PALACE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-NAJIA-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-RELATIVE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-SPIRIT-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-HIDDEN-FLYING-COVERAGE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-MONTH-GENERAL-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-HOUR-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-NUMBER-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-AUTO-REPORT-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-PLATE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-LESSON-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-TRANSMISSION-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-REMOTE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-STAR-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-COVERAGE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-SHEHAI-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-BIEZE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-BAZHUAN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-FUYIN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-FANYIN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LR-GENERAL-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "XIANG-TRIGRAM-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "XIANG-BRANCH-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "XIANG-CONTEXT-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YHYS-CYCLE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YHYS-RELATION-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "INTERP-CORRESPONDENCE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "INTERP-INTEGRATE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ADV-CONTEXT-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "ADV-MH-RELATION-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "FS-DIRECTION-NORMALIZE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "FS-DECLINATION-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "FS-24MOUNTAIN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "FS-UNCERTAINTY-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "FS-MEASUREMENT-CONSENSUS-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "WF-YONGSHEN-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "WF-WANGSHUAI-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "WF-FORTUNE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "WF-TIMING-001",
+          "version": "1.0.0"
+        }
       ]
     }
   ],
   "rules": [
     {
-      "rule_id": "YI-AUTO-COIN-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "个体三枚铜钱自动起卦", "purpose": "按独立起卦凭证可复算地派生六次三枚铜钱结果", "preconditions": ["起卦凭证格式有效"],
-      "inputs": ["cast_nonce"], "procedure": ["按模块域和轮次计算SHA-256", "将每枚铜钱映射为2或3", "自下而上形成六爻"], "outputs": ["coin_rounds", "input_lines", "cast_nonce_hash"],
-      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["确定性工程实现待专家签署", "有限卦象空间允许自然撞卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:auto_cast"
-    },
-    {
-      "rule_id": "MH-AUTO-PERSONAL-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "梅花时间法个体加数", "purpose": "在传统年月日時取数中加入独立个体数", "preconditions": ["历法输入有效", "起卦凭证格式有效"],
-      "inputs": ["calendar", "cast_nonce"], "procedure": ["由凭证派生1至64个体数", "年月日与个体数取上卦", "再加时数取下卦和动爻"], "outputs": ["personal_number", "original", "moving_line"],
-      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["个体加数属于工程基线待专家签署", "有限卦象空间允许自然撞卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.meihua:auto_cast"
-    },
-    {
-      "rule_id": "LY-AUTO-COIN-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "六爻个体三枚铜钱自动排盘", "purpose": "按独立起卦凭证派生六爻后排八宫纳甲", "preconditions": ["起卦凭证格式有效", "历法输入有效"],
-      "inputs": ["cast_nonce", "calendar"], "procedure": ["使用六爻专属域派生六次三枚铜钱", "识别动爻", "排八宫纳甲等盘面"], "outputs": ["coin_rounds", "input_lines", "line_chart"],
-      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["确定性工程实现待专家签署", "有限卦象空间允许自然撞卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:auto_cast"
-    },
-    {
-      "rule_id": "LR-AUTO-REPORT-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "六壬个体报数自动排盘", "purpose": "由独立起卦凭证派生报数并确定占时", "preconditions": ["起卦凭证格式有效", "历法输入有效"],
-      "inputs": ["cast_nonce", "calendar"], "procedure": ["使用六壬专属域派生1至12报数", "将报数映射占时", "保留实际时支并排盘"], "outputs": ["report_number", "occupation_time", "cast_nonce_hash"],
-      "source_refs": ["docs/design/decisions/006-personalized-auto-casting.md"], "limitations": ["报数派生属于工程基线待专家签署", "十二占时之间自然重复"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:auto_cast"
-    },
-    {
-      "rule_id": "CAL-NORMALIZE-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "本地时间标准化", "purpose": "将无偏移本地时间按IANA时区转换为可计算时刻", "preconditions": ["年份在1900至2100之间", "时区名称有效", "时间不处于夏令时歧义或缺失区间"],
-      "inputs": ["local_datetime", "timezone"], "procedure": ["解析ISO-8601本地时间", "按IANA时区定位", "保留本地时间与UTC时间"], "outputs": ["original_local_datetime", "utc_datetime"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["不接受输入自带UTC偏移"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.timezone:parse_local_datetime"
-    },
-    {
-      "rule_id": "CAL-SOLAR-TIME-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "真太阳时修正", "purpose": "在显式启用时记录经度、均时差和夏令时修正", "preconditions": ["启用时必须提供经度"],
-      "inputs": ["local_datetime", "timezone", "longitude", "use_true_solar_time"], "procedure": ["计算标准经线", "计算经度时差", "计算均时差近似值", "扣除夏令时并合并修正"], "outputs": ["effective_local_datetime", "correction"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["均时差使用NOAA风格近似公式", "默认关闭"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.timezone:apply_true_solar_time"
-    },
-    {
-      "rule_id": "CAL-CONVERSION-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "公农历与节气转换", "purpose": "生成农历日期及相邻节气事实", "preconditions": ["时间已标准化"],
-      "inputs": ["effective_local_datetime"], "procedure": ["调用固定版本lunar-python转换", "提取农历与相邻节气"], "outputs": ["lunar", "solar_terms"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#技术决策"], "limitations": ["结果受lunar-python 1.4.8支持范围约束"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.engine:CalendarEngine.calculate"
-    },
-    {
-      "rule_id": "CAL-PILLARS-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "四柱边界工程基线", "purpose": "按立春、节令和子初23时生成四柱", "preconditions": ["历法时间已确定"],
-      "inputs": ["effective_local_datetime"], "procedure": ["立春换年", "节令换月", "23时换日", "计算时柱"], "outputs": ["pillars"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"], "limitations": ["边界仍待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.engine:CalendarEngine.calculate"
-    },
-    {
-      "rule_id": "CAL-TERM-TZ-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "节气绝对时刻时区转换", "purpose": "将东八区节气参考时刻转换为输入IANA时区的同一绝对时刻", "preconditions": ["有效时区和有效时间"],
-      "inputs": ["effective_local_datetime", "timezone"], "procedure": ["转换为Asia/Shanghai参考时刻", "读取节气参考时间", "转换为用户时区和UTC"], "outputs": ["solar_term_reference_datetime", "local_datetime", "utc_datetime"],
-      "source_refs": ["docs/design/decisions/008-calendar-engine-phase-two.md"], "limitations": ["节气数据受lunar-python 1.4.8约束", "天文算法实现待独立交叉验证"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.solar_terms:serialize_jieqi"
-    },
-    {
-      "rule_id": "CAL-TERM-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "二十四节气与月令边界", "purpose": "输出相邻节气及当前月建所依据的前后节令", "preconditions": ["节气参考时刻已确定"],
-      "inputs": ["reference_datetime"], "procedure": ["读取前一当前下一节气", "读取前一和下一节令", "保留秒级时间"], "outputs": ["solar_terms", "month_boundary_terms"],
-      "source_refs": ["docs/design/decisions/008-calendar-engine-phase-two.md"], "limitations": ["秒级指输出粒度，不代表未经验证的天文误差范围"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.solar_terms:solar_term_context"
-    },
-    {
-      "rule_id": "CAL-CYCLE-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "月建生肖与旬空结构化", "purpose": "由四柱生成月建、立春生肖、日旬和旬空事实", "preconditions": ["四柱已确定"],
-      "inputs": ["year_pillar", "month_pillar", "day_pillar"], "procedure": ["月柱地支作为月建", "年柱地支映射生肖", "日柱定位六十甲子和旬空"], "outputs": ["month_branch", "zodiac", "xun", "xun_kong"],
-      "source_refs": ["docs/design/decisions/008-calendar-engine-phase-two.md"], "limitations": ["生肖边界采用立春工程基线", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.calendar.engine:CalendarEngine.calculate"
-    },
-    {
-      "rule_id": "YI-MANUAL-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "手工六爻归一化", "purpose": "将初爻至上爻的6/7/8/9转换为阴阳及动爻", "preconditions": ["恰好六个爻值"],
-      "inputs": ["lines"], "procedure": ["6与8映射阴", "7与9映射阳", "6与9标记为动爻"], "outputs": ["binary_lines", "moving_lines"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["不包含多爻辞解释"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:manual_cast"
-    },
-    {
-      "rule_id": "YI-RELATION-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "关联卦派生", "purpose": "由六爻生成本卦、变卦、互卦、错卦和综卦", "preconditions": ["六爻已归一化"],
-      "inputs": ["binary_lines", "moving_lines"], "procedure": ["按上下三爻查六十四卦", "翻转动爻", "按二三四与三四五取互卦", "逐爻取反生成错卦", "倒序生成综卦"], "outputs": ["original", "changed", "mutual", "opposite", "reversed"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["只生成卦象事实"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:derive_hexagrams"
-    },
-    {
-      "rule_id": "YI-NUMBER-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "周易双数取上下卦", "purpose": "第一数取下卦，第二数取上卦", "preconditions": ["输入为整数"],
-      "inputs": ["lower_number", "upper_number"], "procedure": ["分别除以8取余", "余0按8"], "outputs": ["lower_trigram", "upper_trigram"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["属于MVP指定数字起卦法"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:number_cast"
-    },
-    {
-      "rule_id": "YI-NUMBER-002", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "周易双数取动爻", "purpose": "按两数之和确定动爻", "preconditions": ["输入为整数"],
-      "inputs": ["lower_number", "upper_number"], "procedure": ["两数求和", "除以6取余", "余0按6"], "outputs": ["moving_line"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"], "limitations": ["属于MVP指定数字起卦法"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:number_cast"
-    },
-    {
-      "rule_id": "YI-3NUM-INPUT-001", "version": "1.0.0", "system": "zhouyi", "school": "three-number-engineering-baseline", "status": "draft",
-      "title": "周易三数角色归一化", "purpose": "将三个非负整数分别固定为上卦、下卦和动爻输入", "preconditions": ["恰好三个非负整数"],
-      "inputs": ["numbers", "mapping_version"], "procedure": ["校验数量和整数类型", "第一数标记为上卦", "第二数标记为下卦", "第三数标记为动爻"], "outputs": ["normalized_input", "roles"],
-      "source_refs": ["docs/design/decisions/009-zhouyi-three-number-phase-three.md"], "limitations": ["负数不进入当前规则", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.zhouyi.models:ThreeNumberInput"
-    },
-    {
-      "rule_id": "YI-3NUM-MAPPING-001", "version": "1.0.0", "system": "zhouyi", "school": "three-number-engineering-baseline", "status": "draft",
-      "title": "周易三数八卦映射", "purpose": "按版本化八卦数字表分别确定上下卦", "preconditions": ["三数角色已归一化", "映射版本存在"],
-      "inputs": ["number1", "number2", "mapping_version"], "procedure": ["分别除以8取余", "余0归8", "按配置读取乾1兑2离3震4巽5坎6艮7坤8"], "outputs": ["upper_trigram", "lower_trigram", "mapping"],
-      "source_refs": ["docs/design/decisions/009-zhouyi-three-number-phase-three.md"], "limitations": ["当前仅发布一个待审核映射版本"], "owner": "unassigned", "reviewers": [], "implementation": "app.zhouyi.config.hexagram_mapping:TrigramNumberMapping"
-    },
-    {
-      "rule_id": "YI-3NUM-MOVING-001", "version": "1.0.0", "system": "zhouyi", "school": "three-number-engineering-baseline", "status": "draft",
-      "title": "周易第三数取动爻", "purpose": "由第三个数字独立确定动爻", "preconditions": ["第三数为非负整数"],
-      "inputs": ["number3"], "procedure": ["除以6取余", "余0归6"], "outputs": ["moving_line"],
-      "source_refs": ["docs/design/decisions/009-zhouyi-three-number-phase-three.md"], "limitations": ["不使用前两数之和", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.zhouyi.engine:three_number_cast"
-    },
-    {
-      "rule_id": "YI-TIME-001", "version": "1.0.0", "system": "zhouyi", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "周易农历时间自动排盘", "purpose": "由年支、农历月日及时支生成可复算卦象", "preconditions": ["时间和时区有效"],
-      "inputs": ["local_datetime", "timezone"], "procedure": ["年支数加农历月日取上卦", "再加时支取下卦和动爻"], "outputs": ["original", "changed", "moving_line"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#周易"], "limitations": ["工程指定时间起卦法", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.iching:time_cast"
-    },
-    {
-      "rule_id": "MH-TIME-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "梅花农历时间起卦", "purpose": "由年支、农历月日和时支确定上下卦及动爻", "preconditions": ["时间和时区有效"],
-      "inputs": ["local_datetime", "timezone"], "procedure": ["年支数加月日取上卦", "再加时支取下卦", "下卦总数除以6取动爻"], "outputs": ["upper_trigram", "lower_trigram", "moving_line"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["闰月按月份绝对值取数", "规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:time_cast"
-    },
-    {
-      "rule_id": "MH-NUMBER-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "梅花双数起卦", "purpose": "第一数取上卦，第二数取下卦并以两数之和取动爻", "preconditions": ["输入为整数"],
-      "inputs": ["upper_number", "lower_number"], "procedure": ["第一数除以8取上卦", "第二数除以8取下卦", "两数之和除以6取动爻"], "outputs": ["upper_trigram", "lower_trigram", "moving_line"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:number_cast"
-    },
-    {
-      "rule_id": "MH-THREE-NUMBER-001", "version": "1.0.0", "system": "meihua", "school": "meihua-three-number-baseline", "status": "draft",
-      "title": "梅花三数独立起卦", "purpose": "分别以三个整数确定上卦、下卦和动爻", "preconditions": ["恰好三个整数"],
-      "inputs": ["upper_number", "lower_number", "moving_number"], "procedure": ["第一数除以8取上卦且余0归8", "第二数除以8取下卦且余0归8", "第三数除以6取动爻且余0归6"], "outputs": ["upper_trigram", "lower_trigram", "moving_line"],
-      "source_refs": ["docs/design/decisions/010-meihua-domain-phase-four.md"], "limitations": ["允许有符号整数以兼容既有数字输入口径", "待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:three_number_cast"
-    },
-    {
-      "rule_id": "MH-BODYUSE-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "梅花体用位置", "purpose": "按动爻所在三爻卦确定用卦，另一卦为体", "preconditions": ["动爻位置已确定"],
-      "inputs": ["moving_line"], "procedure": ["动爻在1至3则下卦为用", "动爻在4至6则上卦为用", "另一卦为体"], "outputs": ["body_position", "use_position"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"], "limitations": ["不含旺衰与应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:_cast_from_sources"
-    },
-    {
-      "rule_id": "MH-FIVE-ELEMENT-001", "version": "1.0.0", "system": "meihua", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "梅花体用五行关系", "purpose": "输出体用之间的生克比和关系事实", "preconditions": ["体卦和用卦五行已确定"],
-      "inputs": ["body_element", "use_element"], "procedure": ["比较同五行", "比较五行生关系", "比较五行克关系"], "outputs": ["relation_code", "relation_label"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["关系事实不直接映射吉凶"], "owner": "unassigned", "reviewers": [], "implementation": "app.meihua.engine:five_element_relation"
-    },
-    {
-      "rule_id": "CYCLE-XUN-001", "version": "1.0.0", "system": "calendar", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "日柱旬空与旬遁", "purpose": "由六十甲子日柱确定旬首、旬空和旬遁干", "preconditions": ["日柱为有效六十甲子"],
-      "inputs": ["day_pillar"], "procedure": ["定位六十甲子序号", "按十日划分旬", "计算旬空和十干遁支"], "outputs": ["xun", "empty_branches", "dun_gan"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#统一输入与输出"], "limitations": ["待标准案例复核"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.cyclical:xun_info"
-    },
-    {
-      "rule_id": "LY-LINES-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "六爻值录入", "purpose": "按自下而上顺序将六个6/7/8/9爻值转换为本卦和动爻", "preconditions": ["必须恰有六个爻值", "每个爻值只能是6、7、8或9"],
-      "inputs": ["lines"], "procedure": ["按初爻至上爻读取六值", "6和8映射为阴爻，7和9映射为阳爻", "6和9标记为动爻"], "outputs": ["input_lines", "original", "moving_lines", "changed"],
-      "source_refs": ["docs/design/decisions/011-liuyao-domain-phase-five.md"], "limitations": ["不替代蓍草或铜钱的实际起卦过程"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:line_cast"
-    },
-    {
-      "rule_id": "LY-COINS-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "六次三枚硬币录入", "purpose": "将六轮三枚硬币值求和为六个爻值", "preconditions": ["必须恰有六轮", "每轮必须恰有三枚", "每枚只允许2或3"],
-      "inputs": ["coins"], "procedure": ["按初爻至上爻读取六轮", "每轮三枚值求和得到6至9", "按六爻值规则生成卦象"], "outputs": ["coin_rounds", "input_lines", "original", "moving_lines", "changed"],
-      "source_refs": ["docs/design/decisions/011-liuyao-domain-phase-five.md"], "limitations": ["2和3是确定性输入编码，不判断实体硬币正反面"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:coin_cast"
-    },
-    {
-      "rule_id": "LY-TIME-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "六爻时间自动起卦", "purpose": "由农历时间取数生成六爻卦象", "preconditions": ["时间和时区有效"],
-      "inputs": ["local_datetime", "timezone"], "procedure": ["农历时间取上下卦", "总数取单一动爻"], "outputs": ["original", "changed", "moving_line"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-2"], "limitations": ["工程指定起卦入口", "不替代手工摇卦"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:time_cast"
-    },
-    {
-      "rule_id": "LY-NUMBER-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "六爻双数起卦", "purpose": "由两个整数生成六爻卦象", "preconditions": ["输入为整数"],
-      "inputs": ["lower_number", "upper_number"], "procedure": ["分别除以8取上下卦", "两数之和除以6取动爻"], "outputs": ["original", "changed", "moving_line"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#数字排盘-2"], "limitations": ["工程指定数字起卦法"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:number_cast"
-    },
-    {
-      "rule_id": "LY-PALACE-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "京房八宫世应", "purpose": "确定卦宫、游归魂阶段及世应爻", "preconditions": ["本卦六爻已确定"],
-      "inputs": ["original_lines"], "procedure": ["按八纯卦变爻序列匹配八宫", "按宫序确定世应"], "outputs": ["palace", "host_line", "response_line"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["京房八宫工程基线待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.rules:PALACE_BY_LINES"
-    },
-    {
-      "rule_id": "LY-NAJIA-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "八卦纳甲纳支", "purpose": "为本卦六爻配置纳干和纳支", "preconditions": ["上下卦已确定"],
-      "inputs": ["lower_trigram", "upper_trigram"], "procedure": ["下卦取内卦纳甲", "上卦取外卦纳甲"], "outputs": ["najia_stem", "najia_branch"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["变卦纳甲扩展未输出"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:_decorate"
-    },
-    {
-      "rule_id": "LY-RELATIVE-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "六爻六亲", "purpose": "按宫五行与爻支五行关系确定六亲", "preconditions": ["卦宫和纳支已确定"],
-      "inputs": ["palace_element", "branch_element"], "procedure": ["比较五行生克比和", "映射父母兄弟子孙妻财官鬼"], "outputs": ["six_relative"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["不含用神取用和旺衰"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:_six_relative"
-    },
-    {
-      "rule_id": "LY-SPIRIT-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "六爻日干起六神", "purpose": "按占日天干从初爻顺排六神", "preconditions": ["日干有效"],
-      "inputs": ["day_stem"], "procedure": ["按日干确定初爻六神", "初爻至上爻顺排"], "outputs": ["six_spirits"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"], "limitations": ["只输出盘面事实"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:_decorate"
-    },
-    {
-      "rule_id": "LY-HIDDEN-FLYING-COVERAGE-001", "version": "1.0.0", "system": "liuyao", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "伏神飞神规则覆盖声明", "purpose": "显式报告伏神飞神规则是否完成签署，避免在规则未定时生成推测值", "preconditions": ["六爻盘面已生成"],
-      "inputs": ["palace", "line_relatives"], "procedure": ["检查已签署规则版本和标准案例", "未签署时返回pending_rule_selection", "伏神和飞神数组保持为空"], "outputs": ["status", "hidden_spirits", "flying_spirits", "reason"],
-      "source_refs": ["docs/design/decisions/011-liuyao-domain-phase-five.md"], "limitations": ["当前仅报告覆盖状态，不执行伏神飞神排法"], "owner": "unassigned", "reviewers": [], "implementation": "app.liuyao.engine:_result"
-    },
-    {
-      "rule_id": "LR-MONTH-GENERAL-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "大六壬中气月将", "purpose": "按最近中气确定月将", "preconditions": ["历法时间有效"],
-      "inputs": ["effective_local_datetime"], "procedure": ["定位最近中气", "映射十二月将"], "outputs": ["month_general"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-3"], "limitations": ["交节边界待标准案例复核"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_month_general"
-    },
-    {
-      "rule_id": "LR-HOUR-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "大六壬时间占时", "purpose": "自动排盘采用历法时支作为占时", "preconditions": ["时间和时区有效"],
-      "inputs": ["time_branch"], "procedure": ["读取历法时支"], "outputs": ["occupation_branch"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-3"], "limitations": ["不包含活时选取"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:time_cast"
-    },
-    {
-      "rule_id": "LR-NUMBER-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "大六壬数字占时", "purpose": "将整数映射为子至亥占时", "preconditions": ["输入为整数"],
-      "inputs": ["number"], "procedure": ["整数除以12取余", "余0按亥"], "outputs": ["occupation_branch"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#数字排盘-3"], "limitations": ["数字只替换占时，不修改历法日柱"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:number_cast"
-    },
-    {
-      "rule_id": "LR-PLATE-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "月将加时天地盘", "purpose": "将月将加临占时并顺布天盘", "preconditions": ["月将和占时已确定"],
-      "inputs": ["month_general", "occupation_branch"], "procedure": ["月将加临占时", "十二支顺布"], "outputs": ["earth_plate", "heaven_plate"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_heaven_plate"
-    },
-    {
-      "rule_id": "LR-LESSON-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "日干寄宫四课", "purpose": "由日干支与天盘生成四课", "preconditions": ["天地盘和日柱已确定"],
-      "inputs": ["day_pillar", "heaven_plate"], "procedure": ["日干寄宫取干阳神", "递取干阴神", "取支阳神和支阴神"], "outputs": ["four_lessons"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["寄宫规则待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_four_lessons"
-    },
-    {
-      "rule_id": "LR-TRANSMISSION-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "大六壬基础发传", "purpose": "在覆盖路径内由四课生成三传", "preconditions": ["四课已确定"],
-      "inputs": ["day_pillar", "heaven_plate", "four_lessons"], "procedure": ["依次检查贼克和克", "多候选时检查比用", "初传确定后递取中末传"], "outputs": ["three_transmissions", "coverage_status"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#三传覆盖边界"], "limitations": ["只覆盖唯一贼克、克和比用", "其他路径由独立规则或覆盖状态处理"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_direct_transmissions"
-    },
-    {
-      "rule_id": "LR-REMOTE-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬遥克发传", "purpose": "四课无上下克时按神遥克日、日遥克神顺序确定初传", "preconditions": ["四课无上下克", "非伏吟返吟八专"],
-      "inputs": ["day_stem", "four_lessons", "heaven_plate"], "procedure": ["先查上神克日干为蒿矢", "无则查日干克上神为弹射", "多候选时取与日干阴阳相同者", "由初传上神递取中末传"], "outputs": ["lesson_type", "source_path", "three_transmissions", "trace"],
-      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00000", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["多个候选经比用仍不唯一时不猜测"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_remote_transmissions"
-    },
-    {
-      "rule_id": "LR-STAR-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬昴星发传", "purpose": "四课无上下克、无遥克且四课俱全时按阴阳日昴星法取三传", "preconditions": ["四课无上下克", "无遥克", "四课俱全"],
-      "inputs": ["day_stem", "four_lessons", "heaven_plate"], "procedure": ["阳日仰视地盘酉上神，阴日俯视天盘酉所临地盘", "刚日先辰后日，柔日先日后辰"], "outputs": ["lesson_type", "source_path", "three_transmissions", "trace"],
-      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00000", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["工程案例待双专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_star_transmissions"
-    },
-    {
-      "rule_id": "LR-COVERAGE-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬发传覆盖矩阵", "purpose": "逐类报告发传路径的规则版本和实现状态", "preconditions": ["四课和天地盘已确定"],
-      "inputs": ["day_pillar", "four_lessons", "heaven_plate"], "procedure": ["识别十种结果路径", "读取各路径规则编号和状态", "输出完整覆盖矩阵"], "outputs": ["transmission_coverage"],
-      "source_refs": ["docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["全部路径仍为待专家签署的工程基线"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_coverage_report"
-    },
-    {
-      "rule_id": "LR-SHEHAI-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬涉害发传", "purpose": "比用后仍有多个候选时按归本家沿途克位深浅确定初传", "preconditions": ["贼克或克候选经比用仍不唯一"],
-      "inputs": ["day_pillar", "candidate_lessons", "heaven_plate"], "procedure": ["从候选上神当前地盘位置前行至本宫前", "按上下克方向累计地支和寄干克位", "取涉害最深者", "深度相同按孟仲季，再复等取刚日日课或柔日辰课先见"], "outputs": ["candidate_depths", "source_path", "three_transmissions", "trace"],
-      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00174", "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00176", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["孟仲季和复等采用《六壬大全》订讹口径"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_shehai_transmissions"
-    },
-    {
-      "rule_id": "LR-BIEZE-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬别责发传", "purpose": "三课无克无遥时按刚柔日分别取初传", "preconditions": ["四课去重为三课", "无上下克和遥克"],
-      "inputs": ["day_pillar", "four_lessons", "heaven_plate"], "procedure": ["刚日取干合之干寄宫上神", "柔日取日支前三合", "中末传均取日上神"], "outputs": ["source_path", "three_transmissions", "trace"],
-      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00180", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["柔日按原文直接取支前三合，不取该支上神"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_bieze_transmissions"
-    },
-    {
-      "rule_id": "LR-BAZHUAN-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬八专发传", "purpose": "干支同位两课无克时按阴阳日顺逆三位发传", "preconditions": ["四课去重为两课", "无上下克"],
-      "inputs": ["day_pillar", "four_lessons"], "procedure": ["阳日从日阳神连本位顺数三位", "阴日从辰阴神连本位逆数三位", "中末传均取日上神"], "outputs": ["source_path", "three_transmissions", "trace"],
-      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00181", "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00182", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["论克不论遥，存在上下克时仍按基础克法"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_bazhuan_transmissions"
-    },
-    {
-      "rule_id": "LR-FUYIN-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬伏吟发传", "purpose": "天地盘同位时按有克、自任、自信及杜传规则生成三传", "preconditions": ["天地盘同位"],
-      "inputs": ["day_pillar", "four_lessons"], "procedure": ["有克按克取初传", "无克刚日取日上神、柔日取日支", "按刑递取中末", "遇自刑或刑神重复时按日辰与冲神处理"], "outputs": ["source_path", "three_transmissions", "trace"],
-      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00182", "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00184", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["刑序采用《六壬大全》订讹口径"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_fuyin_transmissions"
-    },
-    {
-      "rule_id": "LR-FANYIN-001", "version": "1.0.0", "system": "liuren", "school": "daliuren-engineering-baseline", "status": "draft",
-      "title": "大六壬返吟井栏射", "purpose": "天地盘相冲且无上下克时按井栏射生成三传", "preconditions": ["天地盘偏移六位", "四课无上下克"],
-      "inputs": ["day_pillar", "four_lessons", "heaven_plate"], "procedure": ["日支斜射前三合位置上神为初传", "辰上神为中传", "日上神为末传"], "outputs": ["source_path", "three_transmissions", "trace"],
-      "source_refs": ["data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00185", "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00186", "docs/design/decisions/012-daliuren-domain-phase-six.md"], "limitations": ["井栏射只发生于丁己辛丑未六日；有克仍按基础克法"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_fanyin_transmissions"
-    },
-    {
-      "rule_id": "LR-GENERAL-001", "version": "1.0.0", "system": "liuren", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "昼夜贵人十二天将", "purpose": "按日干昼夜贵人起例布十二天将", "preconditions": ["日干、当地小时和天地盘已确定"],
-      "inputs": ["day_stem", "civil_hour", "heaven_plate"], "procedure": ["6至18时按昼贵其余按夜贵", "定位贵人临地盘", "按临地方位顺逆布将"], "outputs": ["heavenly_generals"],
-      "source_refs": ["docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"], "limitations": ["昼夜按民用小时划分的工程基线", "贵人起例待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.daliuren.engine:_heavenly_generals"
-    },
-    {
-      "rule_id": "XIANG-TRIGRAM-001", "version": "1.0.0", "system": "imagery", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "八卦基础类象", "purpose": "按盘面角色提供八卦自然、人物、事物和行为等类象候选", "preconditions": ["盘面包含有效八卦"],
-      "inputs": ["trigram", "module", "role"], "procedure": ["读取版本化八卦类象表", "保留盘面模块和角色"], "outputs": ["imagery_candidates"],
-      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#类象层"], "limitations": ["类象待专家逐项签署", "不自动指认现实对象"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.imagery:TRIGRAM_IMAGERY"
-    },
-    {
-      "rule_id": "XIANG-BRANCH-001", "version": "1.0.0", "system": "imagery", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "十二地支基础类象", "purpose": "为六壬月将和三传提供地支类象候选", "preconditions": ["盘面包含有效地支"],
-      "inputs": ["earthly_branch", "module", "role"], "procedure": ["读取地支方位时令和事物类象", "保留月将或三传角色"], "outputs": ["imagery_candidates"],
-      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#类象层"], "limitations": ["首版不含完整神煞和天将类象"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.imagery:BRANCH_IMAGERY"
-    },
-    {
-      "rule_id": "XIANG-CONTEXT-001", "version": "1.0.0", "system": "imagery", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "事项类象维度筛选", "purpose": "按用户明确选择的事项类别排序类象维度", "preconditions": ["事项类别受支持"],
-      "inputs": ["category", "imagery_candidates"], "procedure": ["选择事项优先维度", "保留完整类象和筛选结果"], "outputs": ["priority_dimensions", "selected_imagery"],
-      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#事项筛选"], "limitations": ["问题全文不进入排盘公式", "筛选不表示现实对应已确认"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.imagery:collect_imagery"
-    },
-    {
-      "rule_id": "YHYS-CYCLE-001", "version": "1.0.0", "system": "yuanhui", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "元会运世周期定位", "purpose": "按暂定纪元和周期单位定位公历年", "preconditions": ["历法模块提供公历年"],
-      "inputs": ["solar_year", "epoch"], "procedure": ["按129600年取元", "按10800年取会", "按360年取运", "按30年取世"], "outputs": ["yuan", "hui", "yun", "shi", "year_in_shi"],
-      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#元会运世层", "https://zh.wikisource.org/wiki/皇極經世"], "limitations": ["公元前67017年纪元待专家签署", "只计算到公历年"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.yuanhui:cycle_position"
-    },
-    {
-      "rule_id": "YHYS-RELATION-001", "version": "1.0.0", "system": "yuanhui", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "会支五行与盘面关系", "purpose": "比较当前会支五行与盘面结构五行", "preconditions": ["会支和盘面五行已确定"],
-      "inputs": ["hui_element", "chart_elements"], "procedure": ["逐项比较同类、生和克关系", "保留模块与盘面角色"], "outputs": ["relation_evidence"],
-      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#与盘面关系"], "limitations": ["关系不映射个人吉凶", "不生成应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.yuanhui:analyze_yuan_hui_yun_shi"
-    },
-    {
-      "rule_id": "INTERP-CORRESPONDENCE-001", "version": "1.0.0", "system": "interpretation", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "盘面事实对应解释", "purpose": "把各模块盘面角色和类象转换为当前事项的待核实解释", "preconditions": ["盘面事实已完成", "用户提供事项类别和问题摘要"],
-      "inputs": ["module_results", "context", "imagery"], "procedure": ["分模块读取盘面角色", "关联事项优先类象", "生成事实、对应和核实点"], "outputs": ["module_interpretations", "verification_points"],
-      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#输出边界"], "limitations": ["解释模板待专家签署", "不把类象强制对应现实对象", "不生成吉凶和应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.interpretation:explain_correspondences"
-    },
-    {
-      "rule_id": "INTERP-INTEGRATE-001", "version": "1.0.0", "system": "interpretation", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "跨层解释整合", "purpose": "在不覆盖独立盘面的前提下并列模块解释和宏观时间背景", "preconditions": ["模块对应解释已生成"],
-      "inputs": ["module_interpretations", "yuan_hui_yun_shi"], "procedure": ["保留模块独立解释", "附加元会运世背景", "汇总现实核实点"], "outputs": ["summary", "cross_layer", "limitations"],
-      "source_refs": ["docs/design/decisions/005-imagery-and-yuanhui-baseline.md#接口与展示"], "limitations": ["不进行自动加权", "宏观周期不决定个人事项"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.interpretation:explain_correspondences"
-    },
-    {
-      "rule_id": "ADV-CONTEXT-001", "version": "1.0.0", "system": "advisory", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "事项分类决策检查清单", "purpose": "根据用户明确选择的事项类别生成可核实、可执行的通用决策检查清单", "preconditions": ["用户明确提供事项类别和问题摘要"],
-      "inputs": ["category", "question_summary"], "procedure": ["选择对应事项模板", "生成目标、资源、风险和验证建议", "附加核实问题和高影响事项限制"], "outputs": ["recommendations", "verification_questions", "risk_notes"],
-      "source_refs": ["docs/design/product-design.md#步骤一选择场景", "docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["未经过专家签署", "不构成现实概率或专业意见", "不得写入正式judgements"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.advisory:generate_advisory"
-    },
-    {
-      "rule_id": "ADV-MH-RELATION-001", "version": "1.0.0", "system": "advisory", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "梅花体用关系关注点映射", "purpose": "将已计算的体用五行关系映射为待核实的决策关注点", "preconditions": ["梅花体用关系事实已生成", "用户请求研究性事项建议"],
-      "inputs": ["relation_code", "category", "question_summary"], "procedure": ["读取本卦阶段体用关系", "映射为资源、约束、投入或协同关注点", "生成验证行动"], "outputs": ["focus", "rationale", "recommendation"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"], "limitations": ["映射仅为未审核研究模板", "不映射吉凶", "不生成应期"], "owner": "unassigned", "reviewers": [], "implementation": "app.core.advisory:generate_advisory"
-    },
-    {
-      "rule_id": "FS-DIRECTION-NORMALIZE-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
-      "title": "罗盘角度标准化", "purpose": "将任意有限角度归一化为正北零度顺时针的0至360度区间", "preconditions": ["向首角度为有限数值"],
-      "inputs": ["facing_degree"], "procedure": ["对输入角度按360度取模", "负角度转换为等价正角度"], "outputs": ["normalized_degree"],
-      "source_refs": ["docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["只处理角度坐标，不判断测量是否正确"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:_normalize"
-    },
-    {
-      "rule_id": "FS-DECLINATION-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
-      "title": "磁偏角真北修正", "purpose": "将磁北向首换算为真北向首", "preconditions": ["输入角度基于磁北或真北", "磁偏角为有限数值"],
-      "inputs": ["input_reference", "magnetic_declination"], "procedure": ["磁北输入加磁偏角", "真北输入不重复修正", "结果按360度归一化"], "outputs": ["applied_declination", "true_facing_degree"],
-      "source_refs": ["docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["磁偏角数值及来源由调用方提供", "不内置地磁模型"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:calculate_direction"
-    },
-    {
-      "rule_id": "FS-24MOUNTAIN-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
-      "title": "真北坐向与二十四山", "purpose": "由真北向首计算相反坐山并确定二十四山归属", "preconditions": ["真北向首已确定"],
-      "inputs": ["true_facing_degree"], "procedure": ["向首加180度得到坐山", "每山以15度划分", "区间采用左闭右开"], "outputs": ["true_sitting_degree", "facing_mountain", "sitting_mountain"],
-      "source_refs": ["data/generated/fengshui_mountains.jsonl", "docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["仅生成方位事实", "不包含流派吉凶判断"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:_mountain_at"
-    },
-    {
-      "rule_id": "FS-UNCERTAINTY-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
-      "title": "坐向测量误差传播", "purpose": "将角度测量误差传播为候选山向、分类稳定性和边界预警", "preconditions": ["测量误差在0至180度之间"],
-      "inputs": ["true_facing_degree", "measurement_error"], "procedure": ["构造角度误差区间", "求区间覆盖的候选二十四山", "计算距最近分界距离", "跨界或距分界不足1度时预警"], "outputs": ["candidate_mountains", "classification_stable", "distance_to_boundary", "boundary_warning"],
-      "source_refs": ["docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"], "limitations": ["误差值由测量者评估", "预警不能替代现场复测"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:_direction_fact"
-    },
-    {
-      "rule_id": "FS-MEASUREMENT-CONSENSUS-001", "version": "1.0.0", "system": "fengshui", "school": "twenty-four-mountains-engineering-baseline", "status": "draft",
-      "title": "多次坐向测量圆周共识", "purpose": "汇总三至十二次真北读数并识别一致、跨界或相互矛盾的测量结果", "preconditions": ["至少三次且最多十二次有效测量", "每次测量已独立修正为真北角度"],
-      "inputs": ["measurements", "true_facing_degrees", "measurement_errors"], "procedure": ["计算圆周均值和方向集中度", "计算包含全部读数的最小圆弧", "以最大角偏差加单次误差形成保守误差包络", "跨度超过10度或方向抵消时标记不一致", "误差包络跨山界时保留全部候选"], "outputs": ["status", "circular_mean_degree", "resultant_length", "angular_spread", "effective_measurement_error", "aggregate"],
-      "source_refs": ["docs/design/decisions/014-fengshui-measurement-consensus-phase-eight.md"], "limitations": ["10度一致性阈值为待专家和测量规范复核的工程基线", "不替代现场校准和设备检定", "不生成流派判断"], "owner": "unassigned", "reviewers": [], "implementation": "app.fengshui.engine:analyze_measurements"
-    },
-    {
-      "rule_id": "ZW-CAL-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "紫微斗数农历与四柱转换", "purpose": "将公历出生时刻转换为农历生年月日時及八字四柱干支", "preconditions": ["有效公历时间输入"],
-      "inputs": ["local_datetime", "timezone"], "procedure": ["调用高精度农历转换算法", "提取农历生年、生月、生日、生时支", "生成四柱八字"], "outputs": ["lunar_calendar", "four_pillars"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["不作宿命论推断"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:_get_lunar_info"
-    },
-    {
-      "rule_id": "ZW-MING-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "紫微斗数安命宫与身宫", "purpose": "寅宫起正月顺数生月逆数生时定命宫，顺数生时定身宫", "preconditions": ["农历月日时已确定"],
-      "inputs": ["lunar_month", "hour_branch"], "procedure": ["寅宫顺数至生月", "逆数生时定命宫地支", "顺数生时定身宫地支", "五虎遁布十二宫干"], "outputs": ["ming_palace", "shen_palace", "palaces_by_order"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
-    },
-    {
-      "rule_id": "ZW-BUREAU-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "紫微斗数纳音定五行局", "purpose": "根据命宫干支的六十甲子纳音确定水二、木三、金四、土五或火六局", "preconditions": ["命宫干支已确定"],
-      "inputs": ["ming_stem", "ming_branch"], "procedure": ["匹配六十甲子纳音五行", "映射为对应局数及起运岁数"], "outputs": ["bureau"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
-    },
-    {
-      "rule_id": "ZW-STARS-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "紫微斗数十四主星与吉煞安星", "purpose": "按局数与生日定紫微天府位置，顺逆布十四主星、六吉六煞诸星", "preconditions": ["五行局与农历日已确定"],
-      "inputs": ["bureau_number", "lunar_day", "lunar_month", "hour_branch", "year_stem", "year_branch"], "procedure": ["推算紫微星与天府星地支", "逆布紫微系六星", "顺布天府系八星", "按月日时年干支布六吉六煞"], "outputs": ["palaces_with_stars"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
-    },
-    {
-      "rule_id": "ZW-SIHUA-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "紫微斗数生年四化配置", "purpose": "依据出生年天干配置化禄、化权、化科、化忌四化星曜", "preconditions": ["生年干已确定"],
-      "inputs": ["year_stem"], "procedure": ["查十干四化表", "为命中对应星曜打上四化标记"], "outputs": ["si_hua"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
-    },
-    {
-      "rule_id": "ZW-DECADE-001", "version": "1.0.0", "system": "ziwei", "school": "mvp-engineering-baseline", "status": "draft",
-      "title": "紫微斗数大限顺逆推排", "purpose": "按阴阳男女与五行局数计算各宫大限起止年龄", "preconditions": ["阴阳性别与五行局已确定"],
-      "inputs": ["yin_yang_gender", "bureau_number"], "procedure": ["阳男阴女顺行", "阴男阳女逆行", "以五行局数为起运起点每十年一限"], "outputs": ["major_limits"],
-      "source_refs": ["docs/design/decisions/002-mvp-engineering-baseline.md"], "limitations": ["待专家签署"], "owner": "unassigned", "reviewers": [], "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+      "rule_id": "YI-AUTO-COIN-001",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "个体三枚铜钱自动起卦",
+      "purpose": "按独立起卦凭证可复算地派生六次三枚铜钱结果",
+      "preconditions": [
+        "起卦凭证格式有效"
+      ],
+      "inputs": [
+        "cast_nonce"
+      ],
+      "procedure": [
+        "按模块域和轮次计算SHA-256",
+        "将每枚铜钱映射为2或3",
+        "自下而上形成六爻"
+      ],
+      "outputs": [
+        "coin_rounds",
+        "input_lines",
+        "cast_nonce_hash"
+      ],
+      "source_refs": [
+        "docs/design/decisions/006-personalized-auto-casting.md"
+      ],
+      "limitations": [
+        "确定性工程实现待专家签署",
+        "有限卦象空间允许自然撞卦"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.iching:auto_cast"
+    },
+    {
+      "rule_id": "MH-AUTO-PERSONAL-001",
+      "version": "1.0.0",
+      "system": "meihua",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "梅花时间法个体加数",
+      "purpose": "在传统年月日時取数中加入独立个体数",
+      "preconditions": [
+        "历法输入有效",
+        "起卦凭证格式有效"
+      ],
+      "inputs": [
+        "calendar",
+        "cast_nonce"
+      ],
+      "procedure": [
+        "由凭证派生1至64个体数",
+        "年月日与个体数取上卦",
+        "再加时数取下卦和动爻"
+      ],
+      "outputs": [
+        "personal_number",
+        "original",
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/006-personalized-auto-casting.md"
+      ],
+      "limitations": [
+        "个体加数属于工程基线待专家签署",
+        "有限卦象空间允许自然撞卦"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.meihua:auto_cast"
+    },
+    {
+      "rule_id": "LY-AUTO-COIN-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六爻个体三枚铜钱自动排盘",
+      "purpose": "按独立起卦凭证派生六爻后排八宫纳甲",
+      "preconditions": [
+        "起卦凭证格式有效",
+        "历法输入有效"
+      ],
+      "inputs": [
+        "cast_nonce",
+        "calendar"
+      ],
+      "procedure": [
+        "使用六爻专属域派生六次三枚铜钱",
+        "识别动爻",
+        "排八宫纳甲等盘面"
+      ],
+      "outputs": [
+        "coin_rounds",
+        "input_lines",
+        "line_chart"
+      ],
+      "source_refs": [
+        "docs/design/decisions/006-personalized-auto-casting.md"
+      ],
+      "limitations": [
+        "确定性工程实现待专家签署",
+        "有限卦象空间允许自然撞卦"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:auto_cast"
+    },
+    {
+      "rule_id": "LR-AUTO-REPORT-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六壬个体报数自动排盘",
+      "purpose": "由独立起卦凭证派生报数并确定占时",
+      "preconditions": [
+        "起卦凭证格式有效",
+        "历法输入有效"
+      ],
+      "inputs": [
+        "cast_nonce",
+        "calendar"
+      ],
+      "procedure": [
+        "使用六壬专属域派生1至12报数",
+        "将报数映射占时",
+        "保留实际时支并排盘"
+      ],
+      "outputs": [
+        "report_number",
+        "occupation_time",
+        "cast_nonce_hash"
+      ],
+      "source_refs": [
+        "docs/design/decisions/006-personalized-auto-casting.md"
+      ],
+      "limitations": [
+        "报数派生属于工程基线待专家签署",
+        "十二占时之间自然重复"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:auto_cast"
+    },
+    {
+      "rule_id": "CAL-NORMALIZE-001",
+      "version": "1.0.0",
+      "system": "calendar",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "本地时间标准化",
+      "purpose": "将无偏移本地时间按IANA时区转换为可计算时刻",
+      "preconditions": [
+        "年份在1900至2100之间",
+        "时区名称有效",
+        "时间不处于夏令时歧义或缺失区间"
+      ],
+      "inputs": [
+        "local_datetime",
+        "timezone"
+      ],
+      "procedure": [
+        "解析ISO-8601本地时间",
+        "按IANA时区定位",
+        "保留本地时间与UTC时间"
+      ],
+      "outputs": [
+        "original_local_datetime",
+        "utc_datetime"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"
+      ],
+      "limitations": [
+        "不接受输入自带UTC偏移"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.calendar.timezone:parse_local_datetime"
+    },
+    {
+      "rule_id": "CAL-SOLAR-TIME-001",
+      "version": "1.0.0",
+      "system": "calendar",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "真太阳时修正",
+      "purpose": "在显式启用时记录经度、均时差和夏令时修正",
+      "preconditions": [
+        "启用时必须提供经度"
+      ],
+      "inputs": [
+        "local_datetime",
+        "timezone",
+        "longitude",
+        "use_true_solar_time"
+      ],
+      "procedure": [
+        "计算标准经线",
+        "计算经度时差",
+        "计算均时差近似值",
+        "扣除夏令时并合并修正"
+      ],
+      "outputs": [
+        "effective_local_datetime",
+        "correction"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"
+      ],
+      "limitations": [
+        "均时差使用NOAA风格近似公式",
+        "默认关闭"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.calendar.timezone:apply_true_solar_time"
+    },
+    {
+      "rule_id": "CAL-CONVERSION-001",
+      "version": "1.0.0",
+      "system": "calendar",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "公农历与节气转换",
+      "purpose": "生成农历日期及相邻节气事实",
+      "preconditions": [
+        "时间已标准化"
+      ],
+      "inputs": [
+        "effective_local_datetime"
+      ],
+      "procedure": [
+        "调用固定版本lunar-python转换",
+        "提取农历与相邻节气"
+      ],
+      "outputs": [
+        "lunar",
+        "solar_terms"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#技术决策"
+      ],
+      "limitations": [
+        "结果受lunar-python 1.4.8支持范围约束"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.calendar.engine:CalendarEngine.calculate"
+    },
+    {
+      "rule_id": "CAL-PILLARS-001",
+      "version": "1.0.0",
+      "system": "calendar",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "四柱边界工程基线",
+      "purpose": "按立春、节令和子初23时生成四柱",
+      "preconditions": [
+        "历法时间已确定"
+      ],
+      "inputs": [
+        "effective_local_datetime"
+      ],
+      "procedure": [
+        "立春换年",
+        "节令换月",
+        "23时换日",
+        "计算时柱"
+      ],
+      "outputs": [
+        "pillars"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#时间规则基线"
+      ],
+      "limitations": [
+        "边界仍待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.calendar.engine:CalendarEngine.calculate"
+    },
+    {
+      "rule_id": "CAL-TERM-TZ-001",
+      "version": "1.0.0",
+      "system": "calendar",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "节气绝对时刻时区转换",
+      "purpose": "将东八区节气参考时刻转换为输入IANA时区的同一绝对时刻",
+      "preconditions": [
+        "有效时区和有效时间"
+      ],
+      "inputs": [
+        "effective_local_datetime",
+        "timezone"
+      ],
+      "procedure": [
+        "转换为Asia/Shanghai参考时刻",
+        "读取节气参考时间",
+        "转换为用户时区和UTC"
+      ],
+      "outputs": [
+        "solar_term_reference_datetime",
+        "local_datetime",
+        "utc_datetime"
+      ],
+      "source_refs": [
+        "docs/design/decisions/008-calendar-engine-phase-two.md"
+      ],
+      "limitations": [
+        "节气数据受lunar-python 1.4.8约束",
+        "天文算法实现待独立交叉验证"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.calendar.solar_terms:serialize_jieqi"
+    },
+    {
+      "rule_id": "CAL-TERM-001",
+      "version": "1.0.0",
+      "system": "calendar",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "二十四节气与月令边界",
+      "purpose": "输出相邻节气及当前月建所依据的前后节令",
+      "preconditions": [
+        "节气参考时刻已确定"
+      ],
+      "inputs": [
+        "reference_datetime"
+      ],
+      "procedure": [
+        "读取前一当前下一节气",
+        "读取前一和下一节令",
+        "保留秒级时间"
+      ],
+      "outputs": [
+        "solar_terms",
+        "month_boundary_terms"
+      ],
+      "source_refs": [
+        "docs/design/decisions/008-calendar-engine-phase-two.md"
+      ],
+      "limitations": [
+        "秒级指输出粒度，不代表未经验证的天文误差范围"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.calendar.solar_terms:solar_term_context"
+    },
+    {
+      "rule_id": "CAL-CYCLE-001",
+      "version": "1.0.0",
+      "system": "calendar",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "月建生肖与旬空结构化",
+      "purpose": "由四柱生成月建、立春生肖、日旬和旬空事实",
+      "preconditions": [
+        "四柱已确定"
+      ],
+      "inputs": [
+        "year_pillar",
+        "month_pillar",
+        "day_pillar"
+      ],
+      "procedure": [
+        "月柱地支作为月建",
+        "年柱地支映射生肖",
+        "日柱定位六十甲子和旬空"
+      ],
+      "outputs": [
+        "month_branch",
+        "zodiac",
+        "xun",
+        "xun_kong"
+      ],
+      "source_refs": [
+        "docs/design/decisions/008-calendar-engine-phase-two.md"
+      ],
+      "limitations": [
+        "生肖边界采用立春工程基线",
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.calendar.engine:CalendarEngine.calculate"
+    },
+    {
+      "rule_id": "YI-MANUAL-001",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "手工六爻归一化",
+      "purpose": "将初爻至上爻的6/7/8/9转换为阴阳及动爻",
+      "preconditions": [
+        "恰好六个爻值"
+      ],
+      "inputs": [
+        "lines"
+      ],
+      "procedure": [
+        "6与8映射阴",
+        "7与9映射阳",
+        "6与9标记为动爻"
+      ],
+      "outputs": [
+        "binary_lines",
+        "moving_lines"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"
+      ],
+      "limitations": [
+        "不包含多爻辞解释"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.iching:manual_cast"
+    },
+    {
+      "rule_id": "YI-RELATION-001",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "关联卦派生",
+      "purpose": "由六爻生成本卦、变卦、互卦、错卦和综卦",
+      "preconditions": [
+        "六爻已归一化"
+      ],
+      "inputs": [
+        "binary_lines",
+        "moving_lines"
+      ],
+      "procedure": [
+        "按上下三爻查六十四卦",
+        "翻转动爻",
+        "按二三四与三四五取互卦",
+        "逐爻取反生成错卦",
+        "倒序生成综卦"
+      ],
+      "outputs": [
+        "original",
+        "changed",
+        "mutual",
+        "opposite",
+        "reversed"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"
+      ],
+      "limitations": [
+        "只生成卦象事实"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.iching:derive_hexagrams"
+    },
+    {
+      "rule_id": "YI-NUMBER-001",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "周易双数取上下卦",
+      "purpose": "第一数取下卦，第二数取上卦",
+      "preconditions": [
+        "输入为整数"
+      ],
+      "inputs": [
+        "lower_number",
+        "upper_number"
+      ],
+      "procedure": [
+        "分别除以8取余",
+        "余0按8"
+      ],
+      "outputs": [
+        "lower_trigram",
+        "upper_trigram"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"
+      ],
+      "limitations": [
+        "属于MVP指定数字起卦法"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.iching:number_cast"
+    },
+    {
+      "rule_id": "YI-NUMBER-002",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "周易双数取动爻",
+      "purpose": "按两数之和确定动爻",
+      "preconditions": [
+        "输入为整数"
+      ],
+      "inputs": [
+        "lower_number",
+        "upper_number"
+      ],
+      "procedure": [
+        "两数求和",
+        "除以6取余",
+        "余0按6"
+      ],
+      "outputs": [
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#周易基线"
+      ],
+      "limitations": [
+        "属于MVP指定数字起卦法"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.iching:number_cast"
+    },
+    {
+      "rule_id": "YI-3NUM-INPUT-001",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "three-number-engineering-baseline",
+      "status": "draft",
+      "title": "周易三数角色归一化",
+      "purpose": "将三个非负整数分别固定为上卦、下卦和动爻输入",
+      "preconditions": [
+        "恰好三个非负整数"
+      ],
+      "inputs": [
+        "numbers",
+        "mapping_version"
+      ],
+      "procedure": [
+        "校验数量和整数类型",
+        "第一数标记为上卦",
+        "第二数标记为下卦",
+        "第三数标记为动爻"
+      ],
+      "outputs": [
+        "normalized_input",
+        "roles"
+      ],
+      "source_refs": [
+        "docs/design/decisions/009-zhouyi-three-number-phase-three.md"
+      ],
+      "limitations": [
+        "负数不进入当前规则",
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.zhouyi.models:ThreeNumberInput"
+    },
+    {
+      "rule_id": "YI-3NUM-MAPPING-001",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "three-number-engineering-baseline",
+      "status": "draft",
+      "title": "周易三数八卦映射",
+      "purpose": "按版本化八卦数字表分别确定上下卦",
+      "preconditions": [
+        "三数角色已归一化",
+        "映射版本存在"
+      ],
+      "inputs": [
+        "number1",
+        "number2",
+        "mapping_version"
+      ],
+      "procedure": [
+        "分别除以8取余",
+        "余0归8",
+        "按配置读取乾1兑2离3震4巽5坎6艮7坤8"
+      ],
+      "outputs": [
+        "upper_trigram",
+        "lower_trigram",
+        "mapping"
+      ],
+      "source_refs": [
+        "docs/design/decisions/009-zhouyi-three-number-phase-three.md"
+      ],
+      "limitations": [
+        "当前仅发布一个待审核映射版本"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.zhouyi.config.hexagram_mapping:TrigramNumberMapping"
+    },
+    {
+      "rule_id": "YI-3NUM-MOVING-001",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "three-number-engineering-baseline",
+      "status": "draft",
+      "title": "周易第三数取动爻",
+      "purpose": "由第三个数字独立确定动爻",
+      "preconditions": [
+        "第三数为非负整数"
+      ],
+      "inputs": [
+        "number3"
+      ],
+      "procedure": [
+        "除以6取余",
+        "余0归6"
+      ],
+      "outputs": [
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/009-zhouyi-three-number-phase-three.md"
+      ],
+      "limitations": [
+        "不使用前两数之和",
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.zhouyi.engine:three_number_cast"
+    },
+    {
+      "rule_id": "YI-TIME-001",
+      "version": "1.0.0",
+      "system": "zhouyi",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "周易农历时间自动排盘",
+      "purpose": "由年支、农历月日及时支生成可复算卦象",
+      "preconditions": [
+        "时间和时区有效"
+      ],
+      "inputs": [
+        "local_datetime",
+        "timezone"
+      ],
+      "procedure": [
+        "年支数加农历月日取上卦",
+        "再加时支取下卦和动爻"
+      ],
+      "outputs": [
+        "original",
+        "changed",
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#周易"
+      ],
+      "limitations": [
+        "工程指定时间起卦法",
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.iching:time_cast"
+    },
+    {
+      "rule_id": "MH-TIME-001",
+      "version": "1.0.0",
+      "system": "meihua",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "梅花农历时间起卦",
+      "purpose": "由年支、农历月日和时支确定上下卦及动爻",
+      "preconditions": [
+        "时间和时区有效"
+      ],
+      "inputs": [
+        "local_datetime",
+        "timezone"
+      ],
+      "procedure": [
+        "年支数加月日取上卦",
+        "再加时支取下卦",
+        "下卦总数除以6取动爻"
+      ],
+      "outputs": [
+        "upper_trigram",
+        "lower_trigram",
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"
+      ],
+      "limitations": [
+        "闰月按月份绝对值取数",
+        "规则待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.meihua.engine:time_cast"
+    },
+    {
+      "rule_id": "MH-NUMBER-001",
+      "version": "1.0.0",
+      "system": "meihua",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "梅花双数起卦",
+      "purpose": "第一数取上卦，第二数取下卦并以两数之和取动爻",
+      "preconditions": [
+        "输入为整数"
+      ],
+      "inputs": [
+        "upper_number",
+        "lower_number"
+      ],
+      "procedure": [
+        "第一数除以8取上卦",
+        "第二数除以8取下卦",
+        "两数之和除以6取动爻"
+      ],
+      "outputs": [
+        "upper_trigram",
+        "lower_trigram",
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"
+      ],
+      "limitations": [
+        "规则待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.meihua.engine:number_cast"
+    },
+    {
+      "rule_id": "MH-THREE-NUMBER-001",
+      "version": "1.0.0",
+      "system": "meihua",
+      "school": "meihua-three-number-baseline",
+      "status": "draft",
+      "title": "梅花三数独立起卦",
+      "purpose": "分别以三个整数确定上卦、下卦和动爻",
+      "preconditions": [
+        "恰好三个整数"
+      ],
+      "inputs": [
+        "upper_number",
+        "lower_number",
+        "moving_number"
+      ],
+      "procedure": [
+        "第一数除以8取上卦且余0归8",
+        "第二数除以8取下卦且余0归8",
+        "第三数除以6取动爻且余0归6"
+      ],
+      "outputs": [
+        "upper_trigram",
+        "lower_trigram",
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/010-meihua-domain-phase-four.md"
+      ],
+      "limitations": [
+        "允许有符号整数以兼容既有数字输入口径",
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.meihua.engine:three_number_cast"
+    },
+    {
+      "rule_id": "MH-BODYUSE-001",
+      "version": "1.0.0",
+      "system": "meihua",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "梅花体用位置",
+      "purpose": "按动爻所在三爻卦确定用卦，另一卦为体",
+      "preconditions": [
+        "动爻位置已确定"
+      ],
+      "inputs": [
+        "moving_line"
+      ],
+      "procedure": [
+        "动爻在1至3则下卦为用",
+        "动爻在4至6则上卦为用",
+        "另一卦为体"
+      ],
+      "outputs": [
+        "body_position",
+        "use_position"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#梅花易数基线"
+      ],
+      "limitations": [
+        "不含旺衰与应期"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.meihua.engine:_cast_from_sources"
+    },
+    {
+      "rule_id": "MH-FIVE-ELEMENT-001",
+      "version": "1.0.0",
+      "system": "meihua",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "梅花体用五行关系",
+      "purpose": "输出体用之间的生克比和关系事实",
+      "preconditions": [
+        "体卦和用卦五行已确定"
+      ],
+      "inputs": [
+        "body_element",
+        "use_element"
+      ],
+      "procedure": [
+        "比较同五行",
+        "比较五行生关系",
+        "比较五行克关系"
+      ],
+      "outputs": [
+        "relation_code",
+        "relation_label"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"
+      ],
+      "limitations": [
+        "关系事实不直接映射吉凶"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.meihua.engine:five_element_relation"
+    },
+    {
+      "rule_id": "CYCLE-XUN-001",
+      "version": "1.0.0",
+      "system": "calendar",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "日柱旬空与旬遁",
+      "purpose": "由六十甲子日柱确定旬首、旬空和旬遁干",
+      "preconditions": [
+        "日柱为有效六十甲子"
+      ],
+      "inputs": [
+        "day_pillar"
+      ],
+      "procedure": [
+        "定位六十甲子序号",
+        "按十日划分旬",
+        "计算旬空和十干遁支"
+      ],
+      "outputs": [
+        "xun",
+        "empty_branches",
+        "dun_gan"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#统一输入与输出"
+      ],
+      "limitations": [
+        "待标准案例复核"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.cyclical:xun_info"
+    },
+    {
+      "rule_id": "LY-LINES-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六爻值录入",
+      "purpose": "按自下而上顺序将六个6/7/8/9爻值转换为本卦和动爻",
+      "preconditions": [
+        "必须恰有六个爻值",
+        "每个爻值只能是6、7、8或9"
+      ],
+      "inputs": [
+        "lines"
+      ],
+      "procedure": [
+        "按初爻至上爻读取六值",
+        "6和8映射为阴爻，7和9映射为阳爻",
+        "6和9标记为动爻"
+      ],
+      "outputs": [
+        "input_lines",
+        "original",
+        "moving_lines",
+        "changed"
+      ],
+      "source_refs": [
+        "docs/design/decisions/011-liuyao-domain-phase-five.md"
+      ],
+      "limitations": [
+        "不替代蓍草或铜钱的实际起卦过程"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:line_cast"
+    },
+    {
+      "rule_id": "LY-COINS-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六次三枚硬币录入",
+      "purpose": "将六轮三枚硬币值求和为六个爻值",
+      "preconditions": [
+        "必须恰有六轮",
+        "每轮必须恰有三枚",
+        "每枚只允许2或3"
+      ],
+      "inputs": [
+        "coins"
+      ],
+      "procedure": [
+        "按初爻至上爻读取六轮",
+        "每轮三枚值求和得到6至9",
+        "按六爻值规则生成卦象"
+      ],
+      "outputs": [
+        "coin_rounds",
+        "input_lines",
+        "original",
+        "moving_lines",
+        "changed"
+      ],
+      "source_refs": [
+        "docs/design/decisions/011-liuyao-domain-phase-five.md"
+      ],
+      "limitations": [
+        "2和3是确定性输入编码，不判断实体硬币正反面"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:coin_cast"
+    },
+    {
+      "rule_id": "LY-TIME-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六爻时间自动起卦",
+      "purpose": "由农历时间取数生成六爻卦象",
+      "preconditions": [
+        "时间和时区有效"
+      ],
+      "inputs": [
+        "local_datetime",
+        "timezone"
+      ],
+      "procedure": [
+        "农历时间取上下卦",
+        "总数取单一动爻"
+      ],
+      "outputs": [
+        "original",
+        "changed",
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-2"
+      ],
+      "limitations": [
+        "工程指定起卦入口",
+        "不替代手工摇卦"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:time_cast"
+    },
+    {
+      "rule_id": "LY-NUMBER-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六爻双数起卦",
+      "purpose": "由两个整数生成六爻卦象",
+      "preconditions": [
+        "输入为整数"
+      ],
+      "inputs": [
+        "lower_number",
+        "upper_number"
+      ],
+      "procedure": [
+        "分别除以8取上下卦",
+        "两数之和除以6取动爻"
+      ],
+      "outputs": [
+        "original",
+        "changed",
+        "moving_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#数字排盘-2"
+      ],
+      "limitations": [
+        "工程指定数字起卦法"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:number_cast"
+    },
+    {
+      "rule_id": "LY-PALACE-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "京房八宫世应",
+      "purpose": "确定卦宫、游归魂阶段及世应爻",
+      "preconditions": [
+        "本卦六爻已确定"
+      ],
+      "inputs": [
+        "original_lines"
+      ],
+      "procedure": [
+        "按八纯卦变爻序列匹配八宫",
+        "按宫序确定世应"
+      ],
+      "outputs": [
+        "palace",
+        "host_line",
+        "response_line"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"
+      ],
+      "limitations": [
+        "京房八宫工程基线待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.rules:PALACE_BY_LINES"
+    },
+    {
+      "rule_id": "LY-NAJIA-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "八卦纳甲纳支",
+      "purpose": "为本卦六爻配置纳干和纳支",
+      "preconditions": [
+        "上下卦已确定"
+      ],
+      "inputs": [
+        "lower_trigram",
+        "upper_trigram"
+      ],
+      "procedure": [
+        "下卦取内卦纳甲",
+        "上卦取外卦纳甲"
+      ],
+      "outputs": [
+        "najia_stem",
+        "najia_branch"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"
+      ],
+      "limitations": [
+        "变卦纳甲扩展未输出"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:_decorate"
+    },
+    {
+      "rule_id": "LY-RELATIVE-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六爻六亲",
+      "purpose": "按宫五行与爻支五行关系确定六亲",
+      "preconditions": [
+        "卦宫和纳支已确定"
+      ],
+      "inputs": [
+        "palace_element",
+        "branch_element"
+      ],
+      "procedure": [
+        "比较五行生克比和",
+        "映射父母兄弟子孙妻财官鬼"
+      ],
+      "outputs": [
+        "six_relative"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"
+      ],
+      "limitations": [
+        "不含用神取用和旺衰"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:_six_relative"
+    },
+    {
+      "rule_id": "LY-SPIRIT-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "六爻日干起六神",
+      "purpose": "按占日天干从初爻顺排六神",
+      "preconditions": [
+        "日干有效"
+      ],
+      "inputs": [
+        "day_stem"
+      ],
+      "procedure": [
+        "按日干确定初爻六神",
+        "初爻至上爻顺排"
+      ],
+      "outputs": [
+        "six_spirits"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#盘面事实"
+      ],
+      "limitations": [
+        "只输出盘面事实"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:_decorate"
+    },
+    {
+      "rule_id": "LY-HIDDEN-FLYING-COVERAGE-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "伏神飞神规则覆盖声明",
+      "purpose": "显式报告伏神飞神规则是否完成签署，避免在规则未定时生成推测值",
+      "preconditions": [
+        "六爻盘面已生成"
+      ],
+      "inputs": [
+        "palace",
+        "line_relatives"
+      ],
+      "procedure": [
+        "检查已签署规则版本和标准案例",
+        "未签署时返回pending_rule_selection",
+        "伏神和飞神数组保持为空"
+      ],
+      "outputs": [
+        "status",
+        "hidden_spirits",
+        "flying_spirits",
+        "reason"
+      ],
+      "source_refs": [
+        "docs/design/decisions/011-liuyao-domain-phase-five.md"
+      ],
+      "limitations": [
+        "当前仅报告覆盖状态，不执行伏神飞神排法"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:_result"
+    },
+    {
+      "rule_id": "LR-MONTH-GENERAL-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬中气月将",
+      "purpose": "按最近中气确定月将",
+      "preconditions": [
+        "历法时间有效"
+      ],
+      "inputs": [
+        "effective_local_datetime"
+      ],
+      "procedure": [
+        "定位最近中气",
+        "映射十二月将"
+      ],
+      "outputs": [
+        "month_general"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-3"
+      ],
+      "limitations": [
+        "交节边界待标准案例复核"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_month_general"
+    },
+    {
+      "rule_id": "LR-HOUR-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬时间占时",
+      "purpose": "自动排盘采用历法时支作为占时",
+      "preconditions": [
+        "时间和时区有效"
+      ],
+      "inputs": [
+        "time_branch"
+      ],
+      "procedure": [
+        "读取历法时支"
+      ],
+      "outputs": [
+        "occupation_branch"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#自动排盘-3"
+      ],
+      "limitations": [
+        "不包含活时选取"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:time_cast"
+    },
+    {
+      "rule_id": "LR-NUMBER-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬数字占时",
+      "purpose": "将整数映射为子至亥占时",
+      "preconditions": [
+        "输入为整数"
+      ],
+      "inputs": [
+        "number"
+      ],
+      "procedure": [
+        "整数除以12取余",
+        "余0按亥"
+      ],
+      "outputs": [
+        "occupation_branch"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#数字排盘-3"
+      ],
+      "limitations": [
+        "数字只替换占时，不修改历法日柱"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:number_cast"
+    },
+    {
+      "rule_id": "LR-PLATE-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "月将加时天地盘",
+      "purpose": "将月将加临占时并顺布天盘",
+      "preconditions": [
+        "月将和占时已确定"
+      ],
+      "inputs": [
+        "month_general",
+        "occupation_branch"
+      ],
+      "procedure": [
+        "月将加临占时",
+        "十二支顺布"
+      ],
+      "outputs": [
+        "earth_plate",
+        "heaven_plate"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"
+      ],
+      "limitations": [
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_heaven_plate"
+    },
+    {
+      "rule_id": "LR-LESSON-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "日干寄宫四课",
+      "purpose": "由日干支与天盘生成四课",
+      "preconditions": [
+        "天地盘和日柱已确定"
+      ],
+      "inputs": [
+        "day_pillar",
+        "heaven_plate"
+      ],
+      "procedure": [
+        "日干寄宫取干阳神",
+        "递取干阴神",
+        "取支阳神和支阴神"
+      ],
+      "outputs": [
+        "four_lessons"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"
+      ],
+      "limitations": [
+        "寄宫规则待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_four_lessons"
+    },
+    {
+      "rule_id": "LR-TRANSMISSION-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬基础发传",
+      "purpose": "在覆盖路径内由四课生成三传",
+      "preconditions": [
+        "四课已确定"
+      ],
+      "inputs": [
+        "day_pillar",
+        "heaven_plate",
+        "four_lessons"
+      ],
+      "procedure": [
+        "依次检查贼克和克",
+        "多候选时检查比用",
+        "初传确定后递取中末传"
+      ],
+      "outputs": [
+        "three_transmissions",
+        "coverage_status"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#三传覆盖边界"
+      ],
+      "limitations": [
+        "只覆盖唯一贼克、克和比用",
+        "其他路径由独立规则或覆盖状态处理"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_direct_transmissions"
+    },
+    {
+      "rule_id": "LR-REMOTE-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "daliuren-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬遥克发传",
+      "purpose": "四课无上下克时按神遥克日、日遥克神顺序确定初传",
+      "preconditions": [
+        "四课无上下克",
+        "非伏吟返吟八专"
+      ],
+      "inputs": [
+        "day_stem",
+        "four_lessons",
+        "heaven_plate"
+      ],
+      "procedure": [
+        "先查上神克日干为蒿矢",
+        "无则查日干克上神为弹射",
+        "多候选时取与日干阴阳相同者",
+        "由初传上神递取中末传"
+      ],
+      "outputs": [
+        "lesson_type",
+        "source_path",
+        "three_transmissions",
+        "trace"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00000",
+        "docs/design/decisions/012-daliuren-domain-phase-six.md"
+      ],
+      "limitations": [
+        "多个候选经比用仍不唯一时不猜测"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_remote_transmissions"
+    },
+    {
+      "rule_id": "LR-STAR-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "daliuren-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬昴星发传",
+      "purpose": "四课无上下克、无遥克且四课俱全时按阴阳日昴星法取三传",
+      "preconditions": [
+        "四课无上下克",
+        "无遥克",
+        "四课俱全"
+      ],
+      "inputs": [
+        "day_stem",
+        "four_lessons",
+        "heaven_plate"
+      ],
+      "procedure": [
+        "阳日仰视地盘酉上神，阴日俯视天盘酉所临地盘",
+        "刚日先辰后日，柔日先日后辰"
+      ],
+      "outputs": [
+        "lesson_type",
+        "source_path",
+        "three_transmissions",
+        "trace"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00000",
+        "docs/design/decisions/012-daliuren-domain-phase-six.md"
+      ],
+      "limitations": [
+        "工程案例待双专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_star_transmissions"
+    },
+    {
+      "rule_id": "LR-COVERAGE-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "daliuren-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬发传覆盖矩阵",
+      "purpose": "逐类报告发传路径的规则版本和实现状态",
+      "preconditions": [
+        "四课和天地盘已确定"
+      ],
+      "inputs": [
+        "day_pillar",
+        "four_lessons",
+        "heaven_plate"
+      ],
+      "procedure": [
+        "识别十种结果路径",
+        "读取各路径规则编号和状态",
+        "输出完整覆盖矩阵"
+      ],
+      "outputs": [
+        "transmission_coverage"
+      ],
+      "source_refs": [
+        "docs/design/decisions/012-daliuren-domain-phase-six.md"
+      ],
+      "limitations": [
+        "全部路径仍为待专家签署的工程基线"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_coverage_report"
+    },
+    {
+      "rule_id": "LR-SHEHAI-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "daliuren-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬涉害发传",
+      "purpose": "比用后仍有多个候选时按归本家沿途克位深浅确定初传",
+      "preconditions": [
+        "贼克或克候选经比用仍不唯一"
+      ],
+      "inputs": [
+        "day_pillar",
+        "candidate_lessons",
+        "heaven_plate"
+      ],
+      "procedure": [
+        "从候选上神当前地盘位置前行至本宫前",
+        "按上下克方向累计地支和寄干克位",
+        "取涉害最深者",
+        "深度相同按孟仲季，再复等取刚日日课或柔日辰课先见"
+      ],
+      "outputs": [
+        "candidate_depths",
+        "source_path",
+        "three_transmissions",
+        "trace"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00174",
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00176",
+        "docs/design/decisions/012-daliuren-domain-phase-six.md"
+      ],
+      "limitations": [
+        "孟仲季和复等采用《六壬大全》订讹口径"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_shehai_transmissions"
+    },
+    {
+      "rule_id": "LR-BIEZE-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "daliuren-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬别责发传",
+      "purpose": "三课无克无遥时按刚柔日分别取初传",
+      "preconditions": [
+        "四课去重为三课",
+        "无上下克和遥克"
+      ],
+      "inputs": [
+        "day_pillar",
+        "four_lessons",
+        "heaven_plate"
+      ],
+      "procedure": [
+        "刚日取干合之干寄宫上神",
+        "柔日取日支前三合",
+        "中末传均取日上神"
+      ],
+      "outputs": [
+        "source_path",
+        "three_transmissions",
+        "trace"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00180",
+        "docs/design/decisions/012-daliuren-domain-phase-six.md"
+      ],
+      "limitations": [
+        "柔日按原文直接取支前三合，不取该支上神"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_bieze_transmissions"
+    },
+    {
+      "rule_id": "LR-BAZHUAN-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "daliuren-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬八专发传",
+      "purpose": "干支同位两课无克时按阴阳日顺逆三位发传",
+      "preconditions": [
+        "四课去重为两课",
+        "无上下克"
+      ],
+      "inputs": [
+        "day_pillar",
+        "four_lessons"
+      ],
+      "procedure": [
+        "阳日从日阳神连本位顺数三位",
+        "阴日从辰阴神连本位逆数三位",
+        "中末传均取日上神"
+      ],
+      "outputs": [
+        "source_path",
+        "three_transmissions",
+        "trace"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00181",
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00182",
+        "docs/design/decisions/012-daliuren-domain-phase-six.md"
+      ],
+      "limitations": [
+        "论克不论遥，存在上下克时仍按基础克法"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_bazhuan_transmissions"
+    },
+    {
+      "rule_id": "LR-FUYIN-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "daliuren-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬伏吟发传",
+      "purpose": "天地盘同位时按有克、自任、自信及杜传规则生成三传",
+      "preconditions": [
+        "天地盘同位"
+      ],
+      "inputs": [
+        "day_pillar",
+        "four_lessons"
+      ],
+      "procedure": [
+        "有克按克取初传",
+        "无克刚日取日上神、柔日取日支",
+        "按刑递取中末",
+        "遇自刑或刑神重复时按日辰与冲神处理"
+      ],
+      "outputs": [
+        "source_path",
+        "three_transmissions",
+        "trace"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00182",
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00184",
+        "docs/design/decisions/012-daliuren-domain-phase-six.md"
+      ],
+      "limitations": [
+        "刑序采用《六壬大全》订讹口径"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_fuyin_transmissions"
+    },
+    {
+      "rule_id": "LR-FANYIN-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "daliuren-engineering-baseline",
+      "status": "draft",
+      "title": "大六壬返吟井栏射",
+      "purpose": "天地盘相冲且无上下克时按井栏射生成三传",
+      "preconditions": [
+        "天地盘偏移六位",
+        "四课无上下克"
+      ],
+      "inputs": [
+        "day_pillar",
+        "four_lessons",
+        "heaven_plate"
+      ],
+      "procedure": [
+        "日支斜射前三合位置上神为初传",
+        "辰上神为中传",
+        "日上神为末传"
+      ],
+      "outputs": [
+        "source_path",
+        "three_transmissions",
+        "trace"
+      ],
+      "source_refs": [
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00185",
+        "data/generated/wikisource-corpus/corpus_chunks.jsonl#wikisource-六壬大全-cdf0757c0f2e:00186",
+        "docs/design/decisions/012-daliuren-domain-phase-six.md"
+      ],
+      "limitations": [
+        "井栏射只发生于丁己辛丑未六日；有克仍按基础克法"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_fanyin_transmissions"
+    },
+    {
+      "rule_id": "LR-GENERAL-001",
+      "version": "1.0.0",
+      "system": "liuren",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "昼夜贵人十二天将",
+      "purpose": "按日干昼夜贵人起例布十二天将",
+      "preconditions": [
+        "日干、当地小时和天地盘已确定"
+      ],
+      "inputs": [
+        "day_stem",
+        "civil_hour",
+        "heaven_plate"
+      ],
+      "procedure": [
+        "6至18时按昼贵其余按夜贵",
+        "定位贵人临地盘",
+        "按临地方位顺逆布将"
+      ],
+      "outputs": [
+        "heavenly_generals"
+      ],
+      "source_refs": [
+        "docs/design/decisions/004-four-system-casting-baseline.md#盘面事实-1"
+      ],
+      "limitations": [
+        "昼夜按民用小时划分的工程基线",
+        "贵人起例待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.daliuren.engine:_heavenly_generals"
+    },
+    {
+      "rule_id": "XIANG-TRIGRAM-001",
+      "version": "1.0.0",
+      "system": "imagery",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "八卦基础类象",
+      "purpose": "按盘面角色提供八卦自然、人物、事物和行为等类象候选",
+      "preconditions": [
+        "盘面包含有效八卦"
+      ],
+      "inputs": [
+        "trigram",
+        "module",
+        "role"
+      ],
+      "procedure": [
+        "读取版本化八卦类象表",
+        "保留盘面模块和角色"
+      ],
+      "outputs": [
+        "imagery_candidates"
+      ],
+      "source_refs": [
+        "docs/design/decisions/005-imagery-and-yuanhui-baseline.md#类象层"
+      ],
+      "limitations": [
+        "类象待专家逐项签署",
+        "不自动指认现实对象"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.imagery:TRIGRAM_IMAGERY"
+    },
+    {
+      "rule_id": "XIANG-BRANCH-001",
+      "version": "1.0.0",
+      "system": "imagery",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "十二地支基础类象",
+      "purpose": "为六壬月将和三传提供地支类象候选",
+      "preconditions": [
+        "盘面包含有效地支"
+      ],
+      "inputs": [
+        "earthly_branch",
+        "module",
+        "role"
+      ],
+      "procedure": [
+        "读取地支方位时令和事物类象",
+        "保留月将或三传角色"
+      ],
+      "outputs": [
+        "imagery_candidates"
+      ],
+      "source_refs": [
+        "docs/design/decisions/005-imagery-and-yuanhui-baseline.md#类象层"
+      ],
+      "limitations": [
+        "首版不含完整神煞和天将类象"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.imagery:BRANCH_IMAGERY"
+    },
+    {
+      "rule_id": "XIANG-CONTEXT-001",
+      "version": "1.0.0",
+      "system": "imagery",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "事项类象维度筛选",
+      "purpose": "按用户明确选择的事项类别排序类象维度",
+      "preconditions": [
+        "事项类别受支持"
+      ],
+      "inputs": [
+        "category",
+        "imagery_candidates"
+      ],
+      "procedure": [
+        "选择事项优先维度",
+        "保留完整类象和筛选结果"
+      ],
+      "outputs": [
+        "priority_dimensions",
+        "selected_imagery"
+      ],
+      "source_refs": [
+        "docs/design/decisions/005-imagery-and-yuanhui-baseline.md#事项筛选"
+      ],
+      "limitations": [
+        "问题全文不进入排盘公式",
+        "筛选不表示现实对应已确认"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.imagery:collect_imagery"
+    },
+    {
+      "rule_id": "YHYS-CYCLE-001",
+      "version": "1.0.0",
+      "system": "yuanhui",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "元会运世周期定位",
+      "purpose": "按暂定纪元和周期单位定位公历年",
+      "preconditions": [
+        "历法模块提供公历年"
+      ],
+      "inputs": [
+        "solar_year",
+        "epoch"
+      ],
+      "procedure": [
+        "按129600年取元",
+        "按10800年取会",
+        "按360年取运",
+        "按30年取世"
+      ],
+      "outputs": [
+        "yuan",
+        "hui",
+        "yun",
+        "shi",
+        "year_in_shi"
+      ],
+      "source_refs": [
+        "docs/design/decisions/005-imagery-and-yuanhui-baseline.md#元会运世层",
+        "https://zh.wikisource.org/wiki/皇極經世"
+      ],
+      "limitations": [
+        "公元前67017年纪元待专家签署",
+        "只计算到公历年"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.yuanhui:cycle_position"
+    },
+    {
+      "rule_id": "YHYS-RELATION-001",
+      "version": "1.0.0",
+      "system": "yuanhui",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "会支五行与盘面关系",
+      "purpose": "比较当前会支五行与盘面结构五行",
+      "preconditions": [
+        "会支和盘面五行已确定"
+      ],
+      "inputs": [
+        "hui_element",
+        "chart_elements"
+      ],
+      "procedure": [
+        "逐项比较同类、生和克关系",
+        "保留模块与盘面角色"
+      ],
+      "outputs": [
+        "relation_evidence"
+      ],
+      "source_refs": [
+        "docs/design/decisions/005-imagery-and-yuanhui-baseline.md#与盘面关系"
+      ],
+      "limitations": [
+        "关系不映射个人吉凶",
+        "不生成应期"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.yuanhui:analyze_yuan_hui_yun_shi"
+    },
+    {
+      "rule_id": "INTERP-CORRESPONDENCE-001",
+      "version": "1.0.0",
+      "system": "interpretation",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "盘面事实对应解释",
+      "purpose": "把各模块盘面角色和类象转换为当前事项的待核实解释",
+      "preconditions": [
+        "盘面事实已完成",
+        "用户提供事项类别和问题摘要"
+      ],
+      "inputs": [
+        "module_results",
+        "context",
+        "imagery"
+      ],
+      "procedure": [
+        "分模块读取盘面角色",
+        "关联事项优先类象",
+        "生成事实、对应和核实点"
+      ],
+      "outputs": [
+        "module_interpretations",
+        "verification_points"
+      ],
+      "source_refs": [
+        "docs/design/decisions/005-imagery-and-yuanhui-baseline.md#输出边界"
+      ],
+      "limitations": [
+        "解释模板待专家签署",
+        "不把类象强制对应现实对象",
+        "不生成吉凶和应期"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.interpretation:explain_correspondences"
+    },
+    {
+      "rule_id": "INTERP-INTEGRATE-001",
+      "version": "1.0.0",
+      "system": "interpretation",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "跨层解释整合",
+      "purpose": "在不覆盖独立盘面的前提下并列模块解释和宏观时间背景",
+      "preconditions": [
+        "模块对应解释已生成"
+      ],
+      "inputs": [
+        "module_interpretations",
+        "yuan_hui_yun_shi"
+      ],
+      "procedure": [
+        "保留模块独立解释",
+        "附加元会运世背景",
+        "汇总现实核实点"
+      ],
+      "outputs": [
+        "summary",
+        "cross_layer",
+        "limitations"
+      ],
+      "source_refs": [
+        "docs/design/decisions/005-imagery-and-yuanhui-baseline.md#接口与展示"
+      ],
+      "limitations": [
+        "不进行自动加权",
+        "宏观周期不决定个人事项"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.interpretation:explain_correspondences"
+    },
+    {
+      "rule_id": "ADV-CONTEXT-001",
+      "version": "1.0.0",
+      "system": "advisory",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "事项分类决策检查清单",
+      "purpose": "根据用户明确选择的事项类别生成可核实、可执行的通用决策检查清单",
+      "preconditions": [
+        "用户明确提供事项类别和问题摘要"
+      ],
+      "inputs": [
+        "category",
+        "question_summary"
+      ],
+      "procedure": [
+        "选择对应事项模板",
+        "生成目标、资源、风险和验证建议",
+        "附加核实问题和高影响事项限制"
+      ],
+      "outputs": [
+        "recommendations",
+        "verification_questions",
+        "risk_notes"
+      ],
+      "source_refs": [
+        "docs/design/product-design.md#步骤一选择场景",
+        "docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"
+      ],
+      "limitations": [
+        "未经过专家签署",
+        "不构成现实概率或专业意见",
+        "不得写入正式judgements"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.advisory:generate_advisory"
+    },
+    {
+      "rule_id": "ADV-MH-RELATION-001",
+      "version": "1.0.0",
+      "system": "advisory",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "梅花体用关系关注点映射",
+      "purpose": "将已计算的体用五行关系映射为待核实的决策关注点",
+      "preconditions": [
+        "梅花体用关系事实已生成",
+        "用户请求研究性事项建议"
+      ],
+      "inputs": [
+        "relation_code",
+        "category",
+        "question_summary"
+      ],
+      "procedure": [
+        "读取本卦阶段体用关系",
+        "映射为资源、约束、投入或协同关注点",
+        "生成验证行动"
+      ],
+      "outputs": [
+        "focus",
+        "rationale",
+        "recommendation"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md#输出边界"
+      ],
+      "limitations": [
+        "映射仅为未审核研究模板",
+        "不映射吉凶",
+        "不生成应期"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.advisory:generate_advisory"
+    },
+    {
+      "rule_id": "FS-DIRECTION-NORMALIZE-001",
+      "version": "1.0.0",
+      "system": "fengshui",
+      "school": "twenty-four-mountains-engineering-baseline",
+      "status": "draft",
+      "title": "罗盘角度标准化",
+      "purpose": "将任意有限角度归一化为正北零度顺时针的0至360度区间",
+      "preconditions": [
+        "向首角度为有限数值"
+      ],
+      "inputs": [
+        "facing_degree"
+      ],
+      "procedure": [
+        "对输入角度按360度取模",
+        "负角度转换为等价正角度"
+      ],
+      "outputs": [
+        "normalized_degree"
+      ],
+      "source_refs": [
+        "docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"
+      ],
+      "limitations": [
+        "只处理角度坐标，不判断测量是否正确"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.fengshui.engine:_normalize"
+    },
+    {
+      "rule_id": "FS-DECLINATION-001",
+      "version": "1.0.0",
+      "system": "fengshui",
+      "school": "twenty-four-mountains-engineering-baseline",
+      "status": "draft",
+      "title": "磁偏角真北修正",
+      "purpose": "将磁北向首换算为真北向首",
+      "preconditions": [
+        "输入角度基于磁北或真北",
+        "磁偏角为有限数值"
+      ],
+      "inputs": [
+        "input_reference",
+        "magnetic_declination"
+      ],
+      "procedure": [
+        "磁北输入加磁偏角",
+        "真北输入不重复修正",
+        "结果按360度归一化"
+      ],
+      "outputs": [
+        "applied_declination",
+        "true_facing_degree"
+      ],
+      "source_refs": [
+        "docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"
+      ],
+      "limitations": [
+        "磁偏角数值及来源由调用方提供",
+        "不内置地磁模型"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.fengshui.engine:calculate_direction"
+    },
+    {
+      "rule_id": "FS-24MOUNTAIN-001",
+      "version": "1.0.0",
+      "system": "fengshui",
+      "school": "twenty-four-mountains-engineering-baseline",
+      "status": "draft",
+      "title": "真北坐向与二十四山",
+      "purpose": "由真北向首计算相反坐山并确定二十四山归属",
+      "preconditions": [
+        "真北向首已确定"
+      ],
+      "inputs": [
+        "true_facing_degree"
+      ],
+      "procedure": [
+        "向首加180度得到坐山",
+        "每山以15度划分",
+        "区间采用左闭右开"
+      ],
+      "outputs": [
+        "true_sitting_degree",
+        "facing_mountain",
+        "sitting_mountain"
+      ],
+      "source_refs": [
+        "data/generated/fengshui_mountains.jsonl",
+        "docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"
+      ],
+      "limitations": [
+        "仅生成方位事实",
+        "不包含流派吉凶判断"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.fengshui.engine:_mountain_at"
+    },
+    {
+      "rule_id": "FS-UNCERTAINTY-001",
+      "version": "1.0.0",
+      "system": "fengshui",
+      "school": "twenty-four-mountains-engineering-baseline",
+      "status": "draft",
+      "title": "坐向测量误差传播",
+      "purpose": "将角度测量误差传播为候选山向、分类稳定性和边界预警",
+      "preconditions": [
+        "测量误差在0至180度之间"
+      ],
+      "inputs": [
+        "true_facing_degree",
+        "measurement_error"
+      ],
+      "procedure": [
+        "构造角度误差区间",
+        "求区间覆盖的候选二十四山",
+        "计算距最近分界距离",
+        "跨界或距分界不足1度时预警"
+      ],
+      "outputs": [
+        "candidate_mountains",
+        "classification_stable",
+        "distance_to_boundary",
+        "boundary_warning"
+      ],
+      "source_refs": [
+        "docs/design/decisions/013-fengshui-direction-domain-phase-seven.md"
+      ],
+      "limitations": [
+        "误差值由测量者评估",
+        "预警不能替代现场复测"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.fengshui.engine:_direction_fact"
+    },
+    {
+      "rule_id": "FS-MEASUREMENT-CONSENSUS-001",
+      "version": "1.0.0",
+      "system": "fengshui",
+      "school": "twenty-four-mountains-engineering-baseline",
+      "status": "draft",
+      "title": "多次坐向测量圆周共识",
+      "purpose": "汇总三至十二次真北读数并识别一致、跨界或相互矛盾的测量结果",
+      "preconditions": [
+        "至少三次且最多十二次有效测量",
+        "每次测量已独立修正为真北角度"
+      ],
+      "inputs": [
+        "measurements",
+        "true_facing_degrees",
+        "measurement_errors"
+      ],
+      "procedure": [
+        "计算圆周均值和方向集中度",
+        "计算包含全部读数的最小圆弧",
+        "以最大角偏差加单次误差形成保守误差包络",
+        "跨度超过10度或方向抵消时标记不一致",
+        "误差包络跨山界时保留全部候选"
+      ],
+      "outputs": [
+        "status",
+        "circular_mean_degree",
+        "resultant_length",
+        "angular_spread",
+        "effective_measurement_error",
+        "aggregate"
+      ],
+      "source_refs": [
+        "docs/design/decisions/014-fengshui-measurement-consensus-phase-eight.md"
+      ],
+      "limitations": [
+        "10度一致性阈值为待专家和测量规范复核的工程基线",
+        "不替代现场校准和设备检定",
+        "不生成流派判断"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.fengshui.engine:analyze_measurements"
+    },
+    {
+      "rule_id": "ZW-CAL-001",
+      "version": "1.0.0",
+      "system": "ziwei",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "紫微斗数农历与四柱转换",
+      "purpose": "将公历出生时刻转换为农历生年月日時及八字四柱干支",
+      "preconditions": [
+        "有效公历时间输入"
+      ],
+      "inputs": [
+        "local_datetime",
+        "timezone"
+      ],
+      "procedure": [
+        "调用高精度农历转换算法",
+        "提取农历生年、生月、生日、生时支",
+        "生成四柱八字"
+      ],
+      "outputs": [
+        "lunar_calendar",
+        "four_pillars"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md"
+      ],
+      "limitations": [
+        "不作宿命论推断"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.ziwei.engine:_get_lunar_info"
+    },
+    {
+      "rule_id": "ZW-MING-001",
+      "version": "1.0.0",
+      "system": "ziwei",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "紫微斗数安命宫与身宫",
+      "purpose": "寅宫起正月顺数生月逆数生时定命宫，顺数生时定身宫",
+      "preconditions": [
+        "农历月日时已确定"
+      ],
+      "inputs": [
+        "lunar_month",
+        "hour_branch"
+      ],
+      "procedure": [
+        "寅宫顺数至生月",
+        "逆数生时定命宫地支",
+        "顺数生时定身宫地支",
+        "五虎遁布十二宫干"
+      ],
+      "outputs": [
+        "ming_palace",
+        "shen_palace",
+        "palaces_by_order"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md"
+      ],
+      "limitations": [
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-BUREAU-001",
+      "version": "1.0.0",
+      "system": "ziwei",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "紫微斗数纳音定五行局",
+      "purpose": "根据命宫干支的六十甲子纳音确定水二、木三、金四、土五或火六局",
+      "preconditions": [
+        "命宫干支已确定"
+      ],
+      "inputs": [
+        "ming_stem",
+        "ming_branch"
+      ],
+      "procedure": [
+        "匹配六十甲子纳音五行",
+        "映射为对应局数及起运岁数"
+      ],
+      "outputs": [
+        "bureau"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md"
+      ],
+      "limitations": [
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-STARS-001",
+      "version": "1.0.0",
+      "system": "ziwei",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "紫微斗数十四主星与吉煞安星",
+      "purpose": "按局数与生日定紫微天府位置，顺逆布十四主星、六吉六煞诸星",
+      "preconditions": [
+        "五行局与农历日已确定"
+      ],
+      "inputs": [
+        "bureau_number",
+        "lunar_day",
+        "lunar_month",
+        "hour_branch",
+        "year_stem",
+        "year_branch"
+      ],
+      "procedure": [
+        "推算紫微星与天府星地支",
+        "逆布紫微系六星",
+        "顺布天府系八星",
+        "按月日时年干支布六吉六煞"
+      ],
+      "outputs": [
+        "palaces_with_stars"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md"
+      ],
+      "limitations": [
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-SIHUA-001",
+      "version": "1.0.0",
+      "system": "ziwei",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "紫微斗数生年四化配置",
+      "purpose": "依据出生年天干配置化禄、化权、化科、化忌四化星曜",
+      "preconditions": [
+        "生年干已确定"
+      ],
+      "inputs": [
+        "year_stem"
+      ],
+      "procedure": [
+        "查十干四化表",
+        "为命中对应星曜打上四化标记"
+      ],
+      "outputs": [
+        "si_hua"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md"
+      ],
+      "limitations": [
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "ZW-DECADE-001",
+      "version": "1.0.0",
+      "system": "ziwei",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "紫微斗数大限顺逆推排",
+      "purpose": "按阴阳男女与五行局数计算各宫大限起止年龄",
+      "preconditions": [
+        "阴阳性别与五行局已确定"
+      ],
+      "inputs": [
+        "yin_yang_gender",
+        "bureau_number"
+      ],
+      "procedure": [
+        "阳男阴女顺行",
+        "阴男阳女逆行",
+        "以五行局数为起运起点每十年一限"
+      ],
+      "outputs": [
+        "major_limits"
+      ],
+      "source_refs": [
+        "docs/design/decisions/002-mvp-engineering-baseline.md"
+      ],
+      "limitations": [
+        "待专家签署"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.ziwei.engine:calculate_ziwei_chart"
+    },
+    {
+      "rule_id": "WF-YONGSHEN-001",
+      "version": "1.0.0",
+      "system": "workflow",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "七步工作流定用神与用神五行推导",
+      "purpose": "按事项类别确定主辅用神，并按盘面纳甲/世应/体用关系推导用神五行，不使用固定六亲五行对照表",
+      "preconditions": [
+        "已完成排盘并冻结快照",
+        "事项类别已归一为规范分类键"
+      ],
+      "inputs": [
+        "category",
+        "plate_facts.line_chart",
+        "plate_facts.body_use"
+      ],
+      "procedure": [
+        "按事项类别映射六亲主用神与辅助用神",
+        "在六爻纳甲爻表中按 six_relative 匹配用神爻，两现时取动爻",
+        "世爻、应爻类用神按 roles 字段匹配",
+        "用神五行取该爻纳甲五行",
+        "盘面无纳甲时退回梅花用卦五行并记录依据",
+        "两者皆无时留空并输出缺失原因"
+      ],
+      "outputs": [
+        "primary_yongshen",
+        "secondary_yongshen",
+        "yongshen_wangshuai.element",
+        "yongshen_wangshuai.element_source",
+        "rule_ids"
+      ],
+      "source_refs": [
+        "docs/design/decisions/015-workflow-seven-step-rules.md"
+      ],
+      "limitations": [
+        "事项类别到六亲的映射需专家签署",
+        "寻人类事项按关系定用神，当前以应爻兜底"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.workflow.steps:step3_identify_yongshen,_resolve_yongshen_element"
+    },
+    {
+      "rule_id": "WF-WANGSHUAI-001",
+      "version": "1.0.0",
+      "system": "workflow",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "用神旺衰五档判定",
+      "purpose": "按用神五行与月令地支五行的生克关系判定旺、相、休、囚、死",
+      "preconditions": [
+        "已取得用神五行",
+        "已取得月令地支"
+      ],
+      "inputs": [
+        "yongshen_element",
+        "month_branch"
+      ],
+      "procedure": [
+        "同气为旺",
+        "月令生用神为相",
+        "用神生月令为休",
+        "月令克用神为囚",
+        "用神克月令为死"
+      ],
+      "outputs": [
+        "yongshen_wangshuai.level",
+        "yongshen_wangshuai.reason"
+      ],
+      "source_refs": [
+        "docs/design/decisions/015-workflow-seven-step-rules.md"
+      ],
+      "limitations": [
+        "仅取月令，不计算得地、得势、墓绝",
+        "日辰只作后置参考，不参与分档"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.workflow.steps:step4_wangshuai_analysis"
+    },
+    {
+      "rule_id": "WF-FORTUNE-001",
+      "version": "1.0.0",
+      "system": "workflow",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "吉凶五档等级判定口径",
+      "purpose": "把用神旺衰与体用五行关系折算为可复核的吉凶等级，并逐条给出依据",
+      "preconditions": [
+        "已完成旺衰判定",
+        "已取得体用五行关系"
+      ],
+      "inputs": [
+        "yongshen_wangshuai.level",
+        "tiyong_relation.code"
+      ],
+      "procedure": [
+        "用神旺相加2，囚死减2，休或平不加不减",
+        "用生体加2，体克用加1，比和加1，体生用减1，用克体减2",
+        "合计≥3为大吉，1~2为小吉，0为平，-1为小凶，≤-2为大凶",
+        "每条加减分写入 fortune_basis"
+      ],
+      "outputs": [
+        "fortune_level",
+        "fortune_score",
+        "fortune_basis",
+        "rule_ids"
+      ],
+      "source_refs": [
+        "docs/design/decisions/015-workflow-seven-step-rules.md"
+      ],
+      "limitations": [
+        "五档为工程口径，不等同于古籍断验结论",
+        "未纳入神煞、空亡、墓绝等加分项"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.workflow.steps:step6_synthesis_judgement"
+    },
+    {
+      "rule_id": "WF-TIMING-001",
+      "version": "1.0.0",
+      "system": "workflow",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "应期窗口推算",
+      "purpose": "以动爻地支的逢值、逢冲、逢合与月令节气给出应期参考窗口",
+      "preconditions": [
+        "已完成排盘并冻结快照",
+        "已取得日辰与月令地支"
+      ],
+      "inputs": [
+        "plate_facts.moving_branches",
+        "day_branch",
+        "month_branch",
+        "yongshen_wangshuai.level"
+      ],
+      "procedure": [
+        "取六爻纳甲爻表中动爻的纳甲地支",
+        "动爻逢值日、逢冲日为近期应期，逢合日提示牵连",
+        "按地支顺序计算距今日数",
+        "月令只给本月内得令与否的粗粒度结论",
+        "按旺衰调整应期远近"
+      ],
+      "outputs": [
+        "timing",
+        "rule_ids"
+      ],
+      "source_refs": [
+        "docs/design/decisions/015-workflow-seven-step-rules.md"
+      ],
+      "limitations": [
+        "不推算具体节气日期，避免伪造精度",
+        "仅取前两个动爻，多动爻情形需人工参断"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.workflow.steps:_calculate_timing"
     }
   ]
 }

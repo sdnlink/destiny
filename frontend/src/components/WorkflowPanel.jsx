@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Sparkles,
   Play,
@@ -37,78 +37,17 @@ import {
 import HexagramView from "./HexagramView";
 import StructuredDisplay from "./StructuredDisplay";
 import InteractionResultDisplay from "./InteractionResultDisplay";
+import {
+  CATEGORIES,
+  CASTING_METHODS,
+  FORTUNE_COLORS,
+  SYSTEMS,
+  categoryLabel,
+  statusLabel,
+  formatDate,
+} from "../lib/labels";
+import { localDateTimeValue, newCastNonce } from "../lib/castingInput";
 
-const CATEGORIES = [
-  { id: "career", label: "事业" },
-  { id: "finance", label: "财运" },
-  { id: "relationship", label: "感情姻缘" },
-  { id: "study", label: "考试学业" },
-  { id: "lawsuit", label: "官司是非" },
-  { id: "travel", label: "出行" },
-  { id: "missing_person", label: "寻人" },
-  { id: "lost_item", label: "失物" },
-  { id: "health", label: "健康" },
-  { id: "decision", label: "抉择" },
-  { id: "other", label: "其他谋事" },
-];
-
-const SYSTEMS = [
-  { id: "auto", label: "默认（梅花+六爻）" },
-  { id: "meihua", label: "梅花易数" },
-  { id: "liuyao", label: "六爻纳甲" },
-  { id: "qimen", label: "奇门遁甲" },
-  { id: "daliuren", label: "大六壬" },
-  { id: "bazi", label: "八字命理" },
-  { id: "ziwei", label: "紫微斗数" },
-];
-
-const CASTING_METHODS = [
-  { id: "auto", label: "自动起卦" },
-  { id: "time", label: "时间起卦" },
-  { id: "numbers", label: "报数起卦" },
-  { id: "manual", label: "手工起卦" },
-];
-
-const FORTUNE_COLORS = {
-  大吉: "#297267",
-  小吉: "#3a8a7d",
-  平: "#a66d1e",
-  小凶: "#b85c3a",
-  大凶: "#a53e2d",
-};
-
-function localDateTimeValue() {
-  const d = new Date();
-  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 16);
-}
-
-function newCastNonce() {
-  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID().replaceAll("-", "");
-  const bytes = new Uint8Array(16);
-  globalThis.crypto.getRandomValues(bytes);
-  return Array.from(bytes, (v) => v.toString(16).padStart(2, "0")).join("");
-}
-
-function categoryLabel(cat) {
-  const found = CATEGORIES.find((c) => c.id === cat);
-  return found ? found.label : cat || "未知";
-}
-
-function statusLabel(status) {
-  const map = { draft: "待排盘", casted: "已排盘", interacting: "交互中", reviewed: "已复盘" };
-  return map[status] || status || "未知";
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  try {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
-  } catch {
-    return dateStr;
-  }
-}
 
 export default function WorkflowPanel() {
   const [phase, setPhase] = useState("create");

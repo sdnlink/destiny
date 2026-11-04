@@ -1,7 +1,5 @@
 import unittest
-from datetime import datetime
-from app.ziwei.engine import calculate_ziwei_chart, time_cast, auto_cast
-from app.ziwei.rules import SIHUA_TABLE, NAYIN_ELEMENT_BUREAU, get_ganzhi_nayin
+from app.ziwei.engine import calculate_ziwei_chart, time_cast
 
 
 class ZiweiTests(unittest.TestCase):

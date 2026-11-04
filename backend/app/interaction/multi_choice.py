@@ -4,7 +4,7 @@
 输出各选择利弊、风险、趋势。原盘信息不足时如实告知，建议重新起卦分别测项。
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 def analyze_branches(

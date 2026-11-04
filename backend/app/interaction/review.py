@@ -61,9 +61,10 @@ def review_outcome(
     if outcome_details:
         key_factors = outcome_details.get("key_factors", [])
         for factor in key_factors:
-            if any(f in factor for f in predicted["favorable"]):
+            # 双向包含：预测侧是整句、用户侧是短语，单向匹配会让两条分支永远走不到
+            if _matches_any(factor, predicted["favorable"]):
                 verified.append(f"有利因素应验：{factor}")
-            elif any(o in factor for o in predicted["obstacles"]):
+            elif _matches_any(factor, predicted["obstacles"]):
                 verified.append(f"阻碍因素应验：{factor}")
             else:
                 unverified.append(f"未预见因素：{factor}")
@@ -93,14 +94,31 @@ def review_outcome(
     }
 
 
+def _matches_any(factor: str, candidates) -> bool:
+    """判断用户给出的因素是否命中预测量。
+
+    预测量是完整句子，用户因素是短语，因此两个方向都要比较；空串直接忽略，
+    否则 "" in factor 恒为真会把所有因素都算作应验。
+    """
+    text = (factor or "").strip()
+    if not text:
+        return False
+    for candidate in candidates or []:
+        phrase = (candidate or "").strip()
+        if phrase and (phrase in text or text in phrase):
+            return True
+    return False
+
+
 def _classify_outcome(outcome: str) -> bool:
     """判断实际结果是偏有利还是偏阻滞。"""
     favorable_keywords = ["成功", "顺利", "达成", "通过", "录取", "盈利", "和好", "复合", "找到", "康复", "升职", "加薪"]
     unfavorable_keywords = ["失败", "受阻", "未通过", "落选", "亏损", "分手", "丢失", "病重", "降职", "破财", "拖延"]
-    if any(kw in outcome for kw in favorable_keywords):
-        return True
+    # 先判不利关键词："未通过"包含"通过"，顺序反了会把失败读成有利
     if any(kw in outcome for kw in unfavorable_keywords):
         return False
+    if any(kw in outcome for kw in favorable_keywords):
+        return True
     return True  # 默认偏中性
 
 

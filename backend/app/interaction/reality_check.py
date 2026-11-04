@@ -10,6 +10,11 @@
 from typing import Any, Dict, Optional
 
 
+# 否定表达：紧邻关键词前的单字否定词，以及常见否定短语。
+# 只做「关键词前窗口」判断，避免把「未来符合预期」里的「未」误当否定。
+NEGATION_CHARS = "不未非没否"
+NEGATION_PHRASES = ("不太", "不完全", "不够", "不是很", "并不", "不是", "没有", "未能", "未曾", "无法", "说不上")
+
 # 响应规则
 REALITY_RESPONSES = {
     "符合": {
@@ -68,11 +73,21 @@ def process_reality_response(
     # 归一化回复
     normalized = response.strip()
     if normalized not in REALITY_RESPONSES:
-        # 模糊匹配
-        for key in REALITY_RESPONSES:
-            if key in normalized:
-                normalized = key
-                break
+        # 模糊匹配：关键词按长度降序，"符合"是"不符合"/"部分符合"的子串，
+        # 先匹配短词会把否定回答整体反转。
+        matched = None
+        for key in sorted(REALITY_RESPONSES, key=len, reverse=True):
+            index = normalized.find(key)
+            if index == -1:
+                continue
+            if key in ("符合", "部分符合") and _is_negated_before(normalized, index):
+                # "不太符合""并不完全符合"：命中的是正向表述，但前面紧邻否定词
+                matched = "不符合"
+            else:
+                matched = key
+            break
+        if matched:
+            normalized = matched
         else:
             return {
                 "response_type": "unknown",
@@ -104,6 +119,20 @@ def process_reality_response(
         result["interpretation_shift"] = interpretation_shift
 
     return result
+
+
+def _is_negated_before(text: str, index: int) -> bool:
+    """判断 text[index:] 这个正向关键词前面是否是否定表达。
+
+    "不太符合" / "不是完全符合" / "没有符合" 都要判为否定；
+    而 "未来符合预期" 里的"未"离关键词隔着"来"，不算否定。
+    单字否定词只在紧邻位置生效，否定短语允许出现在整段前缀里
+    （"不是完全符合"的"不是"离关键词隔着"完全"）。
+    """
+    prefix = text[:index]
+    if prefix.endswith(tuple(NEGATION_CHARS)):
+        return True
+    return any(phrase in prefix for phrase in NEGATION_PHRASES)
 
 
 def _suggest_angles(session, response: str) -> list:

@@ -1,22 +1,14 @@
 """Computational engine for BaZi (子平八字四柱命理与大运推演)."""
 
-import hashlib
-from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-import pytz
 from lunar_python import Solar
 
 from app.calendar.engine import CalendarEngine
-from app.calendar.models import CalendarInput
-from app.calendar.solar_terms import REFERENCE_TIMEZONE
 from app.calendar.timezone import parse_local_datetime
 
-from .models import BaZiInput, BaZiResult
 from .rules import (
     BRANCH_ELEMENTS,
-    BRANCH_POLARITY,
-    CHANGSHENG_STAGES,
     EARTHLY_BRANCHES,
     ELEMENT_GENERATED_BY,
     ELEMENT_GENERATING,
@@ -63,17 +55,25 @@ def _sexagenary_pillars_cycle(start_ganzhi: str, direction: int, count: int = 8)
 def _calculate_shensha(
     day_stem: str,
     year_stem: str,
+    month_stem: str,
+    hour_stem: str,
     year_branch: str,
     month_branch: str,
     day_branch: str,
     hour_branch: str,
 ) -> Dict[str, List[str]]:
-    """针对四柱各柱地支计算神煞。"""
+    """针对四柱各柱计算神煞。"""
     all_branches = {
         "year": year_branch,
         "month": month_branch,
         "day": day_branch,
         "hour": hour_branch,
+    }
+    all_stems = {
+        "year": year_stem,
+        "month": month_stem,
+        "day": day_stem,
+        "hour": hour_stem,
     }
     pillar_shensha: Dict[str, List[str]] = {k: [] for k in all_branches}
 
@@ -120,16 +120,20 @@ def _calculate_shensha(
                 if br == jiang_xing and "将星" not in pillar_shensha[p_name]:
                     pillar_shensha[p_name].append("将星")
 
-    # 6. 天德贵人、月德贵人、天医 (以月令查)
-    tian_de_stem_or_br = TIAN_DE_MAP.get(month_branch)
-    yue_de_stem = YUE_DE_MAP.get(month_branch)
+    # 6. 天德、月德、天医 (以月令查)
+    # 天德可能是天干也可能是地支，月德固定为天干：两者都要逐柱比对。
+    tian_de = TIAN_DE_MAP.get(month_branch)
+    yue_de = YUE_DE_MAP.get(month_branch)
     tian_yi_br = TIAN_YI_DOC_MAP.get(month_branch)
 
-    for p_name, br in all_branches.items():
-        if br == tian_yi_br and "天医" not in pillar_shensha[p_name]:
+    for p_name, branch in all_branches.items():
+        if tian_de and (all_stems[p_name] == tian_de or branch == tian_de):
+            pillar_shensha[p_name].append("天德贵人")
+        if yue_de and all_stems[p_name] == yue_de and "月德贵人" not in pillar_shensha[p_name]:
+            pillar_shensha[p_name].append("月德贵人")
+        if branch == tian_yi_br and "天医" not in pillar_shensha[p_name]:
             pillar_shensha[p_name].append("天医")
 
-    # 检查四柱天干是否逢天德/月德
     return pillar_shensha
 
 
@@ -157,7 +161,6 @@ def _evaluate_day_master_strength(
 
     # 地支藏干分值 (每个地支总权重 12 分，按权重分配，月令乘 1.5 倍权重系数)
     for idx, item in enumerate(all_hidden_stems):
-        branch = item["branch"]
         is_month_branch = (idx == 1)  # 第 2 个是月支
         branch_factor = 1.6 if is_month_branch else 1.0
 
@@ -242,7 +245,7 @@ def _generate_bazi_advisory(day_master_info: Dict[str, Any], day_stem: str, pill
 
     general = f"日元{day_stem}属{elem}，全局五行气象{level}。调候与立足之道以生助克泄平衡为基准，宜流通【{fav}】之气。"
     career = f"行事宜顺应【{fav}】行业与方位；在重大职涯决断上，保持稳步推进，避开【{unfav}】过旺之冲击。"
-    wealth = f"求财以稳健为主，命中喜用五行为生财之源，利于把握专业技能与长期积累带来的收益机会。"
+    wealth = "求财以稳健为主，命中喜用五行为生财之源，利于把握专业技能与长期积累带来的收益机会。"
     health = f"注意五行【{unfav}】所对应脏腑与经络的日常调理与养护，注重作息与气血调和。"
 
     return {
@@ -283,6 +286,8 @@ def calculate_bazi(
     shensha_map = _calculate_shensha(
         day_stem=day_stem,
         year_stem=year_stem,
+        month_stem=month_stem,
+        hour_stem=hour_stem,
         year_branch=year_branch,
         month_branch=month_branch,
         day_branch=day_branch,

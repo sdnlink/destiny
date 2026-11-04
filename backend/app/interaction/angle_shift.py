@@ -7,6 +7,8 @@
 
 from typing import Any, Dict, List, Optional
 
+from app.workflow.plate_facts import build_plate_view
+
 
 # 预设解读角度及其象义调整方向
 ANGLE_PRESETS = {
@@ -132,8 +134,8 @@ def angle_shift(
         "shift_focus": preset["shift_focus"] if preset else f"将解读视角调整为「{new_angle}」，重新映射卦中符号的象义",
         "key_questions": preset["key_questions"] if preset else [
             f"从{new_angle}的角度，卦中哪些符号最值得关注？",
-            f"该角度下，世应关系与体用生克有何新的解读？",
-            f"该角度下，动爻与变卦反映了什么新的趋势？",
+            "该角度下，世应关系与体用生克有何新的解读？",
+            "该角度下，动爻与变卦反映了什么新的趋势？",
         ],
         "reinterpretation": reinterpretation,
         "suggested_angles": suggested,
@@ -145,8 +147,12 @@ def angle_shift(
 
 def _match_preset(new_angle: str) -> Optional[str]:
     """匹配预设角度。"""
+    text = (new_angle or "").strip()
+    if not text:
+        # 空字符串是任何预设的子串，必须先短路，否则会谎称命中了第一个预设
+        return None
     for preset_name in ANGLE_PRESETS:
-        if preset_name in new_angle or new_angle in preset_name:
+        if preset_name in text or text in preset_name:
             return preset_name
     # 关键词模糊匹配
     keyword_map = {
@@ -159,7 +165,7 @@ def _match_preset(new_angle: str) -> Optional[str]:
         "机会": "机会角度", "机遇": "机会角度", "有利": "机会角度", "优势": "机会角度",
     }
     for kw, preset in keyword_map.items():
-        if kw in new_angle:
+        if kw in text:
             return preset
     return None
 
@@ -190,17 +196,17 @@ def _generate_reinterpretation(
     lines.append("【基于本卦的重新解读】")
     lines.append("")
 
-    raw_plate = session.snapshot.raw_plate or {}
-    ben_gua = raw_plate.get("ben_gua") or raw_plate.get("本卦") or raw_plate.get("hexagram") or "本卦"
-    bian_gua = raw_plate.get("bian_gua") or raw_plate.get("变卦") or "变卦"
+    plate_view = build_plate_view(session.snapshot)
+    ben_gua = plate_view.get("ben_gua") or "本卦"
+    bian_gua = plate_view.get("bian_gua") or "变卦"
 
     lines.append(f"1. 本卦「{ben_gua}」从{new_angle}看：")
     if preset and "对方" in new_angle:
         lines.append(f"   应爻/用卦所反映的对方状态是本角度的核心。当前卦中对方力量{'较强' if fortune in ('大吉','小吉') else '需结合旺衰判断'}，")
-        lines.append(f"   对方的诉求与行动倾向需从应爻所临六亲六神深入分析。")
+        lines.append("   对方的诉求与行动倾向需从应爻所临六亲六神深入分析。")
     elif preset and "长期" in new_angle:
         lines.append(f"   本卦反映当前格局，但长期走向需重点看变卦「{bian_gua}」。")
-        lines.append(f"   变卦是事项演变的最终指向，当前吉凶可能随时间推移而转化。")
+        lines.append("   变卦是事项演变的最终指向，当前吉凶可能随时间推移而转化。")
     elif preset and "财务" in new_angle:
         lines.append("   妻财爻是本角度的核心用神。妻财旺衰直接反映资金状况，")
         lines.append("   兄弟爻动则主破财分流，子孙爻旺则为财源广进。")
@@ -215,10 +221,10 @@ def _generate_reinterpretation(
 
     lines.append("")
     lines.append("3. 动爻与变爻：")
-    moving = raw_plate.get("moving_line") or raw_plate.get("动爻")
+    moving = plate_view.get("moving_line")
     if moving:
         lines.append(f"   第{moving}爻动，是本卦气机发动之处。从{new_angle}角度，")
-        lines.append(f"   该动爻所反映的变化因素需要重点关注，它可能是事态演变的关键触发点。")
+        lines.append("   该动爻所反映的变化因素需要重点关注，它可能是事态演变的关键触发点。")
     else:
         lines.append(f"   本卦无动爻（或动爻信息未明确），从{new_angle}角度，")
         lines.append("   事态相对稳定，变化可能来自外部因素而非内部发动。")

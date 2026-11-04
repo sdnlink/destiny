@@ -28,6 +28,8 @@
 - [ADR-012：大六壬独立领域第六阶段基线](./decisions/012-daliuren-domain-phase-six.md)
 - [ADR-013：阳宅风水方位独立领域第七阶段基线](./decisions/013-fengshui-direction-domain-phase-seven.md)
 - [ADR-014：阳宅多次测量共识第八阶段基线](./decisions/014-fengshui-measurement-consensus-phase-eight.md)
+- [ADR-015：七步推理工作流的规则登记](./decisions/015-workflow-seven-step-rules.md)
+- [ADR-016：pydantic v1 与 v2 的边界](./decisions/016-pydantic-v1-boundary.md)
 
 ## 文档优先级
 

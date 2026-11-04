@@ -3,20 +3,16 @@
 from types import MappingProxyType
 from typing import Dict, List, Tuple
 
-# 天干与地支
-HEAVENLY_STEMS = ("甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸")
-EARTHLY_BRANCHES = ("子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥")
+from app.common.five_elements import FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES
+from app.common.ganzhi import (
+    BRANCH_ELEMENTS,
+    EARTHLY_BRANCHES,
+    HEAVENLY_STEMS,
+    STEM_ELEMENTS,
+)
 
-STEM_ELEMENTS = MappingProxyType({
-    "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土",
-    "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水",
-})
-
-BRANCH_ELEMENTS = MappingProxyType({
-    "子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土", "巳": "火",
-    "午": "火", "未": "土", "申": "金", "酉": "金", "戌": "土", "亥": "水",
-})
-
+# 天干地支、五行属相、五行生克全部取自 app.common，
+# 这里只做名称转出，避免八字模块再维护一份同样的表。
 STEM_POLARITY = MappingProxyType({
     "甲": "阳", "乙": "阴", "丙": "阳", "丁": "阴", "戊": "阳",
     "己": "阴", "庚": "阳", "辛": "阴", "壬": "阳", "癸": "阴",
@@ -28,12 +24,8 @@ BRANCH_POLARITY = MappingProxyType({
 })
 
 # 五行生克关系
-ELEMENT_GENERATING = MappingProxyType({
-    "木": "火", "火": "土", "土": "金", "金": "水", "水": "木"
-})
-ELEMENT_OVERCOMING = MappingProxyType({
-    "木": "土", "土": "水", "水": "火", "火": "金", "金": "木"
-})
+ELEMENT_GENERATING = FIVE_ELEMENTS_GENERATES
+ELEMENT_OVERCOMING = FIVE_ELEMENTS_CONTROLS
 ELEMENT_GENERATED_BY = MappingProxyType({v: k for k, v in ELEMENT_GENERATING.items()})
 ELEMENT_OVERCOME_BY = MappingProxyType({v: k for k, v in ELEMENT_OVERCOMING.items()})
 

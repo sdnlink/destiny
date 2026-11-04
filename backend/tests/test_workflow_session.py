@@ -11,7 +11,6 @@
 import json
 import os
 import sys
-import tempfile
 
 import pytest
 
@@ -19,11 +18,9 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from app.session import (
-    DivinationSession,
     create_session,
     freeze_snapshot,
     append_interaction,
-    get_store,
     SessionStore,
 )
 from app.interaction import (
@@ -148,6 +145,37 @@ class TestSessionStore:
             store.save(s)
         sessions = store.list_sessions()
         assert len(sessions) == 3
+
+    def test_list_sessions_reuses_metadata_cache(self, tmp_path, monkeypatch):
+        """文件没变时不应重新解析：否则每次列表请求都要读整份快照。"""
+        store = SessionStore(storage_dir=str(tmp_path))
+        session = create_session(question="缓存测试")
+        store.save(session)
+
+        assert store.list_sessions()[0]["question"] == "缓存测试"
+
+        def _boom(*args, **kwargs):
+            raise AssertionError("文件未变化却重新解析了会话文件")
+
+        monkeypatch.setattr(json, "load", _boom)
+        assert store.list_sessions()[0]["question"] == "缓存测试"
+
+    def test_list_sessions_reflects_rewrite(self, tmp_path):
+        store = SessionStore(storage_dir=str(tmp_path))
+        session = create_session(question="初版问题")
+        store.save(session)
+        assert store.list_sessions()[0]["question"] == "初版问题"
+
+        session.question = "改写后的问题"
+        store.save(session)
+        assert store.list_sessions()[0]["question"] == "改写后的问题"
+
+    def test_list_sessions_rejects_skip_after_delete(self, tmp_path):
+        store = SessionStore(storage_dir=str(tmp_path))
+        session = create_session(question="删除测试")
+        store.save(session)
+        assert store.delete(session.session_id) is True
+        assert store.list_sessions() == []
 
 
 # ============================================================

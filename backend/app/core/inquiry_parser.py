@@ -1,7 +1,7 @@
 """Inquiry intent parser extracting semantic targets from user questions."""
 
 import re
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, Set
 
 INTENT_KEYWORDS = {
     "clothing_color": [
@@ -61,15 +61,7 @@ def parse_inquiry_intent(question: str, category: str = "other") -> Dict[str, An
     return {
         "raw_question": text,
         "category": category,
+        # intents 是唯一判定来源；调用方直接用 "xxx" in intents，不再另设 has_* 布尔副本
         "intents": sorted(detected_intents),
-        "has_clothing_color": "clothing_color" in detected_intents,
-        "has_current_activity": "current_activity" in detected_intents,
-        "has_location_direction": "location_direction" in detected_intents,
-        "has_character_state": "character_state" in detected_intents,
-        "has_accessories_items": "accessories_items" in detected_intents,
-        "has_transport_travel": "transport_travel" in detected_intents,
-        "has_item_nature": "item_nature" in detected_intents,
-        "has_health_body": "health_body" in detected_intents,
-        "has_outcome_timing": "outcome_timing" in detected_intents,
         "subject": subject or "求问主体",
     }

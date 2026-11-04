@@ -21,9 +21,27 @@ from app.core.validation import compare_subset, run_validation_cases
 class RuleRegistryTests(unittest.TestCase):
     def test_registry_is_valid_and_has_stable_checksum(self):
         registry = load_rule_registry()
-        self.assertEqual(len(registry["rules"]), 69)
+        # 规则会持续增补，断言下限而不是固定数字，避免每加一条就要改测试
+        self.assertGreaterEqual(len(registry["rules"]), 69)
         self.assertTrue(registry["checksum"].startswith("sha256:"))
         self.assertEqual(registry["rule_sets"][0]["status"], "draft")
+        registered = {(rule["rule_id"], rule["version"]) for rule in registry["rules"]}
+        for ref in registry["rule_sets"][0]["rules"]:
+            self.assertIn((ref["rule_id"], ref["version"]), registered)
+
+    def test_workflow_rules_are_registered(self):
+        """编排层（workflow/interaction）输出的 rule_ids 必须能在注册表里查到。"""
+        registry = load_rule_registry()
+        registered = {rule["rule_id"] for rule in registry["rules"]}
+        workflow_rule_ids = {
+            "WF-YONGSHEN-001",
+            "WF-WANGSHUAI-001",
+            "WF-FORTUNE-001",
+            "WF-TIMING-001",
+        }
+        self.assertEqual(workflow_rule_ids - registered, set())
+        for rule_id in workflow_rule_ids:
+            self.assertEqual(unknown_rule_ids({"rule_ids": [rule_id]}, registry), [])
 
     def test_all_calculation_rule_references_are_registered(self):
         results = [
@@ -49,7 +67,7 @@ class RuleRegistryTests(unittest.TestCase):
 
     def test_validation_case_document_is_explicitly_unreviewed(self):
         document = load_validation_cases()
-        self.assertEqual(len(document["cases"]), 31)
+        self.assertGreaterEqual(len(document["cases"]), 31)
         self.assertIn("pending_expert_review", document["qualification"])
         self.assertTrue(all(not case["reviewers"] for case in document["cases"]))
 

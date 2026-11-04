@@ -1,4 +1,3 @@
-import pytest
 from app.core.inquiry_parser import parse_inquiry_intent
 from app.core.targeted_deduction import generate_targeted_deduction
 from app.core.interpretation import explain_correspondences
@@ -7,8 +6,6 @@ from app.core.interpretation import explain_correspondences
 def test_inquiry_parser_clothing_and_activity():
     q = "推算李笑穿的是什么颜色的衣服，他正在做什么事情"
     res = parse_inquiry_intent(q, "other")
-    assert res["has_clothing_color"] is True
-    assert res["has_current_activity"] is True
     assert res["subject"] == "李笑"
     assert "clothing_color" in res["intents"]
     assert "current_activity" in res["intents"]
@@ -17,9 +14,8 @@ def test_inquiry_parser_clothing_and_activity():
 def test_inquiry_parser_location_and_item():
     q = "丢失的钱包在什么方位，能找到吗"
     res = parse_inquiry_intent(q, "other")
-    assert res["has_location_direction"] is True
-    assert res["has_item_nature"] is True
     assert "location_direction" in res["intents"]
+    assert "item_nature" in res["intents"]
 
 
 def test_targeted_deduction_with_meihua_and_liuyao():

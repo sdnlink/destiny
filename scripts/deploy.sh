@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# 部署脚本（Linux / macOS）。与 deploy.ps1、deploy.bat 行为对齐：
+# 默认先构建再启动，可用 DEPLOY_SKIP_BUILD=1 / DEPLOY_START=0 拆分两步。
 set -euo pipefail
 
 project_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

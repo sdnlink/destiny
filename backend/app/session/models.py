@@ -5,30 +5,27 @@
 解读视角调整记录在 system_response 中，与原始盘面分离。
 """
 
-import hashlib
-import json
 import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from app.common.hashing import canonical_hash
+
 
 # 会话状态机：draft → casting → casted → interacting → reviewed
 SESSION_STATUSES = ("draft", "casting", "casted", "interacting", "reviewed")
 
-# 交互类型（对应模块A-G）
+# 交互类型（对应模块A-G）。只登记 /v1/sessions/{id}/interact 实际分派处理的类型，
+# 未实现的交互不再列入，避免出现「声明了但永远走不到」的枚举值。
 INTERACTION_TYPES = (
     "info_completion",   # 模块A：起盘前信息补全
     "reality_check",     # 模块B：排盘后现实校验
-    "reference_library", # 模块C：拓展参考资料库
-    "followup_entry",    # 模块D：后续交互入口
     "multi_party",       # 模块E：多方人物取象
     "multi_choice",      # 模块F：多抉择分支推演
     "review",            # 模块G：事后复盘
     "deep_question",     # 深度追问（模块D②）
     "angle_shift",       # 换角度解读（模块D③）
-    "system_switch",     # 更换术数门派（模块D④）
-    "choice_simulation", # 代入不同选择推演（模块D⑤）
 )
 
 
@@ -37,8 +34,7 @@ def _now_iso() -> str:
 
 
 def _canonical_hash(value: Any) -> str:
-    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+    return canonical_hash(value)
 
 
 @dataclass

@@ -277,10 +277,8 @@ def generate_targeted_deduction(
 
     # Qimen facts
     qimen_gate = ""
-    qimen_star = ""
     if qimen and "facts" in qimen:
         qimen_gate = qimen["facts"].get("zhi_shi_gate", "")
-        qimen_star = qimen["facts"].get("zhi_fu_star", "")
 
     # Ziwei facts
     ziwei_main_stars = []
@@ -296,7 +294,7 @@ def generate_targeted_deduction(
     findings: List[Dict[str, Any]] = []
 
     # 1. Clothing & Color Deduction
-    if intent_data["has_clothing_color"] or "clothing_color" in intent_data["intents"]:
+    if "clothing_color" in intent_data["intents"]:
         use_profile = TRIGRAM_COLOR_PROFILES.get(use_tri_name, TRIGRAM_COLOR_PROFILES["乾"])
         chg_profile = TRIGRAM_COLOR_PROFILES.get(changed_use_tri_name, use_profile)
         body_profile = TRIGRAM_COLOR_PROFILES.get(body_tri_name, TRIGRAM_COLOR_PROFILES["乾"])
@@ -327,7 +325,7 @@ def generate_targeted_deduction(
         })
 
     # 2. Current Activity Deduction
-    if intent_data["has_current_activity"] or "current_activity" in intent_data["intents"]:
+    if "current_activity" in intent_data["intents"]:
         use_act = TRIGRAM_ACTIVITY_PROFILES.get(use_tri_name, TRIGRAM_ACTIVITY_PROFILES["乾"])
         body_act = TRIGRAM_ACTIVITY_PROFILES.get(body_tri_name, TRIGRAM_ACTIVITY_PROFILES["乾"])
 
@@ -363,7 +361,7 @@ def generate_targeted_deduction(
         })
 
     # 3. Location & Direction Deduction
-    if intent_data["has_location_direction"] or "location_direction" in intent_data["intents"]:
+    if "location_direction" in intent_data["intents"]:
         use_loc = TRIGRAM_LOCATION_PROFILES.get(use_tri_name, TRIGRAM_LOCATION_PROFILES["乾"])
         loc_conclusion = (
             f"【方位指向】位于求问基准点或所处区域的 **{use_loc['direction']}**；"
@@ -382,7 +380,7 @@ def generate_targeted_deduction(
         })
 
     # 4. Character State Deduction
-    if intent_data["has_character_state"] or "character_state" in intent_data["intents"]:
+    if "character_state" in intent_data["intents"]:
         body_act = TRIGRAM_ACTIVITY_PROFILES.get(body_tri_name, TRIGRAM_ACTIVITY_PROFILES["乾"])
         relation_labels = {
             "same_element": "比和（内外同频，心情从容平和）",
@@ -409,7 +407,7 @@ def generate_targeted_deduction(
         })
 
     # 5. Accessories & Items Carried (随身配饰与携带物)
-    if intent_data["has_accessories_items"] or "accessories_items" in intent_data["intents"]:
+    if "accessories_items" in intent_data["intents"]:
         use_acc = TRIGRAM_ACCESSORY_PROFILES.get(use_tri_name, TRIGRAM_ACCESSORY_PROFILES["乾"])
         body_acc = TRIGRAM_ACCESSORY_PROFILES.get(body_tri_name, TRIGRAM_ACCESSORY_PROFILES["乾"])
         acc_conclusion = (
@@ -429,7 +427,7 @@ def generate_targeted_deduction(
         })
 
     # 6. Transport & Travel Mode (出行方式与交通工具)
-    if intent_data["has_transport_travel"] or "transport_travel" in intent_data["intents"]:
+    if "transport_travel" in intent_data["intents"]:
         use_trans = TRIGRAM_TRANSPORT_PROFILES.get(use_tri_name, TRIGRAM_TRANSPORT_PROFILES["乾"])
         trans_conclusion = (
             f"【出行方式倾向】主要采用 **{use_trans['mode']}**；"
@@ -448,7 +446,7 @@ def generate_targeted_deduction(
         })
 
     # 7. Health & Body Parts (身体部位与脏腑健康)
-    if intent_data["has_health_body"] or "health_body" in intent_data["intents"]:
+    if "health_body" in intent_data["intents"]:
         body_health = TRIGRAM_BODY_PROFILES.get(body_tri_name, TRIGRAM_BODY_PROFILES["乾"])
         use_health = TRIGRAM_BODY_PROFILES.get(use_tri_name, TRIGRAM_BODY_PROFILES["乾"])
         health_conclusion = (
@@ -469,9 +467,8 @@ def generate_targeted_deduction(
         })
 
     # 8. Item Nature / Lost Item Deduction (射覆与寻物推演)
-    if intent_data["has_item_nature"] or "item_nature" in intent_data["intents"]:
+    if "item_nature" in intent_data["intents"]:
         use_item = TRIGRAM_ITEM_PROFILES.get(use_tri_name, TRIGRAM_ITEM_PROFILES["乾"])
-        chg_item = TRIGRAM_ITEM_PROFILES.get(changed_use_tri_name, use_item)
         loc_dir = TRIGRAM_LOCATION_PROFILES.get(use_tri_name, {"direction": "周边"})["direction"]
 
         item_conclusion = (
@@ -495,7 +492,7 @@ def generate_targeted_deduction(
         })
 
     # 9. Outcome & Timing / General Development
-    if intent_data["has_outcome_timing"] or not findings:
+    if "outcome_timing" in intent_data["intents"] or not findings:
         relation_guidance = {
             "same_element": ("顺遂平稳", "内外和合，阻力极小，适合稳步推进与团队协作。"),
             "use_generates_body": ("吉利受助", "外部条件有利，常有良机或贵人提携，顺势而为必有所获。"),

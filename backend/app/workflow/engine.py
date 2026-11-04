@@ -4,18 +4,18 @@
 每一步的输出都记录在会话中，步骤间数据单向流动。
 """
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 from app.session import (
     DivinationSession,
-    append_interaction,
     freeze_snapshot,
     get_store,
 )
 
 from .casting import execute_calculations
 from .format import render_fixed_format
-from .scheduler import SYSTEM_LABELS, build_calculation_requests, select_systems
+from .plate_facts import build_plate_facts, compact_plate_output
+from .scheduler import build_calculation_requests, select_systems
 from .steps import (
     step1_info_validation,
     step2_format_plate,
@@ -60,10 +60,12 @@ class WorkflowEngine:
         module_results = execute_calculations(requests)
 
         # 冻结快照（铁律：盘面一经生成永久固定）
+        # plate_facts 把各体系 facts 归一后一起冻结，交互层才有卦名、动爻、体用卦可读
         raw_plate = {
             "scheduling_note": scheduling_note,
             "systems_used": systems,
             "calculation_requests": requests,
+            "plate_facts": build_plate_facts(module_results),
         }
         input_payload = {
             "question": self.session.question,
@@ -116,9 +118,11 @@ class WorkflowEngine:
         )
 
         # 保存工作流结果到会话
+        # step2 只存展示字段：完整盘面已在快照 module_results 里，重复存一份会让
+        # 每个会话文件翻倍（实测单个会话 ~270KB 中 step2 占 ~36KB 且与快照同源）。
         self.session.workflow_result = {
             "step1": step1,
-            "step2": step2,
+            "step2": compact_plate_output(step2),
             "step3": step3,
             "step4": step4,
             "step5": step5,

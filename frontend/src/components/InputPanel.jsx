@@ -18,6 +18,7 @@ import {
   Trash2,
   Workflow,
 } from "lucide-react";
+import { CATEGORIES } from "../lib/labels";
 
 const SCENES = [
   { id: "combined", label: "综合推演", icon: Layers3 },
@@ -154,12 +155,9 @@ export default function InputPanel({
             <label>
               <FieldLabel>事项分类</FieldLabel>
               <select value={form.category} onChange={(event) => update("category", event.target.value)}>
-                <option value="career">事业</option>
-                <option value="finance">财务</option>
-                <option value="relationship">关系</option>
-                <option value="travel">出行</option>
-                <option value="study">学业</option>
-                <option value="other">其他</option>
+                {CATEGORIES.map((item) => (
+                  <option key={item.id} value={item.id}>{item.label}</option>
+                ))}
               </select>
             </label>
             <label>

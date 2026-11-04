@@ -1,8 +1,7 @@
 """Core computational engine for Zi Wei Dou Shu (紫微斗数)."""
 
-import hashlib
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from lunar_python import Solar
 
 from app.calendar.engine import CalendarEngine

@@ -1,11 +1,8 @@
 import unittest
 from fastapi.testclient import TestClient
 
-from app.bazi import auto_cast, calculate_bazi, time_cast
+from app.bazi import calculate_bazi
 from app.bazi.rules import (
-    CHANGSHENG_STAGES,
-    HIDDEN_STEMS_MAP,
-    NAYIN_TABLE,
     get_ten_god,
     get_twelve_stage,
 )

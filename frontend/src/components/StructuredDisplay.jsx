@@ -1,4 +1,5 @@
 import HexagramView from "./HexagramView";
+import { calendarGanzhiText, solarTermLabel } from "../lib/workflowDisplay";
 
 /**
  * 7步工作流结构化数据展示组件。
@@ -66,8 +67,8 @@ function StructuredStepContent({ stepKey, data }) {
           <div className="friendly-row">
             <span className="friendly-label">历法基线：</span>
             <span>
-              {data.calendar.ganzhi && `${data.calendar.ganzhi.year}年 ${data.calendar.ganzhi.month}月 ${data.calendar.ganzhi.day}日`}
-              {data.calendar.solar_term && ` · ${data.calendar.solar_term}`}
+              {calendarGanzhiText(data.calendar)}
+              {solarTermLabel(data.calendar) && ` · ${solarTermLabel(data.calendar)}`}
             </span>
           </div>
         )}

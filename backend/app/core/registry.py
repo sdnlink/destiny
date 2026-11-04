@@ -1,7 +1,7 @@
-import hashlib
 import json
 from pathlib import Path
 
+from app.common.hashing import canonical_digest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 RULE_REGISTRY_PATH = PROJECT_ROOT / "data" / "rules" / "mvp-engineering-baseline.json"
@@ -14,8 +14,7 @@ def _load_json(path):
 
 
 def content_checksum(value):
-    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    return canonical_digest(value)
 
 
 def load_rule_registry(path=RULE_REGISTRY_PATH):
@@ -82,11 +81,23 @@ def rule_index(registry=None):
     return {rule["rule_id"]: rule for rule in registry["rules"]}
 
 
-def referenced_rule_ids(result):
+def referenced_rule_ids(value):
+    """递归收集结果里出现的所有 rule_ids。
+
+    只扫 steps/evidence/judgements 会漏掉顶层 rule_ids（编排层就写在顶层），
+    校验因此形同虚设。
+    """
     references = set()
-    for section in ("steps", "evidence", "judgements"):
-        for item in result.get(section, []):
-            references.update(item.get("rule_ids", []))
+    stack = [value]
+    while stack:
+        item = stack.pop()
+        if isinstance(item, dict):
+            own = item.get("rule_ids")
+            if isinstance(own, list):
+                references.update(rule_id for rule_id in own if isinstance(rule_id, str))
+            stack.extend(item.values())
+        elif isinstance(item, list):
+            stack.extend(item)
     return references
 
 

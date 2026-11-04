@@ -1,7 +1,7 @@
 """Rules and classical tables for Qimen Dunjia (时家转盘奇门遁甲)."""
 
 from types import MappingProxyType
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 # 九宫八卦基底 (洛书九宫)
 PALACE_NAMES = MappingProxyType({

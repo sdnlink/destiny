@@ -4,17 +4,27 @@
 步骤间数据单向流动，后续步骤只能读取前面步骤的输出，不能回写修改。
 """
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
+from app.common.categories import CATEGORY_LABELS, normalize_category
+from app.common.five_elements import (
+    FIVE_ELEMENTS_CONTROLS,
+    FIVE_ELEMENTS_GENERATES,
+    element_relation,
+)
+from app.common.ganzhi import (
+    BRANCH_CLASH,
+    BRANCH_COMBINE,
+    BRANCH_ELEMENTS,
+    EARTHLY_BRANCHES,
+    branch_label,
+)
 from app.core.advisory import CATEGORY_PROFILES, generate_advisory
 from app.core.hexagram_service import get_hexagram_explanation
 from app.core.interpretation import (
-    CATEGORY_LABELS,
     MODULE_LABELS,
-    RELATIVE_MEANINGS,
     RELATION_MEANINGS,
     SPIRIT_MEANINGS,
-    explain_correspondences,
 )
 from app.core.imagery import collect_imagery
 from app.core.literature import collect_literature_opinions
@@ -52,7 +62,7 @@ def step1_info_validation(session) -> Dict[str, Any]:
         "name": "信息校验与起盘数据源确认",
         "question": session.question,
         "category": session.category,
-        "category_label": CATEGORY_LABELS.get(session.category, session.category),
+        "category_label": CATEGORY_LABELS[normalize_category(session.category)],
         "casting_method": session.casting_method,
         "casting_source": session.casting_source,
         "system": session.system,
@@ -123,11 +133,18 @@ CATEGORY_YONGSHEN = {
     "other": {"primary": "世爻", "secondary": "应爻", "logic": "通用事项以世爻为自身、应爻为外部环境，结合卦象综合判断"},
 }
 
-# 梅花易数体用用神
+# 梅花易数体用用神（键名与 app.common.categories 保持一致）
 MEIHUA_YONGSHEN = {
     "career": {"yong": "用卦（官鬼/父母象）", "ti": "体卦", "logic": "梅花以体卦为自身，用卦为事项；事业看用卦是否生体、比和"},
     "finance": {"yong": "用卦（妻财象）", "ti": "体卦", "logic": "财运以体卦为自身，用卦为财；用生体/比和为得财之象"},
     "relationship": {"yong": "用卦（应象）", "ti": "体卦", "logic": "感情以体卦为自身，用卦为对方；体用生克关系反映互动"},
+    "study": {"yong": "用卦（父母/文昌象）", "ti": "体卦", "logic": "学业以体卦为自身，用卦为成绩文书；用生体或比和者学业顺遂"},
+    "lawsuit": {"yong": "用卦（官鬼象）", "ti": "体卦", "logic": "官司以体卦为己方，用卦为对方与公论；体克用者主可控，用克体者受制"},
+    "travel": {"yong": "用卦（父母/驿马象）", "ti": "体卦", "logic": "出行以体卦为自身，用卦为行程；体生用者耗于路途，用生体者得助"},
+    "missing_person": {"yong": "用卦（应象）", "ti": "体卦", "logic": "寻人以体卦为自身，用卦为对方所在；用生体者易寻，用克体者难遇"},
+    "lost_item": {"yong": "用卦（妻财象）", "ti": "体卦", "logic": "失物以体卦为自身，用卦为失物；用生体或比和者易复得"},
+    "health": {"yong": "用卦（官鬼／子孙象）", "ti": "体卦", "logic": "健康以体卦为自身，用卦为病气；体克用者可控，用克体者需严防"},
+    "decision": {"yong": "用卦（对方/外部条件）", "ti": "体卦", "logic": "抉择以体卦为自身立场，用卦为外部条件；比较两者生克定取舍"},
     "other": {"yong": "用卦", "ti": "体卦", "logic": "通用以体卦为自身、用卦为事项，动爻为变化契机"},
 }
 
@@ -146,7 +163,7 @@ def step3_identify_yongshen(session, plate_data: Dict[str, Any]) -> Dict[str, An
             "party_yongshen": 多方人物用神（如有）,
         }
     """
-    category = session.category
+    category = normalize_category(session.category)
     liuyao_yong = CATEGORY_YONGSHEN.get(category, CATEGORY_YONGSHEN["other"])
     meihua_yong = MEIHUA_YONGSHEN.get(category, MEIHUA_YONGSHEN["other"])
 
@@ -170,7 +187,7 @@ def step3_identify_yongshen(session, plate_data: Dict[str, Any]) -> Dict[str, An
         "step": 3,
         "name": "用神定位",
         "category": category,
-        "category_label": CATEGORY_LABELS.get(category, category),
+        "category_label": CATEGORY_LABELS[category],
         "primary_yongshen": liuyao_yong["primary"],
         "secondary_yongshen": liuyao_yong["secondary"],
         "logic": liuyao_yong["logic"],
@@ -182,6 +199,140 @@ def step3_identify_yongshen(session, plate_data: Dict[str, Any]) -> Dict[str, An
 # ============================================================
 # 步骤4：旺衰状态计算
 # ============================================================
+
+# 世应五行关系的读法（与体用关系同一套五行算法，但语义按世/应解读）
+SHIYING_LABELS = {
+    "same_element": "世应比和",
+    "use_generates_body": "应生世",
+    "body_generates_use": "世生应",
+    "use_controls_body": "应克世",
+    "body_controls_use": "世克应",
+}
+
+
+def _liuyao_line_chart(plate_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """取六爻纳甲爻表；非六爻盘返回空列表。"""
+    facts = (plate_data.get("plates", {}).get("liuyao") or {}).get("facts", {})
+    lines = facts.get("line_chart") or []
+    return [line for line in lines if isinstance(line, dict)]
+
+
+def _extract_moving_branches(plate_data: Dict[str, Any]) -> List[str]:
+    """提取动爻地支（六爻纳甲为准）。"""
+    branches = []
+    for line in _liuyao_line_chart(plate_data):
+        if line.get("is_moving"):
+            branch = line.get("najia_branch") or ""
+            if branch and branch not in branches:
+                branches.append(branch)
+    return branches
+
+
+def _resolve_yongshen_element(plate_data: Dict[str, Any], primary: str) -> Tuple[str, str]:
+    """按盘面推导用神五行。
+
+    六亲五行随卦宫五行变化，因此不能使用固定的「六亲→五行」对照表：
+    优先取用神所在爻的纳甲五行，其次取世/应爻，最后退回梅花用卦五行。
+    """
+    if not primary:
+        return "", "未提供用神，无法推导五行"
+
+    lines = _liuyao_line_chart(plate_data)
+    candidates = []
+    if lines:
+        if primary in ("世爻", "世"):
+            candidates = [line for line in lines if "世" in (line.get("roles") or [])]
+        elif primary in ("应爻", "应") or "按关系" in primary:
+            candidates = [line for line in lines if "应" in (line.get("roles") or [])]
+        else:
+            parts = [part.strip() for part in primary.split("/")]
+            candidates = [line for line in lines if line.get("six_relative") in parts]
+        if candidates:
+            moving = [line for line in candidates if line.get("is_moving")]
+            line = (moving or candidates)[0]
+            element = line.get("element") or ""
+            if element:
+                note = "用神{}取第{}爻（{}，{}），纳甲地支{}属{}".format(
+                    primary,
+                    line.get("position", ""),
+                    line.get("six_relative", ""),
+                    "动爻" if line.get("is_moving") else "静爻",
+                    line.get("najia_branch", ""),
+                    element,
+                )
+                if len(candidates) > 1:
+                    note += "；该用神两现，取{}".format("动爻" if moving else "首见之爻")
+                return element, note
+
+    meihua_facts = (plate_data.get("plates", {}).get("meihua") or {}).get("facts", {})
+    body_use = meihua_facts.get("body_use") or {}
+    use_trigram = body_use.get("use_trigram") or {}
+    if use_trigram.get("element"):
+        return use_trigram["element"], "梅花费数为用神，用卦{}属{}".format(
+            use_trigram.get("name", ""), use_trigram["element"]
+        )
+
+    return "", "当前盘面缺少可用的用神定位依据（仅有卦象、无纳甲装卦）"
+
+
+def _extract_shiying_relation(plate_data: Dict[str, Any]) -> Dict[str, Any]:
+    """提取世应两爻及其五行关系。"""
+    lines = _liuyao_line_chart(plate_data)
+    shi = next((line for line in lines if "世" in (line.get("roles") or [])), None)
+    ying = next((line for line in lines if "应" in (line.get("roles") or [])), None)
+    if not shi or not ying:
+        return {"note": "当前盘面无六爻纳甲，世应关系不适用"}
+    result = {
+        "shi": {
+            "position": shi.get("position"),
+            "six_relative": shi.get("six_relative"),
+            "element": shi.get("element"),
+            "branch": shi.get("najia_branch"),
+        },
+        "ying": {
+            "position": ying.get("position"),
+            "six_relative": ying.get("six_relative"),
+            "element": ying.get("element"),
+            "branch": ying.get("najia_branch"),
+        },
+    }
+    shi_element = shi.get("element") or ""
+    ying_element = ying.get("element") or ""
+    if shi_element and ying_element:
+        relation = element_relation(shi_element, ying_element)
+        result["relation"] = {
+            "code": relation["code"],
+            "label": SHIYING_LABELS[relation["code"]],
+            "meaning": RELATION_MEANINGS.get(relation["code"], ""),
+        }
+    return result
+
+
+def _extract_ganzhi_interactions(moving_branches: List[str], day_branch: str, month_branch: str) -> List[Dict[str, Any]]:
+    """动爻地支与日辰、月令的冲合关系。"""
+    items = []
+    for branch in moving_branches:
+        clash = BRANCH_CLASH.get(branch, "")
+        combine = BRANCH_COMBINE.get(branch, "")
+        parts = []
+        if clash and clash == day_branch:
+            parts.append("与日辰{}相冲，事多变动".format(day_branch))
+        if combine and combine == day_branch:
+            parts.append("与日辰{}相合，事易牵连反复".format(day_branch))
+        if clash and clash == month_branch:
+            parts.append("与月令{}相冲，月内起伏明显".format(month_branch))
+        if combine and combine == month_branch:
+            parts.append("与月令{}相合，事有依托".format(month_branch))
+        detail = "动爻{}".format(branch_label(branch))
+        detail += "、".join("，" + part for part in parts) if parts else "，与日辰月令无冲合，应期以逢值逢冲论"
+        items.append({
+            "branch": branch,
+            "day_relation": "冲" if clash and clash == day_branch else ("合" if combine and combine == day_branch else ""),
+            "month_relation": "冲" if clash and clash == month_branch else ("合" if combine and combine == month_branch else ""),
+            "detail": detail,
+        })
+    return items
+
 
 def step4_wangshuai_analysis(session, plate_data: Dict[str, Any], yongshen_data: Dict[str, Any]) -> Dict[str, Any]:
     """计算用神、体用、世应、关键干支旺衰。
@@ -203,34 +354,20 @@ def step4_wangshuai_analysis(session, plate_data: Dict[str, Any], yongshen_data:
     """
     calendar = plate_data.get("calendar") or {}
     ganzhi = calendar.get("ganzhi", {})
-    month_pillar = ganzhi.get("month", {})
-    day_pillar = ganzhi.get("day", {})
-    month_branch = month_pillar.get("branch", "")
-    day_branch = day_pillar.get("branch", "")
+    month_pillar = ganzhi.get("month", {}) or {}
+    day_pillar = ganzhi.get("day", {}) or {}
+    month_branch = month_pillar.get("branch", "") if isinstance(month_pillar, dict) else str(month_pillar)
+    day_branch = day_pillar.get("branch", "") if isinstance(day_pillar, dict) else str(day_pillar)
+    month_pillar_text = month_pillar.get("text", "") if isinstance(month_pillar, dict) else str(month_pillar)
+    day_pillar_text = day_pillar.get("text", "") if isinstance(day_pillar, dict) else str(day_pillar)
 
-    # 月令五行
-    BRANCH_ELEMENT = {
-        "寅": "木", "卯": "木", "巳": "火", "午": "火",
-        "申": "金", "酉": "金", "亥": "水", "子": "水",
-        "辰": "土", "戌": "土", "丑": "土", "未": "土",
-    }
-    month_element = BRANCH_ELEMENT.get(month_branch, "")
-    day_element = BRANCH_ELEMENT.get(day_branch, "")
+    # 月令、日辰五行（地支五行唯一真源：app.common.ganzhi.BRANCH_ELEMENTS）
+    month_element = BRANCH_ELEMENTS.get(month_branch, "")
+    day_element = BRANCH_ELEMENTS.get(day_branch, "")
 
-    # 用神五行（基于类别推断）
-    YONGSHEN_ELEMENT = {
-        "官鬼": "木",  # 官鬼克我，需结合日干
-        "妻财": "土",  # 我克者为财
-        "父母": "水",  # 生我者为父母
-        "子孙": "金",  # 我生者为子孙
-        "兄弟": "火",  # 同我者为兄弟
-    }
+    # 用神五行按盘面推导：六亲爻/世应爻/用卦，绝不用固定对照表
     primary = yongshen_data.get("primary_yongshen", "")
-    yongshen_element = YONGSHEN_ELEMENT.get(primary, "")
-
-    # 旺衰判断（简化：月令生扶为旺，克泄为衰）
-    ELEMENT_SHENG = {"木": "火", "火": "土", "土": "金", "金": "水", "水": "木"}
-    ELEMENT_KE = {"木": "土", "土": "水", "水": "火", "火": "金", "金": "木"}
+    yongshen_element, element_source = _resolve_yongshen_element(plate_data, primary)
 
     wangshuai_level = "平"
     wangshuai_reason = ""
@@ -238,50 +375,61 @@ def step4_wangshuai_analysis(session, plate_data: Dict[str, Any], yongshen_data:
         if yongshen_element == month_element:
             wangshuai_level = "旺（得令）"
             wangshuai_reason = f"用神{yongshen_element}与月令{month_branch}（{month_element}）同气，得令而旺。"
-        elif ELEMENT_SHENG.get(month_element) == yongshen_element:
+        elif FIVE_ELEMENTS_GENERATES.get(month_element) == yongshen_element:
             wangshuai_level = "相（月令生用）"
             wangshuai_reason = f"月令{month_branch}（{month_element}）生用神{yongshen_element}，用神得生为相。"
-        elif ELEMENT_KE.get(month_element) == yongshen_element:
+        elif FIVE_ELEMENTS_GENERATES.get(yongshen_element) == month_element:
             wangshuai_level = "休（用神生月令）"
             wangshuai_reason = f"用神{yongshen_element}生月令{month_branch}（{month_element}），泄气为休。"
-        elif ELEMENT_KE.get(yongshen_element) == month_element:
+        elif FIVE_ELEMENTS_CONTROLS.get(month_element) == yongshen_element:
             wangshuai_level = "囚（月令克用）"
             wangshuai_reason = f"月令{month_branch}（{month_element}）克用神{yongshen_element}，受克为囚。"
         else:
             wangshuai_level = "死（用神克月令）"
             wangshuai_reason = f"用神{yongshen_element}克月令{month_branch}（{month_element}），耗力为死。"
+    elif not yongshen_element:
+        wangshuai_reason = element_source
 
-    # 体用关系（梅花）
+    # 体用关系（梅花）：直接采用引擎已判定的五行关系，保证五类齐全且与引擎同源
     tiyong_relation = None
-    meihua_plate = plate_data.get("plates", {}).get("meihua", {})
-    facts = meihua_plate.get("facts", {})
-    if facts:
-        body_trigram = facts.get("body_trigram") or facts.get("ti_trigram")
-        use_trigram = facts.get("use_trigram") or facts.get("yong_trigram")
-        if body_trigram and use_trigram:
-            body_elem = body_trigram.get("element", "") if isinstance(body_trigram, dict) else ""
-            use_elem = use_trigram.get("element", "") if isinstance(use_trigram, dict) else ""
-            if body_elem == use_elem:
-                tiyong_relation = {"type": "比和", "meaning": RELATION_MEANINGS["same_element"]}
-            elif ELEMENT_SHENG.get(use_elem) == body_elem:
-                tiyong_relation = {"type": "用生体", "meaning": RELATION_MEANINGS["use_generates_body"]}
-            elif ELEMENT_SHENG.get(body_elem) == use_elem:
-                tiyong_relation = {"type": "体生用", "meaning": RELATION_MEANINGS["body_generates_use"]}
+    meihua_facts = (plate_data.get("plates", {}).get("meihua") or {}).get("facts", {})
+    body_use = meihua_facts.get("body_use") or {}
+    relation = (meihua_facts.get("body_use_relation") or {}).get("original") or {}
+    if body_use and relation.get("code"):
+        code = relation["code"]
+        tiyong_relation = {
+            "code": code,
+            "type": relation.get("label", ""),
+            "body_element": (body_use.get("body_trigram") or {}).get("element", ""),
+            "use_element": (body_use.get("use_trigram") or {}).get("element", ""),
+            "meaning": RELATION_MEANINGS.get(code, ""),
+        }
+
+    # 世应关系（六爻）：从纳甲装卦结果提取世应两爻及其五行生克
+    shiying_relation = _extract_shiying_relation(plate_data)
+
+    # 干支冲合：动爻与日辰、月令的冲合关系
+    moving_branches = _extract_moving_branches(plate_data)
+    ganzhi_interactions = _extract_ganzhi_interactions(moving_branches, day_branch, month_branch)
 
     # 生克链条
     analysis_chain = []
     if wangshuai_reason:
         analysis_chain.append(wangshuai_reason)
+    if element_source:
+        analysis_chain.append("用神定位：" + element_source)
     if tiyong_relation:
         analysis_chain.append(f"体用关系：{tiyong_relation['type']}——{tiyong_relation['meaning']}")
+    for item in ganzhi_interactions:
+        analysis_chain.append(item["detail"])
     analysis_chain.append(f"日辰为{day_branch}（{day_element}），需结合日辰对用神的生克冲合作最终判断。")
 
     return {
         "step": 4,
         "name": "旺衰与生克分析",
         "calendar_context": {
-            "month_pillar": month_pillar,
-            "day_pillar": day_pillar,
+            "month_pillar": month_pillar_text,
+            "day_pillar": day_pillar_text,
             "month_branch": month_branch,
             "day_branch": day_branch,
             "month_element": month_element,
@@ -290,12 +438,15 @@ def step4_wangshuai_analysis(session, plate_data: Dict[str, Any], yongshen_data:
         "yongshen_wangshuai": {
             "yongshen": primary,
             "element": yongshen_element,
+            "element_source": element_source,
             "level": wangshuai_level,
             "reason": wangshuai_reason,
         },
         "tiyong_relation": tiyong_relation,
-        "shiying_relation": {"note": "六爻世应关系需从纳甲装卦结果中提取世爻应爻位置与生克关系"},
+        "shiying_relation": shiying_relation,
+        "ganzhi_interactions": ganzhi_interactions,
         "analysis_chain": analysis_chain,
+        "rule_ids": ["WF-YONGSHEN-001", "WF-WANGSHUAI-001"],
     }
 
 
@@ -317,7 +468,7 @@ def step5_xiangyi_deduction(session, plate_data: Dict[str, Any], yongshen_data: 
             "correspondences": 事项对应解释,
         }
     """
-    category = session.category
+    category = normalize_category(session.category)
     plates = plate_data.get("plates", {})
 
     # 提取主卦信息
@@ -345,31 +496,30 @@ def step5_xiangyi_deduction(session, plate_data: Dict[str, Any], yongshen_data: 
             symbol_mappings.append({
                 "symbol": f"本卦「{hexagram_name}」",
                 "original_meaning": summary,
-                "event_mapping": f"在{CATEGORY_LABELS.get(category, category)}事项中，此卦象提示：{summary}",
+                "event_mapping": f"在{CATEGORY_LABELS[category]}事项中，此卦象提示：{summary}",
             })
         # 类别-specific 解读
         cat_field = f"{category}_interpretation"
         cat_interp = hexagram_explanation.get(cat_field, "")
         if cat_interp:
             symbol_mappings.append({
-                "symbol": f"「{hexagram_name}」之{CATEGORY_LABELS.get(category, category)}象",
+                "symbol": f"「{hexagram_name}」之{CATEGORY_LABELS[category]}象",
                 "original_meaning": cat_interp,
                 "event_mapping": cat_interp,
             })
 
-    # 六神象义（如果六爻结果中有）
-    liuyao_plate = plates.get("liuyao", {})
-    liuyao_facts = liuyao_plate.get("facts", {})
-    six_spirits = liuyao_facts.get("six_spirits") or liuyao_facts.get("liushen")
-    if six_spirits:
-        for spirit in six_spirits if isinstance(six_spirits, list) else []:
-            spirit_name = spirit if isinstance(spirit, str) else spirit.get("name", "")
-            if spirit_name in SPIRIT_MEANINGS:
-                symbol_mappings.append({
-                    "symbol": f"六神「{spirit_name}」",
-                    "original_meaning": SPIRIT_MEANINGS[spirit_name],
-                    "event_mapping": f"在本事项中，{spirit_name}临爻提示：{SPIRIT_MEANINGS[spirit_name]}",
-                })
+    # 六神象义（六爻纳甲爻表中每爻的六神）
+    seen_spirits = set()
+    for line in _liuyao_line_chart(plate_data):
+        spirit_name = line.get("six_spirit", "")
+        if not spirit_name or spirit_name in seen_spirits or spirit_name not in SPIRIT_MEANINGS:
+            continue
+        seen_spirits.add(spirit_name)
+        symbol_mappings.append({
+            "symbol": f"六神「{spirit_name}」",
+            "original_meaning": SPIRIT_MEANINGS[spirit_name],
+            "event_mapping": f"在本事项中，{spirit_name}临第{line.get('position', '')}爻（{line.get('six_relative', '')}）提示：{SPIRIT_MEANINGS[spirit_name]}",
+        })
 
     return {
         "step": 5,
@@ -417,7 +567,7 @@ def step6_synthesis_judgement(
             "literature": 文献引证,
         }
     """
-    category = session.category
+    category = normalize_category(session.category)
     context = {"category": category, "question_summary": session.question}
 
     # 调用现有综合研判
@@ -450,9 +600,10 @@ def step6_synthesis_judgement(
     except Exception:
         advisory_result = {}
 
-    # 吉凶等级判定（基于旺衰 + 体用关系 + 综合研判极性）
+    # 吉凶等级判定（旺衰 + 体用五行关系；判定口径登记为 WF-FORTUNE-001）
     wangshuai_level = wangshuai_data.get("yongshen_wangshuai", {}).get("level", "平")
     tiyong = wangshuai_data.get("tiyong_relation", {}) or {}
+    tiyong_code = tiyong.get("code", "")
     tiyong_type = tiyong.get("type", "")
 
     score = 0
@@ -466,29 +617,31 @@ def step6_synthesis_judgement(
     else:
         basis.append(f"用神{wangshuai_level}，力量中等")
 
-    if tiyong_type == "用生体":
-        score += 2
-        basis.append("用生体，外部条件滋养自身")
-    elif tiyong_type == "比和":
-        score += 1
-        basis.append("体用比和，同气相求")
-    elif tiyong_type == "体生用":
-        score -= 1
-        basis.append("体生用，自身持续消耗")
+    TIYONG_SCORE = {
+        "use_generates_body": (2, "用生体，外部条件滋养自身"),
+        "same_element": (1, "体用比和，同气相求"),
+        "body_controls_use": (1, "体克用，自身可掌控局面"),
+        "body_generates_use": (-1, "体生用，自身持续消耗"),
+        "use_controls_body": (-2, "用克体，外部制约明显"),
+    }
+    if tiyong_code in TIYONG_SCORE:
+        delta, text = TIYONG_SCORE[tiyong_code]
+        score += delta
+        basis.append(text)
 
     if score >= 3:
         fortune_level = "大吉"
     elif score >= 1:
         fortune_level = "小吉"
-    elif score == 0:
-        fortune_level = "平"
-    elif score >= -1:
+    elif score == -1:
         fortune_level = "小凶"
-    else:
+    elif score <= -2:
         fortune_level = "大凶"
+    else:
+        fortune_level = "平"
 
     # 当前现状
-    current_status = f"事项处于{CATEGORY_LABELS.get(category, category)}范畴，用神{yongshen_data.get('primary_yongshen', '')}当前{wangshuai_level}。"
+    current_status = f"事项处于{CATEGORY_LABELS[category]}范畴，用神{yongshen_data.get('primary_yongshen', '')}当前{wangshuai_level}。"
     if tiyong_type:
         current_status += f"体用关系为{tiyong_type}。"
 
@@ -496,8 +649,8 @@ def step6_synthesis_judgement(
     favorable = []
     if "旺" in wangshuai_level or "相" in wangshuai_level:
         favorable.append("用神旺相，自身力量充足，具备推进条件")
-    if tiyong_type in ("用生体", "比和"):
-        favorable.append("体用关系有利，外部环境支持或与自身同频")
+    if tiyong_code in ("use_generates_body", "same_element", "body_controls_use"):
+        favorable.append("体用关系有利，外部环境支持或自身可掌控局面")
     if not favorable:
         favorable.append("当前无明显有利因素，需谨慎观望")
 
@@ -505,13 +658,15 @@ def step6_synthesis_judgement(
     obstacles = []
     if "囚" in wangshuai_level or "死" in wangshuai_level or "休" in wangshuai_level:
         obstacles.append("用神休囚死，力量不足，推进阻力较大")
-    if tiyong_type == "体生用":
+    if tiyong_code == "body_generates_use":
         obstacles.append("体生用，自身精力/资源持续消耗，需控制投入")
+    if tiyong_code == "use_controls_body":
+        obstacles.append("用克体，外部规则或竞争持续压制，宜避其锋芒")
     if not obstacles:
         obstacles.append("当前无明显阻碍，但需注意细节变化")
 
     # 趋势与应期（基于动爻地支、日辰冲合、月令的专业推算）
-    trend = _calculate_trend(category, wangshuai_level, tiyong_type, fortune_level)
+    trend = _calculate_trend(category, wangshuai_level, tiyong_code, fortune_level)
     timing = _calculate_timing(plate_data, wangshuai_data, yongshen_data, fortune_level)
 
     return {
@@ -523,12 +678,14 @@ def step6_synthesis_judgement(
         "trend": trend,
         "timing": timing,
         "fortune_level": fortune_level,
+        "fortune_score": score,
         "fortune_basis": basis,
         "synthesis": synthesis_result,
         "advisory": advisory_result,
         "imagery": imagery_result,
         "yuanhui": yuanhui_result,
         "literature": literature_result,
+        "rule_ids": ["WF-WANGSHUAI-001", "WF-FORTUNE-001", "WF-TIMING-001"],
     }
 
 
@@ -536,33 +693,23 @@ def step6_synthesis_judgement(
 # 应期推算辅助函数（术数专业性深化）
 # ============================================================
 
-# 十二地支顺序
-EARTHLY_BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
-
-# 六冲关系
-LIU_CHONG = {"子": "午", "午": "子", "丑": "未", "未": "丑", "寅": "申", "申": "寅",
-             "卯": "酉", "酉": "卯", "辰": "戌", "戌": "辰", "巳": "亥", "亥": "巳"}
-
-# 六合关系
-LIU_HE = {"子": "丑", "丑": "子", "寅": "亥", "亥": "寅", "卯": "戌", "戌": "卯",
-          "辰": "酉", "酉": "辰", "巳": "申", "申": "巳", "午": "未", "未": "午"}
-
-# 三合局
-SAN_HE = {
-    "申子辰": "水", "亥卯未": "木", "寅午戌": "火", "巳酉丑": "金",
-}
-
-# 地支五行
-BRANCH_ELEMENT = {"子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土", "巳": "火",
-                  "午": "火", "未": "土", "申": "金", "酉": "金", "戌": "土", "亥": "水"}
+# 地支顺序、六冲、六合、三合局、地支五行统一取自 app.common.ganzhi，此处不再重复定义
 
 # 月令对应节气（近似）
 MONTH_BRANCH = {"寅": "立春", "卯": "惊蛰", "辰": "清明", "巳": "立夏", "午": "芒种", "未": "小暑",
                 "申": "立秋", "酉": "白露", "戌": "寒露", "亥": "立冬", "子": "大雪", "丑": "小寒"}
 
+TIYONG_TREND = {
+    "use_generates_body": "用生体格局，外部环境持续滋养自身，长期趋势向好",
+    "body_generates_use": "体生用格局，自身持续消耗于外，需注意资源透支风险",
+    "use_controls_body": "用克体格局，外部压力较大，需防范突发阻碍",
+    "body_controls_use": "体克用格局，自身可掌控局面，但需付出较大努力",
+    "same_element": "体用比和，内外同频，事态平稳发展",
+}
 
-def _calculate_trend(category, wangshuai_level, tiyong_type, fortune_level):
-    """基于用神旺衰、体用关系、吉凶等级推算发展趋势。"""
+
+def _calculate_trend(category, wangshuai_level, tiyong_code, fortune_level):
+    """基于用神旺衰、体用五行关系、吉凶等级推算发展趋势。"""
     parts = []
     if "旺" in wangshuai_level or "相" in wangshuai_level:
         parts.append("当前用神旺相，事态处于上升期，具备主动推进的力量基础")
@@ -573,16 +720,8 @@ def _calculate_trend(category, wangshuai_level, tiyong_type, fortune_level):
     else:
         parts.append("用神力量中等，事态处于胶着期，需视具体变化决定进退")
 
-    if tiyong_type == "用生体":
-        parts.append("用生体格局，外部环境持续滋养自身，长期趋势向好")
-    elif tiyong_type == "体生用":
-        parts.append("体生用格局，自身持续消耗于外，需注意资源透支风险")
-    elif tiyong_type == "用克体":
-        parts.append("用克体格局，外部压力较大，需防范突发阻碍")
-    elif tiyong_type == "体克用":
-        parts.append("体克用格局，自身可掌控局面，但需付出较大努力")
-    elif tiyong_type == "比和":
-        parts.append("体用比和，内外同频，事态平稳发展")
+    if tiyong_code in TIYONG_TREND:
+        parts.append(TIYONG_TREND[tiyong_code])
 
     if fortune_level in ("大吉", "小吉"):
         parts.append("综合判断趋势偏吉，关键节点把握得当则可获有利结果")
@@ -600,10 +739,8 @@ def _calculate_timing(plate_data, wangshuai_data, yongshen_data, fortune_level):
     应期法则：
     1. 动爻逢值（值日）、逢冲（对冲日）为近期应期
     2. 用神旺相则应期近，休囚则应期远
-    3. 动爻化合则待冲开之时，动爻化冲则待合住之时
-    4. 远应年月，近应日时
+    3. 远应年月，近应日时
     """
-    plates = plate_data.get("plates", {})
     calendar = plate_data.get("calendar", {})
     ganzhi = calendar.get("ganzhi", {})
     day_branch = ganzhi.get("day", "")
@@ -613,50 +750,38 @@ def _calculate_timing(plate_data, wangshuai_data, yongshen_data, fortune_level):
     if isinstance(month_branch, dict):
         month_branch = month_branch.get("branch", "")
 
-    # 提取动爻地支
-    moving_branches = []
-    for key in ("liuyao", "meihua", "zhouyi"):
-        plate = plates.get(key, {})
-        facts = plate.get("facts", {})
-        # 六爻动爻地支
-        yao_list = facts.get("yao_list") or facts.get("yaos") or []
-        if isinstance(yao_list, list):
-            for yao in yao_list:
-                if isinstance(yao, dict) and yao.get("moving"):
-                    branch = yao.get("branch") or yao.get("earthly_branch", "")
-                    if branch:
-                        moving_branches.append(branch)
-        # 梅花动爻
-        moving_line = facts.get("moving_line")
-        if moving_line and not moving_branches:
-            # 梅花易数动爻对应地支需结合卦象，此处用日辰推算
-            pass
+    # 动爻地支以六爻纳甲爻表为准
+    moving_branches = _extract_moving_branches(plate_data)
 
     wangshuai_level = wangshuai_data.get("yongshen_wangshuai", {}).get("level", "平")
-    primary_yongshen = yongshen_data.get("primary_yongshen", "")
 
     timing_parts = []
 
     # 近期应期（日）
     if moving_branches:
         for mb in moving_branches[:2]:
-            chong = LIU_CHONG.get(mb, "")
-            he = LIU_HE.get(mb, "")
-            timing_parts.append(f"动爻临「{mb}」，逢值（{mb}日）或逢冲（{chong}日）为近期应期")
-            if day_branch:
-                day_idx = EARTHLY_BRANCHES.index(day_branch) if day_branch in EARTHLY_BRANCHES else 0
-                mb_idx = EARTHLY_BRANCHES.index(mb) if mb in EARTHLY_BRANCHES else 0
-                days_to_value = (mb_idx - day_idx) % 12
-                chong_idx = EARTHLY_BRANCHES.index(chong) if chong in EARTHLY_BRANCHES else 0
-                days_to_chong = (chong_idx - day_idx) % 12
-                timing_parts.append(f"  距今日约{days_to_value}日逢值，约{days_to_chong}日逢冲")
+            chong = BRANCH_CLASH.get(mb, "")
+            combine = BRANCH_COMBINE.get(mb, "")
+            line = f"动爻临「{mb}」，逢值（{mb}日）或逢冲（{chong}日）为近期应期"
+            if combine:
+                line += f"，逢合（{combine}日）多主牵连待解"
+            timing_parts.append(line)
+            if day_branch and day_branch in EARTHLY_BRANCHES and mb in EARTHLY_BRANCHES:
+                day_idx = EARTHLY_BRANCHES.index(day_branch)
+                days_to_value = (EARTHLY_BRANCHES.index(mb) - day_idx) % 12
+                if chong in EARTHLY_BRANCHES:
+                    days_to_chong = (EARTHLY_BRANCHES.index(chong) - day_idx) % 12
+                    timing_parts.append(f"  距今日约{days_to_value}日逢值，约{days_to_chong}日逢冲")
+                else:
+                    timing_parts.append(f"  距今日约{days_to_value}日逢值")
     elif day_branch:
         timing_parts.append(f"无明确动爻，以日辰「{day_branch}」为基准，逢用神旺相之日应事")
 
     # 中期应期（月/节气）
     if month_branch:
         next_jieqi = MONTH_BRANCH.get(month_branch, "")
-        timing_parts.append(f"月令「{month_branch}」（{next_jieqi}），月内用神得令则应期在本月，失令则待下月")
+        month_label = f"月令「{month_branch}」（{next_jieqi}）" if next_jieqi else f"月令「{month_branch}」"
+        timing_parts.append(f"{month_label}，月内用神得令则应期在本月，失令则待下月")
 
     # 旺衰决定应期远近
     if "旺" in wangshuai_level or "相" in wangshuai_level:
@@ -694,7 +819,7 @@ def step7_advice_and_disclaimer(session, synthesis_data: Dict[str, Any]) -> Dict
             "disclaimer": 免责提示,
         }
     """
-    category = session.category
+    category = normalize_category(session.category)
     fortune = synthesis_data.get("fortune_level", "平")
     profile = CATEGORY_PROFILES.get(category, CATEGORY_PROFILES["other"])
 

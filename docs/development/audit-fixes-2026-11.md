@@ -1,0 +1,115 @@
+# 2026-11 审计问题修复记录
+
+本文记录上一轮 28 条审计问题的落地情况，供复核与后续排期使用。
+验收标准：后端回归全绿（依赖数据库的用例在无库环境下条件跳过并打印原因）、前端构建通过。
+
+## 验证方式与结果
+
+| 验证项 | 命令 | 结果 |
+| --- | --- | --- |
+| 后端全量回归 | `cd backend && python -m pytest tests -q` | 391 passed / 10 skipped / 24 subtests passed |
+| 后端静态检查 | `cd backend && python -m ruff check app tests` | 0 error（规则集 `E4,E7,E9,F`） |
+| 前端构建 | `cd frontend && npm run build` | 通过，产出按需分包（首包 60.44KB JS + 182.10KB react 分片） |
+| 前端单测 | `cd frontend && npm run test:unit` | 15 passed |
+
+说明：10 个 skip 全部是 `tests/test_calendar_corpus_db.py` 里依赖 ClickHouse 的集成用例，
+无库时由 `HAS_CLICKHOUSE` 判定后 skip，不再伪装成「通过」，也不再因为没有数据库而报红。
+
+## 逐条状态
+
+| # | 问题 | 状态 | 落地位置 |
+| --- | --- | --- | --- |
+| 4 | 事项分类键名三处漂移 | 已修 | `backend/app/common/categories.py`；`core/interpretation.py`、`core/advisory.py`、`core/literature.py`、`workflow/steps.py` 全部改为引用；前端 `src/lib/labels.js` 与后端逐项比对（`tests/test_frontend_labels.py`） |
+| 1 | 冻结快照丢真实起盘参数 | 已修 | `workflow/casting.py` handler 内部 `dict(payload)`，不再 pop 入参 |
+| 2 | 冻结快照缺卦名/动爻，交互层读不到 | 已修 | 新增 `workflow/plate_facts.py`（`build_plate_facts` / `build_plate_view`），`raw_plate` 增加 `plate_facts` |
+| 3 | 交互层字段名 `auxiliary_yongshen` 读错 | 已修 | `interaction/deep_question.py` 改为 `secondary_yongshen` |
+| 5 | 用神五行写死固定对照表 | 已修 | `workflow/steps.py` 改为 `_resolve_yongshen_element`，按纳甲/世应/体用推导并输出 `element_source` |
+| 7 | 体用关系只有两类 | 已修 | 五类齐全，判定统一走 `common/five_elements.element_relation` |
+| 9 | 地支/五行常量各写一份 | 已修 | `common/ganzhi.py`、`common/five_elements.py` 收为唯一真源，`meihua/engine.py`、`bazi/rules.py` 改为转出 |
+| 6 | 吉凶与应期不可追溯 | 已修 | 登记 `WF-YONGSHEN-001`/`WF-WANGSHUAI-001`/`WF-FORTUNE-001`/`WF-TIMING-001`，step4/step6 输出 `rule_ids`、`fortune_score`；口径见 ADR-015 |
+| 8 | 四套 module/method 分发 | 大部分已修 | 新增 `common/calculation_dispatch.py`（27 组）；`core/validation.py`、`workflow/casting.py` 已切；`main.py` 的 if 链改为 `CALCULATION_ENTRIES` 表 |
+| 23 | `requirements-dev` 缺 httpx | 已修 | `requirements-dev.txt` 改为 `-r requirements.txt` + `pytest` + `httpx<0.28`，并加 `tests/test_dependency_contract.py` |
+| 26 | 无 CI/无 lint 配置 | 已修 | `.github/workflows/ci.yml`（lint + pytest + 前端构建与单测）、`pyproject.toml` 增加 `[tool.ruff]` |
+| 27 | 三平台脚本缺口 | 已修 | 新增 `scripts/start_dev.sh`、`scripts/deploy.ps1`、`scripts/deploy.bat` |
+| 28 | 死代码 | 已修 | 清 `steps.py` 局部常量与空分支、`inquiry_parser` 9 个 `has_*`、`session/models.py` 未实现交互类型、`bazi/engine.py` 半成品神煞变量（改为真正计算天德/月德）、`advisory` 单字母变量；`core/db.py get_branch_imagery` 经核实有调用者，非死代码 |
+| 16 | 数据库异常被吞、来源标注撒谎 | 已修 | `core/db.py` 分类记录日志；`main.py` 新增 `constant_payload`，数据库不可达时返回 `source: unavailable` 而不是 `clickhouse_database` |
+| 17 | 常量端点每次探测 + 空缓存永久化 | 已修 | `is_available` 加 30 秒缓存；`hexagram_service` 缓存加 TTL 且空结果不缓存 |
+| 18 | 线程池用于纯 CPU 计算 | 已修 | `workflow/casting.py` 与 `main.py comparison_envelope` 均改顺序执行 |
+| 19 | 会话写入非原子、ID 可穿越 | 已修 | `session/store.py` 原子写（临时文件 + `os.replace`）、会话 ID 严格校验、损坏文件记录日志 |
+| 20 | 会话 JSON 体积放大 | 部分修 | 去掉 `indent=2` 改紧凑序列化；「同一结果存三遍」（快照 `module_results`、`raw_plate`、`workflow_result.step2`）需与前端读取契约同步改，留待单独一轮 |
+| 21 | localStorage 超配额静默失败 | 已修 | `src/lib/storage.js` 改为字节预算 + 超限降级 + 失败返回 false，App 提示用户 |
+| 22 | 口令双写、鉴权空转、异常外泄 | 部分修 | 代码侧口令只从环境读取（`requirements`/`.env.example` 说明）；500 响应不再回 `str(exc)`，改记日志；`APP_API_TOKEN` 未设时启动打印警告。会话归属校验需要身份体系，未见实现 |
+| 24 | pydantic v1→v2 破坏性迁移 | 已界定 | `requirements.txt` 锁 `pydantic>=1.10.26,<2`，迁移步骤写入 ADR-016，并由测试锁定主版本 |
+| 25 | README 数字过期 | 已修 | 14 条规则/7 个案例 → 73/31，并补工作流规则与吉凶边界说明 |
+| 10 | 转发壳模块 | 保留 | `core/{casting,liuyao,meihua,liuren}.py` 是带 `__all__` 的兼容转出层，非重复实现；删除会破坏既有导入路径 |
+| 11 | 三份 HTTP 客户端与三份 canonical_hash | 部分修 | 摘要统一到 `common/hashing.py`；ClickHouse 客户端仍只有 `core/db.py` 一处，语料检索客户端未合并（依赖不同服务） |
+| 12 | 前端与后端双份体系映射 | 部分修 | 前端抽到 `src/lib/calculationPlan.js` 并单测（8 例）；与后端 `workflow/scheduler.py` 的跨栈单源需要新增计划接口，留待单独一轮 |
+| 13 | 超大组件与 `!important` | 未修 | `ResultWorkspace.jsx`(101KB)、`WorkflowPanel.jsx`、`styles.css`(134KB/27 处 `!important`) 拆分属视觉回归风险高的重构，需视觉基线后再做 |
+| 14 | 两套持久化不通、两个入口同抽屉 | 部分修 | 去掉重复的「历史任务」入口，合并为「历史与案例」；localStorage 与后端会话存储的打通属功能设计，未做 |
+| 15 | 前端测试自证、Chrome 路径写死 | 已修 | 测试改为直接 import 生产模块；`smoke.mjs` 不再硬编码 `/usr/bin/google-chrome`，截图落系统临时目录 |
+
+## 行为变化（可能影响既有调用方）
+
+1. `/v1/constants/*` 在数据库不可达时返回 `source: "unavailable"`，不再谎报 `clickhouse_database`；`data` 为空数组并带 `warning`。
+2. 非法 `session_id`（不符合 `sess_[A-Za-z0-9_-]{1,64}`）一律按查无此会话处理，返回 404。
+3. 会话 JSON 改为紧凑序列化，已有文件仍可读取（格式兼容）。
+4. 交互异常返回统一文案「交互处理失败，请查看服务端日志」，不再透出内部异常。
+5. 前端首屏只加载外壳 + 输入面板，结果区与工作流面板改为按需分包。
+6. 动爻爻题改为传统写法（`九三`、`初九`、`上六`），原输出「三九」是极性/位次颠倒；
+   `bian_yao` 改为变爻描述「第3爻由阳变阴」，此前错填变卦名（变卦名仍在 `bian_gua`）。
+   两者由 `backend/tests/test_plate_facts.py` 钉住，避免再次静默退化。
+7. 八字神煞补齐天德/月德：此前只算了月令对应的天德/月德值却从未参与判定，
+   现在逐柱比对天干与地支（天德可能是天干或地支，月德固定为天干）。
+
+## 仍待决策
+
+1. 审计第 13 条的大文件拆分与 `!important` 清理，需要先有视觉回归基线。
+2. 第 20 条「同一结果存三遍」的字段裁剪会改前端读取契约，建议与第 14 条持久化打通一起排期。
+3. 第 24 条 pydantic v2 迁移按 ADR-016 的清单单独执行。
+
+## 第二轮修复（2026-11-04）
+
+本轮目标是补齐上一轮遗留的测试缺口，并修复补测过程中暴露的真实缺陷。
+
+### 验证结果
+
+| 验证项 | 命令 | 结果 |
+| --- | --- | --- |
+| 后端全量回归 | `python -m pytest backend/tests -q` | 620 passed / 10 skipped（ClickHouse）/ 0 failed |
+| 新增工作流单测 | `backend/tests/test_workflow_steps.py` | 105 用例 |
+| 新增交互模块单测 | `backend/tests/test_interaction_modules.py` | 102 用例 |
+| 新增鉴权边界单测 | `backend/tests/test_token_middleware.py` | 5 用例 |
+| 前端渲染级测试 | `npm --prefix frontend run test:unit`（vitest + jsdom） | 7 文件 / 45 用例通过 |
+| 前端既有纯 JS 单测 | `npm --prefix frontend run test:node` | 26 用例通过（命令原样保留） |
+| 前端生产构建 | `npm --prefix frontend run build` | 通过，分块与首包体积不变 |
+
+### 修复项
+
+| 问题 | 状态 | 落地位置 |
+| --- | --- | --- |
+| 健康检查模块清单漏 ziwei/bazi/qimen | 已修 | `backend/app/main.py` `/health`，由 `test_token_middleware.py` 钉住 |
+| `APP_API_TOKEN` 与 `SERVE_WEB=1` 冲突（整站 401） | 已修 | `backend/app/main.py` 中间件只保护 `/v1/*`、`/docs`、`/openapi.json`、`/redoc`；静态资源与 `/health` 公开 |
+| 规则数量文档口径漂移（14/63/73） | 已修 | `docs/readme.md`、`docs/refactoring-plan.md`、`docs/development/calculation-service.md` 统一为 73 条规则、31 个案例、16 条 ADR |
+| 旺衰休/囚/死三档判反 | 已修 | `backend/app/workflow/steps.py` 按 ADR-015 / WF-WANGSHUAI-001 口径：用神生月令→休、月令克用→囚、用神克月令→死 |
+| 现实校验把「不太符合」判成「符合」 | 已修 | `backend/app/interaction/reality_check.py`：长关键词优先 + 关键词前缀否定判断 |
+| 复盘把「未通过」判成偏有利 | 已修 | `backend/app/interaction/review.py` `_classify_outcome` 先判不利关键词 |
+| 复盘有利/阻碍因素归因分支不可达 | 已修 | `backend/app/interaction/review.py` 新增 `_matches_any` 双向包含并忽略空串 |
+| 空角度命中第一个预设 | 已修 | `backend/app/interaction/angle_shift.py` `_match_preset` 对空白输入短路 |
+| 「其他」被误判为「对方」 | 已修 | `backend/app/interaction/multi_party.py` 匹配前剔除「其他/其它」 |
+| 非法月支输出空括号「（）」 | 已修 | `backend/app/workflow/steps.py` 无节气时只输出 `月令「X」` |
+| 历史抽屉使用未导入的 `FileClock` 图标（打开即白屏） | 已修 | `frontend/src/App.jsx` 补 lucide 导入；`frontend/tests/components/App.test.jsx` 新增抽屉渲染用例钉住 |
+| React 组件零渲染测试 | 已修 | 新增 `frontend/tests/components/` 7 个测试文件（HexagramView/InteractionResultDisplay/StructuredDisplay/InputPanel/WorkflowPanel/ResultWorkspace/App），均真实挂载，无 snapshot |
+| 测试把会话 JSON 写进仓库 `data/sessions/` | 已修 | 新增 `backend/tests/conftest.py` 将 `SESSION_STORAGE_DIR` 指向临时目录并退出时清理；`test_session_isolation.py` 钉住；已清理本轮测试产生的 20 个残留文件（保留 8 月的 2 个原有记录） |
+
+### 行为变化（可能影响既有调用方）
+
+1. 旺衰判定按规范口径校正后，step6 吉凶分档随之变化：休（泄气）由 -2 改记 0、囚（受克）由 0 改记 -2；`_calculate_trend`、obstacles、应期远近的「休 vs 囚死」分支同步回到正确档位。
+2. `reality_check` 的模糊匹配语义收紧：`不太符合/并不完全符合/没有符合` 归一为「不符合」；`部分符合吧` 仍为「部分符合」；`未来符合预期` 不再被误判为否定；`不知道` 仍返回 `unknown/retry`。
+3. `review` 的「未通过」类否定结果归为偏阻滞，与 step6 凶判一致；有利/阻碍因素现在能按双向包含命中。
+4. `detect_parties("其他事情怎么办")` 返回 `['求测人']`，真代词（他/她/他们）仍能识别出「对方」。
+5. `_match_preset("")` 与 `_match_preset("   ")` 返回 `None`，不再谎称命中「对方立场」。
+
+### 仍待决策（本轮新增）
+
+1. 六爻伏神飞神、大六壬多类课体取法仍需规则签署，本轮未动。
+2. 风水 FS-001/FS-004~008、房屋档案 PostgreSQL 持久化属架构投入，本轮未动。

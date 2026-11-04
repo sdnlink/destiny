@@ -2,8 +2,8 @@ import unittest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.qimen import auto_cast, calculate_qimen_chart, time_cast
-from app.qimen.rules import PALACE_NAMES, evaluate_qimen_patterns
+from app.qimen import calculate_qimen_chart
+from app.qimen.rules import evaluate_qimen_patterns
 
 
 class QimenTests(unittest.TestCase):

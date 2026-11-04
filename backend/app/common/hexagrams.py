@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Iterable, Optional, Tuple, cast
+from typing import Iterable, Tuple, cast
 
 from .models import Hexagram
 from .trigrams import TRIGRAM_CATALOG, get_trigram_by_bits, trigram_to_bits

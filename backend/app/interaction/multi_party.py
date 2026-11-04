@@ -34,8 +34,10 @@ def detect_parties(question: str) -> List[str]:
         "竞争": "竞争者", "对手": "竞争者",
         "中介": "中介/第三方", "第三方": "中介/第三方", "介绍人": "中介/第三方",
     }
+    # 「其他/其它」是泛指，不是人物；不剔除会让单字「他」误判出「对方」
+    matching_text = question.replace("其他", "").replace("其它", "")
     for kw, role in keywords.items():
-        if kw in question and role not in parties:
+        if kw in matching_text and role not in parties:
             parties.append(role)
     # 如果涉及感情/合作但未明确对方，补充
     if any(kw in question for kw in ["感情", "恋爱", "婚姻", "合作", "合伙", "谈判"]):

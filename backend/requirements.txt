@@ -1,5 +1,7 @@
 fastapi==0.103.2
 lunar_python==1.4.8
-pydantic==1.10.26
+# 项目使用 pydantic v1 API（constr(regex=)/conlist(min_items=)/validator/.dict()）。
+# 上界锁在 2 之前，避免装到 v2 后所有入参模型静默失效；迁移计划见 ADR-016。
+pydantic>=1.10.26,<2
 pytz==2025.2
 uvicorn==0.22.0

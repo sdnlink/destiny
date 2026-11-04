@@ -1,6 +1,8 @@
 from app.calendar import calendar_analysis
 from app.common.casting import derive_integer, nonce_hash
-from app.common.five_elements import FIVE_ELEMENTS_CONTROLS, FIVE_ELEMENTS_GENERATES, validate_element
+from app.common.five_elements import (
+    element_relation,
+)
 from app.common.serialization import derive_hexagram_facts
 from app.common.trigrams import get_trigram_by_number, trigram_to_bits
 
@@ -27,19 +29,8 @@ def moving_line_number(value):
 
 
 def five_element_relation(body_element, use_element):
-    validate_element(body_element)
-    validate_element(use_element)
-    if body_element == use_element:
-        return {"code": "same_element", "label": "体用比和"}
-    if FIVE_ELEMENTS_GENERATES[use_element] == body_element:
-        return {"code": "use_generates_body", "label": "用生体"}
-    if FIVE_ELEMENTS_GENERATES[body_element] == use_element:
-        return {"code": "body_generates_use", "label": "体生用"}
-    if FIVE_ELEMENTS_CONTROLS[use_element] == body_element:
-        return {"code": "use_controls_body", "label": "用克体"}
-    if FIVE_ELEMENTS_CONTROLS[body_element] == use_element:
-        return {"code": "body_controls_use", "label": "体克用"}
-    raise ValueError("unknown five-element relationship")
+    """体用五行关系，统一实现见 app.common.five_elements.element_relation。"""
+    return element_relation(body_element, use_element)
 
 
 def _cast_from_sources(

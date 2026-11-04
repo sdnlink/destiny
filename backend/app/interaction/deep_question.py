@@ -5,7 +5,9 @@
 对用户追问的具体符号/断语进行深化解读，原始盘面不变。
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
+
+from app.workflow.plate_facts import build_plate_view
 
 
 # 可深度追问的符号类型关键词映射
@@ -96,33 +98,34 @@ def _detect_symbols(question: str) -> List[str]:
 def _extract_plate_data(session, detected: List[str]) -> Dict[str, Any]:
     """从冻结盘面提取与追问符号相关的原始数据。"""
     snapshot = session.snapshot
-    raw_plate = snapshot.raw_plate or {}
+    # 统一走盘面事实视图：快照里冻结了归一后的卦名、动爻、体用卦
+    raw_plate = build_plate_view(snapshot)
     workflow = session.workflow_result or {}
 
     data = {}
 
     if "hexagram" in detected:
         data["hexagram_info"] = {
-            "ben_gua": raw_plate.get("ben_gua") or raw_plate.get("本卦") or raw_plate.get("hexagram"),
-            "bian_gua": raw_plate.get("bian_gua") or raw_plate.get("变卦"),
-            "hu_gua": raw_plate.get("hu_gua") or raw_plate.get("互卦"),
-            "ti_gua": raw_plate.get("ti_gua") or raw_plate.get("体卦"),
-            "yong_gua": raw_plate.get("yong_gua") or raw_plate.get("用卦"),
+            "ben_gua": raw_plate.get("ben_gua") or None,
+            "bian_gua": raw_plate.get("bian_gua") or None,
+            "hu_gua": raw_plate.get("hu_gua") or None,
+            "ti_gua": raw_plate.get("ti_gua") or None,
+            "yong_gua": raw_plate.get("yong_gua") or None,
         }
 
     if "moving_line" in detected:
         data["moving_line_info"] = {
-            "moving_line": raw_plate.get("moving_line") or raw_plate.get("动爻"),
-            "bian_yao": raw_plate.get("bian_yao") or raw_plate.get("变爻"),
-            "yao_ci": raw_plate.get("yao_ci") or raw_plate.get("爻辞"),
+            "moving_line": raw_plate.get("moving_line"),
+            "bian_yao": raw_plate.get("bian_yao") or None,
+            "yao_ci": raw_plate.get("yao_ci") or None,
         }
 
     if "yongshen" in detected:
         step3 = workflow.get("step3", {})
         data["yongshen_info"] = {
-            "primary": step3.get("primary_yongshen") or step3.get("主用神"),
-            "auxiliary": step3.get("auxiliary_yongshen") or step3.get("辅助用神"),
-            "logic": step3.get("yongshen_logic") or step3.get("取用逻辑"),
+            "primary": step3.get("primary_yongshen"),
+            "secondary": step3.get("secondary_yongshen"),
+            "logic": step3.get("logic"),
         }
 
     if "wangshuai" in detected:
@@ -189,7 +192,7 @@ def _generate_deep_analysis(
             lines.append("【动爻符号深化】")
             if info.get("moving_line"):
                 lines.append(f"- 动爻位置：第{info['moving_line']}爻。动爻是卦中气机发动之处，代表事项中最活跃、最关键的变化因素。")
-                lines.append(f"- 动爻所主：动爻临何六亲、何六神，决定该变化的性质与方向。动爻生世/应则吉，冲世/应则凶。")
+                lines.append("- 动爻所主：动爻临何六亲、何六神，决定该变化的性质与方向。动爻生世/应则吉，冲世/应则凶。")
             if info.get("yao_ci"):
                 lines.append(f"- 爻辞参考：{info['yao_ci']}")
             lines.append("- 变爻：动爻变化后形成的爻，代表变化后的新状态，需结合变卦综合判断。")
@@ -219,7 +222,7 @@ def _generate_deep_analysis(
             for shen, meaning in LIUSHEN_MEANING.items():
                 if shen in question or (shen == "螣蛇" and "腾蛇" in question):
                     lines.append(f"- {shen}：{meaning}")
-                    lines.append(f"  六神附于爻上，为该爻增添特定的色彩与倾向。同一六亲临不同六神，其表现方式截然不同。")
+                    lines.append("  六神附于爻上，为该爻增添特定的色彩与倾向。同一六亲临不同六神，其表现方式截然不同。")
             lines.append("")
 
         elif symbol_type == "wuxing":

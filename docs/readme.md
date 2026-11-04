@@ -366,7 +366,7 @@ FastAPI 应用 `APP_VERSION = "0.2.0"`，提供以下能力：
 
 ## 8. 规则与验证体系
 
-- **规则注册表**：`data/rules/mvp-engineering-baseline.json`，当前 **14 条可追溯工程规则**，状态均为 `draft`，待专家审核；每条规则独立编号（如 `YI-3NUM-INPUT-001`、`MH-TRIGRAM-001`），含来源引用、前置条件、输入、程序、输出、限制与责任人。
+- **规则注册表**：`data/rules/mvp-engineering-baseline.json`，当前 **73 条可追溯工程规则**，状态均为 `draft`，待专家审核；每条规则独立编号（如 `YI-3NUM-INPUT-001`、`MH-TRIGRAM-001`），含来源引用、前置条件、输入、程序、输出、限制与责任人。
 - **工程回归案例**：`data/validation-cases/mvp-engineering-baseline.json`，当前 **7 个案例全部通过**，代表工程基线而非专家签署案例。
 - **校验链**：`POST /v1/validation-cases/run` 执行回归；`scripts/run_validation_cases.py` 命令行校验；`test_rule_registry.py` 校验注册表结构（必填字段、唯一性、引用完整性）。
 - **治理目标**：规则发布需审核、绑定来源、案例回归；历史结果通过 `rule_version` 引用还原，即使规则下线也不失真。
@@ -442,7 +442,7 @@ npm --prefix frontend run test:browser
 | 主题 | 文档 |
 | --- | --- |
 | 项目总计划 | [`docs/detailed-project-plan.md`](./detailed-project-plan.md)、[`docs/project-plan.md`](./project-plan.md) |
-| 设计文档索引 | [`docs/design/README.md`](./design/README.md)（含 14 条 ADR 决策记录） |
+| 设计文档索引 | [`docs/design/README.md`](./design/README.md)（含 16 条 ADR 决策记录） |
 | 产品与交互 | [`docs/design/product-design.md`](./design/product-design.md) |
 | 系统架构 | [`docs/design/system-architecture.md`](./design/system-architecture.md) |
 | 规则与数据设计 | [`docs/design/rule-and-data-design.md`](./design/rule-and-data-design.md) |
@@ -472,7 +472,7 @@ npm --prefix frontend run test:browser
 
 **计算基线**：
 
-- 14 条可追溯工程规则，状态均为 `draft`，待专家审核。
+- 73 条可追溯工程规则，状态均为 `draft`，待专家审核。
 - 7 个工程回归案例，当前全部通过（不代表专家签署案例）。
 - 历法、周易和梅花共 13 个健康、常量、规则、案例及计算接口。
 - 多模块综合只比较引用已发布规则的结构化判断，不生成自动吉凶总分。

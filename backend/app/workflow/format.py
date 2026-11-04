@@ -3,7 +3,7 @@
 将7步工作流结果渲染为角色规范定义的固定输出格式。
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 
 def render_plate_text(plate_data: Dict[str, Any]) -> str:

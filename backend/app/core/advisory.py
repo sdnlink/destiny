@@ -1,6 +1,8 @@
 """Advisory generation integrating hexagram wisdom, multi-system deduction, and domain-specific questions."""
 
 from typing import Any, Dict, List, Optional
+
+from app.common.categories import CATEGORY_LABELS, normalize_category
 from app.core.hexagram_service import get_hexagram_explanation
 
 CATEGORY_PROFILES = {
@@ -59,6 +61,61 @@ CATEGORY_PROFILES = {
         ],
         "questions": ["当前制约成绩突破的核心薄弱点在哪里？", "每周能保证的高专注深度学习时长是多少？", "距离目标考核标准的差距如何量化？"],
     },
+    "lawsuit": {
+        "label": "官司",
+        "objective": "厘清争点证据链、评估程序风险与争取可控的和解空间",
+        "dimension_focus": "关注证据完整性、程序时效、责任划分与对抗成本",
+        "recommendations": [
+            ("固化证据链与关键时间点", "按时间顺序整理书面凭证、往来记录与关键证人，确认争议焦点的举证责任归属与时限。"),
+            ("评估程序成本与最坏结果", "把诉讼周期、费用、公开影响与执行难度纳入决策，设定可接受的最坏判决与和解底线。"),
+            ("优先探索可控的和解路径", "在程序推进前尝试通过调解或分期方案降低对抗烈度，保留书面确认以免再生争议。"),
+        ],
+        "questions": ["核心争点上，我方证据是否形成闭环？", "法定时效与举证期限是否还有余量？", "和解底线与最坏判决后果分别是什么？"],
+    },
+    "missing_person": {
+        "label": "寻人",
+        "objective": "锁定有效线索、界定可核实范围并安排分层搜寻",
+        "dimension_focus": "关注最后去向、联络方式、社会关系与安全状况",
+        "recommendations": [
+            ("按时间轴还原最后行踪", "梳理最后一次有效联络的时间、地点、通讯内容与随行人员，建立可核实的时间线。"),
+            ("分层启动搜寻与官方渠道", "先联系可能知情者与常去场所，同时依规向公安机关报案并提交照片、体貌与近期信息。"),
+            ("保护当事人隐私与安全优先", "对外发布信息时控制敏感细节，任何线索先核实再行动，避免贸然接触带来安全风险。"),
+        ],
+        "questions": ["最后一次可以确认的联络与位置是什么？", "哪些关系人最可能掌握最新动向？", "已向哪些官方渠道报案并取得受理编号？"],
+    },
+    "lost_item": {
+        "label": "失物",
+        "objective": "缩小遗失范围、判断找回可能并完成止损与补救",
+        "dimension_focus": "关注遗失时点地点、物品属性、可追踪凭证与挂失时效",
+        "recommendations": [
+            ("按动线回溯遗失时点", "沿当日实际路线逐段回想停留、取放与交接动作，先联系场所管理方调取监控或失物登记。"),
+            ("同步冻结可挂失凭证", "立即挂失卡片、账号、证件与电子凭证，避免在寻找期间产生二次损失。"),
+            ("设定止损与替代方案", "为寻找设定明确时限与成本上限，超过阈值即启动补办、理赔或替代采购流程。"),
+        ],
+        "questions": ["最后一次确认物品在手上的时间与地点是什么？", "该物品是否涉及可挂失的凭证或敏感信息？", "寻找的时间与金钱上限如何设定？"],
+    },
+    "health": {
+        "label": "健康",
+        "objective": "明确症状边界、及时规范就医并把生活方式调整落到可执行项",
+        "dimension_focus": "关注症状演变、既往病史、作息饮食与就医依从性",
+        "recommendations": [
+            ("记录症状与诱因再就医", "按日期记录症状强度、持续时间、诱因与用药反应，携带记录就诊以提高判断效率。"),
+            ("遵循规范诊疗与复查计划", "以正规医疗机构的诊断与检查为准，按医嘱完成疗程与复查，不因主观好转而提前停药。"),
+            ("把作息与饮食调整具体化", "将睡眠、运动、饮食干预写成每日可勾选的动作，连续执行四周后再评估效果。"),
+        ],
+        "questions": ["症状的起始时间、变化规律与诱因是什么？", "是否已完成必要的正规检查并保留报告？", "哪些生活习惯是当下最该立刻调整的？"],
+    },
+    "decision": {
+        "label": "抉择",
+        "objective": "把选择还原为可比较的选项、明确决策权重并预留可逆空间",
+        "dimension_focus": "关注各选项代价收益、不可逆程度与关键假设是否成立",
+        "recommendations": [
+            ("列出选项与统一评分口径", "把候选方案写成可比较的条目，按同一组指标打分，避免凭直觉在不等价选项间摇摆。"),
+            ("识别关键假设与验证动作", "找出每个选项成立所依赖的核心假设，用最小成本做一次前置验证再决定投入。"),
+            ("设计可逆台阶与退出条件", "优先选择可分阶段推进的方案，事先写明止损点与退出方式，降低一次性押注风险。"),
+        ],
+        "questions": ["各选项在同一组指标下的得分差距在哪里？", "哪个假设一旦不成立，该选项即应放弃？", "退出的触发条件与成本是否已明确？"],
+    },
     "other": {
         "label": "其他",
         "objective": "明确问题核心、梳理主客观条件与制定可逆执行路径",
@@ -71,6 +128,11 @@ CATEGORY_PROFILES = {
         "questions": ["该事项取得成功的最核心驱动要素是什么？", "当前最大的未知变量是什么？", "第一步最具可行性的切入点在哪里？"],
     },
 }
+
+# 分类标签以 app.common.categories 为唯一真源，避免各处 label 漂移
+for _category_key, _category_profile in CATEGORY_PROFILES.items():
+    _category_profile["label"] = CATEGORY_LABELS[_category_key]
+
 
 RELATION_GUIDANCE = {
     "same_element": {
@@ -111,9 +173,9 @@ def _find_module(module_results, name):
 def generate_advisory(module_results: List[Dict[str, Any]], context: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     if not context:
         return None
-    category = context.get("category", "other")
+    category = normalize_category(context.get("category", "other"), strict=True)
     if category not in CATEGORY_PROFILES:
-        raise ValueError(f"unsupported advisory category: {category}")
+        raise ValueError("unsupported advisory category: {}".format(category))
     question = context.get("question_summary", "").strip()
     profile = CATEGORY_PROFILES[category]
 
@@ -191,7 +253,7 @@ def generate_advisory(module_results: List[Dict[str, Any]], context: Optional[Di
         else:
             trend_points.append(f"【动爻指示】卦中{m_str}发动，提示局势存在动态演化空间，应在变动位置多做针对性准备。")
     else:
-        trend_points.append(f"【静态持守】当前周易推演六爻均安（无动爻），提示短期内外部基本架构保持稳定，事物处于持续积累和常态运行期，不宜凭空预设剧烈突变。")
+        trend_points.append("【静态持守】当前周易推演六爻均安（无动爻），提示短期内外部基本架构保持稳定，事物处于持续积累和常态运行期，不宜凭空预设剧烈突变。")
     if liuren:
         lr_trans = liuren.get("facts", {}).get("three_transmissions", {})
         if lr_trans.get("status") == "completed":
@@ -208,11 +270,11 @@ def generate_advisory(module_results: List[Dict[str, Any]], context: Optional[Di
             risk_points.append(f"【四化化忌】出生生年干触发【{sihua['化忌']}化忌】，提示在涉及该星曜掌管的领域（情绪执念、文书合约或利益沟通）容易产生卡点与考验，需特别谨慎防范。")
     if liuyao:
         ly_facts = liuyao.get("facts", {})
-        moving_lines_ly = [l for l in ly_facts.get("line_chart", []) if l.get("is_moving")]
-        for l in moving_lines_ly:
-            if l.get("six_relative") == "官鬼":
+        moving_lines_ly = [line for line in ly_facts.get("line_chart", []) if line.get("is_moving")]
+        for line in moving_lines_ly:
+            if line.get("six_relative") == "官鬼":
                 risk_points.append("【官鬼动爻】盘中官鬼爻发动，提示涉及规章制度、监管压力、竞争对手或职场风波时须高度谨慎，守法守规方能化险为夷。")
-            elif l.get("six_relative") == "兄弟":
+            elif line.get("six_relative") == "兄弟":
                 risk_points.append("【兄弟动爻】盘中兄弟爻发动，提示需防范同行竞争、同伴分歧或利益分流，合作协议应白纸黑字写明利益分配。")
 
     # 6. 综合研判结论 (Strategic Conclusion)

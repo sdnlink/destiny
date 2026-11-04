@@ -3,20 +3,16 @@
 from typing import Any, Dict, List, Optional
 
 from app.calendar.engine import CalendarEngine
-from app.calendar.timezone import parse_local_datetime
-from app.common.ganzhi import HEAVENLY_STEMS, xun_info
+from app.common.ganzhi import xun_info
 
-from .models import QimenInput, QimenPalace, QimenResult
 from .rules import (
     EIGHT_GATES_ORIGIN,
     EIGHT_SPIRITS,
-    GATE_RING_ORDER,
     NINE_STARS_ORIGIN,
     PALACE_NAMES,
     RING_PALACE_ORDER,
     SAN_QI_LIU_YI,
     SOLAR_TERM_JU_TABLE,
-    STAR_RING_ORDER,
     XUN_SHOU_YI,
     evaluate_qimen_patterns,
 )
@@ -36,8 +32,7 @@ def _determine_yuan(day_branch: str) -> str:
 def _build_di_pan(dun_type: str, ju_number: int) -> Dict[int, str]:
     """根据阳遁/阴遁与局数排布地盘三奇六仪 (洛书九宫飞布)。"""
     di_pan = {}
-    # 阳遁顺九宫飞布，阴遁逆九宫飞布
-    step = 1 if dun_type == "阳遁" else -1
+    # 阳遁顺九宫飞布，阴遁逆九宫飞布（偏移量在下面的 palace_idx 计算里直接体现）
 
     for i, stem in enumerate(SAN_QI_LIU_YI):
         if dun_type == "阳遁":

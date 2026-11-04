@@ -1,6 +1,7 @@
 """Deduction interpretation layer connecting charts and hexagram meanings to real-world questions."""
 
 from typing import Any, Dict, List, Optional
+from app.common.categories import CATEGORY_LABELS  # noqa: F401  (对外沿用原导入路径)
 from app.core.hexagram_service import get_hexagram_explanation
 from app.core.targeted_deduction import generate_targeted_deduction
 
@@ -10,14 +11,6 @@ MODULE_LABELS = {
     "liuyao": "六爻",
     "liuren": "大六壬",
     "ziwei": "紫微斗数",
-}
-CATEGORY_LABELS = {
-    "career": "事业",
-    "finance": "财务",
-    "relationship": "关系",
-    "travel": "出行",
-    "study": "学业",
-    "other": "当前事项",
 }
 RELATIVE_MEANINGS = {
     "父母": "文书契约、规章资质、长辈领导、信息支撑或房产车辆",

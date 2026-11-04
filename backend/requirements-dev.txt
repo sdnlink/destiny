@@ -1,1 +1,5 @@
+-r requirements.txt
 pytest==7.4.4
+# FastAPI TestClient 依赖 httpx；httpx 0.28 与 starlette 0.27 不兼容
+# （报 Client.__init__() got an unexpected keyword argument 'app'），必须锁定 <0.28
+httpx<0.28

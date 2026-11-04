@@ -1,117 +1,54 @@
-from app.calendar import calendar_analysis
-from app.core.iching import manual_cast as yi_manual_cast
-from app.core.iching import number_cast as yi_number_cast
-from app.core.iching import time_cast as yi_time_cast
-from app.zhouyi import three_number_cast as yi_three_number_cast
-from app.daliuren import number_cast as liuren_number_cast
-from app.daliuren import time_cast as liuren_time_cast
-from app.fengshui import analyze_measurements as fengshui_measurements
-from app.fengshui import calculate_direction as fengshui_direction
-from app.core.liuyao import number_cast as liuyao_number_cast
-from app.core.liuyao import time_cast as liuyao_time_cast
-from app.liuyao import coin_cast as liuyao_coin_cast
-from app.liuyao import line_cast as liuyao_line_cast
-from app.core.meihua import number_cast as meihua_number_cast
-from app.core.meihua import time_cast as meihua_time_cast
-from app.meihua import three_number_cast as meihua_three_number_cast
-from app.ziwei import time_cast as ziwei_time_cast, auto_cast as ziwei_auto_cast
+from app.common.calculation_dispatch import execute_calculation
 from app.core.registry import load_rule_registry, load_validation_cases, unknown_rule_ids
 
 
 def execute_validation_case(case):
-    system = case["system"]
-    method = case["method"]
-    payload = case["input"]
-    if system == "calendar" and method == "analyze":
-        return calendar_analysis(**payload)
-    if system == "zhouyi" and method == "manual":
-        return yi_manual_cast(payload["lines"])
-    if system == "zhouyi" and method == "numbers":
-        return yi_number_cast(payload["lower_number"], payload["upper_number"])
-    if system == "zhouyi" and method == "three_numbers":
-        return yi_three_number_cast(*payload["numbers"], mapping_version=payload.get("mapping_version", "earlier-heaven-number-v1"))
-    if system == "zhouyi" and method == "time":
-        return yi_time_cast(**payload)
-    if system == "meihua" and method == "time":
-        return meihua_time_cast(**payload)
-    if system == "meihua" and method == "numbers":
-        return meihua_number_cast(payload["upper_number"], payload["lower_number"])
-    if system == "meihua" and method == "three_numbers":
-        return meihua_three_number_cast(*payload["numbers"])
-    if system == "liuyao" and method == "time":
-        return liuyao_time_cast(**payload)
-    if system == "liuyao" and method == "numbers":
-        values = dict(payload)
-        lower_number = values.pop("lower_number")
-        upper_number = values.pop("upper_number")
-        return liuyao_number_cast(lower_number, upper_number, **values)
-    if system == "liuyao" and method == "lines":
-        values = dict(payload)
-        lines = values.pop("lines")
-        return liuyao_line_cast(lines, **values)
-    if system == "liuyao" and method == "coins":
-        values = dict(payload)
-        coins = values.pop("coins")
-        return liuyao_coin_cast(coins, **values)
-    if system == "liuren" and method == "time":
-        return liuren_time_cast(**payload)
-    if system == "liuren" and method == "numbers":
-        values = dict(payload)
-        number = values.pop("number")
-        return liuren_number_cast(number, **values)
-    if system == "ziwei" and method == "time":
-        return ziwei_time_cast(**payload)
-    if system == "ziwei" and method == "auto":
-        return ziwei_auto_cast(**payload)
-    if system == "fengshui" and method == "direction":
-        return fengshui_direction(**payload)
-    if system == "fengshui" and method == "measurements":
-        return fengshui_measurements(payload["measurements"])
-    raise ValueError("unsupported validation case: {}/{}".format(system, method))
+    """执行单个校验案例。分发表与正式排盘共用，避免两边方法覆盖漂移。"""
+    return execute_calculation(case["system"], case["method"], case["input"])
 
 
 def compare_subset(actual, expected, path="result"):
     differences = []
     if isinstance(expected, dict):
         if not isinstance(actual, dict):
-            return ["{} expected object, got {}".format(path, type(actual).__name__)]
-        for key, expected_value in expected.items():
-            child_path = "{}.{}".format(path, key)
+            return ["{} expected object, got {!r}".format(path, actual)]
+        for key, value in expected.items():
             if key not in actual:
-                differences.append("{} is missing".format(child_path))
-            else:
-                differences.extend(compare_subset(actual[key], expected_value, child_path))
+                differences.append("{} missing expected key {}".format(path, key))
+                continue
+            differences.extend(compare_subset(actual[key], value, "{}.{}".format(path, key)))
+        return differences
+    if isinstance(expected, list):
+        if not isinstance(actual, list):
+            return ["{} expected list, got {!r}".format(path, actual)]
+        if len(actual) != len(expected):
+            return ["{} expected {} items, got {}".format(path, len(expected), len(actual))]
+        for index, (actual_item, expected_item) in enumerate(zip(actual, expected)):
+            differences.extend(compare_subset(actual_item, expected_item, "{}[{}]".format(path, index)))
         return differences
     if actual != expected:
-        differences.append("{} expected {!r}, got {!r}".format(path, expected, actual))
+        return ["{} expected {!r}, got {!r}".format(path, expected, actual)]
     return differences
 
 
 def run_validation_cases(case_document=None, registry=None):
-    case_document = case_document or load_validation_cases()
-    registry = registry or load_rule_registry()
+    document = case_document if case_document is not None else load_validation_cases()
+    rules = registry if registry is not None else load_rule_registry()
     results = []
-    for case in case_document["cases"]:
-        try:
-            actual = execute_validation_case(case)
-            differences = compare_subset(actual, case["expected"])
-            unknown = unknown_rule_ids(actual, registry)
-            if unknown:
-                differences.append("unknown rule ids: {}".format(", ".join(unknown)))
-        except Exception as exc:
-            differences = ["execution failed: {}".format(exc)]
+    failed = 0
+    for case in document["cases"]:
+        result = execute_validation_case(case)
+        differences = compare_subset(result, case["expected"])
+        unknown = unknown_rule_ids(result, rules)
+        if unknown:
+            differences.append("unregistered rule ids: {}".format(", ".join(unknown)))
+        if differences:
+            failed += 1
         results.append({
             "case_id": case["case_id"],
             "system": case["system"],
+            "method": case["method"],
             "passed": not differences,
             "differences": differences,
         })
-    passed = sum(1 for result in results if result["passed"])
-    return {
-        "case_set_id": case_document["case_set_id"],
-        "qualification": case_document["qualification"],
-        "total": len(results),
-        "passed": passed,
-        "failed": len(results) - passed,
-        "results": results,
-    }
+    return {"total": len(document["cases"]), "failed": failed, "results": results}

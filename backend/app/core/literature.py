@@ -5,6 +5,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from app.common.categories import normalize_category
+
 
 SENTENCE_BOUNDARIES = "。！？\n"
 THEMES = [
@@ -55,14 +57,19 @@ THEMES = [
     },
 ]
 
-# 事项类别关键词加权映射
+# 事项类别关键词加权映射（键名与 app.common.categories 保持一致）
 CATEGORY_WEIGHT_KEYWORDS = {
     "career": ["功名", "仕途", "官职", "进取", "迁升", "职守", "名位", "君子", "事业", "劳心"],
-    "wealth": ["财帛", "求财", "得利", "利禄", "商贾", "资财", "丰盈", "生财", "财爻", "货殖"],
+    "finance": ["财帛", "求财", "得利", "利禄", "商贾", "资财", "丰盈", "生财", "财爻", "货殖"],
     "health": ["疾", "病", "安康", "调养", "医", "药", "生克制化", "身弱", "养生", "保元"],
-    "marriage": ["婚姻", "和合", "夫妇", "亲友", "求配", "燕尔", "室家", "同心", "应爻"],
-    "academics": ["学业", "文昌", "科名", "书契", "通达", "明理", "文采", "试名"],
+    "relationship": ["婚姻", "和合", "夫妇", "亲友", "求配", "燕尔", "室家", "同心", "应爻"],
+    "study": ["学业", "文昌", "科名", "书契", "通达", "明理", "文采", "试名"],
     "travel": ["行止", "出行", "道途", "舟车", "客旅", "关山", "远行", "驿马"],
+    "lawsuit": ["讼", "狱", "争讼", "官事", "刑", "词讼", "曲直", "是非"],
+    "missing_person": ["行人", "归人", "音信", "寻访", "踪迹", "远行", "消息"],
+    "lost_item": ["失物", "遗物", "亡失", "寻觅", "复得", "器物"],
+    "decision": ["取舍", "进退", "去就", "犹豫", "两可", "决断"],
+    "other": ["顺逆", "进退", "得失", "吉凶", "审时"],
 }
 
 # 内置核心古籍备用索引库（当 ClickHouse 离线或不可达时无缝优雅降级）
@@ -314,7 +321,7 @@ def collect_literature_opinions(module_results, search_client=None, max_books=3,
 
     category = None
     if isinstance(context, dict):
-        category = context.get("category")
+        category = normalize_category(context.get("category"))
 
     client = search_client or CorpusSearchClient()
     terms = _query_terms(module_results)

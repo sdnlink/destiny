@@ -1,8 +1,7 @@
-import hashlib
 import json
+import logging
 import math
 import os
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -12,6 +11,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, conint, conlist, constr, validator
 
+from app.common.hashing import canonical_hash
 from app.core.advisory import CATEGORY_PROFILES, generate_advisory
 from app.calendar import calendar_analysis
 from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
@@ -39,8 +39,8 @@ from app.meihua import number_cast as meihua_number_cast
 from app.meihua import three_number_cast as meihua_three_number_cast
 from app.meihua import time_cast as meihua_time_cast
 from app.ziwei import time_cast as ziwei_time_cast, auto_cast as ziwei_auto_cast
-from app.bazi import calculate_bazi, time_cast as bazi_time_cast, auto_cast as bazi_auto_cast
-from app.qimen import calculate_qimen_chart, time_cast as qimen_time_cast, auto_cast as qimen_auto_cast
+from app.bazi import time_cast as bazi_time_cast, auto_cast as bazi_auto_cast
+from app.qimen import time_cast as qimen_time_cast, auto_cast as qimen_auto_cast
 from app.core.db import db_repository
 from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
@@ -62,6 +62,12 @@ from app.interaction import (
 
 APP_VERSION = "0.2.0"
 API_TOKEN = os.environ.get("APP_API_TOKEN")
+
+logger = logging.getLogger("destiny.api")
+if not API_TOKEN:
+    logger.warning(
+        "APP_API_TOKEN 未设置：/v1 接口当前不做鉴权，仅应在本地开发环境使用"
+    )
 
 
 class CalendarRequest(BaseModel):
@@ -184,100 +190,81 @@ class ComparisonRequest(BaseModel):
     context: Optional[AdvisoryContext] = None
 
 
-def canonical_hash(value):
-    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return hashlib.sha256(encoded).hexdigest()
+def _calendar_payload(values):
+    return calendar_analysis(**values)
+
+
+def _liuyao_numbers_call(values):
+    request_values = dict(values)
+    lower_number = request_values.pop("lower_number")
+    upper_number = request_values.pop("upper_number")
+    return liuyao_number_cast(lower_number, upper_number, **request_values)
+
+
+def _liuyao_lines_call(values):
+    request_values = dict(values)
+    lines = request_values.pop("lines")
+    return liuyao_line_cast(lines, **request_values)
+
+
+def _liuyao_coins_call(values):
+    request_values = dict(values)
+    coins = request_values.pop("coins")
+    return liuyao_coin_cast(coins, **request_values)
+
+
+def _liuren_numbers_call(values):
+    request_values = dict(values)
+    number = request_values.pop("number")
+    return liuren_number_cast(number, **request_values)
+
+
+# module/method → (入参校验模型, 引擎调用)。/v1/calculations 与 /v1/comparisons 共用这一张表，
+# 不再用长 if 链，新增体系只加一条。
+CALCULATION_ENTRIES = {
+    ("calendar", "analyze"): (CalendarRequest, _calendar_payload),
+    ("zhouyi", "manual"): (YiManualRequest, lambda values: yi_manual_cast(values["lines"])),
+    ("zhouyi", "auto"): (AutoCastRequest, lambda values: yi_auto_cast(**values)),
+    ("zhouyi", "time"): (CalendarRequest, lambda values: yi_time_cast(**values)),
+    ("zhouyi", "numbers"): (YiNumberRequest, lambda values: yi_number_cast(values["lower_number"], values["upper_number"])),
+    ("zhouyi", "three_numbers"): (
+        YiThreeNumberRequest,
+        lambda values: yi_three_number_cast(*values["numbers"], mapping_version=values["mapping_version"]),
+    ),
+    ("meihua", "time"): (CalendarRequest, lambda values: meihua_time_cast(**values)),
+    ("meihua", "auto"): (AutoCastRequest, lambda values: meihua_auto_cast(**values)),
+    ("meihua", "numbers"): (MeihuaNumberRequest, lambda values: meihua_number_cast(values["upper_number"], values["lower_number"])),
+    ("meihua", "three_numbers"): (MeihuaThreeNumberRequest, lambda values: meihua_three_number_cast(*values["numbers"])),
+    ("liuyao", "time"): (CalendarRequest, lambda values: liuyao_time_cast(**values)),
+    ("liuyao", "auto"): (AutoCastRequest, lambda values: liuyao_auto_cast(**values)),
+    ("liuyao", "numbers"): (LiuyaoNumberRequest, _liuyao_numbers_call),
+    ("liuyao", "lines"): (LiuyaoLineRequest, _liuyao_lines_call),
+    ("liuyao", "coins"): (LiuyaoCoinRequest, _liuyao_coins_call),
+    ("liuren", "time"): (CalendarRequest, lambda values: liuren_time_cast(**values)),
+    ("liuren", "auto"): (AutoCastRequest, lambda values: liuren_auto_cast(**values)),
+    ("liuren", "numbers"): (LiurenNumberRequest, _liuren_numbers_call),
+    ("ziwei", "time"): (ZiweiRequest, lambda values: ziwei_time_cast(**values)),
+    ("ziwei", "auto"): (ZiweiAutoRequest, lambda values: ziwei_auto_cast(**values)),
+    ("bazi", "time"): (BaZiRequest, lambda values: bazi_time_cast(**values)),
+    ("bazi", "auto"): (BaZiAutoRequest, lambda values: bazi_auto_cast(**values)),
+    ("qimen", "time"): (CalendarRequest, lambda values: qimen_time_cast(**values)),
+    ("qimen", "auto"): (AutoCastRequest, lambda values: qimen_auto_cast(**values)),
+    ("fengshui", "direction"): (FengshuiDirectionRequest, lambda values: fengshui_direction(**values)),
+    ("fengshui", "measurements"): (
+        FengshuiMeasurementsRequest,
+        lambda values: fengshui_measurements(values["measurements"]),
+    ),
+}
 
 
 def execute(module, method, payload):
-    if module == "calendar" and method == "analyze":
-        request = CalendarRequest(**payload)
-        return calendar_analysis(**request.dict())
-    if module == "zhouyi" and method == "manual":
-        request = YiManualRequest(**payload)
-        return yi_manual_cast(request.lines)
-    if module == "zhouyi" and method == "auto":
-        request = AutoCastRequest(**payload)
-        return yi_auto_cast(**request.dict())
-    if module == "zhouyi" and method == "time":
-        request = CalendarRequest(**payload)
-        return yi_time_cast(**request.dict())
-    if module == "zhouyi" and method == "numbers":
-        request = YiNumberRequest(**payload)
-        return yi_number_cast(request.lower_number, request.upper_number)
-    if module == "zhouyi" and method == "three_numbers":
-        request = YiThreeNumberRequest(**payload)
-        return yi_three_number_cast(*request.numbers, mapping_version=request.mapping_version)
-    if module == "meihua" and method == "time":
-        request = CalendarRequest(**payload)
-        return meihua_time_cast(**request.dict())
-    if module == "meihua" and method == "auto":
-        request = AutoCastRequest(**payload)
-        return meihua_auto_cast(**request.dict())
-    if module == "meihua" and method == "numbers":
-        request = MeihuaNumberRequest(**payload)
-        return meihua_number_cast(request.upper_number, request.lower_number)
-    if module == "meihua" and method == "three_numbers":
-        request = MeihuaThreeNumberRequest(**payload)
-        return meihua_three_number_cast(*request.numbers)
-    if module == "liuyao" and method == "time":
-        request = CalendarRequest(**payload)
-        return liuyao_time_cast(**request.dict())
-    if module == "liuyao" and method == "auto":
-        request = AutoCastRequest(**payload)
-        return liuyao_auto_cast(**request.dict())
-    if module == "liuyao" and method == "numbers":
-        request = LiuyaoNumberRequest(**payload)
-        values = request.dict()
-        lower_number = values.pop("lower_number")
-        upper_number = values.pop("upper_number")
-        return liuyao_number_cast(lower_number, upper_number, **values)
-    if module == "liuyao" and method == "lines":
-        request = LiuyaoLineRequest(**payload)
-        values = request.dict()
-        lines = values.pop("lines")
-        return liuyao_line_cast(lines, **values)
-    if module == "liuyao" and method == "coins":
-        request = LiuyaoCoinRequest(**payload)
-        values = request.dict()
-        coins = values.pop("coins")
-        return liuyao_coin_cast(coins, **values)
-    if module == "liuren" and method == "time":
-        request = CalendarRequest(**payload)
-        return liuren_time_cast(**request.dict())
-    if module == "liuren" and method == "auto":
-        request = AutoCastRequest(**payload)
-        return liuren_auto_cast(**request.dict())
-    if module == "liuren" and method == "numbers":
-        request = LiurenNumberRequest(**payload)
-        values = request.dict()
-        number = values.pop("number")
-        return liuren_number_cast(number, **values)
-    if module == "ziwei" and method == "time":
-        request = ZiweiRequest(**payload)
-        return ziwei_time_cast(**request.dict())
-    if module == "ziwei" and method == "auto":
-        request = ZiweiAutoRequest(**payload)
-        return ziwei_auto_cast(**request.dict())
-    if module == "bazi" and method == "time":
-        request = BaZiRequest(**payload)
-        return bazi_time_cast(**request.dict())
-    if module == "bazi" and method == "auto":
-        request = BaZiAutoRequest(**payload)
-        return bazi_auto_cast(**request.dict())
-    if module == "qimen" and method == "time":
-        request = CalendarRequest(**payload)
-        return qimen_time_cast(**request.dict())
-    if module == "qimen" and method == "auto":
-        request = AutoCastRequest(**payload)
-        return qimen_auto_cast(**request.dict())
-    if module == "fengshui" and method == "direction":
-        request = FengshuiDirectionRequest(**payload)
-        return fengshui_direction(**request.dict())
-    if module == "fengshui" and method == "measurements":
-        request = FengshuiMeasurementsRequest(**payload)
-        return fengshui_measurements([value.dict() for value in request.measurements])
-    raise ValueError(f"unsupported calculation: {module}/{method}")
+    """校验入参后调用对应引擎。未知组合直接报错。"""
+    entry = CALCULATION_ENTRIES.get((module, method))
+    if entry is None:
+        raise ValueError(f"unsupported calculation: {module}/{method}")
+    model, call = entry
+    values = model(**payload).dict()
+    return call(values)
 
 
 def calculation_envelope(module, method, payload):
@@ -306,12 +293,8 @@ def comparison_envelope(calculations, context=None):
     )
     normalized_context = context.dict() if isinstance(context, AdvisoryContext) else context
     input_hash = canonical_hash({"calculations": normalized, "context": normalized_context})
-    with ThreadPoolExecutor(max_workers=len(normalized)) as executor:
-        futures = [
-            executor.submit(execute, item["module"], item["method"], item["input"])
-            for item in normalized
-        ]
-        results = [future.result() for future in futures]
+    # 各引擎都是纯 CPU 计算，串行执行；线程池在 GIL 下没有收益，还会放大共享缓存并发写风险
+    results = [execute(item["module"], item["method"], item["input"]) for item in normalized]
     module_results = [
         {
             "module": item["module"],
@@ -351,8 +334,19 @@ app = FastAPI(
 
 @app.middleware("http")
 async def internal_token_middleware(request: Request, call_next):
-    if API_TOKEN and request.headers.get("Authorization") != f"Bearer {API_TOKEN}":
-        return JSONResponse(status_code=401, content={"error": {"code": "UNAUTHORIZED", "message": "valid bearer token required"}})
+    if API_TOKEN:
+        path = request.url.path
+        # SERVE_WEB=1 时根路径挂载的是浏览器静态资源，无法携带 Bearer 头；
+        # 鉴权只覆盖计算/会话 API 与接口文档，静态页面和 /health 探活保持公开。
+        protected = (
+            path.startswith("/v1")
+            or path == "/docs"
+            or path.startswith("/docs/")
+            or path == "/openapi.json"
+            or path == "/redoc"
+        )
+        if protected and request.headers.get("Authorization") != f"Bearer {API_TOKEN}":
+            return JSONResponse(status_code=401, content={"error": {"code": "UNAUTHORIZED", "message": "valid bearer token required"}})
     return await call_next(request)
 
 
@@ -361,13 +355,40 @@ async def value_error_handler(request: Request, exc: ValueError):
     return JSONResponse(status_code=422, content={"error": {"code": "INVALID_CALCULATION_INPUT", "message": str(exc)}})
 
 
+def constant_payload(rows, fallback=None):
+    """常量端点统一返回。
+
+    只有数据库真的连上时才声明 clickhouse 来源；连不上时明确标注 unavailable，
+    不再用「数据库来源 + 空数组」把不可达伪装成「表里就是空的」。
+    """
+    if db_repository.is_available():
+        return {"data": rows or [], "source": "clickhouse_database"}
+    if fallback:
+        return {"data": fallback, "source": "in_memory_fallback"}
+    return {
+        "data": [],
+        "source": "unavailable",
+        "warning": "数据库不可达，常量表未加载",
+    }
+
+
 @app.get("/health")
 def health():
     return {
         "status": "ok",
         "service": "tianji-mvp-calculation",
         "version": APP_VERSION,
-        "modules": ["calendar", "zhouyi", "meihua", "liuyao", "liuren", "fengshui"],
+        "modules": [
+            "calendar",
+            "zhouyi",
+            "meihua",
+            "liuyao",
+            "liuren",
+            "ziwei",
+            "bazi",
+            "qimen",
+            "fengshui",
+        ],
     }
 
 
@@ -385,9 +406,7 @@ def trigrams():
 @app.get("/v1/constants/trigram-imagery")
 def trigram_imagery(trigram: Optional[str] = None, dimension: Optional[str] = None):
     db_rows = db_repository.get_trigram_imagery(trigram, dimension)
-    if db_rows is not None:
-        return {"data": db_rows, "source": "clickhouse_database"}
-    return {"data": [], "source": "clickhouse_database", "warning": "database unavailable"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/hexagrams")
@@ -429,73 +448,73 @@ def hexagram_explanations(name: Optional[str] = None):
 @app.get("/v1/constants/five-elements")
 def five_elements():
     db_rows = db_repository.get_five_elements()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/stems")
 def heavenly_stems():
     db_rows = db_repository.get_heavenly_stems()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/branches")
 def earthly_branches():
     db_rows = db_repository.get_earthly_branches()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/solar-terms")
 def solar_terms():
     db_rows = db_repository.get_solar_terms()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/sexagenary-cycle")
 def sexagenary_cycle():
     db_rows = db_repository.get_sexagenary_cycle()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/fengshui-mountains")
 def fengshui_mountains():
     db_rows = db_repository.get_fengshui_mountains()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/luoshu-palaces")
 def luoshu_palaces():
     db_rows = db_repository.get_luoshu_palaces()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/twenty-eight-mansions")
 def twenty_eight_mansions(quadrant: Optional[str] = None):
     db_rows = db_repository.get_twenty_eight_mansions(quadrant=quadrant)
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/three-enclosures")
 def three_enclosures():
     db_rows = db_repository.get_three_enclosures()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/historical-calendars")
 def historical_calendars(dynasty: Optional[str] = None):
     db_rows = db_repository.get_historical_calendars(dynasty=dynasty)
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/hetu-numerology")
 def hetu_numerology(element: Optional[str] = None):
     db_rows = db_repository.get_hetu_numerology(element=element)
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/constants/lunar-phases")
 def lunar_phases():
     db_rows = db_repository.get_lunar_phase_regimes()
-    return {"data": db_rows or [], "source": "clickhouse_database"}
+    return constant_payload(db_rows)
 
 
 @app.get("/v1/database/stats")
@@ -886,8 +905,13 @@ def interact_session(session_id: str, request: SessionInteractRequest):
 
         store.save(session)
         return {"data": {"session_id": session.session_id, "interaction_result": result, "snapshot_unchanged": True}}
-    except Exception as exc:
-        return JSONResponse(status_code=500, content={"error": {"code": "INTERACTION_ERROR", "message": str(exc)}})
+    except Exception:
+        # 异常详情只进服务端日志；回给客户端的信息不含内部路径、库名与堆栈
+        logger.exception("interaction failed: session=%s type=%s", session_id, payload.get("interaction_type"))
+        return JSONResponse(
+            status_code=500,
+            content={"error": {"code": "INTERACTION_ERROR", "message": "交互处理失败，请查看服务端日志"}},
+        )
 
 
 if os.environ.get("SERVE_WEB") == "1":

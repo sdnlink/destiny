@@ -17,6 +17,34 @@ BRANCH_ZODIAC = MappingProxyType({
     "子": "鼠", "丑": "牛", "寅": "虎", "卯": "兔", "辰": "龙", "巳": "蛇",
     "午": "马", "未": "羊", "申": "猴", "酉": "鸡", "戌": "狗", "亥": "猪",
 })
+# 六冲：子午、丑未、寅申、卯酉、辰戌、巳亥
+BRANCH_CLASH = MappingProxyType({
+    "子": "午", "午": "子", "丑": "未", "未": "丑", "寅": "申", "申": "寅",
+    "卯": "酉", "酉": "卯", "辰": "戌", "戌": "辰", "巳": "亥", "亥": "巳",
+})
+# 六合：子丑、寅亥、卯戌、辰酉、巳申、午未
+BRANCH_COMBINE = MappingProxyType({
+    "子": "丑", "丑": "子", "寅": "亥", "亥": "寅", "卯": "戌", "戌": "卯",
+    "辰": "酉", "酉": "辰", "巳": "申", "申": "巳", "午": "未", "未": "午",
+})
+# 三合局：申子辰水、亥卯未木、寅午戌火、巳酉丑金
+BRANCH_TRIPLE = MappingProxyType({
+    "申子辰": "水", "亥卯未": "木", "寅午戌": "火", "巳酉丑": "金",
+})
+
+
+def triple_group_of(branch: str) -> str:
+    """返回该地支所属三合局的三个地支，未命中返回空串。"""
+    for group in BRANCH_TRIPLE:
+        if branch in group:
+            return group
+    return ""
+
+
+def branch_label(branch: str) -> str:
+    """地支及其五行标签，用于生成可读的依据说明。"""
+    element = BRANCH_ELEMENTS.get(branch, "")
+    return "{}（{}）".format(branch, element) if element else branch
 
 
 def polarity(value: str) -> str:

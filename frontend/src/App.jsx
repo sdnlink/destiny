@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
   ArrowRight,
@@ -24,11 +24,15 @@ import {
   X,
 } from "lucide-react";
 import InputPanel from "./components/InputPanel";
-import ResultWorkspace from "./components/ResultWorkspace";
-import WorkflowPanel from "./components/WorkflowPanel";
+// 结果工作区与工作流面板体积大且只在切到对应视图时才需要，改为按需加载，
+// 首屏只下载输入面板与外壳，避免单包 389KB 全部前置下载。
+const ResultWorkspace = lazy(() => import("./components/ResultWorkspace"));
+const WorkflowPanel = lazy(() => import("./components/WorkflowPanel"));
 import { analyzeCalendar, checkHealth, compareCalculations, loadRules } from "./lib/api";
 import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
 import { GLOSSARY_CATEGORIES, GLOSSARY_ITEMS } from "./lib/glossary";
+import { buildCalculations, calendarPayload } from "./lib/calculationPlan";
+import { localDateTimeValue, newCastNonce } from "./lib/castingInput";
 import {
   clearDeductionHistory,
   deleteDeductionHistory,
@@ -37,18 +41,6 @@ import {
   importHistoryJSON,
   saveDeductionHistory,
 } from "./lib/storage";
-
-function localDateTimeValue(date = new Date()) {
-  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 16);
-}
-
-function newCastNonce() {
-  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID().replaceAll("-", "");
-  const bytes = new Uint8Array(16);
-  globalThis.crypto.getRandomValues(bytes);
-  return Array.from(bytes, (value) => value.toString(16).padStart(2, "0")).join("");
-}
 
 function initialForm() {
   return {
@@ -86,116 +78,7 @@ function initialForm() {
   };
 }
 
-function calendarPayload(form) {
-  const payload = {
-    local_datetime: form.localDatetime,
-    timezone: form.timezone,
-    use_true_solar_time: form.trueSolar,
-  };
-  if (form.trueSolar) payload.longitude = Number(form.longitude);
-  return payload;
-}
-
-function buildCalculations(form) {
-  const calendar = calendarPayload(form);
-  const auto = { ...calendar, cast_nonce: form.castNonce };
-  const calculations = [{ module: "calendar", method: "analyze", input: calendar }];
-  if (form.scene === "combined" || form.scene === "zhouyi") {
-    calculations.push(
-      form.yiMethod === "auto"
-        ? { module: "zhouyi", method: "auto", input: auto }
-        : form.yiMethod === "time"
-        ? { module: "zhouyi", method: "time", input: calendar }
-        : form.yiMethod === "manual"
-        ? { module: "zhouyi", method: "manual", input: { lines: form.lines } }
-        : {
-            module: "zhouyi",
-            method: "numbers",
-            input: { lower_number: Number(form.yiLower), upper_number: Number(form.yiUpper) },
-          },
-    );
-  }
-  if (form.scene === "combined" || form.scene === "meihua") {
-    calculations.push(
-      form.meihuaMethod === "auto"
-        ? { module: "meihua", method: "auto", input: auto }
-        : form.meihuaMethod === "time"
-        ? { module: "meihua", method: "time", input: calendar }
-        : {
-            module: "meihua",
-            method: "numbers",
-            input: { upper_number: Number(form.mhUpper), lower_number: Number(form.mhLower) },
-          },
-    );
-  }
-  if (form.scene === "combined" || form.scene === "liuyao") {
-    calculations.push(
-      form.liuyaoMethod === "auto"
-        ? { module: "liuyao", method: "auto", input: auto }
-        : form.liuyaoMethod === "time"
-        ? { module: "liuyao", method: "time", input: calendar }
-        : {
-            module: "liuyao",
-            method: "numbers",
-            input: { ...calendar, lower_number: Number(form.lyLower), upper_number: Number(form.lyUpper) },
-          },
-    );
-  }
-  if (form.scene === "combined" || form.scene === "liuren") {
-    calculations.push(
-      form.liurenMethod === "auto"
-        ? { module: "liuren", method: "auto", input: auto }
-        : form.liurenMethod === "time"
-        ? { module: "liuren", method: "time", input: calendar }
-        : { module: "liuren", method: "numbers", input: { ...calendar, number: Number(form.lrNumber) } },
-    );
-  }
-  if (form.scene === "combined" || form.scene === "qimen") {
-    calculations.push(
-      form.qimenMethod === "auto"
-        ? { module: "qimen", method: "auto", input: auto }
-        : { module: "qimen", method: "time", input: calendar },
-    );
-  }
-  if (form.scene === "combined" || form.scene === "bazi") {
-    calculations.push(
-      form.baziMethod === "auto"
-        ? { module: "bazi", method: "auto", input: { ...auto, gender: form.baziGender || form.ziweiGender || "男" } }
-        : { module: "bazi", method: "time", input: { ...calendar, gender: form.baziGender || form.ziweiGender || "男" } },
-    );
-  }
-  if (form.scene === "combined" || form.scene === "ziwei") {
-    calculations.push(
-      form.ziweiMethod === "auto"
-        ? { module: "ziwei", method: "auto", input: { ...auto, gender: form.ziweiGender } }
-        : { module: "ziwei", method: "time", input: { ...calendar, gender: form.ziweiGender } },
-    );
-  }
-  if (form.scene === "fengshui") {
-    calculations.push({
-      module: "fengshui",
-      method: form.fsMode === "multiple" ? "measurements" : "direction",
-      input: form.fsMode === "multiple"
-        ? {
-            measurements: form.fsMeasurements.map((degree) => ({
-              facing_degree: Number(degree),
-              input_reference: form.fsReference,
-              magnetic_declination: Number(form.fsDeclination),
-              measurement_error: Number(form.fsError),
-              measurement_method: "web_multi_entry",
-            })),
-          }
-        : {
-            facing_degree: Number(form.fsFacing),
-            input_reference: form.fsReference,
-            magnetic_declination: Number(form.fsDeclination),
-            measurement_error: Number(form.fsError),
-            measurement_method: "web_manual_entry",
-          },
-    });
-  }
-  return calculations;
-}
+// 表单 → 计算请求的映射统一在 lib/calculationPlan.js，组件里不再维护第二份
 
 function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGlossary, serviceOnline, theme, setTheme, viewMode, setViewMode }) {
   const nextTheme = theme === "paper" ? "dark" : theme === "dark" ? "jade" : "paper";
@@ -211,10 +94,9 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGl
       <div className="nav-items">
         <button className={viewMode === "classic" ? "active" : ""} onClick={() => setViewMode("classic")} title="经典推演模式"><Plus size={18} /><span>经典推演</span></button>
         <button className={viewMode === "workflow" ? "active" : ""} onClick={() => setViewMode("workflow")} title="交互式推演工作流（7步标准化）"><Sparkles size={18} /><span>交互推演</span></button>
-        <button onClick={openHistory} title="历史推演记录与案例库"><Archive size={18} /><span>案例库</span></button>
+        <button onClick={openHistory} title="历史推演记录、案例库与 JSON 备份导入导出"><Archive size={18} /><span>历史与案例</span></button>
         <button onClick={openRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
         <button onClick={openGlossary} title="术数典籍与核心概念速查"><BookOpen size={18} /><span>概念速查</span></button>
-        <button onClick={openHistory} title="历史推演记录"><FileClock size={18} /><span>历史任务</span></button>
       </div>
       <div className="nav-bottom">
         <button className="theme-toggle-btn" onClick={() => setTheme(nextTheme)} title={`切换主题（当前：${themeLabel}，点击切换）`}>
@@ -583,8 +465,10 @@ export default function App() {
       setServiceOnline(true);
       setMobileInputOpen(false);
 
-      // Auto save to local history
-      saveDeductionHistory(response.task_id, ctx, response);
+      // Auto save to local history；配额不足时明确提示，而不是静默丢存档
+      if (!saveDeductionHistory(response.task_id, ctx, response)) {
+        setError("本地存档空间不足，本次结果未保存，请先导出或清理历史存档");
+      }
 
       const calendar = response.module_results.find((item) => item.module === "calendar")?.result;
       if (calendar) setPreview(calendar);
@@ -656,7 +540,9 @@ export default function App() {
       </div>
       {viewMode === "workflow" ? (
         <div className="workflow-container">
-          <WorkflowPanel />
+          <Suspense fallback={<div className="loading-placeholder">正在加载工作区…</div>}>
+            <WorkflowPanel />
+          </Suspense>
         </div>
       ) : (
         <>
@@ -674,7 +560,9 @@ export default function App() {
               error={error}
             />
           </div>
-          <ResultWorkspace result={result} context={resultContext} activeTab={activeTab} setActiveTab={setActiveTab} />
+          <Suspense fallback={<div className="loading-placeholder">正在加载结果面板…</div>}>
+            <ResultWorkspace result={result} context={resultContext} activeTab={activeTab} setActiveTab={setActiveTab} />
+          </Suspense>
         </>
       )}
       <RulesDrawer open={rulesOpen} onClose={() => setRulesOpen(false)} rules={rules} loading={rulesLoading} />
