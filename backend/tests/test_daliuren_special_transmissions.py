@@ -7,7 +7,9 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.common.ganzhi import EARTHLY_BRANCHES
-from app.daliuren.engine import _four_lessons, _three_transmissions
+from app.daliuren.engine import (
+    _four_lessons, _lesson, _remote_transmissions, _three_transmissions,
+)
 
 
 STEMS = "甲乙丙丁戊己庚辛壬癸"
@@ -106,6 +108,25 @@ def test_fanyin_well_railing_covers_all_six_no_control_days(day_pillar, expected
     assert result["lesson_type"] == "返吟"
     assert result["source_path"] == "井栏射"
     assert result["transmissions"] == expected
+
+
+def test_remote_control_with_ambiguous_polarity_falls_back_to_shehai():
+    """遥克比用后仍多候选时继续按涉害取深，不再返回 pending。"""
+    identity_plate = {branch: branch for branch in EARTHLY_BRANCHES}
+    lessons = [
+        _lesson(1, "甲", "辰"),
+        _lesson(2, "甲", "戌"),
+        _lesson(3, "丙", "午"),
+        _lesson(4, "丙", "亥"),
+    ]
+    result = _remote_transmissions(("甲", "子"), identity_plate, lessons)
+    assert result["status"] == "completed"
+    assert result["lesson_type"] == "涉害"
+    assert len(result["transmissions"]) == 3
+    assert result["remote_control"]["path"] == "遥克"
+    assert result["remote_control"]["source_path"] == "弹射"
+    assert result["remote_control"]["candidates"] == ["辰", "戌"]
+    assert any("转涉害取深" in line for line in result["trace"])
 
 
 def test_all_seven_hundred_twenty_day_plate_combinations_finish_deterministically():

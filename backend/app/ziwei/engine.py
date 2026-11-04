@@ -173,6 +173,19 @@ def calculate_ziwei_chart(
             "palace_stem_branch": f"{p_stem}{p_branch}",
             "name": p_name,
             "is_body_palace": is_shen,
+            # 三方四正：本宫 + 三合两宫（+4/+8）+ 对宫（+6），纯宫位索引推导
+            "san_fang_branches": [
+                p_branch,
+                EARTHLY_BRANCHES[(p_branch_idx + 4) % 12],
+                EARTHLY_BRANCHES[(p_branch_idx + 8) % 12],
+            ],
+            "dui_gong_branch": EARTHLY_BRANCHES[(p_branch_idx + 6) % 12],
+            "si_zheng_branches": [
+                p_branch,
+                EARTHLY_BRANCHES[(p_branch_idx + 4) % 12],
+                EARTHLY_BRANCHES[(p_branch_idx + 8) % 12],
+                EARTHLY_BRANCHES[(p_branch_idx + 6) % 12],
+            ],
             "major_limit_start": limit_start,
             "major_limit_end": limit_end,
             "main_stars": [],

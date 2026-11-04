@@ -228,10 +228,25 @@ def _remote_transmissions(day_pillar, plate, lessons):
     trace = ["四课无上下克，检查遥克{}候选为{}".format(source_path, candidates)]
     selected = candidates[0] if len(candidates) == 1 else _select_by_day_polarity(candidates, day_stem)
     if selected is None:
-        return _unsupported(
-            "遥克", candidates, trace + ["遥克比用后仍有多个候选"],
-            "多个遥克候选的后续取法尚未完成标准案例签署",
-        )
+        # 遥克比用后仍有多个候选：转入涉害，按涉害深度（见机/察微/缀瑕）取初传，
+        # 不再返回 pending；取法在同一涉害规则内，保持可复核。
+        lesson_candidates = []
+        seen = set()
+        for lesson in lessons:
+            if lesson["upper"] in candidates and lesson["upper"] not in seen:
+                seen.add(lesson["upper"])
+                lesson_candidates.append(lesson)
+        if len(lesson_candidates) < 2:
+            return _unsupported(
+                "遥克", candidates, trace + ["遥克比用后仍有多个候选"],
+                "候选课不足以进入涉害取法",
+            )
+        result = _shehai_transmissions(day_pillar, plate, lesson_candidates, "遥克")
+        result["remote_control"] = {
+            "path": "遥克", "source_path": source_path, "candidates": candidates,
+        }
+        result["trace"].insert(0, "遥克{}比用不定，转涉害取深".format(source_path))
+        return result
     if len(candidates) > 1:
         trace.append("多个遥克候选中取与日干阴阳相同的{}".format(selected))
     return _completed_transmissions(selected, plate, "遥克", source_path, candidates, trace)

@@ -84,11 +84,76 @@ def test_all_sixty_four_hexagrams_have_one_eight_palace_assignment():
     assert all(1 <= palace.host_line <= 6 and 1 <= palace.response_line <= 6 for palace in PALACE_BY_LINES.values())
 
 
-def test_hidden_and_flying_spirits_are_explicitly_not_fabricated():
-    coverage = line_cast([7, 8, 7, 8, 7, 8], **CALENDAR)["facts"]["hidden_flying_spirits"]
-    assert coverage["status"] == "pending_rule_selection"
+def test_hidden_spirits_are_derived_from_palace_pure_hexagram():
+    facts = line_cast([7, 8, 7, 8, 7, 8], **CALENDAR)["facts"]
+    coverage = facts["hidden_flying_spirits"]
+    assert coverage["status"] == "completed"
+    assert coverage["palace_pure_hexagram"] == facts["palace"]["name"]
+    # 本卦已出现的六亲不取伏神，缺失六亲必须逐一补出
+    assert set(coverage["missing_relatives"]) == {item["six_relative"] for item in coverage["hidden_spirits"]}
+    assert not set(coverage["present_relatives"]) & set(coverage["missing_relatives"])
+    for item in coverage["hidden_spirits"]:
+        host = facts["line_chart"][item["position"] - 1]
+        assert item["flying_spirit"]["position"] == item["position"]
+        assert item["flying_spirit"]["six_relative"] == host["six_relative"]
+        assert item["flying_spirit"]["najia_branch"] == host["najia_branch"]
+        assert item["relation"] in ("飞生伏", "伏生飞", "飞克伏", "伏克飞", "飞伏比和")
+
+
+def test_pure_hexagram_has_no_missing_relatives():
+    from app.liuyao.engine import number_cast
+
+    facts = number_cast(1, 1, **CALENDAR)["facts"]
+    coverage = facts["hidden_flying_spirits"]
+    assert facts["original"]["name"] == "乾"
+    assert coverage["missing_relatives"] == []
     assert coverage["hidden_spirits"] == []
-    assert coverage["flying_spirits"] == []
+    assert len(coverage["present_relatives"]) == 5
+
+
+def test_changed_hexagram_gets_najia_and_advance_retreat_flags():
+    from app.common.ganzhi import BRANCH_ELEMENTS
+    from app.liuyao.engine import ADVANCE_BRANCH, RETREAT_BRANCH, _advance_retreat
+    from app.liuyao.rules import NAJIA
+
+    assert _advance_retreat("亥", "子") == "进神"
+    assert _advance_retreat("子", "亥") == "退神"
+    assert _advance_retreat("子", "丑") == ""
+    assert set(RETREAT_BRANCH) == set(ADVANCE_BRANCH.values())
+
+    facts = line_cast([9, 7, 7, 7, 7, 7], **CALENDAR)["facts"]
+    changed = facts["changed"]
+    lower, upper = NAJIA[changed["lower_trigram"]["name"]], NAJIA[changed["upper_trigram"]["name"]]
+    expected_branches = list(lower[2] + upper[3])
+    assert [line["najia_branch"] for line in facts["changed_line_chart"]] == expected_branches
+    for line, changed_line in zip(facts["line_chart"], facts["changed_line_chart"]):
+        assert changed_line["element"] == BRANCH_ELEMENTS[changed_line["najia_branch"]]
+        assert line["changed_najia_branch"] == changed_line["najia_branch"]
+        if line["is_moving"]:
+            assert line["advance_retreat"] == _advance_retreat(line["najia_branch"], changed_line["najia_branch"])
+        else:
+            assert line["advance_retreat"] == ""
+
+
+def test_line_month_day_derivations_follow_ganzhi_tables():
+    from app.common.ganzhi import BRANCH_CLASH, BRANCH_COMBINE
+
+    facts = line_cast([7, 8, 7, 8, 7, 8], **CALENDAR)["facts"]
+    month, day = facts["month_branch"]["name"], facts["day_pillar"][1]
+    for line in facts["line_chart"]:
+        branch = line["najia_branch"]
+        assert line["is_month_break"] == (BRANCH_CLASH[month] == branch)
+        assert line["is_day_clash"] == (BRANCH_CLASH[day] == branch)
+        assert line["is_day_combine"] == (BRANCH_COMBINE[day] == branch)
+        # 静爻受日冲：旺相为暗动、休囚为日破，二者互斥
+        if line["is_moving"]:
+            assert not line["is_dark_move"] and not line["is_day_break"]
+            continue
+        if not line["is_day_clash"]:
+            assert not line["is_dark_move"] and not line["is_day_break"]
+            continue
+        assert line["is_dark_move"] != line["is_day_break"]
+        assert line["is_dark_move"] == (line["month_strength"] in ("旺", "相"))
 
 
 def test_personalized_auto_cast_is_replayable_and_uses_coin_rounds():
@@ -103,7 +168,12 @@ def test_personalized_auto_cast_is_replayable_and_uses_coin_rounds():
 
 def test_trace_and_rules_are_complete_without_judgements():
     result = coin_cast([[3, 2, 2]] * 6, **CALENDAR)
-    assert len(result["calculation_trace"]) == 12
+    # 6 条投币 + 装卦 4 步 + 月破日破 1 步 + 变卦纳甲 1 步 + 伏神 1 步
+    assert len(result["calculation_trace"]) == 15
+    assert any("month break" in line for line in result["calculation_trace"])
+    assert any("advance or retreat" in line for line in result["calculation_trace"])
+    assert any("pure hexagram" in line for line in result["calculation_trace"])
     assert [step["sequence"] for step in result["steps"]] == [1, 2, 3, 4]
     assert result["steps"][0]["rule_ids"] == ["LY-COINS-001", "LY-LINES-001"]
+    assert result["steps"][3]["rule_ids"] == ["LY-HIDDEN-FLYING-001"]
     assert result["judgements"] == []

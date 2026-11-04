@@ -139,7 +139,11 @@
           "version": "1.0.0"
         },
         {
-          "rule_id": "LY-HIDDEN-FLYING-COVERAGE-001",
+          "rule_id": "LY-HIDDEN-FLYING-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "LY-DAYMONTH-001",
           "version": "1.0.0"
         },
         {
@@ -1434,40 +1438,91 @@
       "implementation": "app.liuyao.engine:_decorate"
     },
     {
-      "rule_id": "LY-HIDDEN-FLYING-COVERAGE-001",
+      "rule_id": "LY-HIDDEN-FLYING-001",
       "version": "1.0.0",
       "system": "liuyao",
       "school": "mvp-engineering-baseline",
       "status": "draft",
-      "title": "伏神飞神规则覆盖声明",
-      "purpose": "显式报告伏神飞神规则是否完成签署，避免在规则未定时生成推测值",
+      "title": "伏神飞神取法",
+      "purpose": "本卦缺失六亲时，按本宫首卦同位爻补出伏神，并给出该位本卦爻作为飞神",
       "preconditions": [
-        "六爻盘面已生成"
+        "六爻盘面已生成",
+        "已完成八宫归属与纳甲装卦"
       ],
       "inputs": [
         "palace",
-        "line_relatives"
+        "line_chart"
       ],
       "procedure": [
-        "检查已签署规则版本和标准案例",
-        "未签署时返回pending_rule_selection",
-        "伏神和飞神数组保持为空"
+        "取本宫首卦（八纯卦）六爻纳甲与六亲",
+        "统计本卦未出现的六亲",
+        "按父母、兄弟、子孙、妻财、官鬼顺序到首卦同位取伏神",
+        "同一六亲在首卦出现多处时取最低爻位，其余记入alternative_positions",
+        "以本卦同位爻为飞神，判飞伏生克"
       ],
       "outputs": [
         "status",
+        "present_relatives",
+        "missing_relatives",
         "hidden_spirits",
-        "flying_spirits",
-        "reason"
+        "flying_spirits"
       ],
       "source_refs": [
         "docs/design/decisions/011-liuyao-domain-phase-five.md"
       ],
       "limitations": [
-        "当前仅报告覆盖状态，不执行伏神飞神排法"
+        "取法与案例为工程基线，断语仍待专家签署",
+        "不处理伏神空破与伏神发动等进阶论断"
       ],
       "owner": "unassigned",
       "reviewers": [],
-      "implementation": "app.liuyao.engine:_result"
+      "implementation": "app.liuyao.engine:_hidden_flying_spirits"
+    },
+    {
+      "rule_id": "LY-DAYMONTH-001",
+      "version": "1.0.0",
+      "system": "liuyao",
+      "school": "mvp-engineering-baseline",
+      "status": "draft",
+      "title": "月建日辰逐爻推导",
+      "purpose": "逐爻推出月令旺衰、月破、日辰生克合冲、日破暗动与旬空状态",
+      "preconditions": [
+        "六爻盘面已生成",
+        "历法月建与日辰已确定"
+      ],
+      "inputs": [
+        "line_chart",
+        "month_branch",
+        "day_pillar",
+        "xun.empty_branches"
+      ],
+      "procedure": [
+        "按月建五行与爻五行定旺相休囚死",
+        "爻支被月建冲判为月破",
+        "按日辰定临、冲、合、受生、泄气、受克",
+        "静爻被日冲且月建旺相判为暗动，休囚判为日破",
+        "空亡之爻逢日辰同支为填实，逢日冲为冲空"
+      ],
+      "outputs": [
+        "month_strength",
+        "is_month_break",
+        "day_relation",
+        "is_day_clash",
+        "is_day_combine",
+        "is_dark_move",
+        "is_day_break",
+        "void_state"
+      ],
+      "source_refs": [
+        "docs/design/decisions/011-liuyao-domain-phase-five.md"
+      ],
+      "limitations": [
+        "只做单爻旺衰，不合成三合局与刑害",
+        "不涉及变爻进退神"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.liuyao.engine:_decorate"
     },
     {
       "rule_id": "LR-MONTH-GENERAL-001",

@@ -3,12 +3,14 @@
 from typing import Any, Dict, List, Optional
 
 from app.calendar.engine import CalendarEngine
-from app.common.ganzhi import xun_info
+from app.common.ganzhi import triple_group_of, xun_info
 
 from .rules import (
     EIGHT_GATES_ORIGIN,
     EIGHT_SPIRITS,
+    HORSE_STAR,
     NINE_STARS_ORIGIN,
+    PALACE_BRANCHES,
     PALACE_NAMES,
     RING_PALACE_ORDER,
     SAN_QI_LIU_YI,
@@ -92,6 +94,15 @@ def calculate_qimen_chart(
     hour_xun_data = xun_info(ganzhi["hour"])
     xun_start_pillar = hour_xun_data["start_pillar"]
     xun_yi = XUN_SHOU_YI.get(xun_start_pillar, "戊")
+    empty_branches = hour_xun_data["empty_branches"]
+    empty_palaces = [
+        palace for palace, branches in PALACE_BRANCHES.items()
+        if any(branch in empty_branches for branch in branches)
+    ]
+    horse_branch = HORSE_STAR[hour_branch]
+    horse_palaces = [
+        palace for palace, branches in PALACE_BRANCHES.items() if horse_branch in branches
+    ]
 
     # 找到旬首六仪在地盘所在的宫位 (值符星、值使门本位原宫)
     origin_palace = 1
@@ -231,6 +242,8 @@ def calculate_qimen_chart(
             "eight_spirit": spirit,
             "is_tian_qin_present": is_tian_qin,
             "qin_stem": qin_stem,
+            "is_void": p_num in empty_palaces,
+            "is_horse": p_num in horse_palaces,
             "patterns": patterns,
         }
 
@@ -256,6 +269,22 @@ def calculate_qimen_chart(
         "ju_number": ju_number,
         "yuan_type": yuan_type,
         "xun_shou": f"{xun_start_pillar}（{xun_yi}）",
+        "xun": {
+            "name": hour_xun_data["name"],
+            "start_pillar": xun_start_pillar,
+            "empty_branches": empty_branches,
+            "dun_gan": hour_xun_data["dun_gan"],
+        },
+        "void": {
+            "empty_branches": empty_branches,
+            "palace_numbers": empty_palaces,
+            "note": "时旬空亡按宫位所辖地支判定；中五宫不辖地支，不标空亡。",
+        },
+        "horse_star": {
+            "branch": horse_branch,
+            "palace_numbers": horse_palaces,
+            "basis": "时支{}属{}局，驿马在{}".format(hour_branch, triple_group_of(hour_branch), horse_branch),
+        },
         "zhi_fu_star": zhi_fu_origin_star,
         "zhi_shi_gate": zhi_shi_origin_gate,
         "zhi_fu_palace": target_star_palace,

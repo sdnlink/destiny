@@ -719,31 +719,45 @@ function getLiuyaoRelative(palaceElement, lineElement) {
   return "比和";
 }
 
+function buildHiddenSpirits(facts) {
+  const backend = facts.hidden_flying_spirits;
+  if (backend && backend.status === "completed" && Array.isArray(backend.hidden_spirits)) {
+    return backend.hidden_spirits.map((item) => ({
+      position: item.position,
+      ganzhi: `${item.najia_stem}${item.najia_branch}`,
+      element: item.element,
+      relative: item.six_relative,
+      relation: item.relation,
+      flying: item.flying_spirit,
+    }));
+  }
+  // 兼容旧会话：本宫首卦纳甲 → 缺失六亲逐位补出
+  const pureConfig = NAJIA_TABLE[facts.palace.name];
+  const pureGanzhi = pureConfig ? [...pureConfig.lower, ...pureConfig.upper] : [];
+  const currentRelatives = new Set(facts.line_chart.map((line) => line.six_relative));
+  const missingRelatives = ["父母", "兄弟", "子孙", "妻财", "官鬼"].filter(
+    (relative) => !currentRelatives.has(relative)
+  );
+  return pureGanzhi
+    .map((ganzhi, index) => {
+      const element = BRANCH_ELEMENTS_MAP[ganzhi[1]] || "土";
+      return {
+        position: index + 1,
+        ganzhi,
+        element,
+        relative: getLiuyaoRelative(facts.palace.element, element),
+      };
+    })
+    .filter((item) => missingRelatives.includes(item.relative));
+}
+
 function LiuyaoView({ result }) {
   if (!result) return <MissingModule name="六爻" />;
   const { facts } = result;
   const [selectedPos, setSelectedPos] = useState(facts.palace.host_line || 1);
 
-  // 伏神分析
-  const palaceName = facts.palace.name;
-  const palaceElem = facts.palace.element;
-  const pureConfig = NAJIA_TABLE[palaceName];
-  const pureGanzhi = pureConfig ? [...pureConfig.lower, ...pureConfig.upper] : [];
-  const pureLines = pureGanzhi.map((gz, i) => {
-    const br = gz[1];
-    const elem = BRANCH_ELEMENTS_MAP[br] || "土";
-    return {
-      position: i + 1,
-      ganzhi: gz,
-      element: elem,
-      relative: getLiuyaoRelative(palaceElem, elem),
-    };
-  });
-
-  const currentRelatives = new Set(facts.line_chart.map((l) => l.six_relative));
-  const allRelatives = ["父母", "兄弟", "子孙", "妻财", "官鬼"];
-  const missingRelatives = allRelatives.filter((r) => !currentRelatives.has(r));
-  const hiddenSpirits = pureLines.filter((pl) => missingRelatives.includes(pl.relative));
+  // 伏神优先采用后端推导（本宫首卦同位补缺），旧会话缺该字段时回退本地计算
+  const hiddenSpirits = buildHiddenSpirits(facts);
 
   const activeLine = facts.line_chart.find((l) => l.position === selectedPos) || facts.line_chart[0];
   const activeHidden = hiddenSpirits.find((h) => h.position === selectedPos);
@@ -806,8 +820,15 @@ function LiuyaoView({ result }) {
                     <td><strong>{line.six_relative}</strong></td>
                     <td>{line.najia_stem}{line.najia_branch}</td>
                     <td><span style={{ color: ELEMENT_COLORS[line.element] || "inherit" }}>{line.element}</span></td>
-                    <td>{line.roles.includes("世爻") ? <span className="shi-badge">世</span> : line.roles.includes("应爻") ? <span className="ying-badge">应</span> : "—"}</td>
-                    <td>{line.is_moving ? <span className="moving-badge">发动 ○</span> : "静爻"}{line.is_void ? " · 旬空" : ""}</td>
+                    <td>{(line.roles || []).some((role) => role === "世" || role === "世爻") ? <span className="shi-badge">世</span> : (line.roles || []).some((role) => role === "应" || role === "应爻") ? <span className="ying-badge">应</span> : "—"}</td>
+                    <td>
+                      {line.is_moving ? <span className="moving-badge">发动 ○</span> : "静爻"}
+                      {line.void_state ? ` · ${line.void_state}` : line.is_void ? " · 旬空" : ""}
+                      {line.is_month_break ? " · 月破" : ""}
+                      {line.is_day_break ? " · 日破" : ""}
+                      {line.is_dark_move ? " · 暗动" : ""}
+                      {line.advance_retreat ? ` · ${line.advance_retreat}` : ""}
+                    </td>
                     <td>
                       {hidden ? (
                         <span className="hidden-pill-tag" title={`伏于${line.najia_branch}下`}>

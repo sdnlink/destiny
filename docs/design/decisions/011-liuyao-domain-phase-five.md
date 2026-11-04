@@ -49,22 +49,31 @@
 
 ## 4. 伏神与飞神覆盖边界
 
-伏神、飞神存在不同取法，当前尚未完成规则选择和标准案例签署。系统不得根据开发者偏好选择排法，也不得生成占位爻位。所有六爻结果固定返回：
+> 2026-11 修订：原决策要求"取法未签署前禁止生成推测值"。为避免占位数据长期贴在结果里，改为**只推导可确定性计算的取法，不生成断语**：以本宫首卦（八纯卦）同位爻补缺取伏神，飞神取本卦同位爻，飞伏生克按五行生克判定。规则登记为`LY-HIDDEN-FLYING-001`（`status: draft`），断语与标准案例仍待专家签署。
+
+伏神、飞神存在不同取法，系统只采用可复算的一种并在结果中写明来源，不生成占位爻位。输出结构：
 
 ```json
 {
-  "status": "pending_rule_selection",
-  "hidden_spirits": [],
-  "flying_spirits": [],
-  "reason": "伏神飞神取法和标准案例尚未完成规则签署"
+  "status": "completed",
+  "method": "eight_palace_pure_hexagram",
+  "palace_pure_hexagram": "坎",
+  "present_relatives": ["..."],
+  "missing_relatives": ["妻财"],
+  "hidden_spirits": [
+    {"six_relative": "妻财", "position": 3, "najia_branch": "午", "relation": "飞克伏",
+     "flying_spirit": {"position": 3, "six_relative": "兄弟", "najia_branch": "亥"}}
+  ],
+  "flying_spirits": ["..."],
+  "note": "首卦同亲多处出现时取最低爻位并在 alternative_positions 标注"
 }
 ```
 
-只有在规则登记、来源、专家签署和正反案例同时完成后，才能发布新的规则版本并改变该状态。
+首卦中同一六亲出现两次（如乾为天父母在辰、戌）时取最低爻位，另一处写入`alternative_positions`，不静默丢弃。状态变为`completed`只表示取法已确定，不表示断语已获签署。
 
 ## 5. 证据链
 
-每次结果包含原始输入、归一化输入、算法与规则版本、本变卦、完整纳甲盘、`calculation_trace`、带规则编号的`steps`、覆盖状态和限制说明。六爻值与三枚硬币分别使用`LY-LINES-001`和`LY-COINS-001`，伏神飞神边界使用`LY-HIDDEN-FLYING-COVERAGE-001`。
+每次结果包含原始输入、归一化输入、算法与规则版本、本变卦、完整纳甲盘、`calculation_trace`、带规则编号的`steps`、覆盖状态和限制说明。六爻值与三枚硬币分别使用`LY-LINES-001`和`LY-COINS-001`，月建日辰逐爻推导使用`LY-DAYMONTH-001`，伏神飞神取法使用`LY-HIDDEN-FLYING-001`。
 
 ## 6. 测试基线
 
@@ -76,7 +85,8 @@
 - 多动爻及每爻变化后阴阳；
 - 64卦均有唯一八宫归属；
 - 世应、纳甲、六亲、六神、月建、日辰和旬空；
-- 伏神飞神未签署时不生成推测值；
+- 伏神飞神按本宫首卦同位补缺推导，八纯卦六亲齐全时不生成伏神；
+- 逐爻月令旺衰、月破、日辰生克合冲、日破暗动与旬空状态可由月建日辰复算；
 - 自动起卦可重放，完整计算轨迹和规则编号可核验；
 - 六爻领域不导入梅花、周易、大六壬或旧`core`算法。
 

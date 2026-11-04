@@ -245,7 +245,16 @@ def _generate_bazi_advisory(day_master_info: Dict[str, Any], day_stem: str, pill
 
     general = f"日元{day_stem}属{elem}，全局五行气象{level}。调候与立足之道以生助克泄平衡为基准，宜流通【{fav}】之气。"
     career = f"行事宜顺应【{fav}】行业与方位；在重大职涯决断上，保持稳步推进，避开【{unfav}】过旺之冲击。"
-    wealth = "求财以稳健为主，命中喜用五行为生财之源，利于把握专业技能与长期积累带来的收益机会。"
+    # 财星取日主所克之五行，随喜忌给出不同结论，不再是与盘面无关的固定句
+    wealth_element = ELEMENT_OVERCOMING[elem]
+    favorable = day_master_info["favorable_elements"]
+    unfavorable = day_master_info["unfavorable_elements"]
+    if wealth_element in favorable:
+        wealth = f"财星属{wealth_element}，为命局喜用，求财宜取【{wealth_element}】相关行业与方位，稳健积累可成。"
+    elif wealth_element in unfavorable:
+        wealth = f"财星属{wealth_element}，为命局忌神，求财不宜贪多冒进，宜守正业、控杠杆，防因财致累。"
+    else:
+        wealth = f"财星属{wealth_element}，喜忌均不显，求财以稳健为主，宜凭专业技能与长期积累获利。"
     health = f"注意五行【{unfav}】所对应脏腑与经络的日常调理与养护，注重作息与气血调和。"
 
     return {
