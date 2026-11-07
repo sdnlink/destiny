@@ -3279,18 +3279,22 @@
         "运星入中按洛书轨迹顺飞，山向星按坐向三元龙阴阳定顺逆",
         "旺山旺向：山星当运到坐且向星当运到向",
         "上山下水：山星当运到向且向星当运到坐",
-        "每山两侧三度起替；替卦起星表尚未工程化、待专家口径签署，不提供替卦盘"
+        "每山两侧三度起替；替卦起星盘按库内《沈氏玄空學》起星图实例推导，经 include_tihua_chart=true 显式请求才提供，默认关闭",
+        "起星：到山/到向运星按洛书数取同元龙山，查替星表入中，顺逆按替星山阴阳飞布；中宫五寄宫未签署时返回 unresolved"
       ],
       "outputs": [
         "facts.grid",
         "facts.conditions",
-        "facts.ti_pu"
+        "facts.ti_pu",
+        "facts.tihua_chart（显式请求时，draft_unsigned）"
       ],
       "source_refs": [
-        "data/generated/wikisource-corpus（地理辨正、青囊经、沈氏玄空學，见 data/sources/web-classics-books.json）"
+        "data/generated/wikisource-corpus（地理辨正、青囊经、沈氏玄空學，见 data/sources/web-classics-books.json）",
+        "《沈氏玄空學》起星图实例：四运午山子向兼、一运乙山辛向兼（回归测试 test_xuankong_tihua_chart.py）"
       ],
       "limitations": [
-        "替卦盘未实现（起星表待工程化/专家口径），落替区间时提示复测或人工起盘",
+        "替卦起星盘为 draft_unsigned：工程草稿替星表（寅午庚丁=8/左辅）与库内原典（=9/弼星）存在可查证口径冲突，待专家签署后方可作为确定性结论",
+        "中宫五寄宫口径未签署时返回 unresolved，不生成猜测值",
         "格局条件为确定性判定，不含吉凶断语"
       ],
       "owner": "unassigned",

@@ -802,6 +802,7 @@ class XuankongRequest(BaseModel):
     period: Optional[int] = Field(None, ge=1, le=9)
     sitting_degree: Optional[float] = Field(None, ge=0, le=360)
     include_tihua_reference: bool = Field(False, json_schema_extra={"example": False})
+    include_tihua_chart: bool = Field(False, json_schema_extra={"example": False})
 
 
 @app.get("/v1/fengshui/xuankong")
@@ -811,10 +812,12 @@ def fengshui_xuankong(
     period: Optional[int] = None,
     sitting_degree: Optional[float] = None,
     include_tihua_reference: bool = False,
+    include_tihua_chart: bool = False,
 ):
     return {"data": calculate_xuankong(
         sitting_mountain, year=year, period=period, sitting_degree=sitting_degree,
         include_tihua_reference=include_tihua_reference,
+        include_tihua_chart=include_tihua_chart,
     )}
 
 
@@ -824,6 +827,7 @@ def fengshui_xuankong_post(request: XuankongRequest):
         request.sitting_mountain, year=request.year, period=request.period,
         sitting_degree=request.sitting_degree,
         include_tihua_reference=request.include_tihua_reference,
+        include_tihua_chart=request.include_tihua_chart,
     )}
 
 
