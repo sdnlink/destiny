@@ -41,6 +41,18 @@ TI_PU_REGION_DEGREES = 3.0
 YUAN_LABELS = {1: "上元", 2: "上元", 3: "上元", 4: "中元", 5: "中元", 6: "中元",
                7: "下元", 8: "下元", 9: "下元"}
 
+# 玄空替卦（起星）参考表——沈氏玄空通行替卦口诀（二十四山替星）。
+# 状态：DRAFT，尚未工程化、待专家口径签署。仅作参考输出，不改变下卦挨星盘，
+# 不用于任何确定性结论；正式起替卦盘需结合完整替卦挨星程序与人工复核。
+TIHUA_STAR = {
+    "子": 1, "癸": 1, "甲": 1, "申": 1,
+    "坤": 2, "壬": 2, "乙": 2, "卯": 2, "未": 2,
+    "戌": 6, "乾": 6, "亥": 6, "辰": 6, "巽": 6, "巳": 6,
+    "艮": 7, "丙": 7, "辛": 7, "酉": 7, "丑": 7,
+    "寅": 8, "午": 8, "庚": 8, "丁": 8,
+}
+TIHUA_RULE_ID = "FS-XUANKONG-TIHUA-001"
+
 
 def period_for_year(year):
     year = int(year)
@@ -103,8 +115,13 @@ def _classic_evidence(queries, limit=4):
         return []
 
 
-def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=None):
-    """按坐山与运造下卦挨星盘，并给出确定性格局条件。"""
+def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=None,
+                       include_tihua_reference=False):
+    """按坐山与运造下卦挨星盘，并给出确定性格局条件。
+
+    `include_tihua_reference` 为 True 时附带沈氏替卦口诀的替星参考（draft），
+    仅作专家复核用途，不改变下卦挨星盘，也不用于任何确定性结论。
+    """
     mountain = mountain_by_name(sitting_mountain)
     facing_name = opposite_mountain(mountain.name)
     if period is None:
@@ -168,7 +185,7 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
             "note": "未提供实测角度，无法判定是否落替卦区间；每山两侧各三度起替。替卦盘待专家口径签署，未提供。",
         }
 
-    return {
+    result = {
         "schema_version": "1.0",
         "system": "fengshui",
         "school": "xuankong-xiagua-engineering-baseline",
@@ -197,5 +214,20 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
         ],
     }
 
+    if include_tihua_reference:
+        result["facts"]["tihua_reference"] = {
+            "rule_id": TIHUA_RULE_ID,
+            "status": "draft_unsigned",
+            "sitting": {"mountain": mountain.name, "tihua_star": TIHUA_STAR.get(mountain.name)},
+            "facing": {"mountain": facing_name, "tihua_star": TIHUA_STAR.get(facing_name)},
+            "note": "替卦起星口诀（沈氏玄空）参考；正式替卦盘待专家签署，未提供，请勿用于生产结论。",
+        }
+        result["warnings"].append(
+            "已附替卦口诀参考（draft），仅供专家复核，不作为确定性结论。"
+        )
 
-__all__ = ("calculate_xuankong", "period_for_year", "yuan_dragon", "opposite_mountain")
+    return result
+
+
+__all__ = ("calculate_xuankong", "period_for_year", "yuan_dragon", "opposite_mountain",
+           "TIHUA_STAR", "TIHUA_RULE_ID")

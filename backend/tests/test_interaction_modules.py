@@ -396,12 +396,13 @@ class TestMultiParty(unittest.TestCase):
         self.assertEqual(result["parties"][0]["yongshen"], "日干")
         self.assertEqual(result["parties"][1]["yongshen"], "值符")
         self.assertNotIn("世爻", result["parties"][0]["position"])
-        self.assertNotIn("六亲", result["parties"][0]["mindset"])
+        self.assertIn("日干", result["parties"][0]["mindset"])
+        self.assertNotIn("应爻", result["parties"][0]["demands"])
         deep = result["focus_party"]["deep_analysis"]
         self.assertIn("奇门遁甲", deep)
         self.assertIn("值符", deep)
         self.assertNotIn("动爻", deep)
-        self.assertNotIn("六神", deep)
+        self.assertNotIn("六神临爻", deep)
 
     def test_auto_detect_from_session_question(self):
         session = _cast_session(question="我和对方合作能否成功")

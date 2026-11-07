@@ -3,6 +3,7 @@ import json
 import logging
 import math
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -325,9 +326,63 @@ async def internal_token_middleware(request: Request, call_next):
     return await call_next(request)
 
 
+# 速率限制（仅在生产受保护部署启用：RATE_LIMIT_PER_MINUTE>0 时对写操作限流）
+# + 审计日志（记录方法/路径/客户端标识/鉴权状态/响应码）。默认关闭限流，避免本地开发与测试被节流。
+RATE_LIMIT_PER_MINUTE = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "0") or "0")
+_audit_logger = logging.getLogger("destiny.audit")
+_rate_limit_buckets: Dict[str, list] = {}
+
+
+@app.middleware("http")
+async def rate_limit_and_audit_middleware(request: Request, call_next):
+    path = request.url.path
+    client_tag = (
+        request.headers.get(OWNER_HEADER_NAME)
+        or (request.client.host if request.client else "anonymous")
+    )
+    if RATE_LIMIT_PER_MINUTE and request.method in ("POST", "DELETE", "PUT"):
+        now = time.monotonic()
+        bucket = _rate_limit_buckets.get(client_tag)
+        if bucket is None or now - bucket[1] >= 60:
+            _rate_limit_buckets[client_tag] = [1, now]
+        else:
+            bucket[0] += 1
+            if bucket[0] > RATE_LIMIT_PER_MINUTE:
+                return JSONResponse(
+                    status_code=429,
+                    content={"error": {"code": "RATE_LIMITED", "message": "请求过于频繁，请稍后再试"}},
+                )
+    response = await call_next(request)
+    if path != "/health":
+        _audit_logger.info(
+            "audit method=%s path=%s status=%s client=%s auth=%s",
+            request.method, path, response.status_code,
+            "set" if request.headers.get(OWNER_HEADER_NAME) else "unset",
+            "set" if request.headers.get("Authorization") else "unset",
+        )
+    return response
+
+
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
     return JSONResponse(status_code=422, content={"error": {"code": "INVALID_CALCULATION_INPUT", "message": str(exc)}})
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": {"code": "HTTP_{}".format(exc.status_code), "message": exc.detail}},
+    )
+
+
+@app.on_event("startup")
+def warm_classics():
+    try:
+        get_classics_library()
+        logging.getLogger("destiny.startup").info("classics library warmed on startup")
+    except Exception as exc:  # noqa: BLE001 - 启动预热失败不应阻断服务
+        logging.getLogger("destiny.startup").warning("classics warm-up skipped: %s", exc)
 
 
 def constant_payload(rows, fallback=None):
@@ -729,6 +784,7 @@ class XuankongRequest(BaseModel):
     year: Optional[int] = Field(None, ge=1864, le=2100)
     period: Optional[int] = Field(None, ge=1, le=9)
     sitting_degree: Optional[float] = Field(None, ge=0, le=360)
+    include_tihua_reference: bool = Field(False, json_schema_extra={"example": False})
 
 
 @app.get("/v1/fengshui/xuankong")
@@ -737,8 +793,12 @@ def fengshui_xuankong(
     year: Optional[int] = None,
     period: Optional[int] = None,
     sitting_degree: Optional[float] = None,
+    include_tihua_reference: bool = False,
 ):
-    return {"data": calculate_xuankong(sitting_mountain, year=year, period=period, sitting_degree=sitting_degree)}
+    return {"data": calculate_xuankong(
+        sitting_mountain, year=year, period=period, sitting_degree=sitting_degree,
+        include_tihua_reference=include_tihua_reference,
+    )}
 
 
 @app.post("/v1/fengshui/xuankong")
@@ -746,6 +806,7 @@ def fengshui_xuankong_post(request: XuankongRequest):
     return {"data": calculate_xuankong(
         request.sitting_mountain, year=request.year, period=request.period,
         sitting_degree=request.sitting_degree,
+        include_tihua_reference=request.include_tihua_reference,
     )}
 
 

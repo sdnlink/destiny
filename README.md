@@ -135,6 +135,11 @@ Web界面默认位于`http://127.0.0.1:5173`，启动前需确保计算API正在
 | `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令缺失时记录警告；数据库相关接口按端点不同降级为 `unavailable` / `in_memory_fallback` / `file_cache`，并在响应的 `source` 字段标注来源 |
 | `APP_API_TOKEN` | `/v1` 接口 Bearer 鉴权 | 未设置时记录「未鉴权」警告，仅可用于本地开发 |
 | `SESSION_STORAGE_DIR` | 会话 JSON 存储目录 | 默认 `data/sessions` |
+| `VITE_PROXY_TARGET` | 前端开发代理的后端地址 | 默认 `http://127.0.0.1:8090`；后端端口被占用或连远程后端时用它覆盖 |
+| `WEB_BASE_URL` / `CHROME_BIN` / `SMOKE_SHOT_DIR` | 浏览器烟测的目标地址 / 浏览器可执行文件 / 截图目录 | 依次为 `http://127.0.0.1:5173` / 自动探测 / 系统临时目录 |
+
+数据库不可达时：探活有 30 秒缓存，查询失败后有 20 秒冷却，冷却期内直接走降级路径
+（不再为同一次故障反复等连接超时，否则一次 `/v1/calculations/compare` 会空耗十几秒）。
 
 验证：
 
@@ -147,6 +152,13 @@ npm --prefix frontend run test:node
 npm --prefix frontend run test:browser
 ./scripts/verify_daorenjia_cache.py \
   --report cache/daorenjia/verification.json
+```
+
+提交前检查（与 CI 同一套 ruff 配置，见 `.pre-commit-config.yaml`）：
+
+```bash
+pip install pre-commit && pre-commit install
+pre-commit run --all-files
 ```
 
 ## 当前数据
@@ -166,7 +178,7 @@ npm --prefix frontend run test:browser
   其中4条属于七步推理工作流（`WF-YONGSHEN-001`/`WF-WANGSHUAI-001`/`WF-FORTUNE-001`/`WF-TIMING-001`），口径见[ADR-015](./docs/design/decisions/015-workflow-seven-step-rules.md)。
 - 31个工程回归案例，当前全部通过，不代表专家签署案例。
 - 健康、常量、规则、案例、计算、典籍检索与风水档案等接口持续增补，机器契约以 `/openapi.json` 为准。
-- 多模块综合只比较引用已登记规则的结构化判断；工作流会输出五档吉凶与`fortune_basis`逐条依据，但不输出未经规则登记的自动总分，「不生成自动吉凶总分」的边界以此为准。
+- 多模块综合只比较引用已登记规则的结构化判断；工作流对排了卦象体系（梅花/六爻/周易）的推演输出五档吉凶与`fortune_basis`逐条依据，未排卦象体系时标记「未评级」且不出分，也不输出未经规则登记的自动总分，「不生成自动吉凶总分」的边界以此为准。
 - 推演结果包含确定性摘要和逐模块详细说明，每段可回溯规则编号。
 - 输入事项可生成未审核的研究性结论、优先建议和核实清单，不替代正式专业意见。
 - 结果可引用匹配卦象的书籍原文，明确展示书中观点、事项参考、来源链接和未审核状态。
