@@ -157,32 +157,54 @@ def _meta_relatives(palace_element, target_element, lines):
     return result
 
 
-def annotate_hidden_emerge(coverage, lines, month_branch, day_branch, month_element):
-    """伏神出伏条件：空、破、日月克伤者不得出（《增删卜易》伏神章口径）。"""
+def annotate_hidden_emerge(coverage, lines, month_branch, day_branch, month_element,
+                           empty_branches=()):
+    """伏神出伏条件（《卜筮正宗·伏神正传第六》「伏待出露」、黄金策
+    「空下伏神易于引拔，伏无提拔终徒尔，飞不推开亦枉然」、飞伏生克吉凶歌）。
+
+    口径修正：伏神状态一律按**伏神自身地支/五行**判定，飞神状态只用于
+    「飞伏生克」关系（伏克飞为出暴、飞来生伏得长生、飞来克伏反伤身）。
+    早先把同位飞神(host)的 void_state / is_day_break / day_relation 直接
+    当成伏神状态，导致「伏神值旬空」等结论实际描述的是飞神，对象错配。
+    """
     for hidden in coverage["hidden_spirits"]:
         branch = hidden["najia_branch"]
         element = hidden["element"]
-        host = lines[hidden["position"] - 1]
+        flying = hidden.get("flying_spirit", {})
+        flying_branch = flying.get("najia_branch")
+        relation = hidden.get("relation", "")
         blockers = []
-        if host["void_state"] == "旬空":
-            blockers.append({"type": "旬空", "reason": "伏神值旬空"})
-        if host["void_state"] == "填实":
-            blockers.append({"type": "填实", "reason": "伏神空亡逢日辰填实，反可引出"})
+        # 伏神自身旬空/月破/日破（按伏神地支，不按飞神）
+        if branch in empty_branches:
+            blockers.append({"type": "旬空", "reason": "伏神{}值旬空，待出旬值日填实".format(branch)})
         if BRANCH_CLASH.get(month_branch) == branch:
-            blockers.append({"type": "月破", "reason": "伏神被月建冲破"})
-        if host["is_day_break"]:
-            blockers.append({"type": "日破", "reason": "伏神静而被日辰冲破"})
+            blockers.append({"type": "月破", "reason": "伏神{}被月建冲破".format(branch)})
+        if BRANCH_CLASH.get(day_branch) == branch:
+            blockers.append({"type": "日破", "reason": "伏神{}被日辰冲破".format(branch)})
         if month_element and FIVE_ELEMENTS_CONTROLS.get(month_element) == element:
-            blockers.append({"type": "月克", "reason": "月建克伏神"})
-        if host["day_relation"] == "受克":
-            blockers.append({"type": "日克", "reason": "日辰克伏神"})
-        if host["day_relation"] == "冲" and not host["is_day_break"] and host["month_strength"] in ("旺", "相"):
-            blockers.append({"type": "暗动", "reason": "伏神被日辰冲而暗动，反主引出"})
+            blockers.append({"type": "月克", "reason": "月建克伏神{}".format(element)})
+        # 飞伏生克：飞神克伏/压伏为阻，伏克飞/飞生伏为引出之机
+        if relation == "飞克伏":
+            blockers.append({"type": "飞克伏", "reason": "飞神克伏（飞来克伏反伤身），不得出"})
+        elif relation == "伏生飞":
+            blockers.append({"type": "伏生飞", "reason": "伏去生飞名泄气，伏神气泄"})
+        elif relation == "伏克飞":
+            blockers.append({"type": "引出", "reason": "伏克飞神为出暴，反主引出"})
+        elif relation == "飞生伏":
+            blockers.append({"type": "引出", "reason": "飞来生伏得长生，易于引拔"})
+        # 「飞不推开亦枉然」：飞神值旬空时伏神易于引拔（空下伏神易于引拔）
+        if flying_branch in empty_branches:
+            blockers.append({"type": "引出", "reason": "飞神值旬空，空下伏神易于引拔"})
         hidden["emerge_blockers"] = blockers
         hidden["can_emerge"] = not any(
-            item["type"] in ("旬空", "月破", "日破", "月克", "日克") for item in blockers
+            item["type"] in ("旬空", "月破", "日破", "月克", "飞克伏", "伏生飞") for item in blockers
         )
-    coverage["emerge_note"] = "伏神空破与受日月克伤者不得出，逢冲空、暗动、填实者反有引出之机；口径出自《增删卜易》伏神章，原文见 evidence。"
+    coverage["emerge_note"] = (
+        "伏神自身空破或受月克、飞神克伏、伏去生飞者不得出；伏克飞（出暴）、"
+        "飞生伏（得长生）、飞神旬空（空下伏神易于引拔）者反有引出之机。"
+        "空亡填实为出旬后值日之应期（见 facts.void_fill_prospects）。"
+        "口径出自《卜筮正宗·伏神正传第六》《旬空论第十》与黄金策，原文见 evidence。"
+    )
 
 
 def _relation_marks(first, second):
@@ -261,9 +283,26 @@ def assess_sanhe_conditions(structures, lines):
             status = "成局但待填实"
         else:
             status = "不成局（待补凑，虚待用口径）"
+        # 《卜筮正宗》「合待冲开」「墓中人，不冲不发」：只有墓支对应之爻
+        # 确为静爻、旬空或月破（即「入墓不发」）时才需待冲开。
+        # 旧实现 `tomb in group["branches"]` 恒真（四局三支本就含墓库），
+        # 令每个三合局都无条件追加该条件，属逻辑恒真缺陷。
         tomb = TRINE_TOMB.get(group["element"])
         if tomb and tomb in group["branches"]:
-            issues.append("局中{}为{}之墓，待冲开之日成之".format(tomb, group["element"]))
+            tomb_member = next((m for m in group["members"] if m["branch"] == tomb), None)
+            tomb_line = next((item for item in lines if item["najia_branch"] == tomb), None)
+            needs_stir = False
+            if tomb_line is not None:
+                needs_stir = (
+                    not tomb_line.get("is_moving")
+                    or tomb_line.get("void_state") == "旬空"
+                    or tomb_line.get("is_month_break")
+                )
+            elif tomb_member is not None:
+                needs_stir = not any(s.startswith("动爻") for s in tomb_member["sources"])
+            if needs_stir:
+                issues.append("局中{}为{}之墓，墓爻静/空/破，待冲开之日成之".format(
+                    tomb, group["element"]))
         assessments.append({
             "element": group["element"],
             "branches": group["branches"],

@@ -293,21 +293,31 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
         conditions.append({"name": "双星到向", "met": False,
                            "note": "判据待专家签署：当前按山向两盘同宫同星判定"})
 
-    # 替卦区间判定：每山十五度，两侧各三度起替；起星盘为显式请求的 draft，不作为默认结论。
+    # 替卦区间判定：每山十五度，两侧各三度起替。
+    # 《沈氏玄空學·論起星》：「兼一二分者，无须寻替；若兼三四分者，当用替星」——
+    # 故恰 3.0 度属起替区间（闭区间 <=），早先严格 < 把边界误判为下卦。
     if sitting_degree is not None:
-        offset = (float(sitting_degree) + 7.5) % 15.0
+        degree = float(sitting_degree)
+        offset = (degree + 7.5) % 15.0
         boundary_distance = min(offset, 15.0 - offset)
+        # 实测度数落哪一山：每山 15 度，子山中心 0/360，MOUNTAINS 按中心度递增；
+        # 取最近中心度（+0.5 四舍五入）。
+        degree_mountain = MOUNTAINS[int(degree / 15.0 + 0.5) % 24].name
         ti_pu = {
-            "in_ti_pu_region": boundary_distance < TI_PU_REGION_DEGREES,
+            "in_ti_pu_region": boundary_distance <= TI_PU_REGION_DEGREES,
             "distance_to_boundary": round(boundary_distance, 6),
-            "measured_degree": float(sitting_degree),
-            "note": "《沈氏玄空學》原文已在库；替卦起星盘可由 include_tihua_chart=true 取得（draft_unsigned，待专家签署口径冲突）；落入替卦区间时亦应复测坐向或人工起盘。",
+            "measured_degree": degree,
+            "degree_mountain": degree_mountain,
+            "degree_matches_sitting_mountain": degree_mountain == mountain.name,
+            "note": "《沈氏玄空學·論起星》兼三四分当用替星（含 3.0 度边界）；替卦起星盘可由 include_tihua_chart=true 取得（draft_unsigned，待专家签署口径冲突）；落入替卦区间时亦应复测坐向或人工起盘。",
         }
     else:
         ti_pu = {
             "in_ti_pu_region": None,
             "measured_degree": None,
-            "note": "未提供实测角度，无法判定是否落替卦区间；每山两侧各三度起替。起星盘需 include_tihua_chart=true 显式请求，默认不提供。",
+            "degree_mountain": None,
+            "degree_matches_sitting_mountain": None,
+            "note": "未提供实测角度，无法判定是否落替卦区间；每山两侧各三度起替（含边界）。起星盘需 include_tihua_chart=true 显式请求，默认不提供。",
         }
 
     result = {
@@ -338,6 +348,12 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
             "格局条件为确定性判定，不含吉凶断语。",
         ],
     }
+    if ti_pu.get("degree_matches_sitting_mountain") is False:
+        result["warnings"].append(
+            "实测角度 {}° 落{}山，与声明坐山{}不一致；应复测坐向后再判替卦。".format(
+                ti_pu["measured_degree"], ti_pu["degree_mountain"], mountain.name
+            )
+        )
 
     if include_tihua_reference:
         result["facts"]["tihua_reference"] = {

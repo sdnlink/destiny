@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from lunar_python import Solar
 
 from app.calendar import calendar_analysis
@@ -20,16 +22,27 @@ RULE_VERSION = "daliuren-engineering-baseline-2.0.0"
 
 
 def _month_general(calendar):
-    solar = calendar["solar"]
+    """月将按中气换将（《六壬指南》：正月雨水后日躔娵訾之次入亥宫，乃登明将）。
+
+    中气边界须与四柱/节气同源：CalendarEngine 用 effective 时刻换算到
+    Asia/Shanghai 参考时求节气；此处改用同一个 solar_term_reference_datetime，
+    避免非东八区或真太阳时修正下 effective local 与参考时跨中气导致错将。
+    """
+    ref = calendar["normalized_input"]["solar_term_reference_datetime"]
+    d = datetime.fromisoformat(ref)
     lunar = Solar.fromYmdHms(
-        solar["year"], solar["month"], solar["day"], solar["hour"], solar["minute"], solar["second"]
+        d.year, d.month, d.day, d.hour, d.minute, d.second
     ).getLunar()
+    # getCurrentQi 仅在中气当日返回；其余日取最近已过中气（雨水后仍用雨水将）。
     qi = lunar.getCurrentQi() or lunar.getPrevQi()
+    if qi is None or qi.getName() not in MONTH_GENERALS:
+        raise ValueError("cannot determine 中气 for month general from {}".format(ref))
     name = qi.getName()
     branch, title = MONTH_GENERALS[name]
     return {
         "branch": branch, "name": title, "boundary_term": name,
         "boundary_datetime": qi.getSolar().toYmdHms(),
+        "reference_datetime": ref,
     }
 
 

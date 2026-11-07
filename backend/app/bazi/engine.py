@@ -1,11 +1,11 @@
 """Computational engine for BaZi (子平八字四柱命理与大运推演)."""
 
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from lunar_python import Solar
 
 from app.calendar.engine import CalendarEngine
-from app.calendar.timezone import parse_local_datetime
 from app.common.ganzhi import xun_info
 
 from .rules import (
@@ -394,9 +394,13 @@ def calculate_bazi(
     is_forward = (year_polar == "阳" and gender == "男") or (year_polar == "阴" and gender == "女")
     direction = 1 if is_forward else -1
 
-    # 起运岁数标准算法：3天1岁，1天4个月
-    # 依据 solar_term_context 计算距离节令的时间差
-    effective_dt = parse_local_datetime(local_datetime, timezone)
+    # 起运岁数标准算法：3天1岁，1天4个月。
+    # 与四柱同源：CalendarEngine 的年/月柱按节气参考时、日/时柱按 effective 时刻
+    # （含真太阳时修正）。起运重建必须用同一个 effective_local_datetime，
+    # 否则真太阳时开启时四柱按修正后时刻、起运却按未修正时刻，产生错配。
+    effective_dt = datetime.fromisoformat(
+        cal_result["normalized_input"]["effective_local_datetime"]
+    )
     solar_inst = Solar.fromYmdHms(
         effective_dt.year, effective_dt.month, effective_dt.day,
         effective_dt.hour, effective_dt.minute, effective_dt.second

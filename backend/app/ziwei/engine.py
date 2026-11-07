@@ -157,14 +157,17 @@ def calculate_ziwei_chart(
         p_name = PALACE_NAMES[i]
         is_shen = (p_branch_idx == shen_palace_idx)
 
-        # 大限计算
+        # 大限计算（《紫微斗數全書·安大限诀》）：
+        #   「阳男阴女从命前一宫起顺行，是父母宫；阴男阳女从命后一宫起逆行，是兄弟宫」。
+        # palaces 按 (ming_idx - i) 排，即 i 递增＝地支递减（十二宫从命宫逆转）。
+        # 「命前一宫」是父母宫(i=11)，顺行沿 i 递减方向推进；
+        # 「命后一宫」是兄弟宫(i=1)，逆行沿 i 递增方向推进。
+        # 早先两式写反：顺行给了兄弟宫第二限、逆行给了父母宫第二限。
         if is_forward:
-            limit_start = bureau_number + i * 10
+            decade_index = (12 - i) % 12
         else:
-            limit_start = bureau_number + (12 - i) % 12 * 10
-            if i == 0:
-                limit_start = bureau_number
-
+            decade_index = i
+        limit_start = bureau_number + decade_index * 10
         limit_end = limit_start + 9
 
         palaces.append({

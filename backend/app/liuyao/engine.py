@@ -84,14 +84,52 @@ def _branch_relation(branch, reference):
 
 
 def _void_state(branch, empty_branches, day_branch):
-    """旬空状态：空亡之爻逢日辰同支为填实，逢日冲为冲空。"""
+    """旬空状态：空亡之爻逢日辰冲为冲空、值日为实空（当日状态）。
+
+    据《卜筮正宗·旬空论第十》：「不过待其出旬、值日、有合空、冲起、冲实、
+    填补之法」——「填实」是**出旬之后**值日/值月的应期，不是当日状态。
+    当日日支必落在本旬之内，与旬空两支（旬首前二支）永不相交，故旧实现
+    `branch == day_branch -> 填实` 恒不可达。当日可能的是「冲空」（日辰冲空亡支）
+    或「旬空」；出旬值日的确定性应期另见 void_fill_prospects。
+    """
     if branch not in empty_branches:
         return ""
-    if branch == day_branch:
-        return "填实"
     if BRANCH_CLASH.get(day_branch) == branch:
         return "冲空"
     return "旬空"
+
+
+def void_fill_prospects(day_pillar: str, empty_branches):
+    """按历法顺推旬空两支「出旬值日」的确定性应期（《卜筮正宗·旬空论》）。
+
+    案例印证：「应于丑日者出旬之日也」「后果验未月者实空之月也」——
+    空亡之爻须待出旬后，轮到该地支值日（或值月）方为填实。
+    返回从当前日柱起、每个空亡支首次值日的干支与距今天数，只列历法事实，
+    不含吉凶断语。
+    """
+    from app.common.ganzhi import EARTHLY_BRANCHES, HEAVENLY_STEMS, sexagenary_index
+    start = sexagenary_index(day_pillar)
+    # 下一旬首的 60 甲子序号（如甲子旬 start=0 → xun_end=10 甲戌）
+    xun_end = (start // 10 + 1) * 10
+    prospects = []
+    for branch in empty_branches:
+        target = EARTHLY_BRANCHES.index(branch)
+        # 只取严格未来、且已出旬（>= xun_end）的第一个值日
+        for days in range(1, 61):
+            idx = (start + days) % 60
+            if idx % 12 == target and days >= xun_end - start:
+                pillar = HEAVENLY_STEMS[idx % 10] + EARTHLY_BRANCHES[idx % 12]
+                prospects.append({
+                    "empty_branch": branch,
+                    "fill_day_pillar": pillar,
+                    "days_from_now": days,
+                    "phase": "出旬值日",
+                })
+                break
+        else:
+            prospects.append({"empty_branch": branch, "fill_day_pillar": None,
+                              "days_from_now": None, "phase": "不可达"})
+    return prospects
 
 
 def _pure_palace_chart(palace_name, palace_element):
@@ -351,7 +389,8 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
 
     month_name = calendar["month_branch"]["name"]
     month_element = BRANCH_ELEMENTS.get(month_name, "")
-    advanced.annotate_hidden_emerge(coverage, lines, month_name, day_pillar[1], month_element)
+    advanced.annotate_hidden_emerge(coverage, lines, month_name, day_pillar[1], month_element,
+                                    xun["empty_branches"])
     structures["sanhe_assessment"] = advanced.assess_sanhe_conditions(structures, lines)
     punishments = advanced.punishments_harms(lines, moving_branches, month_name, day_pillar[1])
     yongshen = advanced.analyze_yongshen(focus, lines, changed_lines, coverage, palace) if focus else None
@@ -374,6 +413,7 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
             "day_branch": {"name": day_pillar[1], "number": EARTHLY_BRANCHES.index(day_pillar[1]) + 1},
             "palace": palace,
             "xun": xun,
+            "void_fill_prospects": void_fill_prospects(day_pillar, xun["empty_branches"]),
             "line_chart": lines,
             "changed_line_chart": changed_lines,
             "branch_structures": structures,

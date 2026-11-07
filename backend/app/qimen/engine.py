@@ -157,10 +157,13 @@ def calculate_qimen_chart(
     xun_start_br = xun_start_pillar[1]
     br_step = (xun_branches.index(hour_branch) - xun_branches.index(xun_start_br)) % 12
 
+    # 《遁甲演義》：「直使在五官，寄坤二官」——值符星与值使门同以旬首
+    # 原宫出发，中五宫无方位故寄坤二宫。值符侧已用 star_source_palace(=2)，
+    # 值使侧必须同源，否则同盘出现「值符从 2 起转、值使从 5 起数」两套基准。
     if dun_type == "阳遁":
-        gate_target_palace = ((origin_palace - 1 + br_step) % 9) + 1
+        gate_target_palace = ((gate_source_palace - 1 + br_step) % 9) + 1
     else:
-        gate_target_palace = ((origin_palace - 1 - br_step) % 9) + 1
+        gate_target_palace = ((gate_source_palace - 1 - br_step) % 9) + 1
 
     if gate_target_palace == 5:
         gate_target_palace = 2
