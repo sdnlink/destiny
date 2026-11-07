@@ -32,6 +32,7 @@ from app.interaction import (
     review_outcome,
 )
 from app.workflow.scheduler import select_systems, build_calculation_requests
+from app.interaction.info_completion import COMPLETION_QUESTIONS
 
 
 # ============================================================
@@ -196,6 +197,14 @@ class TestInfoCompletion:
         assert "questions" in prompt
         assert "instruction" in prompt
 
+    def test_bazi_completion_does_not_offer_number_casting(self):
+        # 八字只按时间起盘，问「报数起卦」会被调度器忽略，用户却以为数字生效
+        session = create_session(question="测试八字", system="bazi")
+        prompt = generate_completion_prompt(session)
+        casting_question = next(q for q in prompt["questions"] if q["field"] == "casting_method")
+        assert "报数" not in casting_question["question"]
+        assert "时间起盘" in casting_question["question"]
+
     def test_ready_when_all_info_present(self):
         session = create_session(
             question="测试",
@@ -339,6 +348,14 @@ class TestScheduler:
 
         with pytest.raises(ValueError, match="不支持的术数门类"):
             select_systems("zhouyi")
+
+    def test_completion_options_only_list_schedulable_systems(self):
+        # 会话入口已拒绝 zhouyi/fengshui，补全提示不能再把它们列为可选项
+        question = COMPLETION_QUESTIONS["system"]["question"]
+        assert "周易" not in question
+        assert "风水" not in question
+        for label in ("梅花易数", "六爻纳甲", "八字命理", "紫微斗数", "奇门遁甲", "大六壬"):
+            assert label in question
 
     def test_build_requests_includes_calendar(self):
         requests = build_calculation_requests(

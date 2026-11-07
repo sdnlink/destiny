@@ -143,7 +143,8 @@ BUILD_INSTALL_DEPENDENCIES=0 BUILD_RUN_TESTS=0 ./scripts/deploy.sh
 | `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令不再有代码内置默认值；缺失时记录警告，数据库相关接口按端点不同降级为 `unavailable` / `in_memory_fallback` / `file_cache`，并在响应的 `source` 字段标注来源 |
 | `APP_API_TOKEN` | `/v1` 接口 Bearer 鉴权 | 未设置时启动即记录「仅本地开发可用」警告 |
 | `SESSION_STORAGE_DIR` | 会话 JSON 目录 | 默认 `data/sessions` |
-| （请求头）`X-Client-Id` | 会话归属标识，16–64 位 URL 安全字符 | 会话接口（`/v1/sessions*`）强制要求；缺失或非法返回 400 `CLIENT_ID_REQUIRED`，跨归属返回 403 `SESSION_FORBIDDEN` |
+| `RATE_LIMIT_PER_MINUTE` | 写操作（POST/DELETE/PUT）按客户端每分钟限流 | 默认 `0`（关闭）；超过上限返回 429 `RATE_LIMITED` |
+| （请求头）`X-Client-Id` | 会话归属标识，16–64 位 URL 安全字符 | 会话接口（`/v1/sessions*`）强制要求；缺失或非法返回 400 `CLIENT_ID_REQUIRED`，跨归属返回 403 `SESSION_FORBIDDEN`；创建时会话门类不在支持清单内返回 400 `INVALID_SYSTEM` |
 
 参考 `.env.example`。
 

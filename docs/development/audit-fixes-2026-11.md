@@ -945,15 +945,20 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
 | 10 | 前端模型兼容 | 大六壬双命名 `liuren`/`daliuren` 别名查找 | `frontend/src/components/result/shared.jsx` 的 `findModule` 支持别名集合查找，避免大六壬模块结果在视图中丢失 | `frontend/src/components/result/shared.jsx` |
 | 11 | 诚实评级口径 | 多方选择分析伪评级清除 | `risk_level` 移除未登记的默认「中」，统一返回「未评级」，契合确定性推演诚实边界 | `backend/app/interaction/multi_choice.py` |
 | 12 | 基础健壮性 | 历法干支性质与模糊测试 + 典籍库热失效支持 | 新增干支周期/有效性/锚点模糊测试，典籍库支持 mtime 变更自动重载 | `backend/tests/test_fuzz_calendar_core.py`、`backend/tests/test_classics_cache.py` |
+| 13 | 会话入口 | 未知术数门类被静默排成「梅花+六爻」 | `select_systems` 对非 auto 且不在支持清单的取值抛错；创建接口落库前返回 400 `INVALID_SYSTEM`，避免用户以为在看指定门类 | `backend/app/workflow/scheduler.py`、`backend/app/main.py`、`backend/tests/test_api_hardening.py`、`backend/tests/test_workflow_session.py` |
+| 14 | 前端起盘方式 | 八字/紫微/奇门仍展示会被后端忽略的报数、手工起卦 | 抽出 `castingMethodsForSystem` 按体系过滤下拉；切体系时把不被支持的当前方式退回「自动」 | `frontend/src/lib/labels.js`、`frontend/src/components/workflow/CreatePhase.jsx`、`frontend/tests/labels-contract.test.mjs` |
+| 15 | 信息补全提示 | 八字/紫微/奇门仍被问「报数起卦」，数字实际会被调度器丢弃；同时补全的体系清单还列着已拒绝的周易/风水 | 起盘方式问题按体系改写（时间型体系只给当下/事件时间，大六壬用「起课」），体系清单收口为可调度的六门类 | `backend/app/interaction/info_completion.py`、`backend/tests/test_workflow_session.py` |
 
 ### 验证结果
 
 | 验证项 | 命令 | 结果 |
 | --- | --- | --- |
-| 后端全量回归 | `python -m pytest backend/tests` | **780 passed / 10 skipped / 0 failed**（无任何异常失败） |
-| 前端纯模块测试 | `npm --prefix frontend run test:node` | **42 passed** |
+| 后端全量回归 | `python -m pytest backend/tests` | **785 passed / 10 skipped / 0 failed** |
+| 前端纯模块测试 | `npm --prefix frontend run test:node` | **43 passed** |
 | 前端单元测试 | `npm --prefix frontend run test:unit` | **54 passed**（8 个测试套件全绿） |
 | 前端生产构建 | `npm --prefix frontend run build` | **通过**（Rollup 按需分包构建完成，零告警） |
+| 真实起盘 | 六体系 create→cast 探针 | 梅花 `tiyong_relation=用生体`、`step6=大吉`；其余五体系 `未评级`、无卦象残留 |
+| 浏览器烟测 | `npm --prefix frontend run test:browser` | **passed**（桌面/移动结果、规则抽屉、会话历史、七步工作流） |
 
 
 

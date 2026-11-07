@@ -31,6 +31,10 @@ from .rules import (
     YANG_REN,
     YI_MA_MAP,
     YUE_DE_MAP,
+    JIE_SHA_MAP,
+    ZAI_SHA_MAP,
+    SUI_SHA_MAP,
+    WANG_SHEN_MAP,
     get_ten_god,
     get_twelve_stage,
 )
@@ -50,6 +54,18 @@ def _sexagenary_pillars_cycle(start_ganzhi: str, direction: int, count: int = 8)
         curr_branch = EARTHLY_BRANCHES[(branch_idx + i * direction) % 12]
         result.append(f"{curr_stem}{curr_branch}")
     return result
+
+
+_SEXAGENARY_CYCLE = [
+    HEAVENLY_STEMS[i % 10] + EARTHLY_BRANCHES[i % 12] for i in range(60)
+]
+
+
+def _kong_wang_branches(day_ganzhi: str) -> set:
+    """旬空：日柱所在旬的两个空亡地支（甲子旬戌亥空，甲戌旬申酉空……）。"""
+    idx = _SEXAGENARY_CYCLE.index(day_ganzhi)
+    k = idx // 10  # 旬序 0..5
+    return {EARTHLY_BRANCHES[(10 - 2 * k) % 12], EARTHLY_BRANCHES[(11 - 2 * k) % 12]}
 
 
 def _calculate_shensha(
@@ -109,6 +125,10 @@ def _calculate_shensha(
             tao_hua = TAO_HUA_MAP.get(group_elem)
             hua_gai = HUA_GAI_MAP.get(group_elem)
             jiang_xing = JIANG_XING_MAP.get(group_elem)
+            jie_sha = JIE_SHA_MAP.get(group_elem)
+            zai_sha = ZAI_SHA_MAP.get(group_elem)
+            sui_sha = SUI_SHA_MAP.get(group_elem)
+            wang_shen = WANG_SHEN_MAP.get(group_elem)
 
             for p_name, br in all_branches.items():
                 if br == yi_ma and "驿马" not in pillar_shensha[p_name]:
@@ -119,6 +139,15 @@ def _calculate_shensha(
                     pillar_shensha[p_name].append("华盖")
                 if br == jiang_xing and "将星" not in pillar_shensha[p_name]:
                     pillar_shensha[p_name].append("将星")
+                # 劫煞、灾煞、岁煞、亡神（同一三合局下的三煞与亡神）
+                if br == jie_sha and "劫煞" not in pillar_shensha[p_name]:
+                    pillar_shensha[p_name].append("劫煞")
+                if br == zai_sha and "灾煞" not in pillar_shensha[p_name]:
+                    pillar_shensha[p_name].append("灾煞")
+                if br == sui_sha and "岁煞" not in pillar_shensha[p_name]:
+                    pillar_shensha[p_name].append("岁煞")
+                if br == wang_shen and "亡神" not in pillar_shensha[p_name]:
+                    pillar_shensha[p_name].append("亡神")
 
     # 6. 天德、月德、天医 (以月令查)
     # 天德可能是天干也可能是地支，月德固定为天干：两者都要逐柱比对。
@@ -133,6 +162,12 @@ def _calculate_shensha(
             pillar_shensha[p_name].append("月德贵人")
         if branch == tian_yi_br and "天医" not in pillar_shensha[p_name]:
             pillar_shensha[p_name].append("天医")
+
+    # 7. 空亡（以日柱干支查旬空）
+    kong_wang = _kong_wang_branches(day_stem + day_branch)
+    for p_name, br in all_branches.items():
+        if br in kong_wang and "空亡" not in pillar_shensha[p_name]:
+            pillar_shensha[p_name].append("空亡")
 
     return pillar_shensha
 

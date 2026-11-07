@@ -149,7 +149,7 @@ def _analyze_single_choice(
         ]
         risk_level = "中"
         trend = "平稳推进，需控制节奏"
-    else:
+    elif fortune in ("小凶", "大凶"):
         pros = [
             f"从{angle['angle']}看，{angle['focus']}，需谨慎",
             "可借此选择排查风险、积累经验",
@@ -160,6 +160,17 @@ def _analyze_single_choice(
         ]
         risk_level = "高"
         trend = "宜暂缓或调整策略，待条件转好"
+    else:
+        pros = [
+            f"从{angle['angle']}看，{angle['focus']}，本盘未评级，仅供核对",
+            "建议结合实际资源与条件逐项核对",
+        ]
+        cons = [
+            "未评级卦盘，无法基于吉凶分数判断利弊",
+            "需要结合动爻与现实约束自主判断",
+        ]
+        risk_level = "未评级"
+        trend = "未作吉凶等级评定，请核对现实动向"
 
     return {
         "choice": choice,
@@ -175,11 +186,13 @@ def _analyze_single_choice(
 def _generate_recommendation(choice_analyses: List[Dict[str, Any]], fortune: str) -> str:
     """生成综合建议。"""
     # 按风险等级排序
-    risk_order = {"低": 0, "中": 1, "高": 2}
+    risk_order = {"低": 0, "中": 1, "高": 2, "未评级": 3}
     sorted_choices = sorted(choice_analyses, key=lambda c: risk_order.get(c["risk_level"], 1))
     best = sorted_choices[0]
 
-    if best["risk_level"] == "低":
+    if best["risk_level"] == "未评级":
+        return f"当前盘面未做吉凶等级评定，无法按吉凶倾向排序。建议结合现实条件与风险承受力自主评估「{best['choice']}」等方案。"
+    elif best["risk_level"] == "低":
         return f"综合卦象倾向，「{best['choice']}」风险较低、趋势较顺，可作为优先考虑方案。但仍需结合实际情况核实关键细节。"
     elif best["risk_level"] == "中":
         return f"各方案风险相近，「{best['choice']}」相对平稳。建议先小范围试点验证，确认可行后再扩大投入。"

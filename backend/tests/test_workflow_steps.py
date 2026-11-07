@@ -1023,6 +1023,18 @@ class TestNonHexagramYongshen(unittest.TestCase):
             self.assertNotIn("世爻", item["party"])
             self.assertNotIn("应爻", item["party"])
 
+    def test_daliuren_party_yongshen_uses_domain_symbols(self):
+        """大六壬盘面提到「对方」时，求测人为日干，对方为辰（支上神）。"""
+        session = create_session(question="我和对方合作能否成功", category="career")
+        plate = {"systems": ["daliuren"], "plates": {"daliuren": {"facts": {}}}}
+        result = wf.step3_identify_yongshen(session, plate)
+        self.assertEqual(len(result["party_yongshen"]), 2)
+        self.assertEqual(result["party_yongshen"][0]["yongshen"], "日干")
+        self.assertEqual(result["party_yongshen"][1]["yongshen"], "辰（支上神）")
+        for item in result["party_yongshen"]:
+            self.assertNotIn("世爻", item["party"])
+            self.assertNotIn("应爻", item["party"])
+
     def test_bazi_uses_favorable_elements(self):
         session = create_session(question="能否升职", category="career")
         result = wf.step3_identify_yongshen(session, self._bazi_plate())

@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { CASTING_METHODS, CATEGORIES, SYSTEMS } from "../src/lib/labels.js";
+import { CASTING_METHODS, CATEGORIES, SYSTEMS, castingMethodsForSystem } from "../src/lib/labels.js";
 import { localDateTimeValue, newCastNonce } from "../src/lib/castingInput.js";
 
 const BACKEND_SYSTEMS = ["auto", "meihua", "liuyao", "qimen", "daliuren", "bazi", "ziwei"];
@@ -28,6 +28,29 @@ test("术数门类选项覆盖后端全部 system 取值", () => {
 test("起盘方式选项覆盖后端全部 casting_method 取值", () => {
   assert.deepEqual(
     CASTING_METHODS.map((item) => item.id),
+    BACKEND_CASTING_METHODS,
+  );
+});
+
+test("八字/紫微/奇门只提供时间起盘，不显示会被忽略的报数/手工", () => {
+  for (const system of ["bazi", "ziwei", "qimen"]) {
+    assert.deepEqual(
+      castingMethodsForSystem(system).map((item) => item.id),
+      ["auto", "time"],
+      system,
+    );
+  }
+  assert.deepEqual(
+    castingMethodsForSystem("daliuren").map((item) => item.id),
+    ["auto", "time", "numbers"],
+  );
+  assert.deepEqual(
+    castingMethodsForSystem("meihua").map((item) => item.id),
+    ["auto", "time", "numbers"],
+  );
+  // 未指定体系时保留全部选项，交给调度器默认口径
+  assert.deepEqual(
+    castingMethodsForSystem("auto").map((item) => item.id),
     BACKEND_CASTING_METHODS,
   );
 });

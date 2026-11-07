@@ -21,7 +21,7 @@ import {
   Loader2,
   Download,
 } from "lucide-react";
-import { CATEGORIES, CASTING_METHODS, FORTUNE_COLORS, SYSTEMS, categoryLabel, formatDate, statusLabel } from "../../lib/labels";
+import { CATEGORIES, FORTUNE_COLORS, SYSTEMS, castingMethodsForSystem, categoryLabel, formatDate, statusLabel } from "../../lib/labels";
 
 export default function CreatePhase({
   form,
@@ -49,6 +49,7 @@ export default function CreatePhase({
   handleExportSessionsJSON,
   handleImportSessionsJSON,
 }) {
+    const availableMethods = castingMethodsForSystem(form.system);
     return (
       <div className="workflow-panel">
         <div className="workflow-header">
@@ -197,7 +198,16 @@ export default function CreatePhase({
             </div>
             <div className="form-group">
               <label>术数门类</label>
-              <select value={form.system} onChange={(e) => setForm({ ...form, system: e.target.value })}>
+              <select
+                value={form.system}
+                onChange={(e) => {
+                  const nextSystem = e.target.value;
+                  const methods = castingMethodsForSystem(nextSystem).map((m) => m.id);
+                  // 切体系时如果当前起盘方式不被新体系支持，退回自动，避免提交了被后端忽略的方式
+                  const nextMethod = methods.includes(form.castingMethod) ? form.castingMethod : "auto";
+                  setForm({ ...form, system: nextSystem, castingMethod: nextMethod });
+                }}
+              >
                 {SYSTEMS.map((s) => (
                   <option key={s.id} value={s.id}>{s.label}</option>
                 ))}
@@ -209,7 +219,7 @@ export default function CreatePhase({
             <div className="form-group">
               <label>起盘方式</label>
               <select value={form.castingMethod} onChange={(e) => setForm({ ...form, castingMethod: e.target.value })}>
-                {CASTING_METHODS.map((m) => (
+                {availableMethods.map((m) => (
                   <option key={m.id} value={m.id}>{m.label}</option>
                 ))}
               </select>

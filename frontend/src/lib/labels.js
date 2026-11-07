@@ -67,6 +67,24 @@ export const CASTING_METHODS = [
   { id: "manual", label: "手工起卦" },
 ];
 
+// 各体系真正支持的起盘方式（与后端 workflow/scheduler REQUEST_BUILDERS 对齐）。
+// 不在这里过滤的话，八字/紫微/奇门选了「报数」也会被调度器悄悄忽略，
+// 用户以为按数字起了盘，实际用的是默认方式。
+const CASTING_METHOD_IDS_BY_SYSTEM = {
+  auto: ["auto", "time", "numbers", "manual"],
+  meihua: ["auto", "time", "numbers"],
+  liuyao: ["auto", "time", "numbers", "manual"],
+  qimen: ["auto", "time"],
+  daliuren: ["auto", "time", "numbers"],
+  bazi: ["auto", "time"],
+  ziwei: ["auto", "time"],
+};
+
+export function castingMethodsForSystem(system) {
+  const ids = CASTING_METHOD_IDS_BY_SYSTEM[system] || CASTING_METHOD_IDS_BY_SYSTEM.auto;
+  return CASTING_METHODS.filter((method) => ids.includes(method.id));
+}
+
 export const FORTUNE_COLORS = {
   大吉: "#297267",
   小吉: "#3a8a7d",

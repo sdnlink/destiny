@@ -22,10 +22,22 @@ COMPLETION_QUESTIONS = {
         "field": "user_profile.current_stage",
     },
     "system": {
-        "question": "是否指定术数门类？可选：周易、梅花易数、六爻纳甲、八字命理、紫微斗数、奇门遁甲、大六壬、风水（阳宅）。不指定则默认主用梅花+六爻辅助。",
+        "question": "是否指定术数门类？可选：梅花易数、六爻纳甲、八字命理、紫微斗数、奇门遁甲、大六壬。不指定则默认主用梅花+六爻辅助。",
         "field": "system",
     },
 }
+
+# 只按时间起盘的体系：问「报数起卦」会让用户以为数字会参与排盘，
+# 实际调度器会忽略它并按默认时间起盘。
+TIME_ONLY_SYSTEMS = ("bazi", "ziwei", "qimen")
+
+
+def _casting_method_question(system: str) -> str:
+    if system in TIME_ONLY_SYSTEMS:
+        return "是否指定起盘时间？可选：当下时间起盘、事件发生时间起盘。不指定则按当下时间起盘。"
+    if system == "daliuren":
+        return "是否指定起盘方式？可选：报数起课、当下时间起课、事件发生时间起课。不指定则默认自动起课。"
+    return COMPLETION_QUESTIONS["casting_method"]["question"]
 
 
 def detect_missing(session) -> List[str]:
@@ -77,7 +89,10 @@ def generate_completion_prompt(session) -> Dict[str, Any]:
     for field in missing:
         template = COMPLETION_QUESTIONS.get(field)
         if template:
-            questions.append({"field": template["field"], "question": template["question"]})
+            question = template["question"]
+            if field == "casting_method":
+                question = _casting_method_question(session.system)
+            questions.append({"field": template["field"], "question": question})
 
     return {
         "type": "info_completion",

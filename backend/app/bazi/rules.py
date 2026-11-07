@@ -160,6 +160,12 @@ JIANG_XING_MAP = MappingProxyType({
     "水": "子", "金": "酉", "火": "午", "木": "卯"
 })
 
+# 三煞（劫煞/灾煞/岁煞）与亡神：基于年支/日支的三合局元素
+JIE_SHA_MAP = MappingProxyType({"水": "巳", "金": "寅", "火": "亥", "木": "申"})
+ZAI_SHA_MAP = MappingProxyType({"水": "午", "金": "卯", "火": "子", "木": "酉"})
+SUI_SHA_MAP = MappingProxyType({"水": "未", "金": "辰", "火": "丑", "木": "戌"})
+WANG_SHEN_MAP = MappingProxyType({"水": "亥", "金": "申", "火": "巳", "木": "寅"})
+
 # 月令查天德月德
 TIAN_DE_MAP = MappingProxyType({
     "寅": "丁", "卯": "申", "辰": "壬", "巳": "辛", "午": "亥", "未": "甲",
