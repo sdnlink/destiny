@@ -28,6 +28,10 @@ SYSTEM_LABELS = {
     "fengshui": "阳宅风水",
 }
 
+# 七步工作流真正能调度的体系（zhouyi/fengshui 的接口另有直连计算入口，
+# 不在会话排盘链路里；这里列清楚，免得未知取值被静默改成默认盘）
+SUPPORTED_SYSTEMS = ("auto", "meihua", "liuyao", "qimen", "daliuren", "bazi", "ziwei")
+
 # 每个体系默认的起盘方式键：表里查不到指定方法时用它（对应原来的 else 分支）
 DEFAULT_METHOD = "auto"
 
@@ -163,6 +167,12 @@ def select_systems(user_specified: str = "auto") -> Tuple[List[str], str]:
         return ["bazi"], "用户指定八字命理，执行四柱排盘、十神、旺衰。"
     if user_specified == "ziwei":
         return ["ziwei"], "用户指定紫微斗数，执行十二宫星曜排盘。"
+    if user_specified != "auto":
+        # 未知取值不能悄悄退回「梅花+六爻」：调用方要么改传 auto，
+        # 要么传一个真正能排盘的体系，否则用户以为在看指定门类，其实看的是别的盘。
+        raise ValueError(
+            "不支持的术数门类：{}（可选 auto/meihua/liuyao/qimen/daliuren/bazi/ziwei）".format(user_specified)
+        )
     # 默认：主用梅花易数 + 六爻辅助
     return ["meihua", "liuyao"], "未指定门派，默认主用梅花易数起卦，六爻纳甲辅助参断。"
 

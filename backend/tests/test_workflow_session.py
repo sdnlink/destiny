@@ -333,6 +333,13 @@ class TestScheduler:
         systems, note = select_systems("daliuren")
         assert systems == ["daliuren"]
 
+    def test_unknown_system_is_rejected_instead_of_defaulting(self):
+        # system=zhouyi 之类的取值不在调度表内，静默退回默认盘会让用户看错体系
+        import pytest
+
+        with pytest.raises(ValueError, match="不支持的术数门类"):
+            select_systems("zhouyi")
+
     def test_build_requests_includes_calendar(self):
         requests = build_calculation_requests(
             ["meihua"], "auto",
