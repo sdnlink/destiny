@@ -1,6 +1,10 @@
 // 交互式推演会话 API（工作流引擎 + 交互模块A-G）
 
-const configuredApiRoot = import.meta.env.VITE_API_ROOT;
+import { getClientId } from "./clientIdentity.js";
+
+// 用可选链读取：本模块也会在 Vite 之外的纯 node 测试进程里被 import，
+// 那里没有 import.meta.env，直接点取会抛 TypeError 把整个测试文件带崩。
+const configuredApiRoot = import.meta.env?.VITE_API_ROOT;
 const API_ROOT = configuredApiRoot === undefined ? "/api" : configuredApiRoot;
 
 async function request(path, options = {}) {
@@ -8,6 +12,8 @@ async function request(path, options = {}) {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      // 会话归属（审计 22）：后端按这个 id 的哈希校验会话属于谁
+      "X-Client-Id": getClientId(),
       ...options.headers,
     },
   });

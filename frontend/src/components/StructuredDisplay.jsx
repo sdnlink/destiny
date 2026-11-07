@@ -63,6 +63,18 @@ function StructuredStepContent({ stepKey, data }) {
       <div className="structured-friendly">
         {data.systems && <div className="friendly-row"><span className="friendly-label">使用体系：</span><span>{(data.systems || []).join("、")}</span></div>}
         <HexagramView plateData={data} />
+        {data.plates && Object.entries(data.plates).map(([key, plate]) => {
+          const rows = Object.entries(plate?.summary || {});
+          if (!rows.length) return null;
+          return (
+            <div className="friendly-row" key={key}>
+              <span className="friendly-label">{plate.system_label || key}盘面：</span>
+              <ul>
+                {rows.map(([label, value]) => <li key={label}>{label}：{value}</li>)}
+              </ul>
+            </div>
+          );
+        })}
         {data.calendar && (
           <div className="friendly-row">
             <span className="friendly-label">历法基线：</span>
@@ -78,6 +90,7 @@ function StructuredStepContent({ stepKey, data }) {
   if (stepKey === "step3") {
     return (
       <div className="structured-friendly">
+        {data.yongshen_framework && <div className="friendly-row"><span className="friendly-label">取用体系：</span><span>{data.yongshen_framework}</span></div>}
         {data.primary_yongshen && <div className="friendly-row"><span className="friendly-label">主用神：</span><span>{data.primary_yongshen}</span></div>}
         {data.secondary_yongshen && <div className="friendly-row"><span className="friendly-label">辅助用神：</span><span>{data.secondary_yongshen}</span></div>}
         {data.logic && <div className="friendly-row"><span className="friendly-label">取用逻辑：</span><span>{data.logic}</span></div>}

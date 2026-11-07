@@ -1,0 +1,197 @@
+
+.io-actions button {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+/* ==========================================================================
+   Mobile Optimization (移动端深度适配)
+   ========================================================================== */
+
+@media (max-width: 600px) {
+  .workflow-container {
+    padding: 10px 12px;
+  }
+
+  .workflow-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .header-actions .btn-small {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .numbers-row {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  /* 基础规则是 .manual-input .manual-row（0,2,0），这里必须同为两段选择器才压得住 */
+  .manual-input .manual-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .result-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .result-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .result-actions .btn-small {
+    flex: 1;
+    min-width: 70px;
+    justify-content: center;
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  .fortune-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px 14px;
+  }
+
+  .fortune-value {
+    font-size: 20px;
+  }
+
+  .result-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .result-tabs button {
+    padding: 8px 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .formatted-result {
+    font-size: 11px;
+    padding: 10px 12px;
+    max-height: 60vh;
+  }
+
+  .interact-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .interact-row input,
+  .interact-row select {
+    width: 100%;
+  }
+
+  .interact-row .btn-small {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hexagram-view {
+    padding: 12px;
+  }
+
+  .line-position {
+    width: 28px;
+    font-size: 11px;
+  }
+
+  .line-spirit,
+  .line-liuqin {
+    width: 28px;
+    font-size: 11px;
+  }
+
+  .session-list-item {
+    padding: 8px 10px;
+  }
+
+  .session-question {
+    font-size: 12px;
+  }
+
+  .session-item-meta {
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  .history-search-row {
+    flex-direction: column;
+  }
+
+  .history-search-row input,
+  .history-search-row select {
+    width: 100%;
+  }
+
+  .collapsible-header {
+    padding: 10px 12px;
+  }
+
+  .collapsible-body {
+    padding: 0 12px 12px;
+  }
+
+  .structured-step {
+    padding: 10px 12px;
+  }
+
+  .friendly-label {
+    min-width: 60px;
+    font-size: 12px;
+  }
+
+  .party-card,
+  .choice-card {
+    padding: 8px 10px;
+  }
+
+  .workflow-form {
+    padding: 14px 16px;
+  }
+
+  .btn-large {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 380px) {
+  .result-actions .btn-small {
+    font-size: 11px;
+    padding: 5px 6px;
+  }
+
+  .result-tabs button {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .hexagram-title {
+    font-size: 14px;
+  }
+
+  .hexagram-name {
+    font-size: 16px;
+  }
+}

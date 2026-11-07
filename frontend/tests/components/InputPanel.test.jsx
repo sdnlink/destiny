@@ -72,6 +72,16 @@ describe("InputPanel", () => {
     expect(screen.getByRole("radio", { name: /综合推演/ })).toHaveAttribute("aria-checked", "true");
   });
 
+  it("模块数按真实请求列表显示，而不是写死的数字", () => {
+    render(<Harness />);
+    // 综合推演 = 日历 + 周易/梅花/六爻/六壬/奇门/八字/紫微 = 8
+    expect(screen.getByText("8 个计算模块")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("radio", { name: /八字/ }));
+    // 单一体系 = 日历 + 该体系 = 2
+    expect(screen.getByText("2 个计算模块")).toBeInTheDocument();
+  });
+
   it("事项分类下拉使用统一的 CATEGORIES 选项", () => {
     render(<Harness />);
 

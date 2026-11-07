@@ -1,0 +1,1205 @@
+
+.ziwei-main-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ziwei-star.main {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #f39c12;
+}
+
+.ziwei-lucky-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.ziwei-star.lucky {
+  font-size: 10px;
+  color: #2ecc71;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ziwei-bad-stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.ziwei-star.bad {
+  font-size: 10px;
+  color: #e74c3c;
+}
+
+.sihua-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 2px;
+  color: #fff;
+}
+
+.sihua-badge.化禄, .sihua-tag.化禄 { background: #27ae60; color: #fff; }
+.sihua-badge.化权, .sihua-tag.化权 { background: #c0392b; color: #fff; }
+.sihua-badge.化科, .sihua-tag.化科 { background: #2980b9; color: #fff; }
+.sihua-badge.化忌, .sihua-tag.化忌 { background: #8e44ad; color: #fff; }
+
+.sihua-badge.mini {
+  font-size: 8px;
+  padding: 0 2px;
+}
+
+.ziwei-cell-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line, #2a2b30);
+  padding-top: 4px;
+  font-size: 10px;
+  color: var(--muted, #888);
+}
+
+.ziwei-branch-name {
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.center-info-content {
+  width: 100%;
+  text-align: center;
+}
+
+.center-info-content h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--gold-accent, #d4af37);
+  letter-spacing: 2px;
+}
+
+.center-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+  text-align: left;
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.center-info-grid div {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.center-info-grid b {
+  color: var(--muted, #888);
+}
+
+.center-sihua-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line, #333);
+}
+
+.sihua-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted, #888);
+}
+
+.sihua-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Comprehensive Advisory & Interpretation Styles
+   ========================================================================== */
+
+.category-badge {
+  background: var(--gold-accent, #d4af37);
+  color: #111;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.badge-sub {
+  font-size: 11px;
+  color: var(--muted, #888);
+  border: 1px solid var(--line, #333);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.advisory-headline {
+  margin: 10px 0 6px;
+  font-size: 19px;
+  color: var(--gold-accent, #f39c12);
+  letter-spacing: 0.5px;
+}
+
+.domain-analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.analysis-card {
+  background: var(--surface, #18191c);
+  border: 1px solid var(--line, #2a2b30);
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.status-card {
+  border-top: 3px solid #2ecc71;
+}
+
+.trend-card {
+  border-top: 3px solid #3498db;
+}
+
+.risk-card {
+  border-top: 3px solid #e67e22;
+}
+
+.analysis-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line, #2a2b30);
+}
+
+.analysis-card-head h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text, #eee);
+}
+
+.card-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot-green { background: #2ecc71; box-shadow: 0 0 6px rgba(46, 204, 113, 0.6); }
+.status-dot-blue { background: #3498db; box-shadow: 0 0 6px rgba(52, 152, 219, 0.6); }
+.status-dot-orange { background: #e67e22; box-shadow: 0 0 6px rgba(230, 126, 34, 0.6); }
+
+.analysis-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary, #ccc);
+}
+
+.analysis-card li {
+  margin-bottom: 8px;
+}
+
+.analysis-card li:last-child {
+  margin-bottom: 0;
+}
+
+.recommendation-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 80px;
+}
+
+.recommendation-priority {
+  width: 26px;
+  height: 26px;
+  background: var(--gold-accent, #d4af37);
+  color: #111;
+  font-weight: 800;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+
+.recommendation-phase {
+  font-size: 10px;
+  color: var(--muted, #888);
+  white-space: nowrap;
+}
+
+.recommendation-body {
+  flex: 1;
+}
+
+.recommendation-body strong {
+  font-size: 14px;
+  color: var(--text, #fff);
+}
+
+.recommendation-body p {
+  margin: 4px 0 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary, #ccc);
+}
+
+.recommendation-body small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted, #888);
+  margin-bottom: 6px;
+}
+
+.styled-ol {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.styled-ol li {
+  margin-bottom: 6px;
+}
+
+.interp-module-card {
+  background: var(--surface, #18191c);
+  border: 1px solid var(--line, #2a2b30);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.interp-module-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.interp-module-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gold-accent, #d4af37);
+}
+
+.interp-fact-pill {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.interp-fact-pill strong {
+  color: var(--muted, #888);
+}
+
+.interp-quote {
+  background: rgba(212, 175, 55, 0.08);
+  border-left: 3px solid var(--gold-accent, #d4af37);
+  padding: 6px 12px;
+  border-radius: 0 4px 4px 0;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: #f1c40f;
+}
+
+.interp-content p {
+  margin: 6px 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text, #ddd);
+}
+
+.interp-action-hint {
+  background: rgba(52, 152, 219, 0.08);
+  border-left: 3px solid #3498db;
+  padding: 6px 12px;
+  border-radius: 0 4px 4px 0;
+  font-size: 12px;
+  margin: 8px 0;
+  color: #90caf9;
+}
+
+/* ==========================================================================
+   BaZi Four Pillars & Luck Cycles Interactive Styles
+   ========================================================================== */
+
+.bazi-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (max-width: 860px) {
+  .bazi-pillars-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.bazi-pillar-card {
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.bazi-pillar-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.bazi-pillar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line, #d9d8d1);
+  padding-bottom: 6px;
+}
+
+.pillar-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+}
+
+.pillar-nayin {
+  font-size: 11px;
+  color: var(--muted, #69716c);
+  background: var(--paper-deep, #f3f1ea);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.bazi-pillar-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ganzhi-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--paper-deep, #f3f1ea);
+  border-radius: 6px;
+  padding: 8px 4px;
+  border: 1px solid var(--line, #d9d8d1);
+}
+
+.ten-god-tag,
+.stage-tag {
+  font-size: 11px;
+  color: var(--muted, #69716c);
+  margin-bottom: 2px;
+}
+
+.ganzhi-char {
+  font-size: 24px;
+  font-family: "PingFang SC", "Microsoft YaHei", serif;
+  line-height: 1.1;
+}
+
+.element-label {
+  font-size: 11px;
+  color: var(--faint, #929993);
+  margin-top: 2px;
+}
+
+.bazi-hidden-section {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.hidden-label {
+  display: block;
+  font-size: 11px;
+  color: var(--faint, #929993);
+  margin-bottom: 4px;
+}
+
+.hidden-stems-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hidden-stem-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.h-stem {
+  font-weight: bold;
+}
+
+.h-god {
+  color: var(--muted, #69716c);
+  font-size: 11px;
+}
+
+.h-type {
+  font-size: 10px;
+  color: var(--faint, #929993);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.bazi-shensha-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.bazi-shensha-tag {
+  font-size: 11px;
+  background: rgba(165, 62, 45, 0.08);
+  color: var(--vermilion, #a53e2d);
+  border: 1px solid rgba(165, 62, 45, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Day Master Strength & Five Elements Meter */
+.bazi-analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .bazi-analysis-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bazi-strength-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 6px;
+}
+
+.strength-header-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.master-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+}
+
+.strength-level-badge {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  background: var(--jade, #297267);
+  color: #fff;
+}
+
+.strength-level-badge.level-极旺,
+.strength-level-badge.level-偏旺 {
+  background: #c62828;
+}
+
+.strength-level-badge.level-中和 {
+  background: #297267;
+}
+
+.strength-level-badge.level-偏弱,
+.strength-level-badge.level-极弱 {
+  background: #1565c0;
+}
+
+.strength-score {
+  font-size: 12px;
+  color: var(--muted, #69716c);
+}
+
+.favorable-pill-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fav-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.group-label {
+  font-size: 12px;
+  color: var(--muted, #69716c);
+  min-width: 65px;
+}
+
+.elem-pill {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid transparent;
+}
+
+.bazi-elements-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.meter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meter-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.meter-elem {
+  font-weight: bold;
+}
+
+.meter-score {
+  color: var(--muted, #69716c);
+}
+
+.meter-pct {
+  font-weight: 500;
+}
+
+.meter-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--line, #d9d8d1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.meter-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 400ms ease;
+}
+
+/* Luck Pillars Timeline */
+.bazi-luck-timeline {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+@media (max-width: 980px) {
+  .bazi-luck-timeline {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.bazi-luck-card {
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 6px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.luck-order {
+  font-size: 11px;
+  color: var(--faint, #929993);
+}
+
+.luck-ganzhi {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+}
+
+.luck-god {
+  font-size: 11px;
+  color: var(--muted, #69716c);
+}
+
+.luck-nayin {
+  font-size: 10px;
+  color: var(--faint, #929993);
+}
+
+.luck-ages {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line, #d9d8d1);
+  padding-top: 4px;
+  width: 100%;
+}
+
+.luck-ages b {
+  font-size: 12px;
+  color: var(--ink, #202622);
+}
+
+.luck-ages small {
+  font-size: 10px;
+  color: var(--faint, #929993);
+}
+
+.luck-direction-badge {
+  font-size: 12px;
+  background: var(--paper-deep, #f3f1ea);
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: var(--muted, #69716c);
+}
+
+/* BaZi Advisory */
+.bazi-advisory-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 760px) {
+  .bazi-advisory-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bazi-adv-card {
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-left: 3px solid var(--jade, #297267);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 14px;
+}
+
+.bazi-adv-card strong {
+  display: block;
+  font-size: 13px;
+  color: var(--jade, #297267);
+  margin-bottom: 4px;
+}
+
+.bazi-adv-card p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink, #202622);
+}
+
+.bazi-overview-core {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0;
+}
+
+.bazi-overview-core strong {
+  font-size: 14px;
+  color: var(--vermilion, #a53e2d);
+}
+
+.bazi-overview-core span {
+  font-size: 12px;
+  color: var(--muted, #69716c);
+}
+
+/* Ziwei & Liuren Interactive Highlighting */
+.ziwei-cell.is-selected {
+  outline: 2px solid var(--vermilion, #a53e2d);
+  background: rgba(165, 62, 45, 0.05);
+}
+
+.ziwei-cell.is-sanfang {
+  outline: 2px dashed var(--jade, #297267);
+  background: rgba(41, 114, 103, 0.04);
+}
+
+.highlight-tag {
+  background: var(--vermilion, #a53e2d);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* 悬停高亮：用更高特异性压过 .liuren-plate-row > strong（0,1,1）与
+   .liuren-plate-row.generals span（0,2,1）的静态配色，不再依赖 !important。 */
+.liuren-plate-row > .branch-active,
+.liuren-plate-row.generals .branch-active {
+  background: var(--amber, #a66d1e);
+  color: #fff;
+  border-radius: 3px;
+}
+
+.selected-line {
+  background: rgba(41, 114, 103, 0.08);
+}
+
+.spirit-badge {
+  font-weight: 500;
+  color: var(--blue, #3e6478);
+}
+
+.shi-badge {
+  background: var(--vermilion, #a53e2d);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.ying-badge {
+  background: var(--jade, #297267);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.moving-badge {
+  color: var(--vermilion, #a53e2d);
+  font-weight: bold;
+}
+
+.inspect-link {
+  color: var(--blue, #3e6478);
+}
+
+/* Fengshui Compass Widget */
+.fengshui-compass-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.luopan-svg {
+  width: 260px;
+  height: 260px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+.luopan-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.legend-facing i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #c62828;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.legend-sitting i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #1565c0;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+/* Literature Badges */
+.fallback-badge {
+  font-size: 11px;
+  background: rgba(166, 109, 30, 0.12);
+  color: var(--amber, #a66d1e);
+  border: 1px solid rgba(166, 109, 30, 0.3);
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: 6px;
+}
+
+.relevance-score-badge {
+  font-size: 11px;
+  background: rgba(41, 114, 103, 0.1);
+  color: var(--jade, #297267);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.lit-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   Export Action Buttons & Feedback
+   ========================================================================== */
+
+.export-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  color: var(--ink, #202622);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.export-btn:hover {
+  background: var(--paper-deep, #f3f1ea);
+  border-color: var(--jade, #297267);
+  color: var(--jade, #297267);
+}
+
+.export-btn .copied-icon {
+  color: var(--jade, #297267);
+}
+
+/* ==========================================================================
+   Qimen Dunjia 9-Palace Grid Interactive Styles
+   ========================================================================== */
+
+.qimen-overview-core {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0;
+}
+
+.qimen-overview-core strong {
+  font-size: 14px;
+  color: var(--amber, #a66d1e);
+}
+
+.qimen-overview-core span {
+  font-size: 12px;
+  color: var(--muted, #69716c);
+}
+
+.qimen-plate-wrapper {
+  margin: 12px 0;
+}
+
+.qimen-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .qimen-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qimen-cell {
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.qimen-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.07);
+}
+
+.qimen-cell.is-zhifu {
+  border: 2px solid var(--vermilion, #a53e2d);
+}
+
+.qimen-cell.is-zhishi {
+  outline: 2px dashed var(--jade, #297267);
+}
+
+.qimen-cell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line, #d9d8d1);
+  padding-bottom: 4px;
+}
+
+.qimen-palace-name {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+}
+
+.qimen-palace-dir {
+  font-size: 11px;
+  color: var(--muted, #69716c);
+}
+
+.qimen-spirit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qimen-spirit-tag {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--blue, #3e6478);
+  background: rgba(62, 100, 120, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.zhifu-badge {
+  font-size: 10px;
+  background: var(--vermilion, #a53e2d);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.zhishi-badge {
+  font-size: 10px;
+  background: var(--jade, #297267);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.qimen-star-stem-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qimen-star {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+}
+
+.qimen-tian-stem {
+  font-size: 20px;
+  font-family: "PingFang SC", "Microsoft YaHei", serif;
+  line-height: 1;
+}
+
+.qin-stem-tag {
+  font-size: 10px;
+  background: var(--paper-deep, #f3f1ea);
+  color: var(--muted, #69716c);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.qimen-gate-row {
+  display: flex;
+  align-items: center;
+}
+
+.qimen-gate {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--ink, #202622);
+  background: var(--paper-deep, #f3f1ea);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.qimen-gate.auspicious-gate {
+  color: var(--jade, #297267);
+  background: rgba(41, 114, 103, 0.1);
+}
+
+.qimen-gate.dead-gate {
+  color: var(--vermilion, #a53e2d);
+  background: rgba(165, 62, 45, 0.1);
+}
+
+.qimen-di-stem-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.di-stem-label {
+  color: var(--faint, #929993);
+}
+
+.qimen-di-stem {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--ink, #202622);
+}
+
+.qimen-pattern-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--line, #d9d8d1);
+  padding-top: 4px;
+}
+
+.qimen-pattern-pill {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.qimen-pattern-pill.吉格,
+.qimen-pattern-pill.大吉格 {
+  background: rgba(41, 114, 103, 0.1);
+  color: var(--jade, #297267);
+  border: 1px solid rgba(41, 114, 103, 0.2);
+}
+
+.qimen-pattern-pill.凶格 {
+  background: rgba(165, 62, 45, 0.08);
+  color: var(--vermilion, #a53e2d);
+  border: 1px solid rgba(165, 62, 45, 0.2);
+}
+
+.qimen-fav-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 860px) {
+  .qimen-fav-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qimen-fav-card {
+  background: var(--paper, #fbfaf6);
+  border: 1px solid var(--line, #d9d8d1);
+  border-top: 3px solid var(--jade, #297267);
+  border-radius: 0 0 6px 6px;
+  padding: 12px;
+}
+
+.fav-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.fav-dir {
+  font-size: 14px;
+  color: var(--ink, #202622);
+}
+
+.fav-score-badge {
+  font-size: 11px;
+  background: rgba(41, 114, 103, 0.1);
+  color: var(--jade, #297267);
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.fav-elements-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.fav-gate, .fav-star, .fav-spirit {
+  font-size: 11px;
+  background: var(--paper-deep, #f3f1ea);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--muted, #69716c);
+}
+
+.fav-summary {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink, #202622);
+}
+
+/* ==========================================================================
+   History Drawer Styles
+   ========================================================================== */
+
+.history-drawer {
+  max-width: 480px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

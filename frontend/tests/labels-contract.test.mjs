@@ -37,6 +37,14 @@ test("事项分类仍是 11 项且 id 唯一", () => {
   assert.equal(new Set(CATEGORIES.map((item) => item.id)).size, CATEGORIES.length);
 });
 
+test("结果页的分类标签覆盖全部 11 类，且与下拉标签一致", async () => {
+  const { CATEGORY_LABELS } = await import("../src/components/result/labels.js");
+  assert.deepEqual(Object.keys(CATEGORY_LABELS).sort(), CATEGORIES.map((item) => item.id).sort());
+  for (const item of CATEGORIES) {
+    assert.equal(CATEGORY_LABELS[item.id], item.label, `${item.id} 标签与下拉不一致`);
+  }
+});
+
 test("localDateTimeValue 输出 datetime-local 需要的格式", () => {
   const value = localDateTimeValue(new Date("2026-11-04T10:31:00+08:00"));
   assert.match(value, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);

@@ -33,6 +33,8 @@ import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
 import { GLOSSARY_CATEGORIES, GLOSSARY_ITEMS } from "./lib/glossary";
 import { buildCalculations, calendarPayload } from "./lib/calculationPlan";
 import { localDateTimeValue, newCastNonce } from "./lib/castingInput";
+import { listSessions } from "./lib/sessionApi";
+import { migrateHistoryItem } from "./lib/sessionMigration";
 import {
   clearDeductionHistory,
   deleteDeductionHistory,
@@ -242,9 +244,14 @@ function RulesDrawer({ open, onClose, rules, loading }) {
   );
 }
 
-function HistoryDrawer({ open, onClose, onLoadHistory }) {
+function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) {
   const [history, setHistory] = useState([]);
   const [importStatus, setImportStatus] = useState("");
+  const [migratingId, setMigratingId] = useState(null);
+  const [migrationError, setMigrationError] = useState("");
+  const [backendSessions, setBackendSessions] = useState([]);
+  const [backendLoading, setBackendLoading] = useState(false);
+  const [backendError, setBackendError] = useState("");
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -252,6 +259,31 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
       setHistory(getDeductionHistory());
       setImportStatus("");
     }
+  }, [open]);
+
+  // 后端会话是另一套持久化（/v1/sessions）：抽屉里同时列出，点一下即可在交互推演里打开。
+  // 后端不可达时只提示，不影响本地存档的读取。
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setBackendLoading(true);
+    setBackendError("");
+    listSessions(50)
+      .then((rows) => {
+        if (!cancelled) setBackendSessions(Array.isArray(rows) ? rows : []);
+      })
+      .catch((requestError) => {
+        if (!cancelled) {
+          setBackendSessions([]);
+          setBackendError(requestError.message);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setBackendLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [open]);
 
   const handleDelete = (id, e) => {
@@ -281,6 +313,23 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
       return;
     }
     exportAllHistoryJSON();
+  };
+
+  // 反向通道（审计 14）：本地存档 → 后端会话。用存档的事由与起盘时刻在后端重建，
+  // 重建后立刻在交互推演里打开；随机种子会重新生成，界面上已说明盘面可能与存档不同。
+  const handleMigrate = async (item, e) => {
+    e.stopPropagation();
+    if (migratingId) return;
+    setMigratingId(item.id);
+    setMigrationError("");
+    try {
+      const { sessionId } = await migrateHistoryItem(item);
+      onOpenWorkflowSession(sessionId);
+    } catch (error) {
+      setMigrationError(error.message);
+    } finally {
+      setMigratingId(null);
+    }
   };
 
   const handleFileImport = (e) => {
@@ -341,7 +390,7 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
 
         <div className="drawer-notice">
           <FileClock size={16} />
-          <span>本地保存最近 50 次推演记录，支持一键复盘、Markdown 导出与 JSON 数据全量备份还原。</span>
+          <span>本地保存最近 50 次推演记录，可复盘、导出 Markdown 或整包 JSON 备份；也可用「转到后端」按存档时刻重建为交互推演会话。</span>
         </div>
 
         {importStatus && (
@@ -349,6 +398,52 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
             <span>{importStatus}</span>
           </div>
         )}
+
+        {migrationError && (
+          <div className="history-import-banner">
+            <span>转到后端会话失败：{migrationError}</span>
+          </div>
+        )}
+
+        <div className="history-list-wrap backend-sessions" role="region" aria-label="后端推演会话">
+          <p className="section-kicker">SERVER SESSIONS</p>
+          {backendError ? (
+            <div className="drawer-loading">后端会话不可达：{backendError}（本地存档仍可正常使用）</div>
+          ) : backendLoading ? (
+            <div className="drawer-loading">正在读取后端会话…</div>
+          ) : backendSessions.length === 0 ? (
+            <div className="drawer-loading">后端暂无推演会话。切到「交互推演」新建一次即可同步到这里。</div>
+          ) : (
+            <div className="history-items-list">
+              {backendSessions.map((session) => (
+                <div
+                  key={session.session_id}
+                  className="history-item-card"
+                  onClick={() => onOpenWorkflowSession(session.session_id)}
+                >
+                  <div className="item-top">
+                    <div className="item-badges">
+                      <span className="cat-badge">{session.system || "auto"}</span>
+                      <span className="scene-badge">{session.status || "draft"}</span>
+                    </div>
+                    <time>
+                      {session.updated_at
+                        ? new Date(session.updated_at).toLocaleString("zh-CN", { hour12: false })
+                        : ""}
+                    </time>
+                  </div>
+                  <strong className="item-question">{session.question || "（无题）"}</strong>
+                  <div className="item-actions">
+                    <button className="btn-load-history">
+                      <ArrowRight size={13} />
+                      <span>在交互推演中打开</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="history-list-wrap">
           {history.length === 0 ? (
@@ -382,6 +477,15 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
                       <Download size={13} />
                       <span>导出</span>
                     </button>
+                    <button
+                      className="btn-export-history"
+                      onClick={(e) => handleMigrate(item, e)}
+                      disabled={Boolean(migratingId)}
+                      title="用存档的事由与起盘时刻在后端重建一个交互推演会话"
+                    >
+                      <ArrowRight size={13} />
+                      <span>{migratingId === item.id ? "重建中…" : "转到后端"}</span>
+                    </button>
                     <button className="btn-delete-history" onClick={(e) => handleDelete(item.id, e)} title="删除记录">
                       <Trash2 size={13} />
                     </button>
@@ -394,7 +498,7 @@ function HistoryDrawer({ open, onClose, onLoadHistory }) {
 
         <footer>
           <Database size={15} />
-          <span>共 {history.length} 条本地推演存档</span>
+          <span>共 {history.length} 条本地推演存档 · 后端 {backendSessions.length} 个会话</span>
         </footer>
       </aside>
     </div>
@@ -420,6 +524,7 @@ export default function App() {
   const [rulesLoading, setRulesLoading] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("tianji_theme") || "paper");
   const [viewMode, setViewMode] = useState("classic"); // classic / workflow
+  const [pendingSessionId, setPendingSessionId] = useState(null);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -458,7 +563,20 @@ export default function App() {
         category: activeForm.category,
         question_summary: activeForm.question,
       });
-      const ctx = { scene: activeForm.scene, category: activeForm.category, question: activeForm.question };
+      // 把起盘输入一并落盘：本地存档此前只存结果，导致「转到后端」无法还原起盘时刻
+      const ctx = {
+        scene: activeForm.scene,
+        category: activeForm.category,
+        question: activeForm.question,
+        input: {
+          local_datetime: activeForm.localDatetime,
+          timezone: activeForm.timezone,
+          cast_nonce: activeNonce,
+          use_true_solar_time: activeForm.trueSolar,
+          // 真太阳时必须有经度才谈得上还原：后端缺经度会直接拒绝这次起盘
+          longitude: activeForm.trueSolar ? Number(activeForm.longitude) : null,
+        },
+      };
       setResult(response);
       setResultContext(ctx);
       setActiveTab("overview");
@@ -541,7 +659,10 @@ export default function App() {
       {viewMode === "workflow" ? (
         <div className="workflow-container">
           <Suspense fallback={<div className="loading-placeholder">正在加载工作区…</div>}>
-            <WorkflowPanel />
+            <WorkflowPanel
+              recoverSessionId={pendingSessionId}
+              onRecovered={() => setPendingSessionId(null)}
+            />
           </Suspense>
         </div>
       ) : (
@@ -566,7 +687,16 @@ export default function App() {
         </>
       )}
       <RulesDrawer open={rulesOpen} onClose={() => setRulesOpen(false)} rules={rules} loading={rulesLoading} />
-      <HistoryDrawer open={historyOpen} onClose={() => setHistoryOpen(false)} onLoadHistory={handleLoadHistory} />
+      <HistoryDrawer
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onLoadHistory={handleLoadHistory}
+        onOpenWorkflowSession={(sessionId) => {
+          setHistoryOpen(false);
+          setViewMode("workflow");
+          setPendingSessionId(sessionId);
+        }}
+      />
       <GlossaryDrawer open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
     </div>
   );

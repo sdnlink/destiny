@@ -44,6 +44,31 @@ describe("HexagramView", () => {
     expect(container.querySelectorAll(".hex-line.yin")).toHaveLength(3);
   });
 
+  it("按后端真实卦象结构（lines + 上下卦对象）渲染爻象，不能退化成全阴", () => {
+    const { container } = render(
+      <HexagramView
+        plateData={meihuaPlate({
+          // 大有：乾下离上，六爻自下而上是 1,1,1,1,0,1
+          original: {
+            name: "大有",
+            ordinal: 14,
+            symbol: "䷍",
+            lines: [1, 1, 1, 1, 0, 1],
+            lower_trigram: { name: "乾", element: "金" },
+            upper_trigram: { name: "离", element: "火" },
+          },
+        })}
+      />
+    );
+
+    expect(screen.getByText("大有")).toBeInTheDocument();
+    expect(screen.getByText("☰乾")).toBeInTheDocument();
+    expect(screen.getByText("☲离")).toBeInTheDocument();
+    // 旧实现读 orig.upper/orig.lower，两者为空 → 六爻全是阴爻（坤为地）
+    expect(container.querySelectorAll(".hex-line.yang")).toHaveLength(5);
+    expect(container.querySelectorAll(".hex-line.yin")).toHaveLength(1);
+  });
+
   it("标记动爻并输出动爻提示", () => {
     const { container } = render(
       <HexagramView
@@ -72,6 +97,51 @@ describe("HexagramView", () => {
     expect(screen.getByText("玄武")).toBeInTheDocument();
     expect(screen.getAllByText("父母")).toHaveLength(2);
     expect(screen.getByText("官鬼")).toBeInTheDocument();
+  });
+
+  it("六神按爻位顺序渲染：初爻用数组第一个，而不是把整份颠倒", () => {
+    const { container } = render(
+      <HexagramView
+        plateData={meihuaPlate({
+          original: { name: "乾为天", upper: "乾", lower: "乾" },
+          six_spirits: ["玄武", "青龙", "朱雀", "勾陈", "螣蛇", "白虎"],
+        })}
+      />
+    );
+
+    const lines = Array.from(container.querySelectorAll(".hex-line"));
+    // DOM 从上爻渲染到初爻
+    const byPosition = {};
+    for (const line of lines) {
+      const pos = line.querySelector(".line-position").textContent;
+      byPosition[pos] = line.querySelector(".line-spirit")?.textContent || "";
+    }
+    expect(byPosition["初爻"]).toBe("玄武");
+    expect(byPosition["上爻"]).toBe("白虎");
+    expect(byPosition["三爻"]).toBe("朱雀");
+  });
+
+  it("梅花与六爻同时存在时，六神取六爻那份而不是回落到默认序列", () => {
+    render(
+      <HexagramView
+        plateData={{
+          plates: {
+            meihua: { facts: { original: { name: "乾为天", upper: "乾", lower: "乾" } } },
+            liuyao: {
+              facts: {
+                original: { name: "地天泰", upper: "坤", lower: "乾" },
+                six_spirits: ["玄武", "青龙", "朱雀", "勾陈", "螣蛇", "白虎"],
+              },
+            },
+          },
+        }}
+      />
+    );
+
+    // 卦名仍取第一个体系（梅花），六神来自六爻
+    expect(screen.getByText("乾为天")).toBeInTheDocument();
+    expect(screen.getByText("玄武")).toBeInTheDocument();
+    expect(screen.getByText("白虎")).toBeInTheDocument();
   });
 
   it("六爻排盘同样可解析，且支持 compact 紧凑模式", () => {

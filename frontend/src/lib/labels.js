@@ -73,6 +73,7 @@ export const FORTUNE_COLORS = {
   平: "#a66d1e",
   小凶: "#b85c3a",
   大凶: "#a53e2d",
+  未评级: "#5b6470",
 };
 
 export const EARTHLY_BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];

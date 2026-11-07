@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "test:unit": "vitest run",
-    "test:node": "node --test tests/workflow-panel.test.mjs tests/calculation-plan.test.mjs tests/workflow-display.test.mjs tests/labels-contract.test.mjs",
+    "test:node": "node --test tests/workflow-panel.test.mjs tests/calculation-plan.test.mjs tests/workflow-display.test.mjs tests/labels-contract.test.mjs tests/session-migration.test.mjs tests/client-identity.test.mjs",
     "test:browser": "node tests/smoke.mjs"
   },
   "dependencies": {

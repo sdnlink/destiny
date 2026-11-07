@@ -114,6 +114,55 @@ describe("StructuredDisplay", () => {
     expect(screen.getByText("用神得生；动爻化进")).toBeInTheDocument();
   });
 
+  it("非卦象体系（八字）在步骤2 渲染盘面摘要，而不是空白", () => {
+    render(
+      <StructuredDisplay
+        workflow={{
+          step2: {
+            systems: ["八字命理"],
+            plates: {
+              bazi: {
+                system_label: "八字命理",
+                facts: {},
+                summary: { 日主: "癸（水）", 四柱: "丙午 戊戌 癸未 丁巳", 日主旺衰: "偏弱", 大运: "8 步" },
+              },
+            },
+          },
+        }}
+      />
+    );
+
+    expect(screen.getByText("八字命理盘面：")).toBeInTheDocument();
+    expect(screen.getByText("日主：癸（水）")).toBeInTheDocument();
+    expect(screen.getByText("四柱：丙午 戊戌 癸未 丁巳")).toBeInTheDocument();
+    expect(screen.getByText("大运：8 步")).toBeInTheDocument();
+  });
+
+  it("非卦象体系：步骤3 标出取用体系，步骤6 显示未评级", () => {
+    render(
+      <StructuredDisplay
+        workflow={{
+          step3: {
+            yongshen_framework: "八字命理",
+            primary_yongshen: "喜用五行（火、木）",
+            secondary_yongshen: "忌神五行（水、金）",
+            logic: "日主【癸水】极弱。喜用五行：火、木。",
+          },
+          step6: {
+            fortune_level: "未评级",
+            current_status: "本次以八字命理盘面为据，未取卦象用神。",
+            fortune_basis: ["本次未排卦象体系（梅花/六爻/周易），按 WF-FORTUNE-001 的口径无法出具卦象吉凶等级"],
+          },
+        }}
+      />
+    );
+
+    expect(screen.getByText("八字命理")).toBeInTheDocument();
+    expect(screen.getByText("喜用五行（火、木）")).toBeInTheDocument();
+    expect(screen.getByText("未评级")).toBeInTheDocument();
+    expect(screen.queryByText(/官鬼/)).toBeNull();
+  });
+
   it("步骤7 以有序列表渲染建议并附文化提示", () => {
     render(<StructuredDisplay workflow={FULL} />);
     expect(screen.getByText("先谈条件再落笔")).toBeInTheDocument();

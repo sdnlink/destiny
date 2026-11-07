@@ -19,6 +19,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { CATEGORIES } from "../lib/labels";
+import { buildCalculations } from "../lib/calculationPlan";
 
 const SCENES = [
   { id: "combined", label: "综合推演", icon: Layers3 },
@@ -115,6 +116,9 @@ export default function InputPanel({
   const showBazi = form.scene === "combined" || form.scene === "bazi";
   const showZiwei = form.scene === "combined" || form.scene === "ziwei";
   const showFengshui = form.scene === "fengshui";
+  // 模块数直接按真实请求列表算，避免手写数字再次落后于体系增减（此前写死「5 个」，
+  // 综合推演实际是日历 + 七个体系 = 8 个请求）。
+  const calculationCount = buildCalculations(form).length;
 
   return (
     <aside className="input-panel" aria-label="推演输入">
@@ -601,7 +605,7 @@ export default function InputPanel({
 
         <div className="submit-bar">
           <div className="submit-meta">
-            <span>{form.scene === "combined" ? "5 个计算模块" : "2 个计算模块"}</span>
+            <span>{calculationCount} 个计算模块</span>
             <small>工程基线 · 无自动吉凶评分</small>
           </div>
           <button className="primary-button" type="submit" disabled={loading}>
