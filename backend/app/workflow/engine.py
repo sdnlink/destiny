@@ -142,12 +142,18 @@ class WorkflowEngine:
         """构建拓展参考资料库（模块C）。"""
         hex_name = step5.get("hexagram_name", "")
         fortune = step6.get("fortune_level", "平")
+        unrated = fortune == "未评级"
 
         # 核心符号原始象义
         core_symbols = []
         for m in step5.get("symbol_mappings", []):
             core_symbols.append(f"{m['symbol']}：{m['original_meaning']}")
-        core_symbols_text = "；".join(core_symbols) if core_symbols else f"本卦「{hex_name}」核心象义需结合卦辞爻辞进一步拆解"
+        if core_symbols:
+            core_symbols_text = "；".join(core_symbols)
+        elif hex_name:
+            core_symbols_text = f"本卦「{hex_name}」核心象义需结合卦辞爻辞进一步拆解"
+        else:
+            core_symbols_text = "本次未排卦象体系，无卦象符号可拆解；请参考步骤2盘面摘要与顾问结论"
 
         # 风险隐患
         risks = []
@@ -158,7 +164,9 @@ class WorkflowEngine:
         risks_text = "；".join(risks) if risks else "当前无显著风险隐患，但仍需关注细节变化"
 
         # 时间窗口
-        if fortune in ("大吉", "小吉"):
+        if unrated:
+            time_window = "本次未排卦象体系，不输出吉时应期窗口；请按事项自身条件与顾问建议安排节奏"
+        elif fortune in ("大吉", "小吉"):
             time_window = "适合行动：用神旺相时段可积极推进；适合观望：节气交接前后；尽量规避：用神休囚死之日"
         elif fortune == "平":
             time_window = "适合行动：小范围验证阶段；适合观望：大局未定之时；尽量规避：冲动冒进、孤注一掷"
@@ -178,6 +186,18 @@ class WorkflowEngine:
             "②忌将研究性结论当作确定性预言，卦象反映的是趋势与概率，非绝对结果；"
             "③忌忽略起盘时间与用神的对应关系，同一卦在不同月令日辰下旺衰不同。"
         )
+
+        if not hex_name:
+            possibilities = (
+                "①顺势发展：若盘面所示条件齐备，事项按有利方向推进，触发条件为关键人支持/资源到位；"
+                "②阻滞反复：若盘面出现相冲相克，事项出现拖延或反复，触发条件为外部阻力/关键人变动；"
+                "③意外转变：若用事宫或关键符号受冲，事项出现意料之外的变化，触发条件为突发因素/时间节点到达。"
+            )
+            misreadings = (
+                "①忌仅凭盘面单一符号断事，需结合本体系的内部逻辑与事项情境综合判断；"
+                "②忌将研究性结论当作确定性预言，盘面反映的是趋势与概率，非绝对结果；"
+                "③忌忽略起局时间与用神/用事宫的对应关系，同一符号在不同时点分量不同。"
+            )
 
         return {
             "core_symbols": core_symbols_text,
@@ -205,23 +225,30 @@ class WorkflowEngine:
 
         # 用神状态
         ys = step3.get("primary_yongshen", "")
-        items.append(f"用神为{ys}，其旺衰状态反映了事项核心要素的当前力量对比")
+        framework = step6.get("yongshen_framework") or step3.get("yongshen_framework") or ""
+        if framework and framework != "卦象体系":
+            items.append(f"用神为{ys}（{framework}口径），该体系不以卦象旺衰论强弱")
+        else:
+            items.append(f"用神为{ys}，其旺衰状态反映了事项核心要素的当前力量对比")
 
         # 吉凶趋势
         fortune = step6.get("fortune_level", "平")
-        items.append(f"综合定性为「{fortune}」，整体趋势{ '偏有利' if fortune in ('大吉','小吉') else '偏阻滞' if fortune in ('小凶','大凶') else '吉凶参半' }")
+        if fortune == "未评级":
+            items.append("综合定性为「未评级」：本次未排卦象体系，不输出吉凶倾向")
+        else:
+            items.append(f"综合定性为「{fortune}」，整体趋势{ '偏有利' if fortune in ('大吉','小吉') else '偏阻滞' if fortune in ('小凶','大凶') else '吉凶参半' }")
 
         return {"items": items[:3]}
 
     def _build_followup_menu(self) -> Dict[str, Any]:
         """构建后续交互入口（模块D）。"""
         options = [
-            "①核对上面的卦局现状描述，告诉我是否符合你的现实；",
+            "①核对上面的盘面现状描述，告诉我是否符合你的现实；",
             "②针对盘局某一个符号、某一句断语进行深度追问；",
             "③换角度解读：备选方案、多方人物心态分析；",
             "④更换术数门派，对此事重新起盘参断；",
             "⑤代入不同选择，推演不同选择之下事态变化；",
-            "⑥留存本卦，后续反馈现实结果进行复盘对照。",
+            "⑥留存本盘，后续反馈现实结果进行复盘对照。",
         ]
         return {"options": options}
 

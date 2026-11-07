@@ -6,9 +6,14 @@
 - 指定奇门：时家奇门（单体系）
 - 指定大六壬：月将日辰四课三传（单体系）
 - 历法始终作为基线预处理
+
+调度结果是一串 `{module, method, input}` 请求，交给 `app.common.calculation_dispatch`
+统一执行。这里用一张"体系 × 起盘方式 → 请求构造器"的表代替原来的 if/elif 长链，
+好处是：可用组合一眼能数清，且能由测试逐个比对 `CALCULATION_HANDLERS`
+（此前两处各自维护，新增方法时另一处容易漏配，直到调用时才 422/报错）。
 """
 
-from typing import List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 
 SYSTEM_LABELS = {
@@ -21,6 +26,122 @@ SYSTEM_LABELS = {
     "qimen": "奇门遁甲",
     "daliuren": "大六壬神课",
     "fengshui": "阳宅风水",
+}
+
+# 每个体系默认的起盘方式键：表里查不到指定方法时用它（对应原来的 else 分支）
+DEFAULT_METHOD = "auto"
+
+
+def _meihua_numbers(source, calendar_input, auto_input):
+    return {
+        "module": "meihua",
+        "method": "numbers",
+        "input": {
+            "upper_number": source.get("upper_number", 8),
+            "lower_number": source.get("lower_number", 8),
+        },
+    }
+
+
+def _meihua_three_numbers(source, calendar_input, auto_input):
+    return {
+        "module": "meihua",
+        "method": "three_numbers",
+        "input": {"numbers": source.get("numbers", [8, 8, 8])},
+    }
+
+
+def _with_calendar(module, method, calendar_input, **extra):
+    return {"module": module, "method": method, "input": {**calendar_input, **extra}}
+
+
+def _with_auto(module, method, auto_input, **extra):
+    return {"module": module, "method": method, "input": {**auto_input, **extra}}
+
+
+def _liuyao_coins(source, calendar_input, auto_input):
+    return _with_calendar(
+        "liuyao",
+        "coins",
+        calendar_input,
+        coins=source.get("coins", [[2, 2, 2]] * 6),
+    )
+
+
+def _liuyao_lines(source, calendar_input, auto_input):
+    return _with_calendar(
+        "liuyao",
+        "lines",
+        calendar_input,
+        lines=source.get("lines", [7, 8, 7, 8, 7, 8]),
+    )
+
+
+def _liuyao_numbers(source, calendar_input, auto_input):
+    return _with_calendar(
+        "liuyao",
+        "numbers",
+        calendar_input,
+        lower_number=source.get("lower_number", 8),
+        upper_number=source.get("upper_number", 8),
+    )
+
+
+def _liuren_numbers(source, calendar_input, auto_input):
+    return _with_calendar("liuren", "numbers", calendar_input, number=source.get("number", 8))
+
+
+def _gendered(module, method, auto_input, source, calendar_input):
+    gender = source.get("gender", "男")
+    if method == "time":
+        return _with_calendar(module, method, calendar_input, gender=gender)
+    return _with_auto(module, method, auto_input, gender=gender)
+
+
+def _bazi(source, calendar_input, auto_input, method="auto"):
+    return _gendered("bazi", method, auto_input, source, calendar_input)
+
+
+def _ziwei(source, calendar_input, auto_input, method="auto"):
+    return _gendered("ziwei", method, auto_input, source, calendar_input)
+
+
+# 体系 × 起盘方式 → 请求构造器。未列出的组合退到 DEFAULT_METHOD 那一条。
+REQUEST_BUILDERS: Dict[str, Dict[str, Callable[[dict, dict, dict], dict]]] = {
+    "meihua": {
+        "numbers": _meihua_numbers,
+        "three_numbers": _meihua_three_numbers,
+        "time": lambda source, calendar_input, auto_input: {
+            "module": "meihua",
+            "method": "time",
+            "input": dict(calendar_input),
+        },
+        DEFAULT_METHOD: lambda source, calendar_input, auto_input: _with_auto("meihua", "auto", auto_input),
+    },
+    "liuyao": {
+        "coins": _liuyao_coins,
+        "manual": _liuyao_lines,
+        "numbers": _liuyao_numbers,
+        "time": lambda source, calendar_input, auto_input: _with_calendar("liuyao", "time", calendar_input),
+        DEFAULT_METHOD: lambda source, calendar_input, auto_input: _with_auto("liuyao", "auto", auto_input),
+    },
+    "qimen": {
+        "time": lambda source, calendar_input, auto_input: _with_calendar("qimen", "time", calendar_input),
+        DEFAULT_METHOD: lambda source, calendar_input, auto_input: _with_auto("qimen", "auto", auto_input),
+    },
+    "daliuren": {
+        "numbers": _liuren_numbers,
+        "time": lambda source, calendar_input, auto_input: _with_calendar("liuren", "time", calendar_input),
+        DEFAULT_METHOD: lambda source, calendar_input, auto_input: _with_auto("liuren", "auto", auto_input),
+    },
+    "bazi": {
+        "time": lambda source, calendar_input, auto_input: _bazi(source, calendar_input, auto_input, "time"),
+        DEFAULT_METHOD: lambda source, calendar_input, auto_input: _bazi(source, calendar_input, auto_input),
+    },
+    "ziwei": {
+        "time": lambda source, calendar_input, auto_input: _ziwei(source, calendar_input, auto_input, "time"),
+        DEFAULT_METHOD: lambda source, calendar_input, auto_input: _ziwei(source, calendar_input, auto_input),
+    },
 }
 
 
@@ -61,7 +182,6 @@ def build_calculation_requests(
     Returns:
         计算请求列表 [{module, method, input}, ...]
     """
-    requests = []
     # 历法始终作为基线
     calendar_input = {
         "local_datetime": casting_source.get("local_datetime", ""),
@@ -70,84 +190,15 @@ def build_calculation_requests(
     }
     if casting_source.get("longitude") is not None:
         calendar_input["longitude"] = casting_source["longitude"]
-    requests.append({"module": "calendar", "method": "analyze", "input": calendar_input})
 
     auto_input = {**calendar_input, "cast_nonce": casting_source.get("cast_nonce", "")}
 
+    requests = [{"module": "calendar", "method": "analyze", "input": calendar_input}]
     for system in systems:
-        if system == "meihua":
-            if casting_method == "numbers":
-                requests.append({
-                    "module": "meihua", "method": "numbers",
-                    "input": {
-                        "upper_number": casting_source.get("upper_number", 8),
-                        "lower_number": casting_source.get("lower_number", 8),
-                    },
-                })
-            elif casting_method == "three_numbers":
-                requests.append({
-                    "module": "meihua", "method": "three_numbers",
-                    "input": {"numbers": casting_source.get("numbers", [8, 8, 8])},
-                })
-            elif casting_method == "time":
-                requests.append({"module": "meihua", "method": "time", "input": calendar_input})
-            else:
-                requests.append({"module": "meihua", "method": "auto", "input": auto_input})
-
-        elif system == "liuyao":
-            if casting_method == "coins":
-                requests.append({
-                    "module": "liuyao", "method": "coins",
-                    "input": {**calendar_input, "coins": casting_source.get("coins", [[2,2,2]]*6)},
-                })
-            elif casting_method == "manual":
-                requests.append({
-                    "module": "liuyao", "method": "lines",
-                    "input": {**calendar_input, "lines": casting_source.get("lines", [7,8,7,8,7,8])},
-                })
-            elif casting_method == "numbers":
-                requests.append({
-                    "module": "liuyao", "method": "numbers",
-                    "input": {
-                        **calendar_input,
-                        "lower_number": casting_source.get("lower_number", 8),
-                        "upper_number": casting_source.get("upper_number", 8),
-                    },
-                })
-            elif casting_method == "time":
-                requests.append({"module": "liuyao", "method": "time", "input": calendar_input})
-            else:
-                requests.append({"module": "liuyao", "method": "auto", "input": auto_input})
-
-        elif system == "qimen":
-            if casting_method == "time":
-                requests.append({"module": "qimen", "method": "time", "input": calendar_input})
-            else:
-                requests.append({"module": "qimen", "method": "auto", "input": auto_input})
-
-        elif system == "daliuren":
-            if casting_method == "numbers":
-                requests.append({
-                    "module": "liuren", "method": "numbers",
-                    "input": {**calendar_input, "number": casting_source.get("number", 8)},
-                })
-            elif casting_method == "time":
-                requests.append({"module": "liuren", "method": "time", "input": calendar_input})
-            else:
-                requests.append({"module": "liuren", "method": "auto", "input": auto_input})
-
-        elif system == "bazi":
-            gender = casting_source.get("gender", "男")
-            if casting_method == "time":
-                requests.append({"module": "bazi", "method": "time", "input": {**calendar_input, "gender": gender}})
-            else:
-                requests.append({"module": "bazi", "method": "auto", "input": {**auto_input, "gender": gender}})
-
-        elif system == "ziwei":
-            gender = casting_source.get("gender", "男")
-            if casting_method == "time":
-                requests.append({"module": "ziwei", "method": "time", "input": {**calendar_input, "gender": gender}})
-            else:
-                requests.append({"module": "ziwei", "method": "auto", "input": {**auto_input, "gender": gender}})
-
+        builders = REQUEST_BUILDERS.get(system)
+        if not builders:
+            # 未知体系沿用原行为：跳过而不排空盘（调用方负责校验 system 取值）
+            continue
+        builder = builders.get(casting_method) or builders[DEFAULT_METHOD]
+        requests.append(builder(casting_source, calendar_input, auto_input))
     return requests

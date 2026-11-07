@@ -137,6 +137,17 @@ def _is_negated_before(text: str, index: int) -> bool:
 
 def _suggest_angles(session, response: str) -> list:
     """根据不符情况建议换角度解读的方向。"""
+    workflow = getattr(session, "workflow_result", None) or {}
+    framework = (workflow.get("step4") or {}).get("yongshen_framework") \
+        or (workflow.get("step3") or {}).get("yongshen_framework") or ""
+    if framework and framework != "卦象体系":
+        # 没有卦爻的盘面，不能让人「更换动爻取象」或「重新评估旺衰」
+        angles = [
+            f"重新审视{framework}的取用口径：确认用神/用事宫是否对应所求之事",
+            "更换解读视角：从盘面其他关键符号（宫位、星曜、门星神、三传）重新取象",
+            "结合起局时间重新评估：同一符号在不同时点分量不同，可能是阶段转换期",
+        ]
+        return angles[:2] if response == "部分符合" else angles
     angles = [
         "更换用神取向：重新审视事项核心要素对应的用神是否准确",
         "更换体用视角：从不同角色/立场重新解读体用生克关系",

@@ -1,0 +1,13 @@
+# 本地提交前检查。CI（.github/workflows/ci.yml）跑的是同一套 ruff 配置，
+# 所以这里只做"能在几秒内跑完"的静态检查，测试与前端构建交给 CI。
+#
+# 启用：pip install pre-commit && pre-commit install
+# 手动全量：pre-commit run --all-files
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # 与本地验证用的 ruff 版本对齐，避免钩子与 CI 报不同结果
+    rev: v0.17.3
+    hooks:
+      - id: ruff
+        # 规则集与阈值定义在 backend/pyproject.toml 的 [tool.ruff]，这里不重复写
+        files: ^backend/

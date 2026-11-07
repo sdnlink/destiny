@@ -76,12 +76,15 @@ class SessionStore:
             return None
         return DivinationSession.from_dict(data)
 
-    def list_sessions(self, limit: int = 50) -> list:
+    def list_sessions(self, limit: int = 50, owner_hash: Optional[str] = None) -> list:
         """列出会话元信息。
 
         会话文件里含完整快照与工作流结果（单个可达数百 KB），每次请求全部
         `json.load` 是纯粹的浪费。这里按 (mtime, size) 缓存元数据，
         文件没变就直接复用，文件被改写才重新解析。
+
+        `owner_hash` 非空时只返回该客户端自己的会话，以及迁移前没有 owner 的老会话
+        （老会话由首个访问者认领，不在此处隐去，否则用户会以为历史数据丢了）。
         """
         sessions = []
         for path in sorted(self.storage_dir.glob("sess_*.json"), reverse=True):
@@ -110,11 +113,14 @@ class SessionStore:
                     "system": data.get("system"),
                     "created_at": data.get("created_at"),
                     "updated_at": data.get("updated_at"),
+                    "owner_hash": data.get("owner_hash") or "",
                 }
                 self._meta_cache[cache_key] = meta
                 # 同一会话被改写后旧指纹失效，避免缓存无限增长
                 for stale in [key for key in self._meta_cache if key[0] == path.name and key != cache_key]:
                     self._meta_cache.pop(stale, None)
+            if owner_hash is not None and meta.get("owner_hash") not in ("", owner_hash):
+                continue
             sessions.append(dict(meta))
             if len(sessions) >= limit:
                 break

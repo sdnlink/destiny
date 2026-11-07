@@ -1,5 +1,6 @@
 数据/
 data/generated/
+data/sessions/
 cache/
 .venv/
 .env

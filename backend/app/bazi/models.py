@@ -5,9 +5,9 @@ from pydantic import BaseModel, Field
 
 
 class BaZiInput(BaseModel):
-    local_datetime: str = Field(..., example="2026-08-15T16:00:00")
-    timezone: str = Field("Asia/Shanghai", example="Asia/Shanghai")
-    gender: str = Field("男", example="男")
+    local_datetime: str = Field(..., json_schema_extra={"example": "2026-08-15T16:00:00"})
+    timezone: str = Field("Asia/Shanghai", json_schema_extra={"example": "Asia/Shanghai"})
+    gender: str = Field("男", json_schema_extra={"example": "男"})
     longitude: Optional[float] = Field(None, ge=-180, le=180)
     use_true_solar_time: bool = False
 

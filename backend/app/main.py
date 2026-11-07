@@ -10,50 +10,31 @@ from typing import Any, Dict, Optional
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, conint, conlist, constr, validator
+from pydantic import BaseModel, Field, conint, conlist, constr, field_validator
 
 from app.common.classics import get_library as get_classics_library
+from app.common.calculation_dispatch import execute_calculation
 from app.common.hashing import canonical_hash
 from app.core.advisory import CATEGORY_PROFILES, generate_advisory
 from app.calendar import calendar_analysis
 from app.core.constants import HEXAGRAM_NAMES, KING_WEN_MATRIX, TRIGRAMS
 from app.core.explanation import explain_calculation_set
-from app.zhouyi import auto_cast as yi_auto_cast
-from app.zhouyi import manual_cast as yi_manual_cast
-from app.zhouyi import number_cast as yi_number_cast
-from app.zhouyi import three_number_cast as yi_three_number_cast
-from app.zhouyi import time_cast as yi_time_cast
 from app.core.interpretation import explain_correspondences
 from app.core.literature import collect_literature_opinions
 from app.core.imagery import collect_imagery
-from app.daliuren import auto_cast as liuren_auto_cast
-from app.daliuren import number_cast as liuren_number_cast
-from app.daliuren import time_cast as liuren_time_cast
-from app.fengshui import analyze_measurements as fengshui_measurements
-from app.fengshui import calculate_direction as fengshui_direction
 from app.fengshui.bazhai import calculate_bazhai
 from app.fengshui.storage import (
     delete_profile, get_profile, list_profiles, resolve_tenant, upsert_profile,
 )
 from app.fengshui.xuankong import calculate_xuankong
-from app.liuyao import auto_cast as liuyao_auto_cast
-from app.liuyao import number_cast as liuyao_number_cast
-from app.liuyao import coin_cast as liuyao_coin_cast
-from app.liuyao import line_cast as liuyao_line_cast
-from app.liuyao import time_cast as liuyao_time_cast
-from app.meihua import auto_cast as meihua_auto_cast
-from app.meihua import number_cast as meihua_number_cast
-from app.meihua import three_number_cast as meihua_three_number_cast
-from app.meihua import time_cast as meihua_time_cast
-from app.ziwei import time_cast as ziwei_time_cast, auto_cast as ziwei_auto_cast
-from app.bazi import time_cast as bazi_time_cast, auto_cast as bazi_auto_cast, liunian_cast as bazi_liunian_cast
-from app.qimen import time_cast as qimen_time_cast, auto_cast as qimen_auto_cast
 from app.core.db import db_repository
 from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
 from app.core.validation import run_validation_cases
 from app.core.yuanhui import analyze_yuan_hui_yun_shi
 from app.session import create_session, get_store
+from app.session.ownership import HEADER_NAME as OWNER_HEADER_NAME
+from app.session.ownership import claim_or_match, client_id_from, owner_hash
 from app.workflow import run_workflow
 from app.interaction import (
     analyze_branches,
@@ -78,8 +59,8 @@ if not API_TOKEN:
 
 
 class CalendarRequest(BaseModel):
-    local_datetime: str = Field(..., example="2026-08-15T16:00:00")
-    timezone: str = Field(..., example="Asia/Shanghai")
+    local_datetime: str = Field(..., json_schema_extra={"example": "2026-08-15T16:00:00"})
+    timezone: str = Field(..., json_schema_extra={"example": "Asia/Shanghai"})
     longitude: Optional[float] = Field(None, ge=-180, le=180)
     use_true_solar_time: bool = False
 
@@ -87,12 +68,12 @@ class CalendarRequest(BaseModel):
 class AutoCastRequest(CalendarRequest):
     cast_nonce: constr(
         strip_whitespace=True, min_length=16, max_length=128,
-        regex=r"^[A-Za-z0-9_-]+$",
+        pattern=r"^[A-Za-z0-9_-]+$",
     )
 
 
 class YiManualRequest(BaseModel):
-    lines: conlist(conint(ge=6, le=9), min_items=6, max_items=6)
+    lines: conlist(conint(ge=6, le=9), min_length=6, max_length=6)
 
 
 class YiNumberRequest(BaseModel):
@@ -101,7 +82,7 @@ class YiNumberRequest(BaseModel):
 
 
 class YiThreeNumberRequest(BaseModel):
-    numbers: conlist(conint(strict=True, ge=0), min_items=3, max_items=3)
+    numbers: conlist(conint(strict=True, ge=0), min_length=3, max_length=3)
     mapping_version: constr(strip_whitespace=True, min_length=1, max_length=80) = "earlier-heaven-number-v1"
 
 
@@ -111,15 +92,15 @@ class MeihuaNumberRequest(BaseModel):
 
 
 class MeihuaThreeNumberRequest(BaseModel):
-    numbers: conlist(conint(strict=True), min_items=3, max_items=3)
+    numbers: conlist(conint(strict=True), min_length=3, max_length=3)
 
 
 class LiuyaoCalendarRequest(CalendarRequest):
-    focus: Optional[str] = Field(None, example="求财买卖")
+    focus: Optional[str] = Field(None, json_schema_extra={"example": "求财买卖"})
 
 
 class LiuyaoAutoRequest(AutoCastRequest):
-    focus: Optional[str] = Field(None, example="求财买卖")
+    focus: Optional[str] = Field(None, json_schema_extra={"example": "求财买卖"})
 
 
 class LiuyaoNumberRequest(LiuyaoCalendarRequest):
@@ -128,14 +109,14 @@ class LiuyaoNumberRequest(LiuyaoCalendarRequest):
 
 
 class LiuyaoLineRequest(LiuyaoCalendarRequest):
-    lines: conlist(conint(strict=True, ge=6, le=9), min_items=6, max_items=6)
+    lines: conlist(conint(strict=True, ge=6, le=9), min_length=6, max_length=6)
 
 
-CoinRound = conlist(conint(strict=True, ge=2, le=3), min_items=3, max_items=3)
+CoinRound = conlist(conint(strict=True, ge=2, le=3), min_length=3, max_length=3)
 
 
 class LiuyaoCoinRequest(LiuyaoCalendarRequest):
-    coins: conlist(CoinRound, min_items=6, max_items=6)
+    coins: conlist(CoinRound, min_length=6, max_length=6)
 
 
 class LiurenNumberRequest(CalendarRequest):
@@ -143,23 +124,23 @@ class LiurenNumberRequest(CalendarRequest):
 
 
 class ZiweiRequest(CalendarRequest):
-    gender: str = Field("男", example="男")
+    gender: str = Field("男", json_schema_extra={"example": "男"})
 
 
 class ZiweiAutoRequest(AutoCastRequest):
-    gender: str = Field("男", example="男")
+    gender: str = Field("男", json_schema_extra={"example": "男"})
 
 
 class BaZiRequest(CalendarRequest):
-    gender: str = Field("男", example="男")
+    gender: str = Field("男", json_schema_extra={"example": "男"})
 
 
 class BaZiAutoRequest(AutoCastRequest):
-    gender: str = Field("男", example="男")
+    gender: str = Field("男", json_schema_extra={"example": "男"})
 
 
 class BaZiLiunianRequest(CalendarRequest):
-    gender: str = Field("男", example="男")
+    gender: str = Field("男", json_schema_extra={"example": "男"})
     start_year: Optional[int] = Field(None, ge=1900, le=2100, description="起始公历年，默认起运年")
     count: int = Field(10, ge=1, le=60, description="流年条数（1-60）")
 
@@ -172,13 +153,15 @@ class FengshuiDirectionRequest(BaseModel):
     declination_source: Optional[constr(strip_whitespace=True, min_length=1, max_length=200)] = None
     measurement_method: Optional[constr(strip_whitespace=True, min_length=1, max_length=100)] = None
 
-    @validator("facing_degree", "magnetic_declination", "measurement_error", pre=True)
+    @field_validator("facing_degree", "magnetic_declination", "measurement_error", mode="before")
+    @classmethod
     def numeric_fields_are_strict_and_finite(cls, value):
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
             raise ValueError("must be a finite number")
         return value
 
-    @validator("input_reference")
+    @field_validator("input_reference")
+    @classmethod
     def reference_is_supported(cls, value):
         if value not in ("magnetic", "true"):
             raise ValueError("must be magnetic or true")
@@ -186,7 +169,7 @@ class FengshuiDirectionRequest(BaseModel):
 
 
 class FengshuiMeasurementsRequest(BaseModel):
-    measurements: conlist(FengshuiDirectionRequest, min_items=3, max_items=12)
+    measurements: conlist(FengshuiDirectionRequest, min_length=3, max_length=12)
 
 
 class CalculationRequest(BaseModel):
@@ -199,7 +182,8 @@ class AdvisoryContext(BaseModel):
     category: str
     question_summary: constr(strip_whitespace=True, min_length=1, max_length=200)
 
-    @validator("category")
+    @field_validator("category")
+    @classmethod
     def category_is_supported(cls, value):
         if value not in CATEGORY_PROFILES:
             raise ValueError("unsupported category")
@@ -207,7 +191,7 @@ class AdvisoryContext(BaseModel):
 
 
 class ComparisonRequest(BaseModel):
-    calculations: conlist(CalculationRequest, min_items=1, max_items=8)
+    calculations: conlist(CalculationRequest, min_length=1, max_length=8)
     context: Optional[AdvisoryContext] = None
 
 
@@ -215,78 +199,46 @@ def _calendar_payload(values):
     return calendar_analysis(**values)
 
 
-def _liuyao_numbers_call(values):
-    request_values = dict(values)
-    lower_number = request_values.pop("lower_number")
-    upper_number = request_values.pop("upper_number")
-    return liuyao_number_cast(lower_number, upper_number, **request_values)
-
-
-def _liuyao_lines_call(values):
-    request_values = dict(values)
-    lines = request_values.pop("lines")
-    return liuyao_line_cast(lines, **request_values)
-
-
-def _liuyao_coins_call(values):
-    request_values = dict(values)
-    coins = request_values.pop("coins")
-    return liuyao_coin_cast(coins, **request_values)
-
-
-def _liuren_numbers_call(values):
-    request_values = dict(values)
-    number = request_values.pop("number")
-    return liuren_number_cast(number, **request_values)
-
-
-# module/method → (入参校验模型, 引擎调用)。/v1/calculations 与 /v1/comparisons 共用这一张表，
-# 不再用长 if 链，新增体系只加一条。
-CALCULATION_ENTRIES = {
-    ("calendar", "analyze"): (CalendarRequest, _calendar_payload),
-    ("zhouyi", "manual"): (YiManualRequest, lambda values: yi_manual_cast(values["lines"])),
-    ("zhouyi", "auto"): (AutoCastRequest, lambda values: yi_auto_cast(**values)),
-    ("zhouyi", "time"): (CalendarRequest, lambda values: yi_time_cast(**values)),
-    ("zhouyi", "numbers"): (YiNumberRequest, lambda values: yi_number_cast(values["lower_number"], values["upper_number"])),
-    ("zhouyi", "three_numbers"): (
-        YiThreeNumberRequest,
-        lambda values: yi_three_number_cast(*values["numbers"], mapping_version=values["mapping_version"]),
-    ),
-    ("meihua", "time"): (CalendarRequest, lambda values: meihua_time_cast(**values)),
-    ("meihua", "auto"): (AutoCastRequest, lambda values: meihua_auto_cast(**values)),
-    ("meihua", "numbers"): (MeihuaNumberRequest, lambda values: meihua_number_cast(values["upper_number"], values["lower_number"])),
-    ("meihua", "three_numbers"): (MeihuaThreeNumberRequest, lambda values: meihua_three_number_cast(*values["numbers"])),
-    ("liuyao", "time"): (CalendarRequest, lambda values: liuyao_time_cast(**values)),
-    ("liuyao", "auto"): (AutoCastRequest, lambda values: liuyao_auto_cast(**values)),
-    ("liuyao", "numbers"): (LiuyaoNumberRequest, _liuyao_numbers_call),
-    ("liuyao", "lines"): (LiuyaoLineRequest, _liuyao_lines_call),
-    ("liuyao", "coins"): (LiuyaoCoinRequest, _liuyao_coins_call),
-    ("liuren", "time"): (CalendarRequest, lambda values: liuren_time_cast(**values)),
-    ("liuren", "auto"): (AutoCastRequest, lambda values: liuren_auto_cast(**values)),
-    ("liuren", "numbers"): (LiurenNumberRequest, _liuren_numbers_call),
-    ("ziwei", "time"): (ZiweiRequest, lambda values: ziwei_time_cast(**values)),
-    ("ziwei", "auto"): (ZiweiAutoRequest, lambda values: ziwei_auto_cast(**values)),
-    ("bazi", "time"): (BaZiRequest, lambda values: bazi_time_cast(**values)),
-    ("bazi", "auto"): (BaZiAutoRequest, lambda values: bazi_auto_cast(**values)),
-    ("bazi", "liunian"): (BaZiLiunianRequest, lambda values: bazi_liunian_cast(**values)),
-    ("qimen", "time"): (CalendarRequest, lambda values: qimen_time_cast(**values)),
-    ("qimen", "auto"): (AutoCastRequest, lambda values: qimen_auto_cast(**values)),
-    ("fengshui", "direction"): (FengshuiDirectionRequest, lambda values: fengshui_direction(**values)),
-    ("fengshui", "measurements"): (
-        FengshuiMeasurementsRequest,
-        lambda values: fengshui_measurements(values["measurements"]),
-    ),
+# module/method → 入参校验模型。引擎调用统一由 common/calculation_dispatch 的
+# CALCULATION_HANDLERS 承担：这里只保留"用什么模型校验"，不再维护第二份调用表，
+# 新增方法只需在分发表加一条、在这里加一个模型。
+CALCULATION_MODELS = {
+    ("calendar", "analyze"): CalendarRequest,
+    ("zhouyi", "manual"): YiManualRequest,
+    ("zhouyi", "auto"): AutoCastRequest,
+    ("zhouyi", "time"): CalendarRequest,
+    ("zhouyi", "numbers"): YiNumberRequest,
+    ("zhouyi", "three_numbers"): YiThreeNumberRequest,
+    ("meihua", "time"): CalendarRequest,
+    ("meihua", "auto"): AutoCastRequest,
+    ("meihua", "numbers"): MeihuaNumberRequest,
+    ("meihua", "three_numbers"): MeihuaThreeNumberRequest,
+    ("liuyao", "time"): CalendarRequest,
+    ("liuyao", "auto"): AutoCastRequest,
+    ("liuyao", "numbers"): LiuyaoNumberRequest,
+    ("liuyao", "lines"): LiuyaoLineRequest,
+    ("liuyao", "coins"): LiuyaoCoinRequest,
+    ("liuren", "time"): CalendarRequest,
+    ("liuren", "auto"): AutoCastRequest,
+    ("liuren", "numbers"): LiurenNumberRequest,
+    ("ziwei", "time"): ZiweiRequest,
+    ("ziwei", "auto"): ZiweiAutoRequest,
+    ("bazi", "time"): BaZiRequest,
+    ("bazi", "auto"): BaZiAutoRequest,
+    ("bazi", "liunian"): BaZiLiunianRequest,
+    ("qimen", "time"): CalendarRequest,
+    ("qimen", "auto"): AutoCastRequest,
+    ("fengshui", "direction"): FengshuiDirectionRequest,
+    ("fengshui", "measurements"): FengshuiMeasurementsRequest,
 }
 
 
 def execute(module, method, payload):
-    """校验入参后调用对应引擎。未知组合直接报错。"""
-    entry = CALCULATION_ENTRIES.get((module, method))
-    if entry is None:
+    """校验入参后交给统一分发表执行。未知组合直接报错。"""
+    model = CALCULATION_MODELS.get((module, method))
+    if model is None:
         raise ValueError(f"unsupported calculation: {module}/{method}")
-    model, call = entry
-    values = model(**payload).dict()
-    return call(values)
+    return execute_calculation(module, method, model(**payload).model_dump())
 
 
 def calculation_envelope(module, method, payload):
@@ -306,14 +258,14 @@ def calculation_envelope(module, method, payload):
 
 def comparison_envelope(calculations, context=None):
     normalized = [
-        calculation.dict() if isinstance(calculation, CalculationRequest) else calculation
+        calculation.model_dump() if isinstance(calculation, CalculationRequest) else calculation
         for calculation in calculations
     ]
     normalized = sorted(
         normalized,
         key=lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
     )
-    normalized_context = context.dict() if isinstance(context, AdvisoryContext) else context
+    normalized_context = context.model_dump() if isinstance(context, AdvisoryContext) else context
     input_hash = canonical_hash({"calculations": normalized, "context": normalized_context})
     # 各引擎都是纯 CPU 计算，串行执行；线程池在 GIL 下没有收益，还会放大共享缓存并发写风险
     results = [execute(item["module"], item["method"], item["input"]) for item in normalized]
@@ -622,158 +574,140 @@ def run_cases():
 
 @app.post("/v1/calendar/analyze")
 def analyze_calendar(request: CalendarRequest):
-    return {"data": calendar_analysis(**request.dict())}
+    return {"data": execute_calculation("calendar", "analyze", request.model_dump())}
 
 
 @app.post("/v1/zhouyi/manual")
 def cast_yi_manual(request: YiManualRequest):
-    return {"data": yi_manual_cast(request.lines)}
+    return {"data": execute_calculation("zhouyi", "manual", request.model_dump())}
 
 
 @app.post("/v1/zhouyi/auto")
 def cast_yi_auto(request: AutoCastRequest):
-    return {"data": yi_auto_cast(**request.dict())}
+    return {"data": execute_calculation("zhouyi", "auto", request.model_dump())}
 
 
 @app.post("/v1/zhouyi/time")
 def cast_yi_time(request: CalendarRequest):
-    return {"data": yi_time_cast(**request.dict())}
+    return {"data": execute_calculation("zhouyi", "time", request.model_dump())}
 
 
 @app.post("/v1/zhouyi/numbers")
 def cast_yi_numbers(request: YiNumberRequest):
-    return {"data": yi_number_cast(request.lower_number, request.upper_number)}
+    return {"data": execute_calculation("zhouyi", "numbers", request.model_dump())}
 
 
 @app.post("/v1/zhouyi/three-numbers")
 def cast_yi_three_numbers(request: YiThreeNumberRequest):
-    return {"data": yi_three_number_cast(*request.numbers, mapping_version=request.mapping_version)}
+    return {"data": execute_calculation("zhouyi", "three_numbers", request.model_dump())}
 
 
 @app.post("/v1/meihua/time")
 def cast_meihua_time(request: CalendarRequest):
-    return {"data": meihua_time_cast(**request.dict())}
+    return {"data": execute_calculation("meihua", "time", request.model_dump())}
 
 
 @app.post("/v1/meihua/auto")
 def cast_meihua_auto(request: AutoCastRequest):
-    return {"data": meihua_auto_cast(**request.dict())}
+    return {"data": execute_calculation("meihua", "auto", request.model_dump())}
 
 
 @app.post("/v1/meihua/numbers")
 def cast_meihua_numbers(request: MeihuaNumberRequest):
-    return {"data": meihua_number_cast(request.upper_number, request.lower_number)}
+    return {"data": execute_calculation("meihua", "numbers", request.model_dump())}
 
 
 @app.post("/v1/meihua/three-numbers")
 def cast_meihua_three_numbers(request: MeihuaThreeNumberRequest):
-    return {"data": meihua_three_number_cast(*request.numbers)}
+    return {"data": execute_calculation("meihua", "three_numbers", request.model_dump())}
 
 
 @app.post("/v1/liuyao/time")
 def cast_liuyao_time(request: LiuyaoCalendarRequest):
-    return {"data": liuyao_time_cast(**request.dict())}
+    return {"data": execute_calculation("liuyao", "time", request.model_dump())}
 
 
 @app.post("/v1/liuyao/auto")
 def cast_liuyao_auto(request: LiuyaoAutoRequest):
-    return {"data": liuyao_auto_cast(**request.dict())}
+    return {"data": execute_calculation("liuyao", "auto", request.model_dump())}
 
 
 @app.post("/v1/liuyao/numbers")
 def cast_liuyao_numbers(request: LiuyaoNumberRequest):
-    values = request.dict()
-    lower_number = values.pop("lower_number")
-    upper_number = values.pop("upper_number")
-    return {"data": liuyao_number_cast(lower_number, upper_number, **values)}
+    return {"data": execute_calculation("liuyao", "numbers", request.model_dump())}
 
 
 @app.post("/v1/liuyao/lines")
 def cast_liuyao_lines(request: LiuyaoLineRequest):
-    values = request.dict()
-    lines = values.pop("lines")
-    return {"data": liuyao_line_cast(lines, **values)}
+    return {"data": execute_calculation("liuyao", "lines", request.model_dump())}
 
 
 @app.post("/v1/liuyao/coins")
 def cast_liuyao_coins(request: LiuyaoCoinRequest):
-    values = request.dict()
-    coins = values.pop("coins")
-    return {"data": liuyao_coin_cast(coins, **values)}
+    return {"data": execute_calculation("liuyao", "coins", request.model_dump())}
 
 
 @app.post("/v1/liuren/time")
 def cast_liuren_time(request: CalendarRequest):
-    return {"data": liuren_time_cast(**request.dict())}
+    return {"data": execute_calculation("liuren", "time", request.model_dump())}
 
 
 @app.post("/v1/liuren/auto")
 def cast_liuren_auto(request: AutoCastRequest):
-    return {"data": liuren_auto_cast(**request.dict())}
+    return {"data": execute_calculation("liuren", "auto", request.model_dump())}
 
 
 @app.post("/v1/liuren/numbers")
 def cast_liuren_numbers(request: LiurenNumberRequest):
-    values = request.dict()
-    number = values.pop("number")
-    return {"data": liuren_number_cast(number, **values)}
+    return {"data": execute_calculation("liuren", "numbers", request.model_dump())}
 
 
 @app.post("/v1/ziwei/time")
 def cast_ziwei_time(request: ZiweiRequest):
-    return {"data": ziwei_time_cast(**request.dict())}
+    return {"data": execute_calculation("ziwei", "time", request.model_dump())}
 
 
 @app.post("/v1/ziwei/auto")
 def cast_ziwei_auto(request: ZiweiAutoRequest):
-    return {"data": ziwei_auto_cast(**request.dict())}
+    return {"data": execute_calculation("ziwei", "auto", request.model_dump())}
 
 
 @app.post("/v1/bazi/time")
 def cast_bazi_time(request: BaZiRequest):
-    return {"data": bazi_time_cast(**request.dict())}
+    return {"data": execute_calculation("bazi", "time", request.model_dump())}
 
 
 @app.post("/v1/bazi/auto")
 def cast_bazi_auto(request: BaZiAutoRequest):
-    return {"data": bazi_auto_cast(**request.dict())}
+    return {"data": execute_calculation("bazi", "auto", request.model_dump())}
 
 
 @app.post("/v1/bazi/liunian")
 def cast_bazi_liunian(request: BaZiLiunianRequest):
     try:
-        return {"data": bazi_liunian_cast(**request.dict())}
+        return {"data": execute_calculation("bazi", "liunian", request.model_dump())}
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
 
 
 @app.post("/v1/qimen/time")
 def cast_qimen_time(request: CalendarRequest):
-    return {"data": qimen_time_cast(**request.dict())}
+    return {"data": execute_calculation("qimen", "time", request.model_dump())}
 
 
 @app.post("/v1/qimen/auto")
 def cast_qimen_auto(request: AutoCastRequest):
-    return {"data": qimen_auto_cast(**request.dict())}
+    return {"data": execute_calculation("qimen", "auto", request.model_dump())}
 
+
+# ============================================================
+# 阳宅风水：八宅 / 玄空 / 房屋档案
+# ============================================================
 
 class BazhaiRequest(BaseModel):
-    sitting_mountain: str = Field(..., example="午")
+    sitting_mountain: str = Field(..., json_schema_extra={"example": "午"})
     birth_year: Optional[int] = Field(None, ge=1864, le=2100)
-    gender: str = Field("男", example="男")
-
-
-class XuankongRequest(BaseModel):
-    sitting_mountain: str = Field(..., example="午")
-    year: Optional[int] = Field(None, ge=1864, le=2100)
-    period: Optional[int] = Field(None, ge=1, le=9)
-    sitting_degree: Optional[float] = Field(None, ge=0, le=360)
-
-
-class FengshuiProfileRequest(BaseModel):
-    tenant_id: str = Field(..., example="tenant-a")
-    building_id: str = Field(..., example="building-001")
-    profile: dict
+    gender: str = Field("男", json_schema_extra={"example": "男"})
 
 
 @app.get("/v1/fengshui/bazhai")
@@ -788,6 +722,13 @@ def fengshui_bazhai(
 @app.post("/v1/fengshui/bazhai")
 def fengshui_bazhai_post(request: BazhaiRequest):
     return {"data": calculate_bazhai(request.sitting_mountain, birth_year=request.birth_year, gender=request.gender)}
+
+
+class XuankongRequest(BaseModel):
+    sitting_mountain: str = Field(..., json_schema_extra={"example": "午"})
+    year: Optional[int] = Field(None, ge=1864, le=2100)
+    period: Optional[int] = Field(None, ge=1, le=9)
+    sitting_degree: Optional[float] = Field(None, ge=0, le=360)
 
 
 @app.get("/v1/fengshui/xuankong")
@@ -830,6 +771,12 @@ def fengshui_profile_detail(building_id: str, tenant_id: Optional[str] = None):
     return {"data": row}
 
 
+class FengshuiProfileRequest(BaseModel):
+    tenant_id: str = Field(..., json_schema_extra={"example": "tenant-a"})
+    building_id: str = Field(..., json_schema_extra={"example": "building-001"})
+    profile: Dict[str, Any]
+
+
 @app.post("/v1/fengshui/buildings")
 def fengshui_profile_upsert(request: FengshuiProfileRequest):
     try:
@@ -855,12 +802,12 @@ def fengshui_profile_delete(building_id: str, tenant_id: Optional[str] = None):
 
 @app.post("/v1/fengshui/direction")
 def calculate_fengshui_direction(request: FengshuiDirectionRequest):
-    return {"data": fengshui_direction(**request.dict())}
+    return {"data": execute_calculation("fengshui", "direction", request.model_dump())}
 
 
 @app.post("/v1/fengshui/measurements")
 def analyze_fengshui_measurements(request: FengshuiMeasurementsRequest):
-    return {"data": fengshui_measurements([value.dict() for value in request.measurements])}
+    return {"data": execute_calculation("fengshui", "measurements", {"measurements": [value.model_dump() for value in request.measurements]})}
 
 
 @app.post("/v1/calculations/evaluate")
@@ -895,9 +842,39 @@ class SessionInteractRequest(BaseModel):
     payload: Dict[str, Any] = Field(default_factory=dict, description="交互参数")
 
 
+def _client_owner_or_error(http_request: Request):
+    """从 X-Client-Id 取归属；缺失或非法时返回 (None, JSONResponse)。
+
+    放在处理函数体内而不是 Header(...) 依赖里：会话创建接口的请求体校验
+    （422 + detail 结构）必须先于归属校验发生，契约测试依赖这个顺序。
+    """
+    client_id = client_id_from(http_request.headers.get(OWNER_HEADER_NAME))
+    if client_id is None:
+        return None, JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "CLIENT_ID_REQUIRED",
+                    "message": f"缺少或非法的 {OWNER_HEADER_NAME} 请求头：会话接口需要客户端标识才能做归属校验",
+                }
+            },
+        )
+    return owner_hash(client_id), None
+
+
+def _forbidden_session():
+    return JSONResponse(
+        status_code=403,
+        content={"error": {"code": "SESSION_FORBIDDEN", "message": "该会话属于其他客户端，当前客户端无权访问"}},
+    )
+
+
 @app.post("/v1/sessions")
-def create_divination_session(request: SessionCreateRequest):
+def create_divination_session(request: SessionCreateRequest, http_request: Request):
     """创建推演会话（draft 状态），返回信息补全提示或会话信息。"""
+    requested_owner, error = _client_owner_or_error(http_request)
+    if error is not None:
+        return error
     session = create_session(
         question=request.question,
         category=request.category,
@@ -905,6 +882,7 @@ def create_divination_session(request: SessionCreateRequest):
         casting_method=request.casting_method,
         casting_source=request.casting_source,
         user_profile=request.user_profile,
+        owner_hash=requested_owner,
     )
     store = get_store()
     store.save(session)
@@ -924,43 +902,78 @@ def create_divination_session(request: SessionCreateRequest):
 
 
 @app.get("/v1/sessions")
-def list_sessions(limit: int = Query(50, ge=1, le=200)):
-    """列出推演会话列表。"""
+def list_sessions(http_request: Request, limit: int = Query(50, ge=1, le=200)):
+    """列出推演会话列表（只含本客户端的会话与迁移前的老会话）。"""
+    requested_owner, error = _client_owner_or_error(http_request)
+    if error is not None:
+        return error
     store = get_store()
-    return {"data": store.list_sessions(limit=limit)}
+    rows = store.list_sessions(limit=limit, owner_hash=requested_owner)
+    # 归属哈希只用于服务端比对，不出现在响应里
+    for row in rows:
+        row.pop("owner_hash", None)
+    return {"data": rows}
 
 
 @app.get("/v1/sessions/{session_id}")
-def get_session(session_id: str):
+def get_session(session_id: str, http_request: Request):
     """获取推演会话完整状态（含不可变快照、交互记录、工作流结果）。"""
+    requested_owner, error = _client_owner_or_error(http_request)
+    if error is not None:
+        return error
     store = get_store()
     session = store.load(session_id)
     if session is None:
         return JSONResponse(status_code=404, content={"error": {"code": "SESSION_NOT_FOUND", "message": "会话不存在"}})
-    return {"data": session.to_dict()}
+    adopted = not session.owner_hash
+    if not claim_or_match(session, requested_owner):
+        return _forbidden_session()
+    if adopted:
+        # 迁移前的老会话没有 owner：这一次访问即为认领，落盘后其他客户端再来就是 403。
+        # 已归属的会话不再每次读取都重写文件。
+        store.save(session)
+    payload = session.to_dict()
+    # 归属哈希只用于服务端比对，不回给客户端
+    payload.pop("owner_hash", None)
+    return {"data": payload}
 
 
 @app.delete("/v1/sessions/{session_id}")
-def delete_session(session_id: str):
+def delete_session(session_id: str, http_request: Request):
     """删除推演会话（含不可变快照与交互记录）。"""
+    requested_owner, error = _client_owner_or_error(http_request)
+    if error is not None:
+        return error
     store = get_store()
     session = store.load(session_id)
     if session is None:
         return JSONResponse(status_code=404, content={"error": {"code": "SESSION_NOT_FOUND", "message": "会话不存在"}})
+    if not claim_or_match(session, requested_owner):
+        return _forbidden_session()
     deleted = store.delete(session_id)
     return {"data": {"session_id": session_id, "deleted": deleted}}
 
 
 @app.post("/v1/sessions/{session_id}/cast")
-def cast_session(session_id: str, request: Optional[SessionCastRequest] = None):
+def cast_session(session_id: str, http_request: Request, request: Optional[SessionCastRequest] = None):
     """执行排盘：运行7步工作流，冻结不可变快照，返回完整推演结果。
 
     铁律：盘面一经生成永久固定，后续交互不得修改原始卦盘。
     """
+    requested_owner, error = _client_owner_or_error(http_request)
+    if error is not None:
+        return error
     store = get_store()
     session = store.load(session_id)
     if session is None:
         return JSONResponse(status_code=404, content={"error": {"code": "SESSION_NOT_FOUND", "message": "会话不存在"}})
+    if not session.owner_hash:
+        # 认领即刻落盘：即使随后排盘失败/被拒，归属也不会退回「谁都能认领」
+        if not claim_or_match(session, requested_owner):
+            return _forbidden_session()
+        store.save(session)
+    elif session.owner_hash != requested_owner:
+        return _forbidden_session()
     if session.snapshot is not None and session.snapshot.frozen:
         return JSONResponse(
             status_code=409,
@@ -983,15 +996,24 @@ def cast_session(session_id: str, request: Optional[SessionCastRequest] = None):
 
 
 @app.post("/v1/sessions/{session_id}/interact")
-def interact_session(session_id: str, request: SessionInteractRequest):
+def interact_session(session_id: str, request: SessionInteractRequest, http_request: Request):
     """交互入口：处理现实校验、多方取象、分支推演、事后复盘等交互。
 
     铁律：所有交互均不得修改已冻结的原始盘面（snapshot）。
     """
+    requested_owner, error = _client_owner_or_error(http_request)
+    if error is not None:
+        return error
     store = get_store()
     session = store.load(session_id)
     if session is None:
         return JSONResponse(status_code=404, content={"error": {"code": "SESSION_NOT_FOUND", "message": "会话不存在"}})
+    if not session.owner_hash:
+        if not claim_or_match(session, requested_owner):
+            return _forbidden_session()
+        store.save(session)
+    elif session.owner_hash != requested_owner:
+        return _forbidden_session()
     if session.snapshot is None:
         return JSONResponse(status_code=409, content={"error": {"code": "NOT_CAST_YET", "message": "请先执行排盘（/cast），再进行交互。"}})
 

@@ -4,7 +4,7 @@
 步骤间数据单向流动，后续步骤只能读取前面步骤的输出，不能回写修改。
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from app.common.categories import CATEGORY_LABELS, normalize_category
 from app.common.five_elements import (
@@ -149,6 +149,98 @@ MEIHUA_YONGSHEN = {
 }
 
 
+HEXAGRAM_MODULES = ("meihua", "liuyao", "zhouyi")
+DOMAIN_MODULES = ("bazi", "ziwei", "qimen", "liuren", "daliuren")
+
+# 紫微斗数按事项取用事宫位（键与 app.common.categories 一致）
+ZIWEI_CATEGORY_PALACES = {
+    "career": ("官禄宫", "命宫", "紫微论事业以官禄宫为用事宫位，命宫看自身格局与承担力"),
+    "finance": ("财帛宫", "命宫", "紫微论财运以财帛宫为用事宫位，兼看田宅与福德"),
+    "relationship": ("夫妻宫", "命宫", "紫微论感情以夫妻宫为用事宫位，命宫看自身立场"),
+    "study": ("官禄宫", "命宫", "紫微论学业考试以官禄宫为用事宫位，兼看文昌文曲与化科"),
+    "lawsuit": ("官禄宫", "迁移宫", "紫微论官讼以官禄宫为用事宫位，迁移宫看外部对手与环境"),
+    "travel": ("迁移宫", "命宫", "紫微论出行以迁移宫为用事宫位，命宫看自身准备"),
+    "missing_person": ("交友宫", "迁移宫", "紫微论寻人以交友宫为用事宫位，迁移宫看对方动向"),
+    "lost_item": ("田宅宫", "财帛宫", "紫微论失物以田宅宫为用事宫位，财帛宫看财物本体"),
+    "health": ("疾厄宫", "命宫", "紫微论健康以疾厄宫为用事宫位，命宫看整体气数"),
+    "decision": ("命宫", "迁移宫", "紫微论抉择以命宫为自身立场，迁移宫看外部条件与变动"),
+    "other": ("命宫", "迁移宫", "紫微通用事项以命宫为自身，迁移宫看外部环境"),
+}
+
+
+def _present_modules(plate_data: Dict[str, Any]) -> set:
+    systems = plate_data.get("systems") or []
+    plates = plate_data.get("plates") or {}
+    return set(systems) | set(plates.keys())
+
+
+def _has_hexagram_system(plate_data: Dict[str, Any]) -> bool:
+    return bool(_present_modules(plate_data) & set(HEXAGRAM_MODULES))
+
+
+def _facts_of(plate_data: Dict[str, Any], module: str) -> Dict[str, Any]:
+    return ((plate_data.get("plates") or {}).get(module) or {}).get("facts") or {}
+
+
+def _domain_yongshen(plate_data: Dict[str, Any], category: str) -> Optional[Dict[str, str]]:
+    """非卦象体系（八字/紫微/奇门/六壬）按各自口径定用神。
+
+    这些体系没有六亲爻位，直接沿用「事业看官鬼爻」会把不存在的概念写进结论。
+    只在本次没排梅花/六爻/周易时启用，卦象体系仍走原来的两套表。
+    """
+    present = _present_modules(plate_data)
+    label = CATEGORY_LABELS[category]
+
+    if "bazi" in present:
+        strength = _facts_of(plate_data, "bazi").get("day_master_strength") or {}
+        facts = _facts_of(plate_data, "bazi")
+        favorable = strength.get("favorable_elements") or []
+        unfavorable = strength.get("unfavorable_elements") or []
+        day_master = facts.get("day_master") or strength.get("day_master") or ""
+        primary = "喜用五行" + ("（{}）".format("、".join(favorable)) if favorable else "")
+        secondary = "忌神五行" + ("（{}）".format("、".join(unfavorable)) if unfavorable else "")
+        logic = (strength.get("analysis") or {}).get("summary") or "八字以日主强弱定喜忌，取喜用五行为用神"
+        if day_master:
+            logic = "日主为{}，{}".format(day_master, logic)
+        return {
+            "framework": "bazi",
+            "framework_label": "八字命理",
+            "primary": primary,
+            "secondary": secondary,
+            "logic": logic,
+        }
+
+    if "ziwei" in present:
+        palace, east_west, logic = ZIWEI_CATEGORY_PALACES.get(category, ZIWEI_CATEGORY_PALACES["other"])
+        return {
+            "framework": "ziwei",
+            "framework_label": "紫微斗数",
+            "primary": "{}（{}用事宫）".format(palace, label),
+            "secondary": east_west,
+            "logic": logic,
+        }
+
+    if "qimen" in present:
+        return {
+            "framework": "qimen",
+            "framework_label": "奇门遁甲",
+            "primary": "日干（求测人）",
+            "secondary": "时干（所测之事）",
+            "logic": "奇门以日干为求测人、时干为所测之事，兼看值符值使与用神宫的门星神格局",
+        }
+
+    if "liuren" in present or "daliuren" in present:
+        return {
+            "framework": "liuren",
+            "framework_label": "大六壬",
+            "primary": "日干（求测人）",
+            "secondary": "三传（事态脉络）",
+            "logic": "大六壬以日干为求测人，三传为事态脉络：初传发端、中传经过、末传结果",
+        }
+
+    return None
+
+
 def step3_identify_yongshen(session, plate_data: Dict[str, Any]) -> Dict[str, Any]:
     """定用神，锁定分析焦点。多人事件列出各方对应用神。
 
@@ -183,6 +275,27 @@ def step3_identify_yongshen(session, plate_data: Dict[str, Any]) -> Dict[str, An
     if "liuyao" in systems:
         yongshen_by_system["liuyao"] = liuyao_yong
 
+    # 没有卦象体系时，按本体系口径定用神；不要把六亲爻位写给八字/紫微/奇门/六壬
+    domain = None if _has_hexagram_system(plate_data) else _domain_yongshen(plate_data, category)
+    if domain:
+        yongshen_by_system[domain["framework"]] = {
+            "primary": domain["primary"],
+            "secondary": domain["secondary"],
+            "logic": domain["logic"],
+        }
+        return {
+            "step": 3,
+            "name": "用神定位",
+            "category": category,
+            "category_label": CATEGORY_LABELS[category],
+            "primary_yongshen": domain["primary"],
+            "secondary_yongshen": domain["secondary"],
+            "logic": domain["logic"],
+            "yongshen_framework": domain["framework_label"],
+            "yongshen_by_system": yongshen_by_system,
+            "party_yongshen": party_yongshen,
+        }
+
     return {
         "step": 3,
         "name": "用神定位",
@@ -191,6 +304,7 @@ def step3_identify_yongshen(session, plate_data: Dict[str, Any]) -> Dict[str, An
         "primary_yongshen": liuyao_yong["primary"],
         "secondary_yongshen": liuyao_yong["secondary"],
         "logic": liuyao_yong["logic"],
+        "yongshen_framework": "卦象体系",
         "yongshen_by_system": yongshen_by_system,
         "party_yongshen": party_yongshen,
     }
@@ -367,6 +481,47 @@ def step4_wangshuai_analysis(session, plate_data: Dict[str, Any], yongshen_data:
 
     # 用神五行按盘面推导：六亲爻/世应爻/用卦，绝不用固定对照表
     primary = yongshen_data.get("primary_yongshen", "")
+
+    # 没有卦象体系时，旺衰/体用/世应这些卦象概念一律不适用，不硬套
+    domain = None if _has_hexagram_system(plate_data) else _domain_yongshen(
+        plate_data, normalize_category(session.category)
+    )
+    if domain:
+        element = ""
+        if domain["framework"] == "bazi":
+            favorable = (_facts_of(plate_data, "bazi").get("day_master_strength") or {}).get("favorable_elements") or []
+            element = favorable[0] if favorable else ""
+        analysis_chain = [
+            "本次盘面为{}，采用该体系用神：{}（不取卦爻六亲）。".format(domain["framework_label"], primary),
+            domain["logic"],
+            "未排梅花/六爻/周易，卦象旺衰、体用与世应关系不适用。",
+        ]
+        return {
+            "step": 4,
+            "name": "旺衰与生克分析",
+            "calendar_context": {
+                "month_pillar": month_pillar_text,
+                "day_pillar": day_pillar_text,
+                "month_branch": month_branch,
+                "day_branch": day_branch,
+                "month_element": month_element,
+                "day_element": day_element,
+            },
+            "yongshen_wangshuai": {
+                "yongshen": primary,
+                "element": element,
+                "element_source": domain["logic"],
+                "level": "不适用",
+                "reason": "{}不以月令定卦象旺衰".format(domain["framework_label"]),
+            },
+            "yongshen_framework": domain["framework_label"],
+            "tiyong_relation": None,
+            "shiying_relation": {"note": "当前盘面无六爻纳甲，世应关系不适用"},
+            "ganzhi_interactions": [],
+            "analysis_chain": analysis_chain,
+            "rule_ids": [],
+        }
+
     yongshen_element, element_source = _resolve_yongshen_element(plate_data, primary)
 
     wangshuai_level = "平"
@@ -442,6 +597,7 @@ def step4_wangshuai_analysis(session, plate_data: Dict[str, Any], yongshen_data:
             "level": wangshuai_level,
             "reason": wangshuai_reason,
         },
+        "yongshen_framework": "卦象体系",
         "tiyong_relation": tiyong_relation,
         "shiying_relation": shiying_relation,
         "ganzhi_interactions": ganzhi_interactions,
@@ -599,6 +755,35 @@ def step6_synthesis_judgement(
         advisory_result = generate_advisory(module_results, context)
     except Exception:
         advisory_result = {}
+
+    # 没有卦象体系时，吉凶等级在规则口径下无法成立：不出分、给「未评级」
+    domain = None if _has_hexagram_system(plate_data) else _domain_yongshen(plate_data, category)
+    if domain:
+        framework = domain["framework_label"]
+        return {
+            "step": 6,
+            "name": "事态综合推演",
+            "current_status": "事项处于{}范畴；本次以{}盘面为据，用神为{}，未取卦象用神。".format(
+                CATEGORY_LABELS[category], framework, domain["primary"]
+            ),
+            "favorable": [],
+            "obstacles": [],
+            "trend": "未排梅花/六爻/周易，不作卦象吉凶与趋势推演；{}盘面的结构见步骤2盘面摘要，事项建议见顾问结论。".format(framework),
+            "timing": None,
+            "fortune_level": "未评级",
+            "fortune_score": None,
+            "fortune_basis": [
+                "本次未排卦象体系（梅花/六爻/周易），按 WF-FORTUNE-001 的口径无法出具卦象吉凶等级",
+                "{}用神：{}".format(framework, domain["primary"]),
+            ],
+            "yongshen_framework": framework,
+            "synthesis": synthesis_result,
+            "advisory": advisory_result,
+            "imagery": imagery_result,
+            "yuanhui": yuanhui_result,
+            "literature": literature_result,
+            "rule_ids": [],
+        }
 
     # 吉凶等级判定（旺衰 + 体用五行关系；判定口径登记为 WF-FORTUNE-001）
     wangshuai_level = wangshuai_data.get("yongshen_wangshuai", {}).get("level", "平")
@@ -825,7 +1010,10 @@ def step7_advice_and_disclaimer(session, synthesis_data: Dict[str, Any]) -> Dict
 
     advice = []
     # 基于吉凶等级的通用建议
-    if fortune in ("大吉", "小吉"):
+    if fortune == "未评级":
+        framework = synthesis_data.get("yongshen_framework") or "所选体系"
+        advice.append("本次未排卦象体系，{}盘面不输出卦象吉凶；建议以盘面事实与顾问结论为参考，按事项自身条件评估推进节奏。".format(framework))
+    elif fortune in ("大吉", "小吉"):
         advice.append("当前卦象有利，可在用神旺相时段积极推进，但仍需核实关键细节，避免因顺境疏忽。")
     elif fortune == "平":
         advice.append("当前吉凶参半，宜稳扎稳打，不宜冒进；先小范围验证再扩大投入。")

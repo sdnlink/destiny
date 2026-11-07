@@ -143,6 +143,7 @@ BUILD_INSTALL_DEPENDENCIES=0 BUILD_RUN_TESTS=0 ./scripts/deploy.sh
 | `CLICKHOUSE_URL` / `CLICKHOUSE_USER` / `CLICKHOUSE_PASSWORD` | ClickHouse 连接 | 口令不再有代码内置默认值；缺失时记录警告，数据库相关接口按端点不同降级为 `unavailable` / `in_memory_fallback` / `file_cache`，并在响应的 `source` 字段标注来源 |
 | `APP_API_TOKEN` | `/v1` 接口 Bearer 鉴权 | 未设置时启动即记录「仅本地开发可用」警告 |
 | `SESSION_STORAGE_DIR` | 会话 JSON 目录 | 默认 `data/sessions` |
+| （请求头）`X-Client-Id` | 会话归属标识，16–64 位 URL 安全字符 | 会话接口（`/v1/sessions*`）强制要求；缺失或非法返回 400 `CLIENT_ID_REQUIRED`，跨归属返回 403 `SESSION_FORBIDDEN` |
 
 参考 `.env.example`。
 
@@ -151,6 +152,8 @@ BUILD_INSTALL_DEPENDENCIES=0 BUILD_RUN_TESTS=0 ./scripts/deploy.sh
 当前Web界面没有登录和令牌输入能力。生产服务应继续监听`127.0.0.1`，由同机反向代理负责TLS、身份认证、访问控制和限流，再转发到`8090`。
 
 设置`APP_API_TOKEN`后，鉴权覆盖`/v1/*`、`/docs`、`/openapi.json`和`/redoc`；`/health`探活与`SERVE_WEB=1`挂载的静态页面保持公开（浏览器无法携带Bearer头，整站401属于配置冲突，中间件已按此边界放行）。因此Token只保护数据与计算接口，页面本身仍需反向代理层面的访问控制。
+
+会话归属是另一层、和Token互补：`APP_API_TOKEN`是部署级口令（所有客户端共用一个），只能挡"外人进不来"；会话接口在此之上还要求`X-Client-Id`，服务端只存其sha256并据此过滤列表、拒绝跨归属读写（审计22）。两者都不等于账号体系：换浏览器就是另一个客户端身份，会话不会跟人走。迁移前无归属的老会话由首个访问者认领并落盘，这个窗口只在"还没人打开过"期间存在。
 
 不要把`APP_API_TOKEN`编译进前端，也不要为了直接公网监听而关闭非回环绑定保护。若部署在容器网络并必须监听`0.0.0.0`，应先完成统一身份认证设计，或由受保护的内部网络和反向代理注入服务端认证。
 

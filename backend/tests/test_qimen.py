@@ -41,6 +41,16 @@ class QimenTests(unittest.TestCase):
         self.assertTrue(len(favs) > 0)
         self.assertIn(favs[0]["gate"], ["开门", "休门", "生门"])
 
+    def test_qimen_result_exposes_facts_for_plate_pipeline(self):
+        """奇门此前把盘面平铺在顶层、没有 facts，冻结快照与 step2 都读不到任何内容。"""
+        result = calculate_qimen_chart("2026-08-15T16:00:00")
+        facts = result.get("facts")
+        self.assertIsInstance(facts, dict)
+        self.assertEqual(facts["dun_type"], result["dun_type"])
+        self.assertEqual(facts["ju_number"], result["ju_number"])
+        self.assertEqual(len(facts["palaces"]), 9)
+        self.assertEqual(facts["zhi_fu_star"], result["zhi_fu_star"])
+
     def test_qimen_pattern_evaluation(self):
         # 戊加丙 (青龙返首)
         p1 = evaluate_qimen_patterns("戊", "丙", "开门", "天心", "值符")

@@ -20,6 +20,46 @@ ROLE_YONGSHEN_MAP = {
     "中介/第三方": {"yongshen": "间爻/六合", "nature": "中间方、撮合者、信息传递方"},
 }
 
+# 非卦象体系没有世应/六亲，按本体系成立的人物符号取象
+DOMAIN_PARTY_SYMBOLS = {
+    "奇门遁甲": {
+        "求测人": "日干",
+        "对方": "时干",
+        "领导/上级": "值符",
+        "下属/晚辈": "值使",
+        "客户/合作方": "时干",
+        "竞争者": "时干",
+        "中介/第三方": "中宫/值使",
+    },
+    "大六壬": {
+        "求测人": "日干",
+        "对方": "三传",
+        "领导/上级": "三传",
+        "下属/晚辈": "三传",
+        "客户/合作方": "三传",
+        "竞争者": "三传",
+        "中介/第三方": "四课",
+    },
+    "八字命理": {
+        "求测人": "日主",
+        "对方": "对应十神（配偶/财官）",
+        "领导/上级": "官星",
+        "下属/晚辈": "食伤",
+        "客户/合作方": "财星",
+        "竞争者": "比劫",
+        "长辈/父母": "印星",
+    },
+    "紫微斗数": {
+        "求测人": "命宫",
+        "对方": "夫妻宫/交友宫",
+        "领导/上级": "官禄宫",
+        "下属/晚辈": "仆役宫",
+        "客户/合作方": "财帛宫",
+        "竞争者": "交友宫",
+        "长辈/父母": "父母宫",
+    },
+}
+
 
 def detect_parties(question: str) -> List[str]:
     """从求测问题中识别涉及的人物角色。"""
@@ -71,8 +111,12 @@ def analyze_multi_party(
     if parties is None:
         parties = detect_parties(session.question or "")
 
+    framework = _domain_framework(session)
     party_analyses = []
     for party in parties:
+        if framework:
+            party_analyses.append(_domain_party(party, framework))
+            continue
         mapping = ROLE_YONGSHEN_MAP.get(party, {"yongshen": "应爻", "nature": "相关方"})
         analysis = {
             "party": party,
@@ -95,7 +139,7 @@ def analyze_multi_party(
         if focus:
             result["focus_party"] = {
                 **focus,
-                "deep_analysis": _deep_party_analysis(session, focus_party),
+                "deep_analysis": _deep_party_analysis(session, focus_party, framework),
             }
 
     return result
@@ -128,8 +172,40 @@ def _infer_party_demands(session, party: str) -> str:
     return f"{party}诉求：需结合其用神所临六亲六神与卦象综合推断"
 
 
-def _deep_party_analysis(session, party: str) -> str:
+def _domain_framework(session) -> str:
+    """非卦象体系返回体系名，卦象体系返回空串。"""
+    workflow = session.workflow_result or {}
+    step3 = workflow.get("step3") or {}
+    step4 = workflow.get("step4") or {}
+    framework = step3.get("yongshen_framework") or step4.get("yongshen_framework") or ""
+    return "" if framework in ("", "卦象体系") else framework
+
+
+def _domain_party(party: str, framework: str) -> Dict[str, Any]:
+    """非卦象体系的人物取象：只给本体系符号，不谈世应六亲。"""
+    symbol = DOMAIN_PARTY_SYMBOLS.get(framework, {}).get(party, "本体系对应宫位/符号")
+    return {
+        "party": party,
+        "yongshen": symbol,
+        "nature": ROLE_YONGSHEN_MAP.get(party, {"nature": "相关方"})["nature"],
+        "position": f"本盘为{framework}，没有世应爻位；{party}按{symbol}取象",
+        "mindset": f"{party}心态：需结合{symbol}所在宫位/十神/三传的现实对应核对，本盘不套用六神六亲推断",
+        "demands": f"{party}诉求：需结合{symbol}与用神的生克合冲关系，以及现实中的角色利益判断",
+    }
+
+
+def _deep_party_analysis(session, party: str, framework: str = "") -> str:
     """单一人物深化解读。"""
+    if framework:
+        symbol = DOMAIN_PARTY_SYMBOLS.get(framework, {}).get(party, "本体系对应宫位/符号")
+        return (
+            f"针对「{party}」的深化解读（{framework}口径）：\n"
+            f"1. 取象符号：{symbol}\n"
+            f"2. 盘面位置：在本体系中查该符号所在宫位/十神/三传，核对现实角色是否对应\n"
+            f"3. 与用神关系：看{symbol}与用神（或用事宫）的生克合冲，判断配合度与阻力来源\n"
+            f"4. 时间信号：结合本体系时间符号（节气/时辰、大运流年、大限）看其态度或行动的变化窗口\n"
+            f"5. 边界说明：本盘未排卦象体系，不动用世应、六亲、六神概念"
+        )
     return (
         f"针对「{party}」的深化解读：\n"
         f"1. 用神定位：{ROLE_YONGSHEN_MAP.get(party, {}).get('yongshen', '待确定')}\n"

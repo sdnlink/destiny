@@ -23,6 +23,11 @@ def _hexagram_brief(value: Any) -> Dict[str, Any]:
         "name": value.get("name") or "",
         "symbol": value.get("symbol") or "",
     }
+    # 阴阳爻线直接带上，前端就不必再按上/下卦名查一张本地八卦表反推——
+    # 那是第二份映射，卦名读法一变就会画错爻。
+    lines = value.get("lines")
+    if isinstance(lines, (list, tuple)) and len(lines) == 6:
+        brief["lines"] = [1 if bit else 0 for bit in lines]
     # 前端卦象图按上下卦名查八卦表再画爻线。引擎把上下卦存成 trigram 字典，
     # 只认字符串的读法会拿不到卦名，结果整卦默认画成坤（六条断线）。
     for key, source_key in (("upper", "upper_trigram"), ("lower", "lower_trigram")):
@@ -68,6 +73,20 @@ def _line_records(facts: Dict[str, Any]) -> List[Dict[str, Any]]:
         for line in lines
         if isinstance(line, dict)
     ]
+
+
+def _line_field(facts: Dict[str, Any], key: str) -> List[str]:
+    """按爻位顺序（初→上）取某一爻字段的六个值。
+
+    只有齐全的六爻才返回数组：缺一爻或读法变了就返回空列表，
+    让前端明确走回退分支，而不是画出一份半真半假的盘。
+    """
+    values = [
+        line.get(key)
+        for line in facts.get("line_chart") or []
+        if isinstance(line, dict) and line.get(key)
+    ]
+    return values if len(values) == 6 else []
 
 
 def _moving_line_desc(original: Any, moving_line: Optional[int]) -> str:
@@ -140,6 +159,12 @@ def build_plate_facts(module_results: List[Dict[str, Any]]) -> Dict[str, Dict[st
                 if isinstance(line, dict) and line.get("is_moving") and line.get("najia_branch")
             ],
             "line_chart": _line_records(facts),
+            # 六神/六亲此前只存在于引擎的 steps 里，盘面事实没往上收一层，
+            # 于是 compact 输出里那两个键永远是空的：前端只能按「青龙起」的
+            # 固定默认顺序画，跟真实日干起出来的六神无关。这里按爻位顺序
+            # （初→上）收成两个数组，和 line_chart 同序。
+            "six_spirits": _line_field(facts, "six_spirit"),
+            "liuqin": _line_field(facts, "six_relative"),
             "palace": facts.get("palace") if isinstance(facts.get("palace"), dict) else None,
             "body_use": body_use if isinstance(body_use, dict) else None,
             "body_use_relation": facts.get("body_use_relation")
@@ -272,6 +297,71 @@ def _calendar_display(calendar: Any) -> Optional[Dict[str, Any]]:
     }
 
 
+def _dig(value: Any, *path: str) -> Any:
+    for key in path:
+        if not isinstance(value, dict):
+            return None
+        value = value.get(key)
+    return value
+
+
+def domain_summary(module: str, facts: Dict[str, Any]) -> Dict[str, str]:
+    """非卦象体系（八字/紫微/奇门/六壬）的展示摘要。
+
+    它们的盘面不在 original/line_chart 里，compact 只搬卦象字段时 step2 会整段空白，
+    用户选了八字却看不到四柱。这里按展示需要抽出少量标量，完整盘面仍在快照里。
+    """
+    summary: Dict[str, str] = {}
+
+    def add(label: str, value: Any) -> None:
+        if value in (None, "", [], {}):
+            return
+        summary[label] = value if isinstance(value, str) else str(value)
+
+    if module == "bazi":
+        pillars = facts.get("pillars") or {}
+        four = " ".join(
+            str((pillars.get(key) or {}).get("ganzhi") or "")
+            for key in ("year", "month", "day", "hour")
+        ).strip()
+        day_master = facts.get("day_master") or ""
+        element = facts.get("day_master_element") or ""
+        add("日主", "{}（{}）".format(day_master, element) if element else day_master)
+        add("四柱", four)
+        add("日主旺衰", _dig(facts, "day_master_strength", "level"))
+        luck = facts.get("luck_pillars") or []
+        add("大运", "{} 步".format(len(luck)) if luck else "")
+    elif module == "ziwei":
+        add("五行局", _dig(facts, "bureau", "name"))
+        add("命宫", _dig(facts, "ming_palace", "palace_stem_branch") or _dig(facts, "ming_palace", "earthly_branch"))
+        add("身宫", _dig(facts, "shen_palace", "palace_stem_branch")
+            or _dig(facts, "shen_palace", "earthly_branch")
+            or (facts.get("shen_palace") if isinstance(facts.get("shen_palace"), str) else ""))
+        si_hua = facts.get("si_hua") or {}
+        add("四化", " · ".join("{} {}".format(key, value) for key, value in si_hua.items()))
+        palaces = facts.get("palaces_by_order") or []
+        add("宫位", "{} 宫".format(len(palaces)) if palaces else "")
+    elif module == "qimen":
+        dun = facts.get("dun_type") or ""
+        ju = facts.get("ju_number")
+        add("局象", "{}{}局·{}".format(dun, ju, facts.get("yuan_type") or "").rstrip("·"))
+        add("节气", facts.get("solar_term"))
+        add("值符", "{} 落 {} 宫".format(facts.get("zhi_fu_star") or "", facts.get("zhi_fu_palace") or "").strip())
+        add("值使", "{} 落 {} 宫".format(facts.get("zhi_shi_gate") or "", facts.get("zhi_shi_palace") or "").strip())
+        favorable = facts.get("favorable_directions") or []
+        if favorable:
+            top = favorable[0]
+            add("首选吉方", "{}方 · {} · {}".format(top.get("direction") or "", top.get("gate") or "", top.get("palace_name") or ""))
+    elif module in ("daliuren", "liuren"):
+        add("占日", facts.get("day_pillar"))
+        add("占时", facts.get("actual_time_branch") or _dig(facts, "occupation_time", "branch"))
+        add("月将", _dig(facts, "month_general", "name"))
+        transmissions = (_dig(facts, "three_transmissions", "transmissions") or [])
+        add("三传", " → ".join(str(item) for item in transmissions))
+        add("课体", _dig(facts, "three_transmissions", "lesson_type"))
+    return summary
+
+
 def compact_plate_output(step2: Dict[str, Any]) -> Dict[str, Any]:
     """把 step2 压成「展示用」结构。
 
@@ -288,9 +378,15 @@ def compact_plate_output(step2: Dict[str, Any]) -> Dict[str, Any]:
         for key in DISPLAY_HEXAGRAM_KEYS:
             if facts.get(key):
                 display_facts[key] = _hexagram_brief(facts.get(key))
-        for key in ("moving_line", "moving_lines", "six_spirits", "liuqin"):
+        for key in ("moving_line", "moving_lines"):
             if facts.get(key):
                 display_facts[key] = facts[key]
+        # 六神/六亲：引擎只把它们放在逐爻 line_chart 与 steps 里，
+        # facts 顶层没有这两个键。不在这里补出来，前端就只能画固定默认序列。
+        for display_key, line_key in (("six_spirits", "six_spirit"), ("liuqin", "six_relative")):
+            values = facts.get(display_key) or _line_field(facts, line_key)
+            if values:
+                display_facts[display_key] = values
         body_use = facts.get("body_use")
         if isinstance(body_use, dict):
             display_facts["body_use"] = {
@@ -300,6 +396,7 @@ def compact_plate_output(step2: Dict[str, Any]) -> Dict[str, Any]:
         plates[module] = {
             "system_label": plate.get("system_label") or module,
             "facts": display_facts,
+            "summary": domain_summary(module, facts),
             "warnings": plate.get("warnings") or [],
             "engine_version": plate.get("engine_version") or "",
             "rule_version": plate.get("rule_version") or "",

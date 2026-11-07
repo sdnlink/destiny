@@ -10,7 +10,11 @@ MODULE_LABELS = {
     "meihua": "梅花易数",
     "liuyao": "六爻",
     "liuren": "大六壬",
+    "daliuren": "大六壬",
     "ziwei": "紫微斗数",
+    "bazi": "八字命理",
+    "qimen": "奇门遁甲",
+    "fengshui": "阳宅风水",
 }
 RELATIVE_MEANINGS = {
     "父母": "文书契约、规章资质、长辈领导、信息支撑或房产车辆",

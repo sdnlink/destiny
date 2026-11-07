@@ -25,6 +25,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.common.categories import CATEGORIES
 from app.session import create_session
 from app.workflow import steps as wf
+from app.workflow.engine import WorkflowEngine
+from app.workflow.format import render_fixed_format, render_plate_text
 
 
 # ============================================================
@@ -238,6 +240,24 @@ class TestStep2FormatPlate(unittest.TestCase):
         module_results = [{"module": "unknown_system", "result": {}}]
         plate = wf.step2_format_plate(module_results, ["unknown_system"])["plates"]["unknown_system"]
         self.assertEqual(plate["system_label"], "unknown_system")
+
+    def test_every_dispatchable_system_has_a_chinese_label(self):
+        """标签表缺项时 step2 会直接把 qimen/bazi 当标签发给前端。"""
+        from app.core.interpretation import MODULE_LABELS
+        from app.workflow.scheduler import SYSTEM_LABELS
+
+        missing = [
+            key for key in SYSTEM_LABELS
+            if key != "calendar" and key not in MODULE_LABELS
+        ]
+        self.assertEqual(missing, [])
+        for key, label in SYSTEM_LABELS.items():
+            if key == "calendar":
+                continue
+            self.assertTrue(
+                MODULE_LABELS[key].startswith(label.split("神课")[0].split("纳甲")[0]),
+                f"{key} 标签不一致：{MODULE_LABELS[key]} vs {label}",
+            )
 
     def test_empty_module_results(self):
         result = wf.step2_format_plate([], [])
@@ -943,6 +963,155 @@ class TestStep7Advice(unittest.TestCase):
         self.assertIn("仅作参考", result["disclaimer"])
         self.assertIn("不构成任何决策依据", result["disclaimer"])
         self.assertEqual(result["name"], "趋吉避凶建议")
+
+    def test_unrated_plan_does_not_claim_hexagram_obstruction(self):
+        session = create_session(question="测试", category="career")
+        result = wf.step7_advice_and_disclaimer(
+            session, {"fortune_level": "未评级", "yongshen_framework": "八字命理"}
+        )
+        self.assertIn("未排卦象体系", result["advice"][0])
+        self.assertNotIn("卦象有阻", result["advice"][0])
+
+
+# ============================================================
+# 非卦象体系（八字/紫微/奇门/六壬）用神口径
+# ============================================================
+
+class TestNonHexagramYongshen(unittest.TestCase):
+    """纯命理/式盘的盘面不该出现「官鬼/父母」这类六亲爻位。"""
+
+    def _qimen_plate(self):
+        return {
+            "systems": ["qimen"],
+            "plates": {"qimen": {"facts": {"dun_type": "阴遁", "ju_number": 3}}},
+        }
+
+    def _bazi_plate(self):
+        return {
+            "systems": ["bazi"],
+            "plates": {
+                "bazi": {
+                    "facts": {
+                        "day_master": "癸",
+                        "day_master_strength": {
+                            "level": "极弱",
+                            "favorable_elements": ["火", "木"],
+                            "unfavorable_elements": ["水", "金"],
+                            "analysis": {"summary": "日主【癸水】极弱。喜用五行：火、木。"},
+                        },
+                    }
+                }
+            },
+        }
+
+    def test_qimen_uses_day_stem_instead_of_six_relatives(self):
+        session = create_session(question="能否升职", category="career")
+        result = wf.step3_identify_yongshen(session, self._qimen_plate())
+        self.assertEqual(result["primary_yongshen"], "日干（求测人）")
+        self.assertNotIn("官鬼", result["logic"])
+        self.assertEqual(set(result["yongshen_by_system"]), {"qimen"})
+        self.assertEqual(result["yongshen_framework"], "奇门遁甲")
+
+    def test_bazi_uses_favorable_elements(self):
+        session = create_session(question="能否升职", category="career")
+        result = wf.step3_identify_yongshen(session, self._bazi_plate())
+        self.assertEqual(result["primary_yongshen"], "喜用五行（火、木）")
+        self.assertEqual(result["secondary_yongshen"], "忌神五行（水、金）")
+        self.assertIn("喜用五行：火、木", result["logic"])
+        self.assertEqual(result["yongshen_framework"], "八字命理")
+
+    def test_ziwei_uses_palace_by_category(self):
+        session = create_session(question="财运如何", category="finance")
+        plate = {"systems": ["ziwei"], "plates": {"ziwei": {"facts": {}}}}
+        result = wf.step3_identify_yongshen(session, plate)
+        self.assertIn("财帛宫", result["primary_yongshen"])
+        self.assertEqual(result["yongshen_framework"], "紫微斗数")
+
+    def test_domain_plan_marks_wangshuai_not_applicable(self):
+        session = create_session(question="能否升职", category="career")
+        result = wf.step4_wangshuai_analysis(
+            session, self._qimen_plate(), {"primary_yongshen": "日干（求测人）"}
+        )
+        self.assertEqual(result["yongshen_wangshuai"]["level"], "不适用")
+        self.assertIsNone(result["tiyong_relation"])
+        self.assertEqual(result["rule_ids"], [])
+        self.assertTrue(any("不取卦爻六亲" in item for item in result["analysis_chain"]))
+
+    def test_domain_plan_has_no_fortune_rating(self):
+        session = create_session(question="能否升职", category="career")
+        result = wf.step6_synthesis_judgement(
+            session, [], self._bazi_plate(),
+            {"primary_yongshen": "喜用五行（火、木）"},
+            {"yongshen_wangshuai": {"level": "不适用"}},
+            {},
+        )
+        self.assertEqual(result["fortune_level"], "未评级")
+        self.assertIsNone(result["fortune_score"])
+        self.assertIsNone(result["timing"])
+        self.assertEqual(result["favorable"], [])
+        self.assertTrue(any("未排卦象体系" in item for item in result["fortune_basis"]))
+
+    def test_hexagram_plan_still_uses_six_relatives(self):
+        session = create_session(question="能否升职", category="career")
+        result = wf.step3_identify_yongshen(session, {"systems": ["liuyao"]})
+        self.assertEqual(result["primary_yongshen"], "官鬼")
+        self.assertEqual(result["yongshen_framework"], "卦象体系")
+
+    def test_reference_library_does_not_invent_a_hexagram(self):
+        library = WorkflowEngine._build_reference_library(
+            None, {"plates": {}}, {"hexagram_name": "", "symbol_mappings": []},
+            {"fortune_level": "未评级", "obstacles": []},
+        )
+        self.assertNotIn("本卦「」", library["core_symbols"])
+        self.assertIn("未排卦象体系", library["core_symbols"])
+        self.assertNotIn("待用神得令", library["time_window"])
+
+    def test_plate_text_for_non_hexagram_shows_summary(self):
+        """固定文本输出此前对非卦象体系只剩一个空标题，必须补盘面摘要。"""
+        text = render_plate_text({"plates": {"qimen": {
+            "system_label": "奇门",
+            "facts": {
+                "dun_type": "阴遁", "ju_number": 3, "yuan_type": "下元",
+                "solar_term": "寒露", "zhi_fu_star": "天柱", "zhi_fu_palace": 6,
+                "zhi_shi_gate": "惊门", "zhi_shi_palace": 4,
+            },
+        }}})
+        self.assertIn("盘面摘要", text)
+        self.assertIn("阴遁3局", text)
+        self.assertNotIn("本卦", text)
+
+    def test_reality_check_describes_unrated_plan(self):
+        check = WorkflowEngine._build_reality_check(
+            None, {"plates": {}}, {"primary_yongshen": "喜用五行（火、木）"},
+            {"fortune_level": "未评级"},
+        )
+        self.assertTrue(any("未评级" in item and "不输出吉凶倾向" in item for item in check["items"]))
+
+    def test_fixed_format_has_no_none_or_raw_dict(self):
+        class _Session:
+            question = "测试事项"
+            casting_method = "auto"
+
+        text = render_fixed_format(
+            _Session(),
+            {"system": "qimen", "casting_method": "auto",
+             "casting_source": {"local_datetime": "2026-11-05T10:00"}},
+            {"plates": {}},
+            {"primary_yongshen": "日干（求测人）"},
+            {"yongshen_wangshuai": {"yongshen": "日干（求测人）", "element": "", "level": "不适用"},
+             "analysis_chain": []},
+            {"hexagram_name": "", "symbol_mappings": []},
+            {"fortune_level": "未评级", "fortune_basis": [], "favorable": [], "obstacles": [],
+             "trend": "未评级，不作趋势推演", "timing": None},
+            {"advice": [], "disclaimer": ""},
+            {"core_symbols": ""},
+            {"items": []},
+            {"options": []},
+        )["text"]
+        self.assertNotIn("None", text)
+        self.assertNotIn("{'", text)
+        self.assertIn("qimen · auto · 2026-11-05T10:00", text)
+        self.assertIn("（本次未排卦象体系，无卦象符号可解读）", text)
 
 
 if __name__ == "__main__":

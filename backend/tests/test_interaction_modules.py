@@ -330,6 +330,17 @@ class TestRealityCheck(unittest.TestCase):
         self.assertEqual(set(reality_check_module.REALITY_RESPONSES),
                          {"符合", "部分符合", "不符合"})
 
+    def test_non_hexagram_angles_do_not_mention_moving_line(self):
+        """没有卦爻的盘面，换角度建议不能让人「更换动爻取象」或「重估旺衰」。"""
+        session = _cast_session(workflow={
+            "step3": {"primary_yongshen": "日干（求测人）", "yongshen_framework": "奇门遁甲"},
+            "step4": {"yongshen_framework": "奇门遁甲", "yongshen_wangshuai": {"level": "不适用"}},
+        })
+        result = process_reality_response(session, "不符合")
+        angles = result["interpretation_shift"]["suggested_angles"]
+        self.assertTrue(any("取用口径" in item for item in angles))
+        self.assertFalse(any("动爻" in item or "月令" in item for item in angles))
+
 
 # ============================================================
 # 模块E：多方人物取象
@@ -375,6 +386,22 @@ class TestMultiParty(unittest.TestCase):
                          ["求测人", "领导/上级"])
         self.assertEqual(result["parties"][1]["yongshen"], "官鬼爻/父母爻")
         self.assertTrue(result["snapshot_unchanged"])
+
+    def test_non_hexagram_parties_use_domain_symbols(self):
+        wf = _workflow("未评级")
+        wf["step3"]["yongshen_framework"] = "奇门遁甲"
+        session = _cast_session(workflow=wf)
+        result = analyze_multi_party(session, parties=["求测人", "领导/上级"],
+                                     focus_party="领导/上级")
+        self.assertEqual(result["parties"][0]["yongshen"], "日干")
+        self.assertEqual(result["parties"][1]["yongshen"], "值符")
+        self.assertNotIn("世爻", result["parties"][0]["position"])
+        self.assertNotIn("六亲", result["parties"][0]["mindset"])
+        deep = result["focus_party"]["deep_analysis"]
+        self.assertIn("奇门遁甲", deep)
+        self.assertIn("值符", deep)
+        self.assertNotIn("动爻", deep)
+        self.assertNotIn("六神", deep)
 
     def test_auto_detect_from_session_question(self):
         session = _cast_session(question="我和对方合作能否成功")
@@ -479,6 +506,21 @@ class TestMultiChoice(unittest.TestCase):
         session = create_session(question="未排盘")
         self.assertIn("error", analyze_branches(session, ["A", "B"]))
 
+    def test_non_hexagram_branches_do_not_claim_fortune(self):
+        wf = _workflow("未评级")
+        wf["step3"]["yongshen_framework"] = "奇门遁甲"
+        wf["step3"]["primary_yongshen"] = "日干（求测人）"
+        wf["step4"]["yongshen_wangshuai"] = {"level": "不适用", "reason": "奇门不以月令定卦象旺衰"}
+        session = _cast_session(workflow=wf)
+        result = analyze_branches(session, ["方案A", "方案B"])
+        self.assertIn("未做卦象吉凶评级", result["recommendation"])
+        self.assertIn("不按", result["recommendation"])
+        self.assertEqual(result["choices"][0]["analysis_angle"], "日干视角")
+        for item in result["choices"]:
+            self.assertNotIn("用神休囚", "".join(item["pros"] + item["cons"]))
+            self.assertNotIn("卦象偏有利", "".join(item["pros"] + item["cons"]))
+            self.assertEqual(item["risk_level"], "中")
+
     def test_recommendation_sorts_by_risk_level(self):
         analyses = [
             {"choice": "高风险方案", "risk_level": "高"},
@@ -512,12 +554,51 @@ class TestReview(unittest.TestCase):
         self.assertEqual(len(result["unverified"]), 1)
         self.assertIn("方向相反", result["unverified"][0])
 
+    def test_neutral_fortune_with_neutral_outcome_is_not_a_mismatch(self):
+        """「平」不指向吉凶，中立结果不能被写成「方向相反」。"""
+        session = _cast_session(workflow=_workflow("平"))
+        result = review_outcome(session, "结果一般，不好也不坏")
+        self.assertEqual(result["unverified"], [])
+        self.assertTrue(any("不指向明确吉凶" in item for item in result["verified"]))
+
+    def test_neutral_fortune_with_favorable_outcome_is_not_a_mismatch(self):
+        session = _cast_session(workflow=_workflow("平"))
+        result = review_outcome(session, "项目顺利达成")
+        self.assertEqual(result["unverified"], [])
+        self.assertIn("偏有利", result["verified"][0])
+
+    def test_neutral_outcome_under_rated_prediction_is_not_a_mismatch(self):
+        session = _cast_session(workflow=_workflow("大吉"))
+        result = review_outcome(session, "结果一般")
+        self.assertEqual(result["unverified"], [])
+        self.assertTrue(any("实际结果中性" in item for item in result["verified"]))
+
+    def test_non_hexagram_review_uses_domain_terms(self):
+        wf = _workflow("未评级")
+        wf["step3"]["yongshen_framework"] = "奇门遁甲"
+        wf["step3"]["primary_yongshen"] = "日干（求测人）"
+        wf["step4"]["yongshen_wangshuai"] = {"level": "不适用"}
+        session = _cast_session(workflow=wf)
+        result = review_outcome(session, "项目落地")
+        self.assertIn("奇门遁甲", result["analysis"]["yongshen"])
+        self.assertIn("日干（求测人）", result["analysis"]["yongshen"])
+        self.assertNotIn("动爻地支", result["analysis"]["timing"])
+        self.assertNotIn("月令日辰转换", result["analysis"]["wangshuai"])
+        self.assertTrue(any("奇门遁甲盘面" in item for item in result["lessons"]))
+
     def test_prediction_defaults_without_workflow_result(self):
         session = _cast_session()
         result = review_outcome(session, "结果一般")
         self.assertEqual(result["predicted_outcome"]["fortune_level"], "平")
         self.assertEqual(result["predicted_outcome"]["trend"], "")
         self.assertEqual(result["predicted_outcome"]["timing"], "")
+
+    def test_unrated_plan_does_not_fake_a_failed_prediction(self):
+        """未评级没有吉凶断语，不能拿它去比对方向造出「未应验」。"""
+        session = _cast_session(workflow=_workflow("未评级", timing=""))
+        result = review_outcome(session, "项目最终失败，合作终止")
+        self.assertEqual(result["unverified"], [])
+        self.assertTrue(any("未评级" in item and "不作吉凶应验判断" in item for item in result["verified"]))
 
     def test_key_factors_without_match_are_listed_as_unforeseen(self):
         session = _cast_session(workflow=_workflow("小吉"))
@@ -634,6 +715,20 @@ class TestDeepQuestion(unittest.TestCase):
             ["hexagram", "moving_line", "yongshen", "liugin",
              "liushen", "wuxing", "wangshuai", "chonghe", "fortune"],
         )
+
+    def test_non_hexagram_question_gets_domain_explanation(self):
+        wf = _workflow("未评级")
+        wf["step3"]["yongshen_framework"] = "八字命理"
+        wf["step3"]["primary_yongshen"] = "喜用五行（火、木）"
+        wf["step4"]["yongshen_wangshuai"] = {"level": "不适用", "reason": "八字命理不以月令定卦象旺衰"}
+        session = _cast_session(workflow=wf)
+        result = deep_question(session, "本卦和动爻怎么理解")
+        self.assertIn("八字命理", result["analysis"])
+        self.assertIn("卦名、动爻、六亲、六神均不适用", result["analysis"])
+        self.assertIn("喜用五行（火、木）", result["analysis"])
+        self.assertNotIn("本卦：", result["analysis"])
+        self.assertNotIn("体用关系", result["analysis"])
+        self.assertTrue(result["snapshot_unchanged"])
 
     def test_hexagram_section_uses_frozen_plate(self):
         session = _cast_session()
@@ -788,6 +883,22 @@ class TestAngleShift(unittest.TestCase):
         """空角度不应命中任何预设（已对空白输入短路返回 None）。"""
         self.assertIsNone(angle_shift_module._match_preset(""))
         self.assertIsNone(angle_shift_module._match_preset("   "))
+
+    def test_non_hexagram_angle_does_not_reinterpret_hexagram(self):
+        wf = _workflow("未评级")
+        wf["step3"]["yongshen_framework"] = "紫微斗数"
+        wf["step3"]["primary_yongshen"] = "官禄宫（事业用事宫）"
+        wf["step4"]["yongshen_wangshuai"] = {"level": "不适用", "reason": "紫微斗数不以月令定卦象旺衰"}
+        session = _cast_session(workflow=wf)
+        result = angle_shift(session, "财务角度")
+        text = result["reinterpretation"]
+        self.assertIn("紫微斗数", text)
+        self.assertIn("官禄宫（事业用事宫）", text)
+        self.assertNotIn("本卦「", text)
+        self.assertNotIn("变卦「", text)
+        self.assertNotIn("妻财爻", text)
+        self.assertNotIn("爻动", text)
+        self.assertTrue(result["snapshot_unchanged"])
 
     def test_suggested_angles_exclude_matched_preset(self):
         result = angle_shift(_cast_session(), "风险角度")

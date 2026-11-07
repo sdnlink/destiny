@@ -31,6 +31,22 @@ def analyze_branches(
     if not choices or len(choices) < 2:
         return {"error": "请提供至少2个备选方案进行分支推演。"}
 
+    framework = _domain_framework(session)
+    if framework:
+        choice_analyses = [
+            _analyze_domain_choice(choice, i, framework) for i, choice in enumerate(choices)
+        ]
+        return {
+            "choices": choice_analyses,
+            "recommendation": (
+                f"本盘为{framework}，未做卦象吉凶评级，不按「吉凶倾向」给方案排序；"
+                f"建议按现实条件、资源与风险承受力比较「{choice_analyses[0]['choice']}」等方案，"
+                "盘面只用于核对各方案对应的符号与时间窗口。"
+            ),
+            "note": f"本分支推演基于现有{framework}盘面取象，未排卦象体系时不套用六爻吉凶口径。原始盘面保持不变。",
+            "snapshot_unchanged": True,
+        }
+
     # 从卦象提取分支分析依据
     workflow = session.workflow_result or {}
     step6 = workflow.get("step6", {})
@@ -51,6 +67,44 @@ def analyze_branches(
         "recommendation": recommendation,
         "note": "本分支推演基于现有卦盘取象，原盘信息不足时建议重新起卦分别测项。原始盘面保持不变。",
         "snapshot_unchanged": True,  # 铁律
+    }
+
+
+def _domain_framework(session) -> str:
+    """非卦象体系返回体系名，卦象体系返回空串。"""
+    workflow = session.workflow_result or {}
+    step3 = workflow.get("step3") or {}
+    step4 = workflow.get("step4") or {}
+    framework = step3.get("yongshen_framework") or step4.get("yongshen_framework") or ""
+    return "" if framework in ("", "卦象体系") else framework
+
+
+DOMAIN_ANGLE_MAP = {
+    "八字命理": ["日主视角", "月令视角", "大运视角", "喜用五行视角"],
+    "紫微斗数": ["命宫视角", "用事宫视角", "四化视角", "三方四正视角"],
+    "奇门遁甲": ["日干视角", "时干视角", "值符值使视角", "九宫方位视角"],
+    "大六壬": ["日干视角", "三传视角", "月将视角", "四课视角"],
+}
+
+
+def _analyze_domain_choice(choice: str, index: int, framework: str) -> Dict[str, Any]:
+    """非卦象体系的分支分析：只给可核对的视角，不给吉凶倾向。"""
+    angles = DOMAIN_ANGLE_MAP.get(framework, ["用神视角", "盘面符号视角", "时间窗口视角"])
+    angle = angles[index % len(angles)]
+    return {
+        "choice": choice,
+        "analysis_angle": angle,
+        "focus": f"该方案在{framework}中对应的{angle}是否成立、有无盘面事实支撑",
+        "pros": [
+            f"从{angle}看，可在盘面中找到与「{choice}」对应的具体符号，便于逐条核对",
+            "盘面事实已冻结，后续反馈可回看同一张盘",
+        ],
+        "cons": [
+            f"{framework}盘面未做卦象吉凶评级，无法给出「更有利」的排序",
+            "方案优劣需按现实资源、时间与风险承受力自行权衡",
+        ],
+        "risk_level": "中",
+        "trend": "不作吉凶趋势判断，仅提供盘面核对视角",
     }
 
 

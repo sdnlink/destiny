@@ -53,8 +53,32 @@ class QueryCacheTests(unittest.TestCase):
     def test_failures_are_not_cached(self):
         with mock.patch.object(db_module, "urlopen", side_effect=URLError("boom")) as opener:
             self.assertIsNone(self.repo.get_trigrams())
+            # 失败会进入 20 秒冷却，冷却期内重复查询不再建连（降级不重试）
             self.assertIsNone(self.repo.get_trigrams())
-        self.assertEqual(opener.call_count, 2, "失败结果不能被缓存，否则数据库恢复后仍然走降级")
+        self.assertEqual(opener.call_count, 1, "冷却期内不应重复尝试建连")
+
+    def test_failed_query_does_not_cache_rows(self):
+        self.repo._failure_until = 0.0
+        payload = json.dumps({"data": [{"number": 1}]}).encode("utf-8")
+        with mock.patch.object(db_module, "urlopen", side_effect=URLError("boom")):
+            self.assertIsNone(self.repo.get_trigrams())
+        self.assertEqual(self.repo._query_cache, {}, "失败的查询不能写进结果缓存")
+        # 数据库恢复（探活成功）后必须立刻回到真实数据，而不是继续吃旧的失败结论
+        self.repo._failure_until = 0.0
+        with mock.patch.object(db_module, "urlopen", return_value=_FakeResponse(payload)):
+            self.assertEqual(self.repo.get_trigrams(), [{"number": 1}])
+
+    def test_successful_ping_clears_cooldown(self):
+        self.repo._enter_cooldown()
+        ping_payload = b"Ok.\n"
+        with mock.patch.object(db_module, "urlopen", return_value=_FakeResponse(ping_payload)):
+            self.assertTrue(self.repo.is_available())
+        self.assertEqual(self.repo._failure_until, 0.0, "数据库恢复后冷却必须解除")
+
+    def test_failed_ping_enters_cooldown(self):
+        with mock.patch.object(db_module, "urlopen", side_effect=URLError("boom")):
+            self.assertFalse(self.repo.is_available())
+        self.assertGreater(self.repo._failure_until, 0.0, "探活失败也应进入冷却，避免后续查询继续空等超时")
 
     def test_stats_query_bypasses_cache(self):
         payload = json.dumps({"data": [{"table": "trigrams", "rows": 8}]}).encode("utf-8")

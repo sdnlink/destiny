@@ -43,6 +43,51 @@ LIUQIN_MEANING = {
 }
 
 
+def _domain_framework(session) -> str:
+    """非卦象体系返回体系名，卦象体系返回空串。
+
+    没有卦爻的盘面里，追问「动爻」「六亲」只会得到一套不适用于该盘的六爻解释，
+    这里先判断体系口径，改走体系内说明。
+    """
+    workflow = session.workflow_result or {}
+    step3 = workflow.get("step3") or {}
+    step4 = workflow.get("step4") or {}
+    framework = step3.get("yongshen_framework") or step4.get("yongshen_framework") or ""
+    return "" if framework in ("", "卦象体系") else framework
+
+
+def _generate_domain_analysis(session, question: str, framework: str) -> str:
+    """非卦象体系的深度追问说明：只讲本体系成立的概念。"""
+    workflow = session.workflow_result or {}
+    step2 = workflow.get("step2") or {}
+    step3 = workflow.get("step3") or {}
+    step4 = workflow.get("step4") or {}
+    step6 = workflow.get("step6") or {}
+
+    lines = [f"【深度追问】{question}", ""]
+    lines.append(f"【体系说明】当前盘面为{framework}，未排梅花/六爻/周易，卦名、动爻、六亲、六神均不适用。")
+    primary = step3.get("primary_yongshen") or ""
+    if primary:
+        lines.append(f"- 用神（{framework}口径）：{primary}")
+    if step3.get("secondary_yongshen"):
+        lines.append(f"- 辅参：{step3['secondary_yongshen']}")
+    if step3.get("logic"):
+        lines.append(f"- 取用理由：{step3['logic']}")
+    wangshuai = step4.get("yongshen_wangshuai") or {}
+    if wangshuai.get("level"):
+        lines.append(f"- 旺衰：{wangshuai['level']}（{wangshuai.get('reason', '')}）")
+    summary = (step2.get("plates") or {}).get((step2.get("systems") or [""])[0], {}).get("summary") or {}
+    if summary:
+        lines.append("- 盘面摘要：" + "；".join(f"{k}：{v}" for k, v in summary.items()))
+    fortune = step6.get("fortune_level")
+    if fortune:
+        lines.append(f"- 吉凶定性：{fortune}")
+    lines.append("- 可追问方向：盘面各符号（宫位、星曜、门星神、三传等）的取象，或顾问结论中的具体判断。")
+    lines.append("")
+    lines.append("原始盘面保持不变，本次说明仅调整解读视角。")
+    return "\n".join(lines)
+
+
 def deep_question(
     session,
     question: str,
@@ -64,6 +109,17 @@ def deep_question(
     """
     if session.snapshot is None:
         return {"error": "盘面尚未生成，无法进行深度追问。请先执行排盘。"}
+
+    framework = _domain_framework(session)
+    if framework:
+        return {
+            "type": "deep_question",
+            "question": question,
+            "detected_symbols": _detect_symbols(question),
+            "analysis": _generate_domain_analysis(session, question, framework),
+            "related_plate_data": _extract_plate_data(session, _detect_symbols(question)),
+            "snapshot_unchanged": True,
+        }
 
     # 检测问题中涉及的符号类型
     detected = _detect_symbols(question)

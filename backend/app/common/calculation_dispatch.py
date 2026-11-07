@@ -11,6 +11,7 @@
 from typing import Any, Callable, Dict, Tuple
 
 from app.bazi import auto_cast as bazi_auto_cast
+from app.bazi import liunian_cast as bazi_liunian_cast
 from app.bazi import time_cast as bazi_time_cast
 from app.calendar import calendar_analysis
 from app.daliuren import auto_cast as liuren_auto_cast
@@ -62,6 +63,7 @@ CALCULATION_HANDLERS: Dict[Tuple[str, str], Callable[[Dict[str, Any]], Any]] = {
     ("liuren", "numbers"): lambda payload: _liuren_numbers(payload),
     ("bazi", "time"): lambda payload: bazi_time_cast(**payload),
     ("bazi", "auto"): lambda payload: bazi_auto_cast(**payload),
+    ("bazi", "liunian"): lambda payload: bazi_liunian_cast(**payload),
     ("ziwei", "time"): lambda payload: ziwei_time_cast(**payload),
     ("ziwei", "auto"): lambda payload: ziwei_auto_cast(**payload),
     ("qimen", "time"): lambda payload: qimen_time_cast(**payload),

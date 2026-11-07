@@ -9,7 +9,7 @@ from app.core.db import db_repository
 
 logger = logging.getLogger("destiny.hexagram_service")
 
-_FALLBACK_FILE = Path(__file__).resolve().parents[2] / "data" / "rules" / "hexagram-explanations.json"
+_FALLBACK_FILE = Path(__file__).resolve().parents[3] / "data" / "rules" / "hexagram-explanations.json"
 
 # 缓存带过期时间，且空结果不缓存：
 # 之前首载失败会把空字典永久写进缓存，之后即使数据源恢复也永远查不到解释。

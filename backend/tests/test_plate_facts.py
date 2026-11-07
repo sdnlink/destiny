@@ -84,6 +84,36 @@ class BuildPlateFactsTests(unittest.TestCase):
         facts = build_plate_facts([{"module": "calendar", "result": {"solar": {}}}])
         self.assertEqual(facts, {})
 
+    def test_six_spirits_and_relatives_come_from_line_chart(self):
+        """六神/六亲必须从逐爻事实收上来，且按爻位顺序（初→上）排列。
+
+        此前这两个键只存在于引擎 steps 的输出里，盘面事实没有它们，
+        前端就只能按「青龙起」的固定序列画——和真实日干起的六神无关。
+        """
+        lines = [
+            {"position": 1, "six_spirit": "玄武", "six_relative": "妻财"},
+            {"position": 2, "six_spirit": "青龙", "six_relative": "官鬼"},
+            {"position": 3, "six_spirit": "朱雀", "six_relative": "兄弟", "is_moving": True},
+            {"position": 4, "six_spirit": "勾陈", "six_relative": "妻财"},
+            {"position": 5, "six_spirit": "螣蛇", "six_relative": "子孙"},
+            {"position": 6, "six_spirit": "白虎", "six_relative": "兄弟"},
+        ]
+        result = self._liuyao_result()
+        result["result"]["facts"]["line_chart"] = lines
+        facts = build_plate_facts([result])["liuyao"]
+        self.assertEqual(facts["six_spirits"], ["玄武", "青龙", "朱雀", "勾陈", "螣蛇", "白虎"])
+        self.assertEqual(facts["liuqin"], ["妻财", "官鬼", "兄弟", "妻财", "子孙", "兄弟"])
+
+    def test_incomplete_line_chart_leaves_arrays_empty(self):
+        """缺爻时不返回半份数组：宁可让前端走回退分支，也不画一份半真半假的盘。"""
+        result = self._liuyao_result()
+        result["result"]["facts"]["line_chart"] = [
+            {"position": 3, "six_spirit": "朱雀", "six_relative": "兄弟"},
+        ]
+        facts = build_plate_facts([result])["liuyao"]
+        self.assertEqual(facts["six_spirits"], [])
+        self.assertEqual(facts["liuqin"], [])
+
 
 class CompactPlateOutputTests(unittest.TestCase):
     """step2 只保存展示字段，完整盘面留在快照 module_results。"""
@@ -108,7 +138,7 @@ class CompactPlateOutputTests(unittest.TestCase):
                 "liuyao": {
                     "system_label": "六爻纳甲",
                     "facts": {
-                        "original": {"name": "蛊", "ordinal": 18, "symbol": "䷑", "upper": "艮", "lower": "巽"},
+                        "original": {"name": "蛊", "ordinal": 18, "symbol": "䷑", "upper": "艮", "lower": "巽", "lines": [0, 0, 0, 1, 0, 1]},
                         "changed": {"name": "蒙", "ordinal": 4, "symbol": "䷃"},
                         "mutual": {"name": "归妹", "ordinal": 54, "symbol": "䷵"},
                         "moving_lines": [3],
@@ -139,10 +169,33 @@ class CompactPlateOutputTests(unittest.TestCase):
         self.assertEqual(facts["original"]["name"], "蛊")
         self.assertEqual(facts["original"]["upper"], "艮")
         self.assertEqual(facts["original"]["lower"], "巽")
+        # 爻线随卦象一起保留：前端据此直接画爻，不再按上下卦名反查八卦表
+        self.assertEqual(facts["original"]["lines"], [0, 0, 0, 1, 0, 1])
         self.assertEqual(facts["changed"]["name"], "蒙")
         self.assertEqual(facts["moving_lines"], [3])
         self.assertEqual(len(facts["six_spirits"]), 6)
         self.assertEqual(compact["plates"]["liuyao"]["system_label"], "六爻纳甲")
+
+    def test_compact_derives_six_spirits_from_line_chart(self):
+        """step2 的 facts 与引擎原始 facts 同源，同样没有六神顶层键。
+
+        compact 这一步必须自己从 line_chart 补出来，否则前端仍然只能画默认序列。
+        """
+        step2 = self._full_step2()
+        facts = step2["plates"]["liuyao"]["facts"]
+        # 引擎真实输出没有这两个顶层键，这里去掉夹具里的预置值，逼 compact 自行推导
+        facts.pop("six_spirits", None)
+        facts["line_chart"] = [
+            {"position": i + 1, "six_spirit": spirit, "six_relative": relative}
+            for i, (spirit, relative) in enumerate([
+                ("玄武", "妻财"), ("青龙", "官鬼"), ("朱雀", "兄弟"),
+                ("勾陈", "妻财"), ("螣蛇", "子孙"), ("白虎", "兄弟"),
+            ])
+        ]
+        compact = compact_plate_output(step2)
+        compact_facts = compact["plates"]["liuyao"]["facts"]
+        self.assertEqual(compact_facts["six_spirits"], ["玄武", "青龙", "朱雀", "勾陈", "螣蛇", "白虎"])
+        self.assertEqual(compact_facts["liuqin"], ["妻财", "官鬼", "兄弟", "妻财", "子孙", "兄弟"])
 
     def test_calendar_becomes_renderable_strings(self):
         compact = compact_plate_output(self._full_step2())
@@ -196,6 +249,69 @@ class CompactPlateOutputTests(unittest.TestCase):
             len(json.dumps(compact, ensure_ascii=False)),
             len(json.dumps(full, ensure_ascii=False)),
         )
+
+    def test_domain_summary_covers_non_hexagram_systems(self):
+        """八字/紫微/奇门/六壬的盘面不在卦象字段里，compact 必须另给一份摘要。"""
+        bazi_facts = {
+            "day_master": "癸",
+            "day_master_element": "水",
+            "pillars": {
+                "year": {"ganzhi": "丙午"}, "month": {"ganzhi": "戊戌"},
+                "day": {"ganzhi": "癸未"}, "hour": {"ganzhi": "丁巳"},
+            },
+            "day_master_strength": {"level": "偏弱"},
+            "luck_pillars": [{"ganzhi": "甲午"}, {"ganzhi": "乙未"}],
+        }
+        qimen_facts = {
+            "dun_type": "阴遁", "ju_number": 6, "yuan_type": "上元", "solar_term": "立冬",
+            "zhi_fu_star": "天心", "zhi_fu_palace": 6, "zhi_shi_gate": "开门", "zhi_shi_palace": 8,
+            "favorable_directions": [{"direction": "西北", "gate": "开门", "palace_name": "乾六宫"}],
+        }
+        ziwei_facts = {
+            "bureau": {"name": "水二局"},
+            "ming_palace": {"palace_stem_branch": "癸巳"},
+            "shen_palace": {"palace_stem_branch": "辛卯"},
+            "si_hua": {"化禄": "太阳"},
+            "palaces_by_order": [{"name": "命宫"}, {"name": "兄弟宫"}],
+        }
+        liuren_facts = {
+            "day_pillar": "癸未",
+            "actual_time_branch": "巳",
+            "month_general": {"name": "登明"},
+            "three_transmissions": {"transmissions": ["寅", "午", "戌"], "lesson_type": "涉害课"},
+        }
+        step2 = {
+            "systems": ["bazi", "ziwei", "qimen", "daliuren"],
+            "plates": {
+                "bazi": {"system_label": "八字命理", "facts": bazi_facts},
+                "ziwei": {"system_label": "紫微斗数", "facts": ziwei_facts},
+                "qimen": {"system_label": "奇门遁甲", "facts": qimen_facts},
+                "daliuren": {"system_label": "大六壬", "facts": liuren_facts},
+            },
+        }
+        compact = compact_plate_output(step2)
+
+        bazi = compact["plates"]["bazi"]["summary"]
+        self.assertEqual(bazi["日主"], "癸（水）")
+        self.assertEqual(bazi["四柱"], "丙午 戊戌 癸未 丁巳")
+        self.assertEqual(bazi["日主旺衰"], "偏弱")
+        self.assertEqual(bazi["大运"], "2 步")
+
+        ziwei = compact["plates"]["ziwei"]["summary"]
+        self.assertEqual(ziwei["五行局"], "水二局")
+        self.assertEqual(ziwei["命宫"], "癸巳")
+        self.assertEqual(ziwei["身宫"], "辛卯")
+        self.assertEqual(ziwei["四化"], "化禄 太阳")
+        self.assertEqual(ziwei["宫位"], "2 宫")
+
+        qimen = compact["plates"]["qimen"]["summary"]
+        self.assertEqual(qimen["局象"], "阴遁6局·上元")
+        self.assertEqual(qimen["值符"], "天心 落 6 宫")
+        self.assertEqual(qimen["首选吉方"], "西北方 · 开门 · 乾六宫")
+
+        liuren = compact["plates"]["daliuren"]["summary"]
+        self.assertEqual(liuren["三传"], "寅 → 午 → 戌")
+        self.assertEqual(liuren["课体"], "涉害课")
 
     def test_trigram_dict_names_are_flattened_for_frontend(self):
         """引擎把上下卦存成字典，展示层需要字符串卦名才能画出爻线。"""

@@ -1,8 +1,8 @@
 fastapi==0.103.2
 lunar_python==1.4.8
-# Project uses the pydantic v1 API (constr(regex=)/conlist(min_items=)/validator/.dict()).
-# Upper bound pinned below 2: pydantic v2 would silently invalidate every request model. See ADR-016 for the migration plan.
-pydantic>=1.10.26,<2
+# 已迁移到 pydantic v2（constr(pattern=)/conlist(min_length=)/@field_validator/.model_dump()）。
+# 下界 2.9 是本次验证过的版本线；上界 3 防止大版本语义再变。迁移记录见 ADR-016。
+pydantic>=2.9,<3
 pytz==2025.2
 uvicorn==0.22.0
 # FastAPI/TestClient behaviour depends on starlette 0.27 (see test_dependency_contract.py).

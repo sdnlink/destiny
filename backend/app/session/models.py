@@ -89,6 +89,8 @@ class DivinationSession:
     casting_method: str = "auto"  # auto / time / numbers / manual / coins
     casting_source: Dict[str, Any] = field(default_factory=dict)
     user_profile: Dict[str, Any] = field(default_factory=dict)  # 性别/年龄/现状等
+    # 会话归属（审计 22）：客户端 id 的哈希，空值表示迁移前的老会话，由首个访问者认领
+    owner_hash: str = ""
     status: str = "draft"
     snapshot: Optional[DivinationSnapshot] = None
     interactions: List[InteractionRecord] = field(default_factory=list)
@@ -123,6 +125,7 @@ def create_session(
     casting_method: str = "auto",
     casting_source: Optional[Dict[str, Any]] = None,
     user_profile: Optional[Dict[str, Any]] = None,
+    owner_hash: str = "",
 ) -> DivinationSession:
     """创建新的推演会话（draft 状态）。"""
     return DivinationSession(
@@ -133,6 +136,7 @@ def create_session(
         casting_method=casting_method,
         casting_source=casting_source or {},
         user_profile=user_profile or {},
+        owner_hash=owner_hash,
         status="draft",
     )
 

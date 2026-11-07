@@ -5,6 +5,8 @@
 
 from typing import Any, Dict
 
+from app.workflow.plate_facts import domain_summary
+
 
 def render_plate_text(plate_data: Dict[str, Any]) -> str:
     """渲染完整排盘结果为文本。"""
@@ -39,6 +41,11 @@ def render_plate_text(plate_data: Dict[str, Any]) -> str:
                 lines.append(f"  变卦：{changed.get('name', '')}（{changed.get('ordinal', '')}）")
             else:
                 lines.append(f"  变卦：{changed}")
+        # 非卦象体系没有 original，只剩一个空标题；补上盘面摘要
+        if not original and facts:
+            summary = domain_summary(module, facts)
+            if summary:
+                lines.append("  盘面摘要：" + "；".join(f"{k}：{v}" for k, v in summary.items()))
         # 体用
         body = facts.get("body_trigram") or facts.get("ti_trigram")
         use = facts.get("use_trigram") or facts.get("yong_trigram")
@@ -89,7 +96,15 @@ def render_fixed_format(
 
     # 求测事由 & 起盘方式
     parts.append(f"【求测事由】：{session.question}")
-    parts.append(f"【起盘方式】：{session.casting_method}（{step1.get('casting_source', {})}）")
+    source = step1.get("casting_source") or {}
+    casting_desc = " · ".join(
+        str(v) for v in (step1.get("system"), step1.get("casting_method")) if v
+    ) or str(session.casting_method)
+    if isinstance(source, dict):
+        when = source.get("local_datetime") or source.get("datetime") or ""
+        if when:
+            casting_desc += f" · {when}"
+    parts.append(f"【起盘方式】：{casting_desc}")
     parts.append("")
 
     # 完整排盘结果
@@ -111,7 +126,11 @@ def render_fixed_format(
     # 旺衰与生克分析
     parts.append("====旺衰与生克分析====")
     ys = step4.get("yongshen_wangshuai", {})
-    parts.append(f"用神{ys.get('yongshen', '')}（{ys.get('element', '')}）：{ys.get('level', '')}")
+    ys_element = ys.get("element", "")
+    ys_name = f"用神{ys.get('yongshen', '')}"
+    if ys_element:
+        ys_name += f"（{ys_element}）"
+    parts.append(f"{ys_name}：{ys.get('level', '')}")
     parts.append(f"判定：{ys.get('reason', '')}")
     tiyong = step4.get("tiyong_relation")
     if tiyong:
@@ -128,19 +147,28 @@ def render_fixed_format(
         parts.append(f"  原始象义：{mapping['original_meaning']}")
         parts.append(f"  事理映射：{mapping['event_mapping']}")
     if not step5.get("symbol_mappings"):
-        parts.append("（符号象义待结合具体卦爻进一步拆解）")
+        if step5.get("hexagram_name"):
+            parts.append("（符号象义待结合具体卦爻进一步拆解）")
+        else:
+            parts.append("（本次未排卦象体系，无卦象符号可解读）")
     parts.append("")
 
     # 事态综合推演
     parts.append("====事态综合推演====")
     parts.append(f"现状：{step6.get('current_status', '')}")
+    unrated = step6.get("fortune_level") == "未评级"
     parts.append("有利点：")
     for f in step6.get("favorable", []):
         parts.append(f"  - {f}")
+    if not step6.get("favorable") and unrated:
+        parts.append("  （本次未评级，不输出有利因素）")
     parts.append("阻碍点：")
     for o in step6.get("obstacles", []):
         parts.append(f"  - {o}")
-    parts.append(f"趋势与参考应期：{step6.get('trend', '')} {step6.get('timing', '')}")
+    if not step6.get("obstacles") and unrated:
+        parts.append("  （本次未评级，不输出阻碍因素）")
+    timing = step6.get("timing") or ""
+    parts.append(f"趋势与参考应期：{step6.get('trend', '')} {timing}".rstrip())
     parts.append(f"吉凶定性：{step6.get('fortune_level', '')}")
     parts.append(f"判定依据：{'；'.join(step6.get('fortune_basis', []))}")
     parts.append("")
@@ -155,17 +183,19 @@ def render_fixed_format(
 
     # 拓展参考资料库
     parts.append("====拓展参考资料库====")
+    scope = "本卦" if step5.get("hexagram_name") else "盘面"
     parts.append(f"1.核心符号原始象义：{reference_library.get('core_symbols', '')}")
-    parts.append(f"2.本卦重点风险隐患：{reference_library.get('risks', '')}")
+    parts.append(f"2.{scope}重点风险隐患：{reference_library.get('risks', '')}")
     parts.append(f"3.参考时间窗口：{reference_library.get('time_window', '')}")
     parts.append(f"4.事件多发展可能性以及对应触发条件：{reference_library.get('possibilities', '')}")
-    parts.append(f"5.本卦常见误读误区提醒：{reference_library.get('misreadings', '')}")
+    parts.append(f"5.{scope}常见误读误区提醒：{reference_library.get('misreadings', '')}")
     parts.append("")
 
     # 卦象现状核对
-    parts.append("📌卦象现状核对（请对照现实看是否符合，回复\"符合/部分符合/不符合\"，仅调整事理解读视角，绝不修改原始卦盘）")
+    scope = "卦象" if step5.get("hexagram_name") else "盘面"
+    parts.append(f"📌{scope}现状核对（请对照现实看是否符合，回复\"符合/部分符合/不符合\"，仅调整事理解读视角，绝不修改原始盘面）")
     for i, item in enumerate(reality_check.get("items", []), 1):
-        parts.append(f"{i}、卦局显示：{item}")
+        parts.append(f"{i}、{scope}显示：{item}")
     parts.append("")
 
     # 后续交互入口

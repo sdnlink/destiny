@@ -11,6 +11,10 @@ from urllib.request import Request, urlopen
 logger = logging.getLogger("destiny.db")
 
 AVAILABILITY_TTL_SECONDS = 30.0
+# 一次失败连接在本机实测要 2–4 秒（探活与查询各自超时、localhost 还要先试 IPv6），
+# 而一次 /v1/calculations/compare 会连打三条常量查询：没有失败冷却时，
+# 数据库不可达的机器上单个请求要空耗 12 秒，前端 15 秒超时就是这么撞上的。
+QUERY_FAILURE_COOLDOWN_SECONDS = 20.0
 # 常量表是只读字典数据，一次页面加载会连续打十几个常量端点。
 # 没有缓存时每个请求都要新建连接、重新鉴权、重新查表。
 CONSTANT_TTL_SECONDS = 120.0
@@ -27,14 +31,17 @@ class ClickHouseRepository:
         self.timeout = timeout
         self._availability = None
         self._availability_checked_at = 0.0
+        # 查询失败后的冷却截止时间：期内不再尝试建连，直接走降级路径
+        self._failure_until = 0.0
         # 查询结果缓存：常量表是按字典表，重复查同一句 SQL 没必要重复建连接
         self._query_cache = {}
 
     def is_available(self):
         """带缓存的可用性探测。
 
-        常量端点每个请求都会探测一次，未缓存时数据库不可达要等 1.5s 超时；
+        常量端点每个请求都会探测一次，未缓存时数据库不可达要等超时；
         这里缓存 30 秒，避免一次页面加载打出十几个超时。
+        localhost 会先试 IPv6 再试 IPv4，实测 1 秒超时约耗 2 秒，所以取 1 秒。
         """
         now = time.monotonic()
         if self._availability is not None and now - self._availability_checked_at < AVAILABILITY_TTL_SECONDS:
@@ -44,22 +51,33 @@ class ClickHouseRepository:
             req = Request(url, method="GET")
             credentials = base64.b64encode(f"{self.user}:{self.password}".encode("utf-8")).decode("ascii")
             req.add_header("Authorization", f"Basic {credentials}")
-            with urlopen(req, timeout=1.5) as resp:
+            with urlopen(req, timeout=1.0) as resp:
                 available = resp.status == 200 and resp.read().strip() == b"Ok."
         except (HTTPError, URLError, OSError, ValueError) as exc:
             logger.info("clickhouse ping failed: %s", exc)
             available = False
         self._availability = available
         self._availability_checked_at = now
+        if available:
+            # 数据库恢复了：解除查询冷却，下一个请求立刻回到真实数据
+            self._failure_until = 0.0
+        else:
+            self._enter_cooldown()
         return available
+
+    def _enter_cooldown(self):
+        self._failure_until = time.monotonic() + QUERY_FAILURE_COOLDOWN_SECONDS
 
     def query(self, statement, parameters=None, cache_seconds=CONSTANT_TTL_SECONDS):
         """执行只读查询。
 
-        成功结果按 (SQL, 参数) 缓存 `cache_seconds` 秒；失败结果不缓存，
-        数据库恢复后下一个请求立刻能拿到真实数据。
+        成功结果按 (SQL, 参数) 缓存 `cache_seconds` 秒；失败结果不进结果缓存，
+        只进 20 秒的失败冷却 —— 冷却期内重复查询直接返回 None（降级），
+        避免每次失败都要重新等一次连接超时。
         需要绝对新鲜度的调用（如库表统计）传 cache_seconds=0。
         """
+        if time.monotonic() < self._failure_until:
+            return None
         cache_key = (statement, tuple(sorted((parameters or {}).items())))
         if cache_seconds > 0:
             cached = self._query_cache.get(cache_key)
@@ -80,10 +98,10 @@ class ClickHouseRepository:
             with urlopen(req, timeout=self.timeout) as response:
                 payload = response.read().decode("utf-8")
         except (HTTPError, URLError, OSError) as exc:
-            # 网络/鉴权失败：记录原因再返回 None，调用方据此走降级路径
-            self._availability = False
-            self._availability_checked_at = time.monotonic()
+            # 网络/鉴权失败：记录原因再返回 None，调用方据此走降级路径；
+            # 同时进入冷却期，冷却内不再重复等超时（见 QUERY_FAILURE_COOLDOWN_SECONDS）。
             logger.warning("clickhouse query failed: %s", exc)
+            self._enter_cooldown()
             return None
         except ValueError as exc:
             logger.warning("clickhouse response decode failed: %s", exc)

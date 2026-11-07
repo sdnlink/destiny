@@ -258,7 +258,7 @@ def calculate_qimen_chart(
         "strategy": "奇门重在审机夺势，动静有常。天盘奇仪与九星指示天时良机，人盘八门指示人事进退，神盘指引心境定力。",
     }
 
-    return {
+    result = {
         "rule_id": RULE_VERSION,
         "system": "qimen",
         "solar_datetime": cal_res["time"]["effective_local_datetime"],
@@ -293,6 +293,18 @@ def calculate_qimen_chart(
         "favorable_directions": favorable_directions,
         "advisory": advisory,
     }
+    # 与其余体系保持一致：盘面事实放进 facts。缺这一层时，冻结快照的
+    # plate_facts、工作量表 step2 的 plates 都拿不到奇门任何内容（静默空白）。
+    result["facts"] = {
+        key: result[key]
+        for key in (
+            "rule_id", "system", "solar_datetime", "lunar_datetime", "ganzhi", "solar_term",
+            "dun_type", "ju_number", "yuan_type", "xun_shou", "xun", "void", "horse_star",
+            "zhi_fu_star", "zhi_shi_gate", "zhi_fu_palace", "zhi_shi_palace",
+            "palaces", "favorable_directions", "advisory",
+        )
+    }
+    return result
 
 
 def auto_cast(

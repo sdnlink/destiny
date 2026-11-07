@@ -116,6 +116,24 @@ def angle_shift(
     if session.snapshot is None:
         return {"error": "盘面尚未生成，无法换角度解读。请先执行排盘。"}
 
+    framework = _domain_framework(session)
+    if framework:
+        return {
+            "type": "angle_shift",
+            "new_angle": new_angle,
+            "matched_preset": None,
+            "shift_description": f"从「{new_angle}」的角度重新解读{framework}盘面",
+            "shift_focus": "没有卦爻可换象，改为从本体系的关键符号与宫位重新取象",
+            "key_questions": [
+                f"从{new_angle}的角度，盘面中哪些宫位/符号最相关？",
+                "该角度下，用神或用事宫是否要重新取用？",
+                "该角度下，盘面摘要里的哪些事实支持这一判断？",
+            ],
+            "reinterpretation": _generate_domain_reinterpretation(session, new_angle, framework),
+            "suggested_angles": _suggest_other_angles(new_angle),
+            "snapshot_unchanged": True,
+        }
+
     # 匹配预设角度
     matched = _match_preset(new_angle)
     preset = ANGLE_PRESETS.get(matched) if matched else None
@@ -254,3 +272,48 @@ def _suggest_other_angles(current_angle: str) -> List[str]:
     if matched:
         return [a for a in all_angles if a != matched][:4]
     return all_angles[:5]
+
+
+def _domain_framework(session) -> str:
+    """非卦象体系返回体系名，卦象体系返回空串。"""
+    workflow = session.workflow_result or {}
+    step3 = workflow.get("step3") or {}
+    step4 = workflow.get("step4") or {}
+    framework = step3.get("yongshen_framework") or step4.get("yongshen_framework") or ""
+    return "" if framework in ("", "卦象体系") else framework
+
+
+def _generate_domain_reinterpretation(session, new_angle: str, framework: str) -> str:
+    """非卦象体系的换角度解读：从盘面符号与用事口径重讲，不谈卦爻。"""
+    workflow = session.workflow_result or {}
+    step2 = workflow.get("step2") or {}
+    step3 = workflow.get("step3") or {}
+    step4 = workflow.get("step4") or {}
+    step6 = workflow.get("step6") or {}
+
+    lines = [f"【换角度解读】从「{new_angle}」重新审视{framework}盘面", ""]
+    lines.append("本盘未排卦象体系，没有本卦/变卦/动爻可换象；以下只从本体系成立的符号展开。")
+    lines.append("")
+    if step3.get("primary_yongshen"):
+        lines.append(f"1. 用神口径：{step3['primary_yongshen']}")
+        if step3.get("logic"):
+            lines.append(f"   {step3['logic']}")
+    wangshuai = step4.get("yongshen_wangshuai") or {}
+    if wangshuai.get("level"):
+        lines.append(f"2. 旺衰：{wangshuai['level']}（{wangshuai.get('reason', '')}）")
+    plates = step2.get("plates") or {}
+    for module, plate in plates.items():
+        summary = plate.get("summary") or {}
+        if summary:
+            lines.append(f"3. {plate.get('system_label', module)}盘面摘要：" + "；".join(f"{k}：{v}" for k, v in summary.items()))
+            break
+    if step6.get("fortune_level"):
+        lines.append(f"4. 吉凶定性：{step6['fortune_level']}")
+        for basis in step6.get("fortune_basis") or []:
+            lines.append(f"   - {basis}")
+    lines.append("")
+    lines.append(f"该角度下应重新审视：{framework}中与该角度相关的宫位/星曜/门星神/三传，")
+    lines.append("以及这些符号与用神（用事宫）的关系；原盘事实不变，只调整取象的重心。")
+    lines.append("")
+    lines.append("【铁律声明】换角度解读仅调整事理解读，原始盘面（snapshot）完全不变。")
+    return "\n".join(lines)
