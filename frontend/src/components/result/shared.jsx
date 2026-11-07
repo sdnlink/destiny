@@ -30,7 +30,8 @@ import {
 import { CATEGORY_LABELS, CAST_METHOD_LABELS, ELEMENT_COLORS, IMAGERY_MODULE_LABELS, IMAGERY_ROLE_LABELS, IMAGERY_STAGE_LABELS, PILLAR_LABELS, SCENE_LABELS } from "./labels";
 
 function findModule(result, module) {
-  return result?.module_results?.find((item) => item.module === module)?.result;
+  const aliases = module === "liuren" || module === "daliuren" ? ["liuren", "daliuren"] : [module];
+  return result?.module_results?.find((item) => aliases.includes(item.module))?.result;
 }
 
 function DataState({ label, value, mono = false }) {
