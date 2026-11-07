@@ -1012,6 +1012,17 @@ class TestNonHexagramYongshen(unittest.TestCase):
         self.assertEqual(set(result["yongshen_by_system"]), {"qimen"})
         self.assertEqual(result["yongshen_framework"], "奇门遁甲")
 
+    def test_non_hexagram_party_yongshen_uses_domain_symbols(self):
+        """奇门盘面提到「对方」时，多方用神不能写成世爻/应爻。"""
+        session = create_session(question="我和对方合作能否成功", category="career")
+        result = wf.step3_identify_yongshen(session, self._qimen_plate())
+        self.assertEqual(len(result["party_yongshen"]), 2)
+        self.assertEqual(result["party_yongshen"][0]["yongshen"], "日干")
+        self.assertEqual(result["party_yongshen"][1]["yongshen"], "时干")
+        for item in result["party_yongshen"]:
+            self.assertNotIn("世爻", item["party"])
+            self.assertNotIn("应爻", item["party"])
+
     def test_bazi_uses_favorable_elements(self):
         session = create_session(question="能否升职", category="career")
         result = wf.step3_identify_yongshen(session, self._bazi_plate())
