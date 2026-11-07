@@ -163,6 +163,17 @@ describe("StructuredDisplay", () => {
     expect(screen.queryByText(/官鬼/)).toBeNull();
   });
 
+  it("非卦象体系的步骤5 给出盘面说明，而不是空白卡片", () => {
+    render(
+      <StructuredDisplay
+        workflow={{ step5: { hexagram_name: "", symbol_mappings: [] } }}
+      />
+    );
+    expect(
+      screen.getByText(/本次盘面未排卦象体系，无卦象符号可解读/)
+    ).toBeInTheDocument();
+  });
+
   it("步骤7 以有序列表渲染建议并附文化提示", () => {
     render(<StructuredDisplay workflow={FULL} />);
     expect(screen.getByText("先谈条件再落笔")).toBeInTheDocument();

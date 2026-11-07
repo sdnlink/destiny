@@ -925,6 +925,31 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
 - 「未评级」是撤掉假评分后的诚实结果，不代表已经给这些体系设计了独立的吉凶算法；
   若要让八字/紫微也有吉凶档位，需要另外立规则并登记到规则库。
 
+## 第十八轮修复（2026-11-07）
+
+本轮针对全项目深度 Review 发现的算法节气边界缺陷、解释/考据体系完备性、历法语料库接入断层以及前端组件契约鲁棒性进行专项修复与验证。
+
+### 修复项清单
+
+| # | 模块 | 缺陷/缺口 | 根因与修复方案 | 落地位置 |
+| --- | --- | --- | --- | --- |
+| 1 | 奇门遁甲 | 夏至等中气起盘时节气判断偏差 | `lunar_python` 的 `getPrevJie()` 仅返回 12 节，而夏至/冬至为中气。导致夏至当日查到芒种、阴阳遁与三元错翻。修复为优先使用当前或前一全节气 `(solar_terms.current or solar_terms.previous)` | `backend/app/qimen/engine.py`、`tests/test_qimen.py` |
+| 2 | 解释系统 | 八字与奇门缺少专属事实解释器 | `backend/app/core/explanation.py` 仅覆盖六爻/梅花/周易，未对 `bazi` 与 `qimen` 生成结构化解释段落。补齐 `_bazi_explanation`（强弱/格局/用神）与 `_qimen_explanation`（局象/值符值使/门星象意）并注册到分发入口 | `backend/app/core/explanation.py`、`tests/test_explanation.py` |
+| 3 | 典籍考据 | 奇门与紫微经典引证与候选匹配缺失 | `core/literature.py` 缺乏《奇门遁甲统宗》与《紫微斗数全书》典籍定义，关键词提取漏掉门星格局与命宫四化。补齐经典条目定义、query_terms 提取与打分权重 | `backend/app/core/literature.py`、`tests/test_literature.py` |
+| 4 | 典籍库语料 | 历法语料库未参与检索索引构建 | 脚本生成的 `data/generated/calendar-corpus`（《历法溯源》、《中国古代天体测量学》、《步天歌》等）未被 `ClassicsLibrary` 加载。配置 `DEFAULT_CALENDAR_CORPUS_DIR` 并合并至内存倒排索引与典籍清单 | `backend/app/common/classics.py`、`tests/test_classic_grounded_modules.py` |
+| 5 | 前端解释视图 | ExplanationView 标题与规则标识渲染契约不兼容 | 后端返回 `title` 与 `rule_ids: list`，前端视图组件仅读取 `heading` 与 `rule_id: string`。增加 `section.heading \|\| section.title` 与列表拼接兼容降级，补齐前端组件单测 | `frontend/src/components/result/ExplanationView.jsx`、`tests/components/ExplanationView.test.jsx` |
+| 6 | 工作流用神 | 非卦象体系多方人物取象误套用世应 | 多方人物分析时在奇门/八字盘面上仍输出「世爻/应爻」。修改为使用本体系对应符号（如奇门日干/时干）映射并断言 | `backend/app/workflow/steps.py`、`tests/test_workflow_steps.py` |
+| 7 | 测试与加固 | API 加固用例断言错误封套与参数缺失 | 修正 `test_api_hardening.py` 对 422/限流错误封套的断言口径，修复玄空端点缺失的年份入参 | `backend/tests/test_api_hardening.py` |
+
+### 验证结果
+
+| 验证项 | 命令 | 结果 |
+| --- | --- | --- |
+| 后端全量回归 | `python -m pytest backend/tests` | **768 passed / 10 skipped / 0 failed**（无任何异常失败） |
+| 前端纯模块测试 | `npm --prefix frontend run test:node` | **42 passed** |
+| 前端单元测试 | `npm --prefix frontend run test:unit` | **53 passed**（8 个测试套件全绿） |
+| 前端生产构建 | `npm --prefix frontend run build` | **通过**（Rollup 按需分包构建完成，零告警） |
+
 
 
 

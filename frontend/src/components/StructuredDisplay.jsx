@@ -140,6 +140,9 @@ function StructuredStepContent({ stepKey, data }) {
             </ul>
           </div>
         )}
+        {!data.hexagram_name && !(data.symbol_mappings && data.symbol_mappings.length > 0) && (
+          <p className="empty-inline">本次盘面未排卦象体系，无卦象符号可解读；盘面事实见步骤 2 盘面摘要与顾问结论。</p>
+        )}
       </div>
     );
   }
