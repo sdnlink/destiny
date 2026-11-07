@@ -197,6 +197,33 @@ class CompactPlateOutputTests(unittest.TestCase):
         self.assertEqual(compact_facts["six_spirits"], ["玄武", "青龙", "朱雀", "勾陈", "螣蛇", "白虎"])
         self.assertEqual(compact_facts["liuqin"], ["妻财", "官鬼", "兄弟", "妻财", "子孙", "兄弟"])
 
+    def test_keeps_body_use_relation_for_step4(self):
+        """体用生克是 step4 判定体用关系的真源，compact 丢掉它会让评分少一项。"""
+        step2 = {
+            "step": 2,
+            "systems": ["meihua"],
+            "plates": {
+                "meihua": {
+                    "system_label": "梅花易数",
+                    "facts": {
+                        "original": {"name": "遁", "lines": [1, 1, 1, 0, 0, 1]},
+                        "moving_lines": [1],
+                        "body_use": {
+                            "body_trigram": {"name": "乾", "element": "金"},
+                            "use_trigram": {"name": "艮", "element": "土"},
+                        },
+                        "body_use_relation": {
+                            "original": {"code": "use_generates_body", "label": "用生体"},
+                            "changed": {"code": "same_element", "label": "体用比和"},
+                        },
+                    },
+                }
+            },
+        }
+        facts = compact_plate_output(step2)["plates"]["meihua"]["facts"]
+        self.assertEqual(facts["body_use"]["body_trigram"]["name"], "乾")
+        self.assertEqual(facts["body_use_relation"]["original"]["code"], "use_generates_body")
+
     def test_calendar_becomes_renderable_strings(self):
         compact = compact_plate_output(self._full_step2())
         calendar = compact["calendar"]

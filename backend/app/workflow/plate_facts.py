@@ -393,6 +393,10 @@ def compact_plate_output(step2: Dict[str, Any]) -> Dict[str, Any]:
                 "body_trigram": _trigram_brief(body_use.get("body_trigram")),
                 "use_trigram": _trigram_brief(body_use.get("use_trigram")),
             }
+        # 体用生克是 step4 判定「体用关系」的唯一真源；compact 丢掉它会让
+        # tiyong_relation 永远是 None，吉凶评分里也少了这一项。
+        if isinstance(facts.get("body_use_relation"), dict):
+            display_facts["body_use_relation"] = facts["body_use_relation"]
         plates[module] = {
             "system_label": plate.get("system_label") or module,
             "facts": display_facts,

@@ -109,7 +109,7 @@ def _zhouyi_explanation(item):
                     "auto": "YI-AUTO-COIN-001", "manual": "YI-MANUAL-001",
                     "numbers": "YI-NUMBER-001", "three_numbers": "YI-3NUM-MAPPING-001",
                     "time": "YI-TIME-001",
-                }[item["method"]]],
+                }.get(item.get("method"), "YI-AUTO-COIN-001")],
             },
             {
                 "title": "动爻与变卦",
@@ -216,6 +216,8 @@ def _liuyao_explanation(item):
         "auto": "LY-AUTO-COIN-001", "time": "LY-TIME-001", "numbers": "LY-NUMBER-001",
         "lines": "LY-LINES-001", "coins": "LY-COINS-001",
     }
+    method_label = method_labels.get(item.get("method"), "六爻纳甲")
+    method_rule = method_rules.get(item.get("method"), "LY-AUTO-COIN-001")
     return {
         "module": "liuyao",
         "title": "六爻纳甲排盘",
@@ -227,11 +229,11 @@ def _liuyao_explanation(item):
             {
                 "title": "起卦与八宫",
                 "text": "采用{}排盘，本卦{}上{}下，归{}宫{}。".format(
-                    method_labels[item["method"]],
+                    method_label,
                     original["upper_trigram"]["name"], original["lower_trigram"]["name"],
                     palace["name"], palace["stage"],
                 ),
-                "rule_ids": [method_rules[item["method"]], "LY-PALACE-001"],
+                "rule_ids": [method_rule, "LY-PALACE-001"],
             },
             {
                 "title": "纳甲与六亲",
@@ -281,7 +283,7 @@ def _liuren_explanation(item):
                     month_general["boundary_term"], month_general["name"], month_general["branch"],
                     facts["occupation_time"]["branch"],
                 ),
-                "rule_ids": ["LR-MONTH-GENERAL-001", hour_rules[item["method"]]],
+                "rule_ids": ["LR-MONTH-GENERAL-001", hour_rules.get(item.get("method"), "LR-HOUR-001")],
             },
             {
                 "title": "天地盘与四课",
@@ -397,24 +399,31 @@ def _fengshui_explanation(item):
 
 def _ziwei_explanation(item):
     result = item["result"]
-    facts = result["facts"]
-    ming_palace = facts["ming_palace"]
-    shen_palace = facts["shen_palace"]
-    bureau = facts["bureau"]
-    ming_p = next(p for p in facts["palaces_by_order"] if p["name"] == "命宫")
-    main_stars = "、".join(s["name"] for s in ming_p["main_stars"]) or "无主星"
-    lucky_stars = "、".join(s["name"] for s in ming_p["lucky_stars"]) or "无"
-    bad_stars = "、".join(s["name"] for s in ming_p["bad_stars"]) or "无"
-    sihua_text = "、".join(f"{v}{k}" for k, v in facts["si_hua"].items())
+    facts = result.get("facts", {}) or result
+    ming_palace = facts.get("ming_palace", {})
+    shen_palace = facts.get("shen_palace", {})
+    bureau = facts.get("bureau", {})
+    ming_p = next((p for p in facts.get("palaces_by_order", []) if p.get("name") == "命宫"), {})
+    main_stars = "、".join(s["name"] for s in ming_p.get("main_stars", [])) or "无主星"
+    lucky_stars = "、".join(s["name"] for s in ming_p.get("lucky_stars", [])) or "无"
+    bad_stars = "、".join(s["name"] for s in ming_p.get("bad_stars", [])) or "无"
+    sihua_text = "、".join(f"{v}{k}" for k, v in facts.get("si_hua", {}).items())
+    pillars = facts.get("four_pillars", {})
+
+    ming_pos = ming_palace.get("palace_stem_branch", "")
+    shen_pos = shen_palace.get("palace_stem_branch", "")
+    bureau_name = bureau.get("name", "")
+    bureau_nayin = bureau.get("nayin", "")
+    decade_start = bureau.get("number", 2)
 
     return {
         "module": "ziwei",
         "title": "紫微斗数命盘",
-        "summary": f"命宫在{ming_palace['palace_stem_branch']}，五行局为{bureau['name']}（{bureau['nayin']}），命宫主星为{main_stars}，身宫在{shen_palace['palace_stem_branch']}。",
+        "summary": f"命宫在{ming_pos}，五行局为{bureau_name}（{bureau_nayin}），命宫主星为{main_stars}，身宫在{shen_pos}。",
         "sections": [
             {
                 "title": "命身宫位与五行局",
-                "text": f"生辰八字四柱为{facts['four_pillars'].get('year', '')}、{facts['four_pillars'].get('month', '')}、{facts['four_pillars'].get('day', '')}、{facts['four_pillars'].get('hour', facts['four_pillars'].get('time', ''))}，{facts.get('yin_yang_gender', '')}，大限{'顺行' if facts.get('is_forward_decade') else '逆行'}。命宫在{ming_palace.get('palace_stem_branch', '')}，身宫在{shen_palace.get('palace_stem_branch', '')}；五行局定为{bureau.get('name', '')}，命主为{facts.get('ming_zhu', '')}，身主为{facts.get('shen_zhu', '')}。",
+                "text": f"生辰八字四柱为{pillars.get('year', '')}、{pillars.get('month', '')}、{pillars.get('day', '')}、{pillars.get('hour', pillars.get('time', ''))}，{facts.get('yin_yang_gender', '')}，大限{'顺行' if facts.get('is_forward_decade') else '逆行'}。命宫在{ming_pos}，身宫在{shen_pos}；五行局定为{bureau_name}，命主为{facts.get('ming_zhu', '')}，身主为{facts.get('shen_zhu', '')}。",
                 "rule_ids": ["ZW-CAL-001", "ZW-MING-001", "ZW-BUREAU-001"],
             },
             {
@@ -424,7 +433,7 @@ def _ziwei_explanation(item):
             },
             {
                 "title": "生年四化与大限",
-                "text": f"生年四化配置为：{sihua_text}。起运大限从{bureau['number']}岁起步，按十天干地支顺布十二宫位。",
+                "text": f"生年四化配置为：{sihua_text}。起运大限从{decade_start}岁起步，按十天干地支顺布十二宫位。",
                 "rule_ids": ["ZW-SIHUA-001", "ZW-DECADE-001"],
             },
         ],
