@@ -940,14 +940,19 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
 | 5 | 前端解释视图 | ExplanationView 标题与规则标识渲染契约不兼容 | 后端返回 `title` 与 `rule_ids: list`，前端视图组件仅读取 `heading` 与 `rule_id: string`。增加 `section.heading \|\| section.title` 与列表拼接兼容降级，补齐前端组件单测 | `frontend/src/components/result/ExplanationView.jsx`、`tests/components/ExplanationView.test.jsx` |
 | 6 | 工作流用神 | 非卦象体系多方人物取象误套用世应 | 多方人物分析时在奇门/八字盘面上仍输出「世爻/应爻」。修改为使用本体系对应符号（如奇门日干/时干）映射并断言 | `backend/app/workflow/steps.py`、`tests/test_workflow_steps.py` |
 | 7 | 测试与加固 | API 加固用例断言错误封套与参数缺失 | 修正 `test_api_hardening.py` 对 422/限流错误封套的断言口径，修复玄空端点缺失的年份入参 | `backend/tests/test_api_hardening.py` |
+| 8 | 解释器容错 | 起卦方法字典查表与紫微命盘缺少命宫字段时的异常防护 | `explanation.py` 查表改用 `.get()` 并回退默认规则，紫微命盘提取星曜与大限起步年时增加安全判空 | `backend/app/core/explanation.py` |
+| 9 | 盘面事实 | 体用生克字段来源缺失 | `plate_facts.py` 补齐梅花体用生克真源，消除 `tiyong_relation` 恒为 `None` 的缺陷 | `backend/app/workflow/plate_facts.py` |
+| 10 | 前端模型兼容 | 大六壬双命名 `liuren`/`daliuren` 别名查找 | `frontend/src/components/result/shared.jsx` 的 `findModule` 支持别名集合查找，避免大六壬模块结果在视图中丢失 | `frontend/src/components/result/shared.jsx` |
+| 11 | 诚实评级口径 | 多方选择分析伪评级清除 | `risk_level` 移除未登记的默认「中」，统一返回「未评级」，契合确定性推演诚实边界 | `backend/app/interaction/multi_choice.py` |
+| 12 | 基础健壮性 | 历法干支性质与模糊测试 + 典籍库热失效支持 | 新增干支周期/有效性/锚点模糊测试，典籍库支持 mtime 变更自动重载 | `backend/tests/test_fuzz_calendar_core.py`、`backend/tests/test_classics_cache.py` |
 
 ### 验证结果
 
 | 验证项 | 命令 | 结果 |
 | --- | --- | --- |
-| 后端全量回归 | `python -m pytest backend/tests` | **768 passed / 10 skipped / 0 failed**（无任何异常失败） |
+| 后端全量回归 | `python -m pytest backend/tests` | **780 passed / 10 skipped / 0 failed**（无任何异常失败） |
 | 前端纯模块测试 | `npm --prefix frontend run test:node` | **42 passed** |
-| 前端单元测试 | `npm --prefix frontend run test:unit` | **53 passed**（8 个测试套件全绿） |
+| 前端单元测试 | `npm --prefix frontend run test:unit` | **54 passed**（8 个测试套件全绿） |
 | 前端生产构建 | `npm --prefix frontend run build` | **通过**（Rollup 按需分包构建完成，零告警） |
 
 
