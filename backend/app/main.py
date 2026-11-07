@@ -37,6 +37,7 @@ from app.session import create_session, get_store
 from app.session.ownership import HEADER_NAME as OWNER_HEADER_NAME
 from app.session.ownership import claim_or_match, client_id_from, owner_hash
 from app.workflow import run_workflow
+from app.workflow.scheduler import SUPPORTED_SYSTEMS
 from app.interaction import (
     analyze_branches,
     analyze_multi_party,
@@ -952,6 +953,16 @@ def create_divination_session(request: SessionCreateRequest, http_request: Reque
     requested_owner, error = _client_owner_or_error(http_request)
     if error is not None:
         return error
+    if request.system not in SUPPORTED_SYSTEMS:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": {
+                    "code": "INVALID_SYSTEM",
+                    "message": "不支持的术数门类：{}".format(request.system),
+                }
+            },
+        )
     session = create_session(
         question=request.question,
         category=request.category,

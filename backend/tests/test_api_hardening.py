@@ -41,6 +41,16 @@ class ApiHardeningTests(unittest.TestCase):
         self.assertEqual(ref["sitting"]["mountain"], "午")
         self.assertIsNotNone(ref["sitting"]["tihua_star"])
 
+    def test_unsupported_system_is_rejected_at_create(self):
+        # zhouyi/fengshui 不在七步排盘链路里，不能静默落成「梅花+六爻」默认盘
+        resp = self.client.post(
+            "/v1/sessions",
+            json={"question": "未知体系校验", "system": "zhouyi"},
+            headers={"X-Client-Id": "unsupported-system-" + "a" * 32},
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(resp.json()["error"]["code"], "INVALID_SYSTEM")
+
 
 class RateLimitTests(unittest.TestCase):
     @classmethod
