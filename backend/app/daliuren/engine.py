@@ -184,14 +184,6 @@ def _shehai_transmissions(day_pillar, plate, candidate_lessons, source_path):
     return result
 
 
-def _unsupported(path, candidates, trace, reason):
-    return {
-        "status": "pending_rule_selection", "lesson_type": path, "source_path": path,
-        "candidates": candidates, "pending_path": path, "transmissions": [],
-        "reason": reason, "trace": trace,
-    }
-
-
 def _direct_transmissions(day_pillar, plate, lessons):
     candidates = _candidate_lessons(lessons, "lower_controls_upper")
     source_path = "贼克" if candidates else None
@@ -229,18 +221,13 @@ def _remote_transmissions(day_pillar, plate, lessons):
     selected = candidates[0] if len(candidates) == 1 else _select_by_day_polarity(candidates, day_stem)
     if selected is None:
         # 遥克比用后仍有多个候选：转入涉害，按涉害深度（见机/察微/缀瑕）取初传，
-        # 不再返回 pending；取法在同一涉害规则内，保持可复核。
+        # 取法在同一涉害规则内，保持可复核；绝不退回 pending，保证三传必然可计算。
         lesson_candidates = []
         seen = set()
         for lesson in lessons:
             if lesson["upper"] in candidates and lesson["upper"] not in seen:
                 seen.add(lesson["upper"])
                 lesson_candidates.append(lesson)
-        if len(lesson_candidates) < 2:
-            return _unsupported(
-                "遥克", candidates, trace + ["遥克比用后仍有多个候选"],
-                "候选课不足以进入涉害取法",
-            )
         result = _shehai_transmissions(day_pillar, plate, lesson_candidates, "遥克")
         result["remote_control"] = {
             "path": "遥克", "source_path": source_path, "candidates": candidates,
