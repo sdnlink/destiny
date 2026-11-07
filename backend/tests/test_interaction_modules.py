@@ -520,7 +520,7 @@ class TestMultiChoice(unittest.TestCase):
         for item in result["choices"]:
             self.assertNotIn("用神休囚", "".join(item["pros"] + item["cons"]))
             self.assertNotIn("卦象偏有利", "".join(item["pros"] + item["cons"]))
-            self.assertEqual(item["risk_level"], "中")
+            self.assertEqual(item["risk_level"], "未评级")
 
     def test_recommendation_sorts_by_risk_level(self):
         analyses = [

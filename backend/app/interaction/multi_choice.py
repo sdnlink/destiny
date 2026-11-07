@@ -103,7 +103,7 @@ def _analyze_domain_choice(choice: str, index: int, framework: str) -> Dict[str,
             f"{framework}盘面未做卦象吉凶评级，无法给出「更有利」的排序",
             "方案优劣需按现实资源、时间与风险承受力自行权衡",
         ],
-        "risk_level": "中",
+        "risk_level": "未评级",
         "trend": "不作吉凶趋势判断，仅提供盘面核对视角",
     }
 
