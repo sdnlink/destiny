@@ -100,6 +100,25 @@ class QimenTests(unittest.TestCase):
         self.assertEqual(data_eval["module"], "qimen")
         self.assertEqual(data_eval["status"], "completed")
 
+    def test_qimen_solar_term_zhongqi_coverage(self):
+        """修复审计缺陷：奇门定局必须使用24节气（含中气），冬至夏至阴阳遁正确翻转。"""
+        # 1. 2026-07-01 (夏至后、小暑前)：应采用「夏至」阴遁定局，不能延用芒种阳遁
+        res_xiazhi = calculate_qimen_chart("2026-07-01T12:00:00")
+        self.assertEqual(res_xiazhi["dun_type"], "阴遁")
+        # 夏至定局为 阴遁 9, 3, 6 局之一
+        self.assertIn(res_xiazhi["ju_number"], [9, 3, 6])
+
+        # 2. 2026-12-25 (冬至后、小寒前)：应采用「冬至」阳遁定局，不能延用大雪阴遁
+        res_dongzhi = calculate_qimen_chart("2026-12-25T12:00:00")
+        self.assertEqual(res_dongzhi["dun_type"], "阳遁")
+        # 冬至定局为 阳遁 1, 7, 4 局之一
+        self.assertIn(res_dongzhi["ju_number"], [1, 7, 4])
+
+        # 3. 2026-03-25 (春分后、清明前，中气)：应采用「春分」阳遁定局
+        res_chunfen = calculate_qimen_chart("2026-03-25T12:00:00")
+        self.assertEqual(res_chunfen["dun_type"], "阳遁")
+        self.assertIn(res_chunfen["ju_number"], [3, 9, 6])
+
 
 if __name__ == "__main__":
     unittest.main()

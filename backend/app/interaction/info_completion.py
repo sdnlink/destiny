@@ -22,7 +22,7 @@ COMPLETION_QUESTIONS = {
         "field": "user_profile.current_stage",
     },
     "system": {
-        "question": "是否指定术数门类？可选：梅花易数（默认）、六爻纳甲、奇门遁甲、大六壬。不指定则默认主用梅花+六爻辅助。",
+        "question": "是否指定术数门类？可选：周易、梅花易数、六爻纳甲、八字命理、紫微斗数、奇门遁甲、大六壬、风水（阳宅）。不指定则默认主用梅花+六爻辅助。",
         "field": "system",
     },
 }

@@ -65,6 +65,7 @@ export default function ResultPhase({
 }) {
     const wf = result.workflow_result || {};
     const formatted = result.formatted_text || "";
+    const hasHexagram = Boolean((wf.step5 || {}).hexagram_name);
     const step6 = wf.step6 || {};
     const fortune = step6.fortune_level || "平";
 
@@ -229,7 +230,9 @@ export default function ResultPhase({
                   type="text"
                   value={deepQuestionInput}
                   onChange={(e) => setDeepQuestionInput(e.target.value)}
-                  placeholder="针对某符号/断语深度追问，如：动爻代表什么？"
+                  placeholder={hasHexagram
+                    ? "针对某符号/断语深度追问，如：动爻代表什么？"
+                    : "针对某符号/断语深度追问，如：用神代表什么？"}
                   onKeyDown={(e) => e.key === "Enter" && handleDeepQuestion()}
                 />
                 <button className="btn-secondary btn-small" onClick={handleDeepQuestion} disabled={anyLoading || !deepQuestionInput.trim()}>

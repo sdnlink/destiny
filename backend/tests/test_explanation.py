@@ -11,6 +11,8 @@ from app.core.iching import manual_cast
 from app.core.meihua import time_cast
 from app.core.liuren import time_cast as liuren_time_cast
 from app.core.liuyao import time_cast as liuyao_time_cast
+from app.bazi import time_cast as bazi_time_cast
+from app.qimen import time_cast as qimen_time_cast
 
 
 class ExplanationTests(unittest.TestCase):
@@ -67,6 +69,27 @@ class ExplanationTests(unittest.TestCase):
         self.assertEqual(len(output["modules"]), 5)
         self.assertIn("六爻", output["summary"])
         self.assertIn("三传为午、辰、寅", output["summary"])
+
+    def test_explains_bazi_and_qimen_facts(self):
+        """验证八字与奇门解释器已接入，不再被 explain_calculation_set 静默过滤。"""
+        dt = "2026-08-15T16:00:00"
+        tz = "Asia/Shanghai"
+        results = [
+            {"module": "bazi", "method": "time", "result": bazi_time_cast(dt, tz)},
+            {"module": "qimen", "method": "time", "result": qimen_time_cast(dt, tz)},
+        ]
+        output = explain_calculation_set(results, self.comparison)
+        self.assertEqual(len(output["modules"]), 2)
+        module_names = [m["module"] for m in output["modules"]]
+        self.assertIn("bazi", module_names)
+        self.assertIn("qimen", module_names)
+        self.assertIn("八字命理", output["summary"])
+        self.assertIn("奇门遁甲", output["summary"])
+        for mod in output["modules"]:
+            self.assertTrue(len(mod["sections"]) >= 3)
+            for sec in mod["sections"]:
+                self.assertTrue(sec["title"])
+                self.assertTrue(sec["rule_ids"])
 
 
 if __name__ == "__main__":

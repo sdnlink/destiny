@@ -33,6 +33,9 @@ SOURCE_MANIFESTS = (
 DEFAULT_CORPUS_DIR = (
     Path(__file__).resolve().parents[3] / "data" / "generated" / "wikisource-corpus"
 )
+DEFAULT_CALENDAR_CORPUS_DIR = (
+    Path(__file__).resolve().parents[3] / "data" / "generated" / "calendar-corpus"
+)
 DEFAULT_SOURCES_DIR = Path(__file__).resolve().parents[3] / "data" / "sources"
 EXCERPT_RADIUS = 60
 
@@ -88,20 +91,25 @@ class ClassicsLibrary:
             return
         chunks = []
         documents = {}
-        documents_path = self.corpus_dir / "corpus_documents.jsonl"
-        chunks_path = self.corpus_dir / "corpus_chunks.jsonl"
+        target_dirs = [self.corpus_dir]
+        if self.corpus_dir == DEFAULT_CORPUS_DIR and DEFAULT_CALENDAR_CORPUS_DIR.exists():
+            target_dirs.append(DEFAULT_CALENDAR_CORPUS_DIR)
+
         try:
-            if documents_path.exists():
-                with documents_path.open(encoding="utf-8") as handle:
-                    for line in handle:
-                        row = json.loads(line)
-                        documents[row["document_id"]] = row
-            if chunks_path.exists():
-                with chunks_path.open(encoding="utf-8") as handle:
-                    for line in handle:
-                        row = json.loads(line)
-                        row["chunk_index"] = int(row["chunk_index"])
-                        chunks.append(row)
+            for c_dir in target_dirs:
+                documents_path = c_dir / "corpus_documents.jsonl"
+                chunks_path = c_dir / "corpus_chunks.jsonl"
+                if documents_path.exists():
+                    with documents_path.open(encoding="utf-8") as handle:
+                        for line in handle:
+                            row = json.loads(line)
+                            documents[row["document_id"]] = row
+                if chunks_path.exists():
+                    with chunks_path.open(encoding="utf-8") as handle:
+                        for line in handle:
+                            row = json.loads(line)
+                            row["chunk_index"] = int(row["chunk_index"])
+                            chunks.append(row)
         except (OSError, ValueError, KeyError, TypeError) as exc:
             logging.getLogger(__name__).warning(
                 "典籍语料加载失败，本次以空库降级：%s (%s)", self.corpus_dir, exc)

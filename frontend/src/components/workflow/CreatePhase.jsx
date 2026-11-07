@@ -294,7 +294,7 @@ export default function CreatePhase({
 
           <div className="workflow-notice">
             <ShieldCheck size={14} />
-            <span>铁律：原始排盘一经生成永久固定，后续交互仅调整解读视角，绝不修改卦盘本身。</span>
+            <span>铁律：原始排盘一经生成永久固定，后续交互仅调整解读视角，绝不修改原始盘面。</span>
           </div>
         </div>
       </div>

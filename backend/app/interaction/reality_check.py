@@ -19,12 +19,12 @@ NEGATION_PHRASES = ("不太", "不完全", "不够", "不是很", "并不", "不
 REALITY_RESPONSES = {
     "符合": {
         "action": "enter_extended",
-        "description": "卦象现状与现实吻合，进入拓展交互，可深入追问符号含义、发展趋势或行动建议。",
+        "description": "盘面现状与现实吻合，进入拓展交互，可深入追问符号含义、发展趋势或行动建议。",
         "shift_needed": False,
     },
     "部分符合": {
         "action": "adjust_interpretation",
-        "description": "卦盘原样保留，仅调整事理解读与象义映射。请告知哪些部分符合、哪些部分不符，以便重新取象解析。",
+        "description": "原始盘面原样保留，仅调整事理解读与象义映射。请告知哪些部分符合、哪些部分不符，以便重新取象解析。",
         "shift_needed": True,
     },
     "不符合": {

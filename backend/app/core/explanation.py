@@ -4,10 +4,24 @@ MODULE_LABELS = {
     "meihua": "梅花易数",
     "liuyao": "六爻",
     "liuren": "大六壬",
+    "daliuren": "大六壬",
     "ziwei": "紫微斗数",
+    "bazi": "八字命理",
+    "qimen": "奇门遁甲",
     "fengshui": "阳宅方位",
 }
-MODULE_ORDER = {"calendar": 0, "zhouyi": 1, "meihua": 2, "liuyao": 3, "liuren": 4, "ziwei": 5, "fengshui": 6}
+MODULE_ORDER = {
+    "calendar": 0,
+    "zhouyi": 1,
+    "meihua": 2,
+    "liuyao": 3,
+    "liuren": 4,
+    "daliuren": 4,
+    "ziwei": 5,
+    "bazi": 6,
+    "qimen": 7,
+    "fengshui": 8,
+}
 
 
 def _calendar_explanation(item):
@@ -418,13 +432,98 @@ def _ziwei_explanation(item):
     }
 
 
+def _bazi_explanation(item):
+    result = item["result"]
+    facts = result.get("facts", {})
+    pillars = facts.get("pillars", {})
+    strength = facts.get("day_master_strength") or result.get("day_master_strength", {})
+    day_master = facts.get("day_master") or strength.get("day_master", "")
+    day_elem = strength.get("element", "")
+    level = strength.get("level", "中和")
+    fav = "、".join(strength.get("favorable_elements", [])) or "无"
+    unfav = "、".join(strength.get("unfavorable_elements", [])) or "无"
+    analysis_summary = (strength.get("analysis") or {}).get("summary", "")
+    luck_start = result.get("luck_start_info") or facts.get("luck_start_info", {})
+    luck_desc = f"起运于约{luck_start.get('start_age', '')}岁" if luck_start.get("start_age") else "大运已排定"
+
+    year_str = f"{pillars.get('year', {}).get('stem', '')}{pillars.get('year', {}).get('branch', '')}"
+    month_str = f"{pillars.get('month', {}).get('stem', '')}{pillars.get('month', {}).get('branch', '')}"
+    day_str = f"{pillars.get('day', {}).get('stem', '')}{pillars.get('day', {}).get('branch', '')}"
+    hour_str = f"{pillars.get('hour', {}).get('stem', '')}{pillars.get('hour', {}).get('branch', '')}"
+
+    return {
+        "module": "bazi",
+        "title": "子平八字命盘",
+        "summary": f"日主为【{day_master}{day_elem}】，五行气象定级为【{level}】。喜用五行：{fav}；忌神五行：{unfav}。{luck_desc}。",
+        "sections": [
+            {
+                "title": "四柱干支与十神",
+                "text": f"生辰四柱为：年柱{year_str}（{pillars.get('year', {}).get('nayin', '')}）、月柱{month_str}（{pillars.get('month', {}).get('nayin', '')}）、日柱{day_str}（{pillars.get('day', {}).get('nayin', '')}）、时柱{hour_str}（{pillars.get('hour', {}).get('nayin', '')}）。",
+                "rule_ids": ["BZ-CAL-001", "BZ-TEN-GODS-001"],
+            },
+            {
+                "title": "日主强弱与五行喜忌",
+                "text": analysis_summary or f"日元为{day_master}，全局五行判定为{level}。喜用为{fav}，忌神为{unfav}。",
+                "rule_ids": ["BZ-STRENGTH-001", "BZ-FAVORABLE-001"],
+            },
+            {
+                "title": "大运顺逆与起运",
+                "text": f"大运起运推算：{luck_desc}，顺布八步大运区间，辅助研判中长期时运起伏走势。",
+                "rule_ids": ["BZ-LUCK-PILLARS-001"],
+            },
+        ],
+        "limitations": list(result.get("warnings", [])),
+    }
+
+
+def _qimen_explanation(item):
+    result = item["result"]
+    facts = result.get("facts", {}) or result
+    dun_type = facts.get("dun_type", "")
+    ju_number = facts.get("ju_number", "")
+    yuan_type = facts.get("yuan_type", "")
+    zhi_fu_star = facts.get("zhi_fu_star", "")
+    zhi_shi_gate = facts.get("zhi_shi_gate", "")
+    zhi_fu_palace = facts.get("zhi_fu_palace", "")
+    zhi_shi_palace = facts.get("zhi_shi_palace", "")
+    favs = facts.get("favorable_directions", []) or result.get("favorable_directions", [])
+    fav_text = "、".join(f"{f['direction']}{f['gate']}" for f in favs[:3]) if favs else "正南开门"
+
+    return {
+        "module": "qimen",
+        "title": "时家奇门遁甲盘",
+        "summary": f"局象为【{dun_type}{ju_number}局·{yuan_type}】，值符【{zhi_fu_star}】落{zhi_fu_palace}宫，值使【{zhi_shi_gate}】落{zhi_shi_palace}宫。吉方首选：{fav_text}。",
+        "sections": [
+            {
+                "title": "定局与局象",
+                "text": f"依当日日支与24节气拆补法定局为【{dun_type}{ju_number}局·{yuan_type}】，三奇六仪按洛书九宫飞布完成地盘排演。",
+                "rule_ids": ["QM-CHAIBU-JU-001", "QM-DIPAN-001"],
+            },
+            {
+                "title": "值符值使与飞转星门",
+                "text": f"时辰旬首统领六仪，值符{zhi_fu_star}加临{zhi_fu_palace}宫天盘，值使{zhi_shi_gate}加临{zhi_shi_palace}宫人盘；八神天盘顺位旋转完成四盘立局。",
+                "rule_ids": ["QM-ZHIFU-ZHISHI-001", "QM-ROTATION-001"],
+            },
+            {
+                "title": "吉门吉方研判",
+                "text": f"三吉门（开门、休门、生门）配合奇仪得使，首选吉方为：{fav_text}，适宜商务拓展、求谋出行与趋避布局。",
+                "rule_ids": ["QM-GATES-DIRECTIONS-001"],
+            },
+        ],
+        "limitations": list(result.get("warnings", [])),
+    }
+
+
 EXPLAINERS = {
     "calendar": _calendar_explanation,
     "zhouyi": _zhouyi_explanation,
     "meihua": _meihua_explanation,
     "liuyao": _liuyao_explanation,
     "liuren": _liuren_explanation,
+    "daliuren": _liuren_explanation,
     "ziwei": _ziwei_explanation,
+    "bazi": _bazi_explanation,
+    "qimen": _qimen_explanation,
     "fengshui": _fengshui_explanation,
 }
 

@@ -46,9 +46,10 @@ def render_plate_text(plate_data: Dict[str, Any]) -> str:
             summary = domain_summary(module, facts)
             if summary:
                 lines.append("  盘面摘要：" + "；".join(f"{k}：{v}" for k, v in summary.items()))
-        # 体用
-        body = facts.get("body_trigram") or facts.get("ti_trigram")
-        use = facts.get("use_trigram") or facts.get("yong_trigram")
+        # 体用（梅花把体用放在 facts.body_use 下，兼容旧口径的顶层键）
+        body_use = facts.get("body_use") or {}
+        body = facts.get("body_trigram") or facts.get("ti_trigram") or body_use.get("body_trigram")
+        use = facts.get("use_trigram") or facts.get("yong_trigram") or body_use.get("use_trigram")
         if body and isinstance(body, dict):
             lines.append(f"  体卦：{body.get('name', '')}（{body.get('element', '')}）")
         if use and isinstance(use, dict):
@@ -140,8 +141,9 @@ def render_fixed_format(
         parts.append(f"  - {chain}")
     parts.append("")
 
-    # 卦象符号事理解读
-    parts.append("====卦象符号事理解读====")
+    # 符号事理解读（没有卦名时不能把章节写成「卦象符号」）
+    symbol_scope = "卦象符号" if step5.get("hexagram_name") else "盘面符号"
+    parts.append(f"===={symbol_scope}事理解读====")
     for mapping in step5.get("symbol_mappings", []):
         parts.append(f"【{mapping['symbol']}】")
         parts.append(f"  原始象义：{mapping['original_meaning']}")
@@ -150,7 +152,7 @@ def render_fixed_format(
         if step5.get("hexagram_name"):
             parts.append("（符号象义待结合具体卦爻进一步拆解）")
         else:
-            parts.append("（本次未排卦象体系，无卦象符号可解读）")
+            parts.append("（本次未排卦象体系，无卦象符号可解读；盘面事实见步骤 2 盘面摘要）")
     parts.append("")
 
     # 事态综合推演

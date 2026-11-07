@@ -1080,6 +1080,20 @@ class TestNonHexagramYongshen(unittest.TestCase):
         self.assertIn("阴遁3局", text)
         self.assertNotIn("本卦", text)
 
+    def test_plate_text_reads_meihua_body_use(self):
+        """梅花体用存在 facts.body_use 下，固定文本必须按真实结构取到体卦/用卦。"""
+        text = render_plate_text({"plates": {"meihua": {
+            "system_label": "梅花",
+            "facts": {
+                "body_use": {
+                    "body_trigram": {"name": "乾", "element": "金"},
+                    "use_trigram": {"name": "兑", "element": "金"},
+                },
+            },
+        }}})
+        self.assertIn("体卦：乾（金）", text)
+        self.assertIn("用卦：兑（金）", text)
+
     def test_reality_check_describes_unrated_plan(self):
         check = WorkflowEngine._build_reality_check(
             None, {"plates": {}}, {"primary_yongshen": "喜用五行（火、木）"},
@@ -1111,7 +1125,9 @@ class TestNonHexagramYongshen(unittest.TestCase):
         self.assertNotIn("None", text)
         self.assertNotIn("{'", text)
         self.assertIn("qimen · auto · 2026-11-05T10:00", text)
-        self.assertIn("（本次未排卦象体系，无卦象符号可解读）", text)
+        self.assertIn("====盘面符号事理解读====", text)
+        self.assertNotIn("====卦象符号事理解读====", text)
+        self.assertIn("盘面事实见步骤 2 盘面摘要", text)
 
 
 if __name__ == "__main__":

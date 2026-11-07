@@ -353,18 +353,22 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
               <div><span className="band-icon"><Icon size={16} /></span><div><h3>{module.title}</h3><p>{module.summary}</p></div></div>
             </div>
             <div className="explanation-sections">
-              {module.sections.map((section, index) => (
-                <div className="explanation-section" key={`${section.rule_id}-${index}`}>
-                  <div className="section-meta">
-                    <span className="explanation-index">{index + 1}</span>
-                    <span className="rule-badge">{section.rule_id}</span>
+              {module.sections.map((section, index) => {
+                const ruleBadge = section.rule_id || (Array.isArray(section.rule_ids) ? section.rule_ids.join(" · ") : "");
+                const headingText = section.heading || section.title || "";
+                return (
+                  <div className="explanation-section" key={`${ruleBadge || index}-${index}`}>
+                    <div className="section-meta">
+                      <span className="explanation-index">{index + 1}</span>
+                      {ruleBadge && <span className="rule-badge">{ruleBadge}</span>}
+                    </div>
+                    <div className="section-body">
+                      {headingText && <h4>{headingText}</h4>}
+                      <p>{section.text}</p>
+                    </div>
                   </div>
-                  <div className="section-body">
-                    <h4>{section.heading}</h4>
-                    <p>{section.text}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         );

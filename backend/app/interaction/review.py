@@ -200,16 +200,22 @@ def _multi_angle_analysis(
 
     # 人为外部干扰
     unexpected = (outcome_details or {}).get("unexpected", [])
+    if framework:
+        trend_subject = "盘面结构"
+        trend_note = "盘面结构反映的是起盘时刻的格局条件，不构成吉凶断言"
+    else:
+        trend_subject = "卦象"
+        trend_note = "卦象反映的是起盘时刻的趋势概率"
     if unexpected:
         analysis["external_interference"] = (
             f"实际过程中出现意外因素：{'；'.join(unexpected)}。"
-            "这些人为或外部干扰可能改变了卦象所反映的趋势。"
-            "卦象反映的是起盘时刻的趋势概率，后续人为决策与外部突发事件可能改变走向。"
+            f"这些人为或外部干扰可能改变了{trend_subject}所反映的趋势。"
+            f"{trend_note}，后续人为决策与外部突发事件可能改变走向。"
         )
     else:
         analysis["external_interference"] = (
             "实际过程中是否存在未预见的人为决策或外部事件？"
-            "任何重大的人为选择或外部环境变化都可能影响卦象趋势的兑现。"
+            f"任何重大的人为选择或外部环境变化都可能影响{trend_subject}趋势的兑现。"
         )
 
     return analysis
@@ -223,10 +229,16 @@ def _extract_lessons(
 ) -> List[str]:
     """提取经验教训。"""
     lessons = []
+    if framework:
+        verified_note = "取象与盘面口径"
+        unverified_note = "用神取向与盘面符号的现实对应"
+    else:
+        verified_note = "取象与旺衰判断"
+        unverified_note = "用神取向、旺衰判断或应期推算"
     if verified:
-        lessons.append(f"应验方面：本次推演中有{len(verified)}项与实际吻合，说明相关取象与旺衰判断具有参考价值。")
+        lessons.append(f"应验方面：本次推演中有{len(verified)}项与实际吻合，说明相关{verified_note}具有参考价值。")
     if unverified:
-        lessons.append(f"未应验方面：有{len(unverified)}项与实际不符，需复盘用神取向、旺衰判断或应期推算是否存在偏差。")
+        lessons.append(f"未应验方面：有{len(unverified)}项与实际不符，需复盘{unverified_note}是否存在偏差。")
     if framework:
         lessons.append(f"{framework}盘面反映的是起盘时刻的盘面结构，不是绝对预言；人为选择与外部事件可能改变走向。")
     else:

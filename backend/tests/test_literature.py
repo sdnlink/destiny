@@ -79,6 +79,35 @@ class LiteratureTests(unittest.TestCase):
         expected_terms = {item["term"] for item in output["query_terms"]}
         self.assertEqual(matched_terms, expected_terms)
 
+    def test_qimen_and_ziwei_literature_candidates(self):
+        """验证奇门与紫微模块可正确生成典籍检索候选词。"""
+        qimen_result = {
+            "module": "qimen",
+            "method": "time",
+            "result": {
+                "zhi_fu_star": "天心",
+                "zhi_shi_gate": "开门",
+                "facts": {"zhi_fu_star": "天心", "zhi_shi_gate": "开门"},
+            },
+        }
+        ziwei_result = {
+            "module": "ziwei",
+            "method": "time",
+            "result": {
+                "facts": {
+                    "palaces_by_order": [
+                        {"name": "命宫", "main_stars": [{"name": "紫微"}]},
+                    ]
+                }
+            },
+        }
+        output = collect_literature_opinions([qimen_result, ziwei_result], DiverseSearchClient(), max_books=5)
+        terms = [item["term"] for item in output["query_terms"]]
+        self.assertIn("天心", terms)
+        self.assertIn("开门", terms)
+        self.assertIn("紫微", terms)
+        self.assertTrue(any("奇门" in b["matched_term"] or b["matched_term"] in ("天心", "开门") for b in output["books"]))
+
 
 if __name__ == "__main__":
     unittest.main()

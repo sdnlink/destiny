@@ -128,6 +128,24 @@ FALLBACK_CLASSICAL_CORPUS = [
         "keywords": ["风水", "青囊", "二十四山", "罗盘", "向位", "分金", "撼龙"],
         "snippet": "《青囊经》曰：天尊地卑，阳奇阴偶。理寓于气，气囿于形。顺五兆，因四时，相济和合，明向背与分金之度，以定安居吉凶之应。",
     },
+    {
+        "document_id": "fallback-qimen",
+        "chunk_id": "qimen-core-007",
+        "title": "《奇门遁甲统宗》",
+        "source_url": "corpus://internal/qimen-core",
+        "content_sha256": "9fd17458e161b476203e26950174c371e85a4dd7216a0b3071498b414e53e4f",
+        "keywords": ["奇门", "奇门遁甲", "值符", "值使", "三奇", "开门", "休门", "生门", "九星", "八门", "天心", "天禽", "天蓬", "天冲", "天辅", "天英", "天芮", "天柱", "天任"],
+        "snippet": "《奇门遁甲统宗》云：急则从神缓从门，值符所临皆吉宿，值使所指主发端。得奇得使，顺天时而动，利建侯行师，诸事大遂。",
+    },
+    {
+        "document_id": "fallback-ziwei",
+        "chunk_id": "ziwei-core-008",
+        "title": "《紫微斗数全书》",
+        "source_url": "corpus://internal/ziwei-core",
+        "content_sha256": "a0e28569f272c587314f37061285d482f96b5ee8327b1c41825a9c525f64f50",
+        "keywords": ["紫微", "紫微斗数", "命宫", "身宫", "十四正曜", "天府", "贪狼", "武曲", "太阳", "太阴", "破军", "七杀", "天同", "天机", "廉贞", "巨门", "天相", "天梁"],
+        "snippet": "《紫微斗数全书》卷一骨髓赋云：希夷仰观天星，按人命而定贵贱。紫微居午无杀凑，位至公卿；天府同垣富贵长，左右辅弼吉相随。审星度吉凶，断穷通寿夭。",
+    },
 ]
 
 
@@ -195,11 +213,46 @@ def _query_terms(module_results):
                 "hexagram": "八字",
                 "role": "八字日元",
             })
-        elif mod == "liuren":
+        elif mod in ("liuren", "daliuren"):
             candidates.append({
                 "term": "大六壬",
                 "hexagram": "六壬",
                 "role": "大六壬三传",
+            })
+        elif mod == "qimen":
+            zhi_fu = facts.get("zhi_fu_star") or res.get("zhi_fu_star")
+            zhi_shi = facts.get("zhi_shi_gate") or res.get("zhi_shi_gate")
+            if zhi_fu:
+                candidates.append({
+                    "term": zhi_fu,
+                    "hexagram": "奇门",
+                    "role": "奇门值符",
+                })
+            if zhi_shi:
+                candidates.append({
+                    "term": zhi_shi,
+                    "hexagram": "奇门",
+                    "role": "奇门值使",
+                })
+            if not zhi_fu and not zhi_shi:
+                candidates.append({
+                    "term": "奇门遁甲",
+                    "hexagram": "奇门",
+                    "role": "奇门局象",
+                })
+        elif mod == "ziwei":
+            ming_p = next((p for p in facts.get("palaces_by_order", []) if p.get("name") == "命宫"), None)
+            main_star = ming_p["main_stars"][0]["name"] if ming_p and ming_p.get("main_stars") else None
+            if main_star:
+                candidates.append({
+                    "term": main_star,
+                    "hexagram": "紫微",
+                    "role": "紫微命主",
+                })
+            candidates.append({
+                "term": "紫微斗数",
+                "hexagram": "紫微",
+                "role": "紫微命盘",
             })
         elif mod == "fengshui":
             candidates.append({
@@ -220,7 +273,8 @@ def _query_terms(module_results):
 
 MODULE_NAMES = {
     "zhouyi": "周易", "meihua": "梅花", "liuyao": "六爻",
-    "bazi": "八字", "liuren": "六壬", "ziwei": "紫微", "fengshui": "风水"
+    "bazi": "八字", "liuren": "六壬", "daliuren": "六壬", "ziwei": "紫微",
+    "qimen": "奇门", "fengshui": "风水"
 }
 
 
@@ -235,6 +289,10 @@ def _relevance_score(row, term, category=None):
     if "梅花" in title:
         score += 12
     if "增删卜易" in title or "卜筮正宗" in title:
+        score += 14
+    if "奇门" in title:
+        score += 14
+    if "紫微" in title:
         score += 14
     if "大六壬" in title or "滴天髓" in title or "青囊" in title:
         score += 12

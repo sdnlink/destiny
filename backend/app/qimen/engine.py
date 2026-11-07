@@ -72,8 +72,10 @@ def calculate_qimen_chart(
     hour_stem, hour_branch = ganzhi["hour"][0], ganzhi["hour"][1]
 
     # 1. 拆补法定局
-    term_name = cal_res["solar_terms"]["previous_month_boundary"]["name"]
-    # 若该节气不在常用24节气表内，取主节气名称
+    # 必须使用全部24节气（包含12节与12中气，冬至/夏至等中气为阴阳遁翻转关键节点）
+    active_term = cal_res.get("solar_terms", {}).get("current") or cal_res.get("solar_terms", {}).get("previous") or {}
+    term_name = active_term.get("name") or "立春"
+    # 若该节气不在常用24节气表内，取立春兜底
     if term_name not in SOLAR_TERM_JU_TABLE:
         term_name = "立春"
 

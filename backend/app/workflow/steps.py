@@ -241,6 +241,21 @@ def _domain_yongshen(plate_data: Dict[str, Any], category: str) -> Optional[Dict
     return None
 
 
+def _domain_party_yongshen(framework_label: str) -> List[Dict[str, str]]:
+    """非卦象体系的多方人物取象：用本体系符号，不用世爻/应爻。"""
+    pairs = {
+        "奇门遁甲": ("日干", "时干"),
+        "大六壬": ("日干", "三传"),
+        "八字命理": ("日主", "对应十神（配偶/财官）"),
+        "紫微斗数": ("命宫", "夫妻宫/交友宫"),
+    }
+    self_symbol, other_symbol = pairs.get(framework_label, ("本体系用神", "本体系对应符号"))
+    return [
+        {"party": "求测人", "yongshen": self_symbol, "role": "自身立场、状态、能力"},
+        {"party": "对方", "yongshen": other_symbol, "role": "对方立场、态度、动向"},
+    ]
+
+
 def step3_identify_yongshen(session, plate_data: Dict[str, Any]) -> Dict[str, Any]:
     """定用神，锁定分析焦点。多人事件列出各方对应用神。
 
@@ -679,7 +694,7 @@ def step5_xiangyi_deduction(session, plate_data: Dict[str, Any], yongshen_data: 
 
     return {
         "step": 5,
-        "name": "卦象符号事理解读",
+        "name": "卦象符号事理解读" if hexagram_name else "盘面符号事理解读",
         "hexagram_name": hexagram_name,
         "hexagram_explanation": hexagram_explanation,
         "symbol_mappings": symbol_mappings,

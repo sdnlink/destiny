@@ -69,6 +69,12 @@ class TestClassicsLibrary:
         assert len(ids) == len(set(ids))
         assert rows
 
+    def test_calendar_corpus_search(self, library):
+        # 历法语料库补强测试：步天歌、历法常数
+        passages = library.search("步天歌", limit=2)
+        assert passages, "历法语料库应能被检索"
+        assert any("步天歌" in p["title"] or "步天歌" in p["excerpt"] for p in passages)
+
 
 class TestLiuyaoAdvanced:
     def test_yongshen_candidates_and_meta_relatives(self):
