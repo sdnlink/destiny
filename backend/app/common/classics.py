@@ -206,11 +206,53 @@ class ClassicsLibrary:
         return passages[:limit]
 
 
+# 开发期热失效开关：默认关闭，保证生产路径零行为变更（缓存语义与之前一致）。
+# 开启后，每次取库会比对语料目录 mtime，文件变更即重建索引，免去重启。
+CLASSICS_AUTO_RELOAD = os.environ.get("CLASSICS_AUTO_RELOAD") == "1"
+
 _library = None
+_library_mtime = None
+
+
+def _corpus_mtime():
+    """语料目录（含其内文件）的最新修改时间，用于开发期热失效检测。"""
+    latest = 0.0
+    for base in (DEFAULT_CORPUS_DIR, DEFAULT_CALENDAR_CORPUS_DIR):
+        try:
+            latest = max(latest, os.path.getmtime(base))
+        except OSError:
+            pass
+        if os.path.isdir(base):
+            try:
+                for entry in os.scandir(base):
+                    if entry.is_file():
+                        latest = max(latest, entry.stat().st_mtime)
+            except OSError:
+                pass
+    return latest
+
+
+def reload_library():
+    """强制重建典籍库并刷新 mtime 快照，返回新实例。"""
+    global _library, _library_mtime
+    _library = ClassicsLibrary()
+    _library_mtime = _corpus_mtime()
+    return _library
 
 
 def get_library():
-    global _library
+    global _library, _library_mtime
     if _library is None:
         _library = ClassicsLibrary()
+        _library_mtime = _corpus_mtime()
+    elif CLASSICS_AUTO_RELOAD and _corpus_mtime() != _library_mtime:
+        _library = ClassicsLibrary()
+        _library_mtime = _corpus_mtime()
     return _library
+
+
+def reset_library_cache():
+    """测试用：清除缓存，下次调用重新加载。"""
+    global _library, _library_mtime
+    _library = None
+    _library_mtime = None
