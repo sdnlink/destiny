@@ -45,12 +45,16 @@ NAYIN_PAIRS = [
 ]
 
 def get_ganzhi_nayin(stem: str, branch: str) -> str:
+    if stem not in STEM_TO_INDEX or branch not in BRANCH_TO_INDEX:
+        raise ValueError("invalid ganzhi: {}{}".format(stem, branch))
     s_idx = STEM_TO_INDEX[stem]
     b_idx = BRANCH_TO_INDEX[branch]
     for idx in range(60):
         if idx % 10 == s_idx and idx % 12 == b_idx:
             return NAYIN_PAIRS[idx // 2]
-    return "水二局"
+    # 六十甲子中干支阴阳必同，合法输入必定命中；否则属不可能组合，显式报错，
+    # 不再返回 "水二局"（那是五行局名，不是纳音名，会让 bureau.nayin 类型错乱）。
+    raise ValueError("ganzhi not in sexagenary cycle: {}{}".format(stem, branch))
 
 # 生年干四化表: 禄 权 科 忌
 SIHUA_TABLE = {

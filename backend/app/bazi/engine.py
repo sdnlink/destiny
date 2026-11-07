@@ -6,6 +6,7 @@ from lunar_python import Solar
 
 from app.calendar.engine import CalendarEngine
 from app.calendar.timezone import parse_local_datetime
+from app.common.ganzhi import xun_info
 
 from .rules import (
     BRANCH_ELEMENTS,
@@ -56,16 +57,9 @@ def _sexagenary_pillars_cycle(start_ganzhi: str, direction: int, count: int = 8)
     return result
 
 
-_SEXAGENARY_CYCLE = [
-    HEAVENLY_STEMS[i % 10] + EARTHLY_BRANCHES[i % 12] for i in range(60)
-]
-
-
 def _kong_wang_branches(day_ganzhi: str) -> set:
-    """旬空：日柱所在旬的两个空亡地支（甲子旬戌亥空，甲戌旬申酉空……）。"""
-    idx = _SEXAGENARY_CYCLE.index(day_ganzhi)
-    k = idx // 10  # 旬序 0..5
-    return {EARTHLY_BRANCHES[(10 - 2 * k) % 12], EARTHLY_BRANCHES[(11 - 2 * k) % 12]}
+    """旬空：委托 app.common.ganzhi.xun_info 单一真源，避免第四份 60 甲子实现。"""
+    return set(xun_info(day_ganzhi)["empty_branches"])
 
 
 def _calculate_shensha(
@@ -118,7 +112,9 @@ def _calculate_shensha(
             pillar_shensha[p_name].append("禄神")
 
     # 5. 驿马、桃花、华盖、将星 (以年支和日支查)
-    for ref_br in {year_branch, day_branch}:
+    # 用有序去重而非 set：set 迭代顺序随 PYTHONHASHSEED 变化，会让神煞列表
+    # 顺序跨进程不确定；固定为 (年支, 日支) 顺序保证输出可复现。
+    for ref_br in dict.fromkeys((year_branch, day_branch)):
         group_elem = SAN_HE_GROUP.get(ref_br)
         if group_elem:
             yi_ma = YI_MA_MAP.get(group_elem)
@@ -409,8 +405,13 @@ def calculate_bazi(
     eight_char = lunar_inst.getEightChar()
     eight_char.setSect(1)
     yun = eight_char.getYun(1 if gender == "男" else 0)
-    start_year_offset = yun.getStartYear() or 3
-    start_month_offset = yun.getStartMonth() or 0
+    # 0 是合法起运岁数（出生即交节），不可用 `or` 兜底，否则整条大运平移 3 年。
+    start_year_offset = yun.getStartYear()
+    if start_year_offset is None:
+        start_year_offset = 3
+    start_month_offset = yun.getStartMonth()
+    if start_month_offset is None:
+        start_month_offset = 0
 
     birth_year = effective_dt.year
     start_actual_year = birth_year + start_year_offset

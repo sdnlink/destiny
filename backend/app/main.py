@@ -808,8 +808,8 @@ class XuankongRequest(BaseModel):
 @app.get("/v1/fengshui/xuankong")
 def fengshui_xuankong(
     sitting_mountain: str,
-    year: Optional[int] = None,
-    period: Optional[int] = None,
+    year: Optional[int] = Query(None, ge=1864, le=2100),
+    period: Optional[int] = Query(None, ge=1, le=9),
     sitting_degree: Optional[float] = None,
     include_tihua_reference: bool = False,
     include_tihua_chart: bool = False,

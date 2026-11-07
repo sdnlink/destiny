@@ -89,13 +89,15 @@ YUAN_INDEX = {"地": 0, "天": 1, "人": 2}
 
 
 def period_for_year(year):
+    """三元九运：上元一运起于 1864，每运 20 年，九运 180 年一轮回。
+
+    2043 之后并非恒为九运，而是重新起上元一运（2044–2063）——POST 端点允许
+    year 至 2100，早先在此区间无条件返回 9 属算法错误。
+    """
     year = int(year)
-    for number, start, end in PERIODS:
-        if start <= year <= end:
-            return number
     if year < PERIODS[0][1]:
         raise ValueError("year {} earlier than 上元一运 1864".format(year))
-    return 9
+    return ((year - PERIODS[0][1]) // 20) % 9 + 1
 
 
 def mountain_by_name(name):
@@ -238,6 +240,10 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
         if year is None:
             raise ValueError("year or period is required")
         period = period_for_year(year)
+    elif type(period) is not int or not 1 <= period <= 9:
+        # 函数级校验：越界 period 会令 _fly_sequence 产出含 0/10 的非法星盘，
+        # 并在 YUAN_LABELS[period] 触发 KeyError；字符串则触发 TypeError。
+        raise ValueError("period must be an integer between 1 and 9")
 
     sitting_forward = mountain.name not in YIN_MOUNTAINS
     facing_forward = facing_name not in YIN_MOUNTAINS
@@ -273,10 +279,19 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
     else:
         conditions.append({"name": "上山下水", "met": False,
                            "note": "山星当运到向、向星当运到坐"})
+    # 与旺山旺向/上山下水一致：未满足时也写入带 note 的条件项，避免下游缺项。
+    # 双星判据（山向两盘同宫同星）在 24 山×9 运下恒不命中，正确口径待专家签署，
+    # 此处只统一输出结构，不杜撰新判据。
     if mountain_at_sitting == facing_at_sitting:
         conditions.append({"name": "双星到坐", "met": True})
+    else:
+        conditions.append({"name": "双星到坐", "met": False,
+                           "note": "判据待专家签署：当前按山向两盘同宫同星判定"})
     if mountain_at_facing == facing_at_facing:
         conditions.append({"name": "双星到向", "met": True})
+    else:
+        conditions.append({"name": "双星到向", "met": False,
+                           "note": "判据待专家签署：当前按山向两盘同宫同星判定"})
 
     # 替卦区间判定：每山十五度，两侧各三度起替；起星盘为显式请求的 draft，不作为默认结论。
     if sitting_degree is not None:
