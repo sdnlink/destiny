@@ -293,6 +293,9 @@ def step3_identify_yongshen(session, plate_data: Dict[str, Any]) -> Dict[str, An
     # 没有卦象体系时，按本体系口径定用神；不要把六亲爻位写给八字/紫微/奇门/六壬
     domain = None if _has_hexagram_system(plate_data) else _domain_yongshen(plate_data, category)
     if domain:
+        # 没有卦爻就没有世应：多方人物按本体系符号取象
+        if party_yongshen:
+            party_yongshen = _domain_party_yongshen(domain["framework_label"])
         yongshen_by_system[domain["framework"]] = {
             "primary": domain["primary"],
             "secondary": domain["secondary"],
