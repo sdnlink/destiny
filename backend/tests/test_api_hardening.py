@@ -37,7 +37,7 @@ class ApiHardeningTests(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         ref = resp.json()["data"]["facts"]["tihua_reference"]
         self.assertEqual(ref["rule_id"], "FS-XUANKONG-TIHUA-001")
-        self.assertEqual(ref["status"], "draft_unsigned")
+        self.assertEqual(ref["status"], "resolved_by_library_classics")
         self.assertEqual(ref["sitting"]["mountain"], "午")
         self.assertIsNotNone(ref["sitting"]["tihua_star"])
 

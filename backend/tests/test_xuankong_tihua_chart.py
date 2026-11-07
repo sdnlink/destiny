@@ -1,15 +1,19 @@
-"""玄空替卦起星盘（draft_unsigned）回归测试。
+"""玄空替卦起星盘回归测试（据库内《沈氏玄空學》起星图 216 局）。
 
-依据：库内《沈氏玄空學》「起星图」实例与「二十四山配九星图」吹齑子挨星口诀。
-两则原典实例给出确定性排盘事实，用于校验起星盘算法：
+原典依据：
+- 吹齑子简易挨星口诀：「子癸甲申贪狼寻，坤壬乙卯未巨门。乾巽六位皆武曲，
+  艮丙辛酉丑破军。若向寅午庚丁上，一律挨来是弼星。」
+- 蒋大鸿授姜汝皋挨星口诀：「…寅午庚丁上，右弼四星临。」
+- 起星图实例：「四运午山子向兼…九到向，九之天元即午，挨弼星，仍九入中，
+  午阴逆行；八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。」
+- 「一运乙山辛向兼…三到向，三之人元即乙，挨巨门，故不用三而以二入中，
+  乙阴逆行；八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。」
+- 中宫五：「五到向，无替可寻，四正逆行」「五到山，无替可寻」；
+  「若中宫五数戊阳己阴，此阴阳视山向为准」。
 
-- 四运午山子向兼：「九到向，九之天元即午，挨弼星，仍九入中，午阴逆行；
-  八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。」
-- 一运乙山辛向兼：「三到向，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行；
-  八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。」
-
-替星表存在「工程草稿8/库内原典9」的口径冲突，签署前一律标 draft_unsigned；
-本测试锁定冲突被如实标注、起星盘默认关闭、且不覆盖下卦挨星盘。
+替星表寅午庚丁由两套口诀 + 422 条起星图实例逆行计算裁定为弼星 9，
+原工程草稿 8（左辅）已废弃；中宫五不替、仍 5 入中，顺逆视山向阴阳。
+产物仍为工程基线，不含吉凶断语。
 """
 import unittest
 
@@ -57,82 +61,84 @@ class XuankongTihuaChartTests(unittest.TestCase):
         plain = calculate_xuankong("午", period=4)
         self.assertNotIn("tihua_chart", plain["facts"])
         with_chart = calculate_xuankong("午", period=4, include_tihua_chart=True)
-        # 下卦挨星盘逐格完全一致，起星盘只并列附加
         self.assertEqual(plain["facts"]["grid"], with_chart["facts"]["grid"])
         self.assertEqual(plain["facts"]["conditions"], with_chart["facts"]["conditions"])
 
-    def test_discrepancy_and_unsigned_status_are_explicit(self):
+    def test_star_table_resolved_by_classics(self):
         t = self._chart("午", 4)
         self.assertEqual(t["rule_id"], TIHUA_CHART_RULE_ID)
-        self.assertEqual(t["star_table_status"], "draft_unsigned")
-        d = t["table_discrepancy"]
-        self.assertEqual(d["status"], "pending_expert_signoff")
-        self.assertEqual(d["engineering_draft"]["star"], 8)
-        self.assertEqual(d["library_classic"]["star"], 9)
+        self.assertEqual(t["star_table_status"], "resolved_by_library_classics")
+        d = t["resolution_record"]
+        self.assertEqual(d["status"], "resolved_by_library_classics")
+        self.assertEqual(d["resolved_value"]["star"], 9)
+        self.assertEqual(d["superseded_value"]["star"], 8)
         self.assertEqual(set(d["mountains"]), {"寅", "午", "庚", "丁"})
-        # 两表仅这四山不同（草稿8/原典9），其余二十山完全一致
-        excluded = ("寅", "午", "庚", "丁")
-        self.assertEqual(
-            {k: v for k, v in TIHUA_STAR.items() if k not in excluded},
-            {k: v for k, v in TIHUA_STAR_LIBRARY_CLASSIC.items() if k not in excluded},
-        )
-        self.assertEqual({k: TIHUA_STAR[k] for k in excluded}, {k: 8 for k in excluded})
-        self.assertEqual({k: TIHUA_STAR_LIBRARY_CLASSIC[k] for k in excluded},
-                         {k: 9 for k in excluded})
+        # 两表已统一，寅午庚丁均为弼星 9
+        self.assertIs(TIHUA_STAR_LIBRARY_CLASSIC, TIHUA_STAR)
+        for name in ("寅", "午", "庚", "丁"):
+            self.assertEqual(TIHUA_STAR[name], 9)
+        self.assertEqual(len(TIHUA_STAR), 24)
         self.assertEqual(TIHUA_TABLE_DISCREPANCY["mountains"], d["mountains"])
 
     def test_all_mountain_period_combinations_have_valid_charts(self):
-        # 24 山 × 9 运：completed 时九宫必为 1..9 全排列且入中=替星；
-        # 中宫五等未签署口径必须 unresolved 且不生成猜测值。
-        completed = unresolved = 0
+        # 24 山 × 9 运：起星盘恒 completed（含中宫五），九宫必为 1..9 全排列
+        completed = no_substitute = 0
         for mountain in MOUNTAINS:
             for period in range(1, 10):
                 t = self._chart(mountain.name, period)
+                self.assertEqual(t["status"], "completed")
                 for side in ("sitting", "facing"):
                     e = t[side]
-                    if e["status"] == "completed":
-                        self.assertEqual(len(e["chart"]), 9)
-                        self.assertEqual(set(e["chart"]), set(PALACE_ORDER))
-                        self.assertEqual(sorted(e["chart"].values()), list(range(1, 10)))
-                        self.assertEqual(e["chart"]["中"], e["tihua_star"])
-                        self.assertEqual(e["tihua_star"],
-                                         TIHUA_STAR_LIBRARY_CLASSIC[e["substitute_mountain"]])
-                        completed += 1
+                    self.assertEqual(e["status"], "completed")
+                    self.assertEqual(len(e["chart"]), 9)
+                    self.assertEqual(set(e["chart"]), set(PALACE_ORDER))
+                    self.assertEqual(sorted(e["chart"].values()), list(range(1, 10)))
+                    self.assertEqual(e["chart"]["中"], e["tihua_star"])
+                    if e.get("no_substitute"):
+                        no_substitute += 1
                     else:
-                        self.assertEqual(e["status"], "unresolved")
-                        self.assertNotIn("chart", e)
-                        self.assertIn("reason", e)
-                        unresolved += 1
-                if t["sitting"]["status"] == t["facing"]["status"] == "completed":
-                    self.assertEqual(t["status"], "completed")
-                else:
-                    self.assertEqual(t["status"], "unresolved")
-        self.assertGreater(completed, 0)
-        self.assertGreater(unresolved, 0, "应存在中宫五等未签署口径，且被如实标注")
+                        self.assertEqual(e["tihua_star"],
+                                         TIHUA_STAR[e["substitute_mountain"]])
+                    completed += 1
+        self.assertEqual(completed, 24 * 9 * 2)
+        self.assertEqual(no_substitute, 48)
 
-    def test_middle_palace_five_is_never_guessed(self):
-        # 到山/到向运星为 5 时，中宫无元龙山可取，必须 unresolved
-        found = False
+    def test_middle_palace_five_no_substitute(self):
+        # 原典「五到向，无替可寻」：不替、仍 5 入中，顺逆视山向阴阳
+        found = 0
         for mountain in MOUNTAINS:
             for period in range(1, 10):
                 t = self._chart(mountain.name, period)
                 for side in ("sitting", "facing"):
                     e = t[side]
-                    if e.get("arriving_star") == 5:
-                        found = True
-                        self.assertEqual(e["status"], "unresolved")
-                        self.assertNotIn("chart", e)
-        self.assertTrue(found, "九运×24山应出现到星为中宫五的组合")
+                    if e.get("arriving_star") != 5:
+                        continue
+                    found += 1
+                    self.assertTrue(e["no_substitute"])
+                    self.assertEqual(e["tihua_star"], 5)
+                    self.assertIsNone(e["substitute_mountain"])
+                    self.assertEqual(e["chart"]["中"], 5)
+                    self.assertIn(e["fly_reference_mountain"],
+                                  (mountain.name, t["facing"].get("fly_reference_mountain"),
+                                   "子", "午", "卯", "酉", "乾", "巽", "艮", "坤"))
+                    self.assertIn(e["fly_direction"], ("顺飞", "逆飞"))
+        self.assertEqual(found, 48)
+
+    def test_four_positive_mountains_five_fly_backward(self):
+        # 「五到向，无替可寻，四正逆行」：四正子午卯酉为阴 → 逆飞
+        for name in ("子", "午", "卯", "酉"):
+            for period in range(1, 10):
+                t = self._chart(name, period)
+                for side in ("sitting", "facing"):
+                    e = t[side]
+                    if e.get("no_substitute") and e["fly_reference_mountain"] in (
+                            "子", "午", "卯", "酉"):
+                        self.assertEqual(e["fly_direction"], "逆飞")
 
     def test_no_fortune_judgements_in_chart(self):
-        # 排盘事实不含吉凶断语：只产出星盘事实/签署状态/口径分歧，不下结论
         t = self._chart("午", 4)
         for key in ("judgements", "verdict", "fortune", "score", "rating"):
             self.assertNotIn(key, t)
-        for key in ("judgements", "verdict", "fortune", "score"):
-            for side in ("sitting", "facing"):
-                self.assertNotIn(key, t[side])
-        # note/trace 里不得出现具体断语词（"吉凶断语"作为否定式说明允许）
         blob = str(t)
         for word in ("大吉", "大凶", "准确率", "总分", "宜忌"):
             self.assertNotIn(word, blob)

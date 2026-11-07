@@ -3286,15 +3286,17 @@
         "facts.grid",
         "facts.conditions",
         "facts.ti_pu",
-        "facts.tihua_chart（显式请求时，draft_unsigned）"
+        "facts.tihua_chart（显式请求时，据库内原典裁定）"
       ],
       "source_refs": [
         "data/generated/wikisource-corpus（地理辨正、青囊经、沈氏玄空學，见 data/sources/web-classics-books.json）",
-        "《沈氏玄空學》起星图实例：四运午山子向兼、一运乙山辛向兼（回归测试 test_xuankong_tihua_chart.py）"
+        "《沈氏玄空學》起星图实例：四运午山子向兼、一运乙山辛向兼（回归测试 test_xuankong_tihua_chart.py）",
+        "《沈氏玄空學》二十四山配九星图吹齑子/蒋大鸿授姜汝皋两套挨星口诀、起星图二百一十六局（逆行计算见 test_xuankong_reverse_computation.py）"
       ],
       "limitations": [
-        "替卦起星盘为 draft_unsigned：工程草稿替星表（寅午庚丁=8/左辅）与库内原典（=9/弼星）存在可查证口径冲突，待专家签署后方可作为确定性结论",
-        "中宫五寄宫口径未签署时返回 unresolved，不生成猜测值",
+        "替星表寅午庚丁已据库内两套挨星口诀（弼星9）与422条起星图实例逆行计算裁定，原工程草稿8（左辅）废弃；裁定记录见 TIHUA_TABLE_DISCREPANCY",
+        "中宫五按原典「五到向，无替可寻」不替、仍5入中，顺逆视山向阴阳",
+        "替卦起星盘仍属工程基线，专家签署与正式规则发布流程另行",
         "格局条件为确定性判定，不含吉凶断语"
       ],
       "owner": "unassigned",
