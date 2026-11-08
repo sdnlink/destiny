@@ -95,6 +95,8 @@
 
 前端 `BaziView` 新增按需加载的「个人生平时间轴」区块（`LifelineView.jsx`），展示月令提纲、逐年大运/流年、岁运组合、皇极经世背景与 `warnings`，不渲染吉凶结论；并提供可选的已发生事件录入（每行「年份 描述」，只做只读对齐）。
 
+导航新增「命运专项」工作区（`frontend/src/components/destiny/DestinyPanel.jsx`），把原先嵌在八字结果里的能力拆成三个页签：本命盘（`POST /v1/calculations/evaluate` 的 `bazi/time`）、流年（`POST /v1/bazi/liunian`）、生平时间轴（`POST /v1/bazi/lifeline`）。三个页签共用同一份出生信息（`BirthProfileSection.jsx`），避免出现第二套时间/时区/真太阳时口径；本命盘页签通过 `showLifeline={false}` 隐藏内嵌时间轴，时间轴只在独立页签生成。
+
 回归护栏见 `backend/tests/test_lifeline_and_systems.py` 与 `frontend/tests/components/LifelineView.test.jsx`。
 
 数据边界（非"未实现"，仅记录残余缺口）：典籍待补清单已清账，八宅明镜/阳宅十书/沈氏玄空学/紫微斗数全书/卜筮正宗均由公开来源补齐入库（详见 `/v1/classics/status` 的 `sourcing_backlog`）；《紫微斗數全書》卷四图说（站方仅 PDF 扫描）与《阳宅三要》暂缺。

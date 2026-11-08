@@ -4,6 +4,7 @@ import {
   ArrowRight,
   BookOpen,
   BookOpenCheck,
+  CalendarRange,
   Database,
   Download,
   FileClock,
@@ -28,6 +29,7 @@ import InputPanel from "./components/InputPanel";
 // 首屏只下载输入面板与外壳，避免单包 389KB 全部前置下载。
 const ResultWorkspace = lazy(() => import("./components/ResultWorkspace"));
 const WorkflowPanel = lazy(() => import("./components/WorkflowPanel"));
+const DestinyPanel = lazy(() => import("./components/destiny/DestinyPanel"));
 import { analyzeCalendar, checkHealth, compareCalculations, loadRules } from "./lib/api";
 import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
 import { GLOSSARY_CATEGORIES, GLOSSARY_ITEMS } from "./lib/glossary";
@@ -96,6 +98,7 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGl
       <div className="nav-items">
         <button className={viewMode === "classic" ? "active" : ""} onClick={() => setViewMode("classic")} title="经典推演模式"><Plus size={18} /><span>经典推演</span></button>
         <button className={viewMode === "workflow" ? "active" : ""} onClick={() => setViewMode("workflow")} title="交互式推演工作流（7步标准化）"><Sparkles size={18} /><span>交互推演</span></button>
+        <button className={viewMode === "destiny" ? "active" : ""} onClick={() => setViewMode("destiny")} title="命运专项：本命盘、流年与生平时间轴"><CalendarRange size={18} /><span>命运专项</span></button>
         <button onClick={openHistory} title="历史推演记录、案例库与 JSON 备份导入导出"><Archive size={18} /><span>历史与案例</span></button>
         <button onClick={openRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
         <button onClick={openGlossary} title="术数典籍与核心概念速查"><BookOpen size={18} /><span>概念速查</span></button>
@@ -523,7 +526,7 @@ export default function App() {
   const [rules, setRules] = useState([]);
   const [rulesLoading, setRulesLoading] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("tianji_theme") || "paper");
-  const [viewMode, setViewMode] = useState("classic"); // classic / workflow
+  const [viewMode, setViewMode] = useState("classic"); // classic / workflow / destiny
   const [pendingSessionId, setPendingSessionId] = useState(null);
 
   useEffect(() => {
@@ -654,6 +657,16 @@ export default function App() {
       <div className="mobile-topbar">
         <div className="brand-mark"><span>☰</span><span>☷</span></div>
         <strong>天机演象</strong>
+        <select
+          className="mobile-view-select"
+          value={viewMode}
+          onChange={(event) => setViewMode(event.target.value)}
+          aria-label="切换工作模式"
+        >
+          <option value="classic">经典</option>
+          <option value="workflow">交互</option>
+          <option value="destiny">命运</option>
+        </select>
         <button className="icon-button" onClick={() => setMobileInputOpen(!mobileInputOpen)} aria-label="切换输入面板"><Menu size={20} /></button>
       </div>
       {viewMode === "workflow" ? (
@@ -665,6 +678,10 @@ export default function App() {
             />
           </Suspense>
         </div>
+      ) : viewMode === "destiny" ? (
+        <Suspense fallback={<div className="loading-placeholder">正在加载命运专项…</div>}>
+          <DestinyPanel />
+        </Suspense>
       ) : (
         <>
           <div className={`input-column ${mobileInputOpen ? "mobile-open" : ""}`}>

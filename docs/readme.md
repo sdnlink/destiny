@@ -107,7 +107,7 @@ destiny/
 │   └── tests/                # pytest 测试（领域回归、API、语料、边界、工作流会话等 30+ 文件）
 ├── frontend/                 # React + Vite Web 推演工作台
 │   ├── src/
-│   │   ├── App.jsx           # 应用壳：导航（经典/交互双模式）、抽屉、状态编排
+│   │   ├── App.jsx           # 应用壳：导航（经典/交互/命运专项三模式）、抽屉、状态编排
 │   │   ├── components/       # InputPanel.jsx / ResultWorkspace.jsx / WorkflowPanel.jsx（交互式工作流）
 │   │   ├── lib/              # api.js（HTTP 封装）/ sessionApi.js（会话API）/ export.js（Markdown 导出）
 │   │   │                     # storage.js（历史本地持久化）/ glossary.js（概念速查）
@@ -316,8 +316,13 @@ FastAPI 应用 `APP_VERSION = "0.2.0"`，提供以下能力：
 
 **主题与视觉**：宣纸素雅 / 玄墨深邃 / 青铜古韵三种主题，通过 `data-theme` 属性切换并持久化。
 
-**双模式导航**：左侧导航提供「经典推演」与「交互推演」两种模式切换：
+**三模式导航**：左侧导航提供「经典推演」「交互推演」与「命运专项」三种模式切换：
 - **经典推演**：原有 InputPanel + ResultWorkspace 流程，适合快速多模块对照计算。
+- **命运专项（DestinyPanel）**：以出生时刻为唯一输入，复用既有八字接口，提供三个子功能：
+  1. **本命盘**：四柱、藏干十神、五行旺衰与大运起运（`POST /v1/calculations/evaluate`，`bazi/time`）。
+  2. **流年**：按公历起止年份列出流年干支、十神、纳音、大运区间与岁运组合事实（`POST /v1/bazi/liunian`）。
+  3. **生平时间轴**：复用 `LifelineView`，独立录入生辰与已发生事件，调用 `POST /v1/bazi/lifeline`；事件只做只读对齐，不预测未来。
+  紫微流年/大限暂未拆入该工作区，因为后端尚无对应独立流年能力；六爻/奇门/六壬属事件型起盘，也不作为年度命运入口。
 - **交互推演（WorkflowPanel）**：标准化7步工作流界面，完整实现角色规范的交互闭环：
   1. **创建会话**：输入求测事由、事项类别、术数门类、起盘方式、性别、当前阶段。
   2. **信息补全（模块A）**：系统检测缺失信息并按需提问（最多3项），支持"直接起盘"跳过。

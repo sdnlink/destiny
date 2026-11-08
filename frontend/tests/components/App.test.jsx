@@ -6,6 +6,8 @@ vi.mock("../../src/lib/api.js", () => ({
   loadRules: vi.fn().mockResolvedValue({ data: [] }),
   analyzeCalendar: vi.fn(),
   compareCalculations: vi.fn(),
+  evaluateCalculation: vi.fn(),
+  analyzeLiunian: vi.fn(),
 }));
 
 vi.mock("../../src/lib/sessionApi.js", () => ({
@@ -55,6 +57,17 @@ describe("App", () => {
     fireEvent.click(screen.getByTitle("交互式推演工作流（7步标准化）"));
 
     expect(await screen.findByRole("heading", { name: "交互式推演工作台" })).toBeInTheDocument();
+  });
+
+  it("切换到命运专项视图时懒加载三个页签", async () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByTitle("命运专项：本命盘、流年与生平时间轴"));
+
+    expect(await screen.findByRole("heading", { name: "命运专项" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /本命盘/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /流年/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /生平时间轴/ })).toBeInTheDocument();
   });
 
   it("打开历史与案例抽屉时渲染提示区（图标导入缺失会整块白屏）", async () => {

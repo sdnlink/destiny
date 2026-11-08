@@ -40,6 +40,20 @@ export function compareCalculations(calculations, context) {
   });
 }
 
+export function evaluateCalculation(module, method, input) {
+  return request("/v1/calculations/evaluate", {
+    method: "POST",
+    body: JSON.stringify({ module, method, input }),
+  });
+}
+
+export function analyzeLiunian(payload) {
+  return request("/v1/bazi/liunian", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function analyzeLifeline(payload) {
   return request("/v1/bazi/lifeline", {
     method: "POST",

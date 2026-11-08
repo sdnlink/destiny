@@ -14,6 +14,7 @@ Web界面位于`frontend/`，使用React、Vite和Lucide图标，连接现有MVP
 - 梅花时间起卦与双数起卦。
 - 计算前历法校验及四柱确认。
 - 总览、历法、各术数模块结果页（含六爻典籍依据面板、八字大运/流年展示）及对照分析结果页。
+- 命运专项工作区的本命盘、逐年流年与生平时间轴三个独立页签。
 - 总览中的事项结论，以及独立“结论建议”页面。
 - 本卦、变卦、互卦、错卦、综卦及动爻可视化。
 - 体用和五行关系证据、规则编号、计算步骤及中间值。
@@ -85,6 +86,9 @@ npm run test:browser
 | 路径 | 内容 |
 | --- | --- |
 | `frontend/src/App.jsx` | 应用状态、计算请求、导航和规则抽屉 |
+| `frontend/src/components/destiny/DestinyPanel.jsx` | 命运专项工作区（本命盘 / 流年 / 生平时间轴） |
+| `frontend/src/components/destiny/BirthProfileSection.jsx` | 命运专项共用出生信息表单 |
+| `frontend/src/components/destiny/LiunianView.jsx` | 流年逐年事实表 |
 | `frontend/src/components/InputPanel.jsx` | 推演输入与历法预校验 |
 | `frontend/src/components/ResultWorkspace.jsx` | 全部结果视图和卦盘组件 |
 | `frontend/src/lib/api.js` | API请求与错误归一化 |

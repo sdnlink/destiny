@@ -172,6 +172,28 @@ await desktop.screenshot({ path: shot("tianji-workflow-interact.png"), fullPage:
 await assertNoOverflow(desktop, "desktop workflow result");
 await desktop.screenshot({ path: shot("tianji-workflow-desktop.png"), fullPage: true });
 
+// 命运专项：三个页签都走真实后端。这里覆盖「拆出来的独立入口」整条链路：
+// 共用出生信息 → 本命盘（/v1/calculations/evaluate）→ 流年（/v1/bazi/liunian）→ 时间轴（/v1/bazi/lifeline）。
+await desktop.goto(baseUrl, { waitUntil: "networkidle" });
+await desktop.getByRole("button", { name: "命运专项" }).click();
+await desktop.getByRole("heading", { name: "命运专项" }).waitFor();
+await desktop.getByLabel("公历出生日期时间").fill("1984-02-10T10:00");
+await desktop.getByLabel("出生地时区").fill("Asia/Shanghai");
+await desktop.getByRole("button", { name: "排本命盘" }).click();
+await desktop.getByRole("heading", { name: "八字四柱与大运排盘" }).waitFor({ timeout: 20000 });
+await desktop.getByRole("tab", { name: /流年/ }).click();
+await desktop.getByLabel("起始年份").fill("2026");
+await desktop.getByLabel("年数").fill("5");
+await desktop.getByRole("button", { name: "生成流年" }).click();
+await desktop.getByRole("heading", { name: "流年逐年事实（子平岁运）" }).waitFor({ timeout: 20000 });
+await desktop.getByText("BZ-LIUNIAN-001", { exact: true }).waitFor();
+await desktop.getByText("2026", { exact: true }).first().waitFor();
+await desktop.getByRole("tab", { name: /生平时间轴/ }).click();
+await desktop.getByRole("button", { name: "生成时间轴" }).click();
+await desktop.getByText(/月令提纲：/).waitFor({ timeout: 20000 });
+await assertNoOverflow(desktop, "desktop destiny");
+await desktop.screenshot({ path: shot("tianji-destiny-desktop.png"), fullPage: true });
+
 // 历史抽屉与后端会话（/v1/sessions）的联动：抽屉里必须能列出刚创建的会话，
 // 点一下就能在交互推演里恢复结果。两套存档不通的问题是审计 14 的核心。
 await desktop.getByRole("button", { name: "历史与案例" }).click();
@@ -230,9 +252,15 @@ await mobile.getByRole("heading", { name: "综合推演研判与古籍引证" })
 await assertNoOverflow(mobile, "mobile result");
 await mobile.screenshot({ path: shot("tianji-result-mobile.png"), fullPage: true });
 
+// 移动端导航栏是隐藏的，顶栏模式选择必须能把用户带到命运专项，否则新入口在手机上不可达。
+await mobile.getByLabel("切换工作模式").selectOption("destiny");
+await mobile.getByRole("heading", { name: "命运专项" }).waitFor();
+await assertNoOverflow(mobile, "mobile destiny");
+await mobile.screenshot({ path: shot("tianji-destiny-mobile.png"), fullPage: true });
+
 if (consoleErrors.length) {
   throw new Error(`browser console errors:\n${consoleErrors.join("\n")}`);
 }
 
 await browser.close();
-console.log("browser smoke passed: fengshui single/consensus, desktop result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), and mobile result");
+console.log("browser smoke passed: fengshui single/consensus, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), and mobile destiny entry");
