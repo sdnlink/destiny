@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { chromium } from "playwright";
@@ -185,6 +186,7 @@ await desktop.getByRole("tab", { name: /紫微斗数/ }).click();
 await desktop.getByRole("button", { name: "排紫微盘" }).click();
 await desktop.getByRole("heading", { name: "紫微斗数全景天盘" }).waitFor({ timeout: 20000 });
 await desktop.getByRole("heading", { name: "大限区间" }).waitFor();
+await desktop.getByText(/当前约 \d+ 岁，落在/).waitFor();
 await desktop.screenshot({ path: shot("tianji-ziwei-desktop.png"), fullPage: true });
 await desktop.getByRole("tab", { name: /流年/ }).click();
 await desktop.getByLabel("起始年份").fill("2026");
@@ -248,6 +250,20 @@ await desktop.getByRole("button", { name: "排八宅盘" }).click();
 await desktop.getByRole("heading", { name: "八宅大游年盘" }).waitFor({ timeout: 20000 });
 await assertNoOverflow(desktop, "desktop bazhai workspace");
 await desktop.screenshot({ path: shot("tianji-fengshui-bazhai-desktop.png"), fullPage: true });
+
+// 导出入口不能只是画在页面上：点击后必须真的下载一份含当前体系内容的 Markdown。
+const [bazhaiDownload] = await Promise.all([
+  desktop.waitForEvent("download"),
+  desktop.getByRole("button", { name: "导出报告" }).click(),
+]);
+const bazhaiPath = await bazhaiDownload.path();
+if (!bazhaiDownload.suggestedFilename().endsWith(".md") || !bazhaiPath) {
+  throw new Error("bazhai report download missing markdown file");
+}
+const bazhaiReport = fs.readFileSync(bazhaiPath, "utf8");
+if (!bazhaiReport.includes("# 阳宅风水 · 八宅") || !bazhaiReport.includes("## 大游年歌")) {
+  throw new Error("bazhai report content is not the current module report");
+}
 
 await desktop.getByRole("tab", { name: "玄空" }).click();
 await desktop.getByRole("button", { name: "排玄空盘" }).click();

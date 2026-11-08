@@ -91,6 +91,18 @@ function ZiweiPalaceCard({ palace, isSelected, isSanFang, onClick }) {
 
 const BRANCH_RING = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
 
+function ageAt(inputDatetime) {
+  const birth = new Date(inputDatetime);
+  if (Number.isNaN(birth.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const beforeBirthday =
+    now.getMonth() < birth.getMonth() ||
+    (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate());
+  if (beforeBirthday) age -= 1;
+  return age >= 0 ? age : null;
+}
+
 function ZiweiView({ result }) {
   const [selectedBranch, setSelectedBranch] = useState("寅");
 
@@ -104,6 +116,12 @@ function ZiweiView({ result }) {
   const limitPalaces = [...facts.palaces_by_branch]
     .filter((palace) => Number.isFinite(Number(palace.major_limit_start)))
     .sort((left, right) => Number(left.major_limit_start) - Number(right.major_limit_start));
+  const currentAge = ageAt(facts.input_datetime);
+  const currentLimit = currentAge === null
+    ? null
+    : limitPalaces.find(
+        (palace) => currentAge >= Number(palace.major_limit_start) && currentAge <= Number(palace.major_limit_end),
+      );
 
   const currIdx = BRANCH_RING.indexOf(selectedBranch);
   const oppBranch = BRANCH_RING[(currIdx + 6) % 12];
@@ -173,7 +191,10 @@ function ZiweiView({ result }) {
               <span className="band-icon"><ListTree size={16} /></span>
               <div>
                 <h3>大限区间</h3>
-                <p>按起运年龄排序，点击区间可回到对应宫位；只列宫位与大限区间事实，不生成大限断语。</p>
+                <p>
+                  按起运年龄排序，点击区间可回到对应宫位；只列宫位与大限区间事实，不生成大限断语。
+                  {currentAge !== null && currentLimit ? ` 当前约 ${currentAge} 岁，落在 ${currentLimit.name} ${currentLimit.major_limit_start}–${currentLimit.major_limit_end} 岁区间。` : ""}
+                </p>
               </div>
             </div>
           </div>
@@ -182,11 +203,12 @@ function ZiweiView({ result }) {
               <button
                 key={palace.earthly_branch}
                 type="button"
-                className={`ziwei-limit-item ${selectedBranch === palace.earthly_branch ? "is-selected" : ""}`}
+                className={`ziwei-limit-item ${selectedBranch === palace.earthly_branch ? "is-selected" : ""} ${currentLimit?.earthly_branch === palace.earthly_branch ? "is-current" : ""}`}
                 onClick={() => setSelectedBranch(palace.earthly_branch)}
               >
                 <span className="ziwei-limit-range">
                   {palace.major_limit_start}–{palace.major_limit_end} 岁
+                  {currentLimit?.earthly_branch === palace.earthly_branch ? " · 当前" : ""}
                 </span>
                 <strong>{palace.name}</strong>
                 <span className="ziwei-limit-meta">

@@ -799,6 +799,16 @@
   background: rgba(165, 62, 45, 0.05);
 }
 
+.ziwei-limit-item.is-current {
+  border-color: var(--amber, #a66d1e);
+  box-shadow: inset 3px 0 0 var(--amber, #a66d1e);
+}
+
+.ziwei-limit-item.is-current .ziwei-limit-range {
+  color: var(--amber, #a66d1e);
+  font-weight: 600;
+}
+
 .ziwei-limit-range {
   font-size: 11px;
   color: var(--muted, #69716c);
