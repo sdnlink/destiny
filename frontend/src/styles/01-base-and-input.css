@@ -533,44 +533,53 @@ select:focus {
   box-shadow: 0 1px 3px rgba(30, 36, 32, 0.11);
 }
 
-.scene-schools {
+.classic-scope-note {
   display: grid;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.scene-school {
-  display: grid;
-  gap: 5px;
-}
-
-.scene-school-head {
-  display: flex;
-  align-items: baseline;
   gap: 8px;
-  padding: 0 2px;
+  margin-bottom: 12px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f7f6f2;
 }
 
-.scene-school-head strong {
+.classic-scope-note > strong {
   color: var(--ink);
   font-size: 12px;
-  letter-spacing: 0.08em;
+  font-weight: 700;
 }
 
-.scene-school-head span {
+.classic-scope-note p {
+  margin: 0;
   color: var(--muted);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.classic-scope-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.classic-scope-list li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
   font-size: 11px;
 }
 
-.scene-switch {
-  grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+.classic-scope-list li strong {
+  color: var(--ink);
+  font-size: 11px;
 }
 
-.scene-switch button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
+.classic-scope-list li span {
+  color: var(--muted);
+  font-size: 10px;
 }
 
 .method-switch {

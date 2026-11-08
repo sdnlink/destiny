@@ -182,7 +182,6 @@ export default function ConsultPanel({
           previewLoading={previewLoading}
           preview={preview}
           error={error}
-          showSceneSwitch={false}
           panelKicker={panelKicker}
           panelTitle={panelTitle}
           submitLabel={submitLabel}

@@ -31,41 +31,12 @@ desktop.on("console", (message) => {
 
 await desktop.goto(baseUrl, { waitUntil: "networkidle" });
 await desktop.getByRole("heading", { name: "推演参数" }).waitFor();
+await desktop.getByText(/不再在本页重复设入口/).waitFor();
+if (await desktop.getByRole("radio").count()) {
+  throw new Error("classic workspace still exposes split system entries");
+}
 await assertNoOverflow(desktop, "desktop input");
 await desktop.screenshot({ path: shot("tianji-input-desktop.png"), fullPage: true });
-
-await desktop.getByRole("radio", { name: "风水", exact: true }).click();
-await desktop.getByLabel("向首方位角").fill("7.4");
-await desktop.getByRole("button", { name: "真北测量", exact: true }).click();
-await desktop.getByLabel("测量误差 ±").fill("0.2");
-await desktop.getByRole("button", { name: /开始推演/ }).click();
-await desktop.getByText(/^compare_[a-f0-9]+$/).waitFor({ timeout: 15000 });
-await desktop.locator(".result-tabs").getByRole("button", { name: "阳宅风水", exact: true }).click();
-await desktop.getByRole("heading", { name: "阳宅真北坐向" }).waitFor();
-await desktop.getByText("跨越分界", { exact: true }).waitFor();
-await desktop.getByText("子、癸", { exact: true }).waitFor();
-await assertNoOverflow(desktop, "desktop fengshui result");
-await desktop.screenshot({ path: shot("tianji-fengshui-desktop.png"), fullPage: true });
-
-await desktop.goto(baseUrl, { waitUntil: "networkidle" });
-await desktop.getByRole("radio", { name: "风水", exact: true }).click();
-await desktop.getByRole("button", { name: "多次共识", exact: true }).click();
-await desktop.getByLabel("第1次向首读数").fill("359");
-await desktop.getByLabel("第2次向首读数").fill("0");
-await desktop.getByLabel("第3次向首读数").fill("1");
-await desktop.getByRole("button", { name: "真北测量", exact: true }).click();
-await desktop.getByLabel("测量误差 ±").fill("0.5");
-await desktop.getByRole("button", { name: /开始推演/ }).click();
-await desktop.getByText(/^compare_[a-f0-9]+$/).waitFor({ timeout: 15000 });
-await desktop.locator(".result-tabs").getByRole("button", { name: "阳宅风水", exact: true }).click();
-await desktop.getByRole("heading", { name: "阳宅多次测量共识" }).waitFor();
-await desktop.getByText("一致", { exact: true }).waitFor();
-await desktop.getByText("1.5°", { exact: true }).waitFor();
-await desktop.getByRole("heading", { name: "逐次真北读数" }).waitFor();
-await assertNoOverflow(desktop, "desktop fengshui consensus");
-await desktop.screenshot({ path: shot("tianji-fengshui-consensus-desktop.png"), fullPage: true });
-
-await desktop.goto(baseUrl, { waitUntil: "networkidle" });
 
 await desktop.getByRole("button", { name: /开始推演/ }).click();
 await desktop.getByText(/^compare_[a-f0-9]+$/).waitFor({ timeout: 15000 });
@@ -258,11 +229,29 @@ await desktop.screenshot({ path: shot("tianji-spacetime-workspace-desktop.png"),
 // 阳宅风水独立入口：单次坐向与多次共识都走真实后端，验证「拆出来的菜单」不是空壳。
 await desktop.locator(".app-navigation").getByRole("button", { name: "阳宅风水", exact: true }).click();
 await desktop.getByRole("heading", { name: "阳宅风水" }).waitFor();
+await desktop.getByLabel("向首方位角").fill("7.4");
+await desktop.getByRole("button", { name: "真北测量", exact: true }).click();
+await desktop.getByLabel("测量误差 ±").fill("0.2");
 await desktop.getByRole("button", { name: "生成阳宅坐向" }).click();
 await desktop.getByRole("heading", { name: "阳宅真北坐向与二十四山" }).waitFor({ timeout: 20000 });
+await desktop.getByText("跨越分界", { exact: true }).waitFor();
+await desktop.getByText("子、癸", { exact: true }).waitFor();
+await assertNoOverflow(desktop, "desktop fengshui workspace");
+await desktop.screenshot({ path: shot("tianji-fengshui-desktop.png"), fullPage: true });
+
 await desktop.getByRole("button", { name: "多次共识" }).click();
+await desktop.getByLabel("第1次向首读数").fill("359");
+await desktop.getByLabel("第2次向首读数").fill("0");
+await desktop.getByLabel("第3次向首读数").fill("1");
+await desktop.getByRole("button", { name: "真北测量", exact: true }).click();
+await desktop.getByLabel("测量误差 ±").fill("0.5");
 await desktop.getByRole("button", { name: "生成阳宅坐向" }).click();
 await desktop.getByRole("heading", { name: "阳宅多次测量共识" }).waitFor({ timeout: 20000 });
+await desktop.getByText("一致", { exact: true }).waitFor();
+await desktop.getByText("1.5°", { exact: true }).waitFor();
+await desktop.getByRole("heading", { name: "逐次真北读数" }).waitFor();
+await assertNoOverflow(desktop, "desktop fengshui consensus");
+await desktop.screenshot({ path: shot("tianji-fengshui-consensus-desktop.png"), fullPage: true });
 await assertNoOverflow(desktop, "desktop fengshui workspace");
 await desktop.screenshot({ path: shot("tianji-fengshui-workspace-desktop.png"), fullPage: true });
 

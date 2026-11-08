@@ -22,18 +22,6 @@ import { CATEGORIES } from "../lib/labels";
 import { SCHOOLS } from "../lib/schools";
 import { buildCalculations } from "../lib/calculationPlan";
 
-const SCENES = [
-  { id: "combined", label: "综合推演", icon: Layers3 },
-  { id: "zhouyi", label: "周易", icon: BookOpen },
-  { id: "meihua", label: "梅花", icon: Compass },
-  { id: "liuyao", label: "六爻", icon: Grid3X3 },
-  { id: "liuren", label: "六壬", icon: Workflow },
-  { id: "qimen", label: "奇门", icon: Compass },
-  { id: "bazi", label: "八字", icon: Sparkles },
-  { id: "ziwei", label: "紫微", icon: Sparkles },
-  { id: "fengshui", label: "风水", icon: Mountain },
-];
-
 const QUESTION_PRESETS = [
   { category: "career", question: "是否接受新的工作机会与团队邀请" },
   { category: "finance", question: "近期重大项目投资与资金布局可行性" },
@@ -190,7 +178,6 @@ export default function InputPanel({
   previewLoading,
   preview,
   error,
-  showSceneSwitch = true,
   panelKicker = "新建推演",
   panelTitle = "推演参数",
   submitLabel = "开始推演",
@@ -225,13 +212,13 @@ export default function InputPanel({
       update("fsMeasurements", form.fsMeasurements.filter((_, current) => current !== index));
     }
   };
-  const showZhouyi = form.scene === "combined" || form.scene === "zhouyi";
-  const showMeihua = form.scene === "combined" || form.scene === "meihua";
-  const showLiuyao = form.scene === "combined" || form.scene === "liuyao";
-  const showLiuren = form.scene === "combined" || form.scene === "liuren";
-  const showQimen = form.scene === "combined" || form.scene === "qimen";
-  const showBazi = form.scene === "combined" || form.scene === "bazi";
-  const showZiwei = form.scene === "combined" || form.scene === "ziwei";
+  const showZhouyi = form.scene === "zhouyi";
+  const showMeihua = form.scene === "meihua";
+  const showLiuyao = form.scene === "liuyao";
+  const showLiuren = form.scene === "liuren";
+  const showQimen = form.scene === "qimen";
+  const showBazi = form.scene === "bazi";
+  const showZiwei = form.scene === "ziwei";
   const showFengshui = form.scene === "fengshui";
   // 模块数直接按真实请求列表算，避免手写数字再次落后于体系增减（此前写死「5 个」，
   // 综合推演实际是日历 + 七个体系 = 8 个请求）。
@@ -257,36 +244,19 @@ export default function InputPanel({
 
       <form onSubmit={onSubmit}>
         <section className="form-section">
-          <div className="section-title"><Layers3 size={16} /><span>流派与体系</span></div>
-          {showSceneSwitch && (
-            <div className="scene-schools" aria-label="术数流派与体系">
-              {SCHOOLS.map((school) => (
-                <div className="scene-school" key={school.id}>
-                  <div className="scene-school-head">
+          <div className="section-title"><Layers3 size={16} /><span>{form.scene === "combined" ? "综合范围" : "体系与事项"}</span></div>
+          {form.scene === "combined" && (
+            <div className="classic-scope-note">
+              <strong>综合推演 · 跨流派对照</strong>
+              <p>已拆分的体系不再在本页重复设入口，请到对应专项工作区录入参数。</p>
+              <ul className="classic-scope-list">
+                {SCHOOLS.filter((school) => school.id !== "combined").map((school) => (
+                  <li key={school.id}>
                     <strong>{school.label}</strong>
-                    <span>{school.description}</span>
-                  </div>
-                  <div className="segmented scene-switch" role="radiogroup" aria-label={`${school.label}流派体系`}>
-                    {school.systems.map((systemId) => {
-                      const scene = SCENES.find((item) => item.id === systemId);
-                      if (!scene) return null;
-                      const { id, label, icon: Icon } = scene;
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          role="radio"
-                          aria-checked={form.scene === id}
-                          className={form.scene === id ? "active" : ""}
-                          onClick={() => update("scene", id)}
-                        >
-                          <Icon size={15} />{label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+                    <span>→ {school.menu}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
           <div className="field-grid">

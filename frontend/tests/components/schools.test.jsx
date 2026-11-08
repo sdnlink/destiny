@@ -11,5 +11,6 @@ describe("schools", () => {
     expect(schoolForSystem("unknown")).toBe(SCHOOLS[0]);
     expect(schoolForSystem("liuyao").label).toBe("易占");
     expect(schoolForSystem("ziwei").label).toBe("命理");
+    expect(schoolForSystem("liuyao").menu).toBe("卜筮专项");
   });
 });

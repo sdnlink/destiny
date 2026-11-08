@@ -66,32 +66,24 @@ function Harness({ initialForm = baseForm(), onSubmit = vi.fn(), ...rest }) {
 }
 
 describe("InputPanel", () => {
-  it("渲染面板标题、起卦凭证与九个体系选项", () => {
+  it("综合推演只保留综合入口，不再列出已拆分的体系", () => {
     render(<Harness />);
 
     expect(screen.getByRole("heading", { name: "推演参数" })).toBeInTheDocument();
     expect(screen.getByText("凭证 abcdef12")).toBeInTheDocument();
-
-    const radios = screen.getAllByRole("radio");
-    expect(radios).toHaveLength(9);
-    expect(screen.getByRole("radio", { name: /综合推演/ })).toHaveAttribute("aria-checked", "true");
-  });
-
-  it("体系选项按流派归并到同一组", () => {
-    render(<Harness />);
-
-    expect(within(screen.getByRole("radiogroup", { name: "易占流派体系" })).getAllByRole("radio")).toHaveLength(3);
-    expect(within(screen.getByRole("radiogroup", { name: "命理流派体系" })).getAllByRole("radio")).toHaveLength(2);
-    expect(within(screen.getByRole("radiogroup", { name: "三式流派体系" })).getAllByRole("radio")).toHaveLength(2);
-    expect(within(screen.getByRole("radiogroup", { name: "堪舆流派体系" })).getAllByRole("radio")).toHaveLength(1);
+    expect(screen.getByText("综合推演 · 跨流派对照")).toBeInTheDocument();
+    expect(screen.getByText(/不再在本页重复设入口/)).toBeInTheDocument();
+    expect(screen.queryAllByRole("radio")).toHaveLength(0);
   });
 
   it("模块数按真实请求列表显示，而不是写死的数字", () => {
     render(<Harness />);
     // 综合推演 = 日历 + 周易/梅花/六爻/六壬/奇门/八字/紫微 = 8
     expect(screen.getByText("8 个计算模块")).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByRole("radio", { name: /八字/ }));
+  it("单一体系的模块数仍按真实请求列表计算", () => {
+    render(<Harness initialForm={{ ...baseForm(), scene: "bazi" }} />);
     // 单一体系 = 日历 + 该体系 = 2
     expect(screen.getByText("2 个计算模块")).toBeInTheDocument();
   });
@@ -129,13 +121,8 @@ describe("InputPanel", () => {
     expect(screen.getAllByRole("combobox")[0]).toHaveValue("finance");
   });
 
-  it("切到风水体系时只显示风水参数区块", () => {
-    render(<Harness />);
-
-    expect(screen.getByText("周易参数")).toBeInTheDocument();
-    expect(screen.queryByText("阳宅坐向测量")).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("radio", { name: /风水/ }));
+  it("风水体系只显示风水参数区块", () => {
+    render(<Harness initialForm={{ ...baseForm(), scene: "fengshui" }} />);
 
     expect(screen.getByText("阳宅坐向测量")).toBeInTheDocument();
     expect(screen.queryByText("周易参数")).not.toBeInTheDocument();
@@ -144,7 +131,7 @@ describe("InputPanel", () => {
   });
 
   it("手工排盘模式可以逐爻修改阴阳老少", () => {
-    render(<Harness />);
+    render(<Harness initialForm={{ ...baseForm(), scene: "liuyao" }} />);
 
     fireEvent.click(screen.getAllByText("手工排盘")[0]);
 
@@ -159,8 +146,7 @@ describe("InputPanel", () => {
   });
 
   it("六爻支持手工爻与铜钱两种排盘输入", () => {
-    render(<Harness />);
-    fireEvent.click(screen.getByRole("radio", { name: /六爻/ }));
+    render(<Harness initialForm={{ ...baseForm(), scene: "liuyao" }} />);
 
     fireEvent.click(screen.getByText("手工排盘"));
     expect(screen.getAllByRole("button", { name: /^(初|二|三|四|五|上)爻 [6789] / })).toHaveLength(24);
@@ -170,20 +156,22 @@ describe("InputPanel", () => {
     expect(screen.getByLabelText("上爻 第3枚铜钱")).toHaveValue("2");
   });
 
-  it("周易与梅花支持三数排盘", () => {
-    render(<Harness />);
+  it("周易支持三数排盘", () => {
+    render(<Harness initialForm={{ ...baseForm(), scene: "zhouyi" }} />);
 
     fireEvent.click(within(screen.getByText("周易参数").closest("section")).getByText("三数排盘"));
     expect(screen.getByDisplayValue("1")).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByRole("radio", { name: /梅花/ }));
+  it("梅花支持三数排盘", () => {
+    render(<Harness initialForm={{ ...baseForm(), scene: "meihua" }} />);
+
     fireEvent.click(screen.getByText("三数排盘"));
     expect(screen.getAllByDisplayValue("1").length).toBeGreaterThan(0);
   });
 
   it("六爻可选指定用神焦点", () => {
-    render(<Harness />);
-    fireEvent.click(screen.getByRole("radio", { name: /六爻/ }));
+    render(<Harness initialForm={{ ...baseForm(), scene: "liuyao" }} />);
 
     const focus = screen.getByRole("combobox", { name: /用神焦点/ });
     expect(focus).toHaveValue("");
@@ -207,8 +195,7 @@ describe("InputPanel", () => {
   });
 
   it("多次共识模式下可以增删向首读数", () => {
-    render(<Harness />);
-    fireEvent.click(screen.getByRole("radio", { name: /风水/ }));
+    render(<Harness initialForm={{ ...baseForm(), scene: "fengshui" }} />);
 
     fireEvent.click(screen.getByText("多次共识"));
     expect(screen.getByText("3 / 12")).toBeInTheDocument();
