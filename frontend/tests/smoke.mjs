@@ -284,6 +284,13 @@ await desktop.getByText("替卦起星盘（工程基线）").waitFor({ timeout: 
 await assertNoOverflow(desktop, "desktop xuankong workspace");
 await desktop.screenshot({ path: shot("tianji-fengshui-xuankong-desktop.png"), fullPage: true });
 
+// 房屋档案页签：确认后端已有 CRUD 能力在前端有真实入口，列表读取不报错。
+await desktop.getByRole("tab", { name: "房屋档案" }).click();
+await desktop.getByText("已存档案", { exact: true }).waitFor();
+await desktop.getByRole("button", { name: "刷新" }).waitFor();
+await assertNoOverflow(desktop, "desktop fengshui archive");
+await desktop.screenshot({ path: shot("tianji-fengshui-archive-desktop.png"), fullPage: true });
+
 // 历史抽屉与后端会话（/v1/sessions）的联动：抽屉里必须能列出刚创建的会话，
 // 点一下就能在交互推演里恢复结果。两套存档不通的问题是审计 14 的核心。
 await desktop.getByRole("button", { name: "历史与案例" }).click();
@@ -377,4 +384,4 @@ if (consoleErrors.length) {
 }
 
 await browser.close();
-console.log("browser smoke passed: fengshui single/consensus/bazhai/xuankong, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile, three-number + manual lines + coins + result tabs)");
+console.log("browser smoke passed: fengshui single/consensus/bazhai/xuankong/archive, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile, three-number + manual lines + coins + result tabs)");

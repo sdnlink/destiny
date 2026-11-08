@@ -89,6 +89,27 @@ export function analyzeFengshuiXuankong(payload) {
   });
 }
 
+export function listFengshuiBuildings(tenantId = "local") {
+  return request(`/v1/fengshui/buildings?tenant_id=${encodeURIComponent(tenantId)}`);
+}
+
+export function saveFengshuiBuilding({ tenantId = "local", buildingId, profile }) {
+  return request("/v1/fengshui/buildings", {
+    method: "POST",
+    body: JSON.stringify({
+      tenant_id: tenantId,
+      building_id: buildingId,
+      profile,
+    }),
+  });
+}
+
+export function deleteFengshuiBuilding(buildingId, tenantId = "local") {
+  return request(`/v1/fengshui/buildings/${encodeURIComponent(buildingId)}?tenant_id=${encodeURIComponent(tenantId)}`, {
+    method: "DELETE",
+  });
+}
+
 export function loadYuanhuiCycle(year) {
   return request(`/v1/yuanhui/cycle?year=${encodeURIComponent(year)}`);
 }

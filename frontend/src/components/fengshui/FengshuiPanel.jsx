@@ -1,10 +1,13 @@
-import { useState } from "react";
-import { CircleAlert, Compass, Download, Grid3X3, LoaderCircle, LocateFixed, Mountain, Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Archive, CircleAlert, Compass, Download, Grid3X3, LoaderCircle, LocateFixed, Mountain, Plus, RefreshCw, Save, Trash2 } from "lucide-react";
 import {
   analyzeFengshuiBazhai,
   analyzeFengshuiDirection,
   analyzeFengshuiMeasurements,
   analyzeFengshuiXuankong,
+  deleteFengshuiBuilding,
+  listFengshuiBuildings,
+  saveFengshuiBuilding,
 } from "../../lib/api";
 import { downloadMarkdownFile } from "../../lib/export";
 import { generateStandaloneReport } from "../../lib/moduleReport";
@@ -22,7 +25,10 @@ const TOOLS = [
   { id: "direction", label: "坐向测量", icon: Mountain },
   { id: "bazhai", label: "八宅", icon: Compass },
   { id: "xuankong", label: "玄空", icon: Grid3X3 },
+  { id: "archive", label: "房屋档案", icon: Archive },
 ];
+
+const FENGSHUI_TENANT = import.meta.env.VITE_FENGSHUI_TENANT || "local";
 
 function EmptyState({ icon: Icon = Mountain, title, body }) {
   return (
@@ -36,6 +42,11 @@ function EmptyState({ icon: Icon = Mountain, title, body }) {
 
 function parseNumber(value) {
   return String(value).trim() === "" ? Number.NaN : Number(value);
+}
+
+function archiveTime(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "—" : date.toLocaleString("zh-CN", { hour12: false });
 }
 
 function ToolTabs({ active, onChange, disabled }) {
@@ -97,6 +108,15 @@ export default function FengshuiPanel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [archiveRows, setArchiveRows] = useState([]);
+  const [archiveLoading, setArchiveLoading] = useState(false);
+  const [archiveError, setArchiveError] = useState("");
+  const [archiveName, setArchiveName] = useState("");
+  const [archiveSource, setArchiveSource] = useState("web_fengshui_workspace");
+  const [archiveNote, setArchiveNote] = useState("");
+  const [archiveConsent, setArchiveConsent] = useState(false);
+  const [archiveSaving, setArchiveSaving] = useState(false);
+
   const switchTool = (id) => {
     if (loading) return;
     setTool(id);
@@ -146,6 +166,94 @@ export default function FengshuiPanel() {
     measurement_error: parseNumber(measurementError),
     measurement_method: mode === "multiple" ? "web_multi_entry" : "web_manual_entry",
   });
+
+  async function loadArchives() {
+    setArchiveLoading(true);
+    setArchiveError("");
+    try {
+      const rows = await listFengshuiBuildings(FENGSHUI_TENANT);
+      setArchiveRows(Array.isArray(rows) ? rows : []);
+    } catch (requestError) {
+      setArchiveError(requestError.message || "房屋档案读取失败");
+    } finally {
+      setArchiveLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (tool === "archive") loadArchives();
+  }, [tool]);
+
+  const archiveMeasurements = () => {
+    const rows = mode === "single" ? [buildMeasurement(facing)] : measurements.map((value) => buildMeasurement(value));
+    return rows.filter((row) => Number.isFinite(row.facing_degree) && row.facing_degree >= 0 && row.facing_degree <= 360);
+  };
+
+  const handleArchiveSave = async () => {
+    const name = archiveName.trim();
+    if (!name) {
+      setArchiveError("请填写档案名称");
+      return;
+    }
+    if (!archiveConsent) {
+      setArchiveError("保存档案须先确认已取得屋主知情同意");
+      return;
+    }
+    const rows = archiveMeasurements();
+    if (rows.length === 0) {
+      setArchiveError("当前没有可保存的有效向首读数");
+      return;
+    }
+    setArchiveSaving(true);
+    setArchiveError("");
+    try {
+      const buildingId = `building-${Date.now()}`;
+      await saveFengshuiBuilding({
+        tenantId: FENGSHUI_TENANT,
+        buildingId,
+        profile: {
+          name,
+          measurements: rows,
+          owner_consent: true,
+          source: archiveSource.trim() || "web_fengshui_workspace",
+          note: archiveNote.trim(),
+          created_via: "standalone_fengshui_workspace",
+        },
+      });
+      setArchiveName("");
+      setArchiveNote("");
+      setArchiveConsent(false);
+      await loadArchives();
+    } catch (requestError) {
+      setArchiveError(requestError.message || "房屋档案保存失败");
+    } finally {
+      setArchiveSaving(false);
+    }
+  };
+
+  const handleArchiveLoad = (row) => {
+    const measurement = row?.profile?.measurements?.[0];
+    if (!measurement) return;
+    setMode("single");
+    setFacing(String(measurement.facing_degree ?? ""));
+    setReference(measurement.input_reference || "magnetic");
+    setDeclination(String(measurement.magnetic_declination ?? "0"));
+    setMeasurementError(String(measurement.measurement_error ?? "1"));
+    setResult(null);
+    setError("");
+    setTool("direction");
+  };
+
+  const handleArchiveDelete = async (buildingId) => {
+    if (!window.confirm(`删除房屋档案 ${buildingId}？该操作不可撤销。`)) return;
+    setArchiveError("");
+    try {
+      await deleteFengshuiBuilding(buildingId, FENGSHUI_TENANT);
+      await loadArchives();
+    } catch (requestError) {
+      setArchiveError(requestError.message || "房屋档案删除失败");
+    }
+  };
 
   const handleDirection = async (event) => {
     event.preventDefault();
@@ -274,7 +382,7 @@ export default function FengshuiPanel() {
       kicker="FENGSHUI WORKSPACE"
       title="阳宅风水"
       description="独立录入坐向、八宅命卦或玄空运盘参数，计算真北坐向、二十四山、八宅九星与玄空挨星。"
-      badge="坐向 · 八宅 · 玄空"
+      badge="坐向 · 八宅 · 玄空 · 档案"
       tabs={<ToolTabs active={tool} onChange={switchTool} disabled={loading} />}
       sidebar={(
         <>
@@ -493,6 +601,27 @@ export default function FengshuiPanel() {
               </button>
             </form>
           )}
+
+          {tool === "archive" && (
+            <div className="form-section fengshui-entry-form">
+              <div className="section-title"><Archive size={16} /><span>保存当前测量</span></div>
+              <p className="standalone-form-hint">
+                保存的是当前坐向表单里的读数；档案须记录屋主知情同意与测量来源。
+              </p>
+              <div className="archive-current">
+                <span>当前读数</span>
+                <strong>
+                  {mode === "single"
+                    ? `${facing || "—"}°`
+                    : `${measurements.filter((value) => String(value).trim()).length} 次`}
+                </strong>
+                <small>{reference === "magnetic" ? "磁北测量" : "真北测量"} · 磁偏角 {declination || 0}° · 误差 ±{measurementError || 0}°</small>
+              </div>
+              <button type="button" className="secondary-command" onClick={() => setTool("direction")}>
+                回到坐向测量
+              </button>
+            </div>
+          )}
         </>
       )}
     >
@@ -540,6 +669,109 @@ export default function FengshuiPanel() {
           body="在左侧选择坐山与运，可选填年份和实测角度，然后点击「排玄空盘」。"
         />
       ))}
+
+      {tool === "archive" && (
+        <div className="archive-workspace">
+          <section className="archive-save-card">
+            <div className="section-title"><Save size={16} /><span>房屋档案</span></div>
+            <p className="standalone-form-hint">
+              将当前坐向读数保存为房屋档案，供同一空间的多次勘察对照；档案落盘在部署端，不写入本地推演历史。
+            </p>
+            <div className="archive-form-grid">
+              <label>
+                <span className="field-label">档案名称</span>
+                <input
+                  type="text"
+                  value={archiveName}
+                  placeholder="例如 自宅 · 主卧"
+                  onChange={(event) => setArchiveName(event.target.value)}
+                />
+              </label>
+              <label>
+                <span className="field-label">测量来源</span>
+                <input
+                  type="text"
+                  value={archiveSource}
+                  placeholder="例如 罗盘现场测量"
+                  onChange={(event) => setArchiveSource(event.target.value)}
+                />
+              </label>
+            </div>
+            <label>
+              <span className="field-label">备注（选填）</span>
+              <textarea
+                value={archiveNote}
+                placeholder="楼层、朝向补充、现场情况等"
+                onChange={(event) => setArchiveNote(event.target.value)}
+              />
+            </label>
+            <div className="standalone-checkbox-row">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={archiveConsent}
+                  onChange={(event) => setArchiveConsent(event.target.checked)}
+                />
+                <span>已取得屋主知情同意</span>
+              </label>
+            </div>
+            {archiveError && (
+              <div className="standalone-error" role="alert">
+                <CircleAlert size={16} />
+                <span>{archiveError}</span>
+              </div>
+            )}
+            <button type="button" className="primary-button full-button" disabled={archiveSaving} onClick={handleArchiveSave}>
+              {archiveSaving ? <LoaderCircle size={16} className="spin" /> : <Save size={16} />}
+              保存档案
+            </button>
+          </section>
+
+          <section className="archive-list-section">
+            <div className="archive-list-heading">
+              <div>
+                <strong>已存档案</strong>
+                <small>{archiveRows.length} 条 · 档案按部署端租户隔离</small>
+              </div>
+              <button type="button" className="secondary-command" disabled={archiveLoading} onClick={loadArchives}>
+                {archiveLoading ? <LoaderCircle size={14} className="spin" /> : <RefreshCw size={14} />}
+                刷新
+              </button>
+            </div>
+            {archiveLoading && archiveRows.length === 0 ? (
+              <div className="archive-list-empty">正在读取档案…</div>
+            ) : archiveRows.length === 0 ? (
+              <div className="archive-list-empty">还没有档案。先在坐向测量里取读数，再回到这里保存。</div>
+            ) : (
+              <div className="archive-list">
+                {archiveRows.map((row) => {
+                  const profile = row.profile || {};
+                  return (
+                    <article className="archive-row" key={row.building_id}>
+                      <div className="archive-row-main">
+                        <strong>{profile.name || row.building_id}</strong>
+                        <small>
+                          {row.building_id} · {(profile.measurements || []).length} 次读数 · {archiveTime(row.updated_at)}
+                        </small>
+                        {profile.note ? <p>{profile.note}</p> : null}
+                      </div>
+                      <div className="archive-row-actions">
+                        <button type="button" className="secondary-command" onClick={() => handleArchiveLoad(row)}>
+                          载入坐向
+                        </button>
+                        <button type="button" className="ghost-action" onClick={() => handleArchiveDelete(row.building_id)}>
+                          <Trash2 size={14} />
+                          删除
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </WorkspaceShell>
   );
 }

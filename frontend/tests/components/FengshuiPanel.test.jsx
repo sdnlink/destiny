@@ -6,6 +6,9 @@ vi.mock("../../src/lib/api.js", () => ({
   analyzeFengshuiMeasurements: vi.fn(),
   analyzeFengshuiBazhai: vi.fn(),
   analyzeFengshuiXuankong: vi.fn(),
+  listFengshuiBuildings: vi.fn(),
+  saveFengshuiBuilding: vi.fn(),
+  deleteFengshuiBuilding: vi.fn(),
 }));
 
 vi.mock("../../src/components/result/FengshuiView", () => ({
@@ -25,6 +28,8 @@ import {
   analyzeFengshuiDirection,
   analyzeFengshuiMeasurements,
   analyzeFengshuiXuankong,
+  listFengshuiBuildings,
+  saveFengshuiBuilding,
 } from "../../src/lib/api.js";
 import FengshuiPanel from "../../src/components/fengshui/FengshuiPanel";
 
@@ -132,5 +137,50 @@ describe("FengshuiPanel", () => {
       year: 2026,
     });
     expect(await screen.findByTestId("xuankong-view")).toHaveTextContent("下元9运");
+  });
+
+  it("房屋档案页签读取已存档案", async () => {
+    listFengshuiBuildings.mockResolvedValue([
+      {
+        building_id: "building-1",
+        updated_at: "2026-11-08T08:00:00Z",
+        profile: { name: "自宅 · 主卧", measurements: [{ facing_degree: 180 }], note: "三层" },
+      },
+    ]);
+    render(<FengshuiPanel />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "房屋档案" }));
+
+    await waitFor(() => expect(listFengshuiBuildings).toHaveBeenCalledWith("local"));
+    expect(await screen.findByText("自宅 · 主卧")).toBeInTheDocument();
+    expect(screen.getByText(/building-1 · 1 次读数/)).toBeInTheDocument();
+  });
+
+  it("保存档案须先勾选知情同意并提交当前坐向", async () => {
+    listFengshuiBuildings.mockResolvedValue([]);
+    saveFengshuiBuilding.mockResolvedValue({ building_id: "building-new" });
+    render(<FengshuiPanel />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "房屋档案" }));
+    await waitFor(() => expect(listFengshuiBuildings).toHaveBeenCalled());
+    fireEvent.change(screen.getByLabelText("档案名称"), { target: { value: "自宅" } });
+    fireEvent.click(screen.getByRole("button", { name: "保存档案" }));
+
+    expect(saveFengshuiBuilding).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent("知情同意");
+
+    fireEvent.click(screen.getByLabelText("已取得屋主知情同意"));
+    fireEvent.click(screen.getByRole("button", { name: "保存档案" }));
+
+    await waitFor(() => expect(saveFengshuiBuilding).toHaveBeenCalledTimes(1));
+    expect(saveFengshuiBuilding).toHaveBeenCalledWith(expect.objectContaining({
+      tenantId: "local",
+      buildingId: expect.any(String),
+      profile: expect.objectContaining({
+        name: "自宅",
+        owner_consent: true,
+        measurements: [expect.objectContaining({ facing_degree: 180 })],
+      }),
+    }));
   });
 });
