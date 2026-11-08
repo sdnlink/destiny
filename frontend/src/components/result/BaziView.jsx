@@ -82,7 +82,7 @@ function BaziPillarCard({ pillar, title }) {
   );
 }
 
-function BaziView({ result }) {
+function BaziView({ result, calendar }) {
   if (!result) return <MissingModule name="八字命理" />;
   const facts = result.facts || {};
   const pillars = facts.pillars || {};
@@ -210,7 +210,7 @@ function BaziView({ result }) {
         </div>
       </section>
 
-      <LifelineView result={result} />
+      <LifelineView result={result} calendar={calendar} />
 
       {advisory && Object.keys(advisory).length > 0 && (
         <section className="data-band advisory-band">

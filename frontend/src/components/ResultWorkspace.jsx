@@ -131,7 +131,7 @@ export default function ResultWorkspace({ result, context, activeTab, setActiveT
         {activeTab === "liuyao" && <LiuyaoView result={liuyao} />}
         {activeTab === "liuren" && <LiurenView result={liuren} />}
         {activeTab === "qimen" && <QimenView result={qimen} />}
-        {activeTab === "bazi" && <BaziView result={bazi} />}
+        {activeTab === "bazi" && <BaziView result={bazi} calendar={calendar} />}
         {activeTab === "ziwei" && <ZiweiView result={ziwei} />}
         {activeTab === "fengshui" && <FengshuiView result={fengshui} />}
         {activeTab === "comparison" && <ComparisonView comparison={result.comparison} />}

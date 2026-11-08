@@ -1002,7 +1002,7 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
   另有 4 处单字 OCR 按同句源山订正），旧「422 条」口径已订正。
 - `tests/test_lifeline_and_systems.py` 的 `TiebanDataGapTests` 重复断言已删除。
 
-### 继续收口（CI 语料夹具）
+### 继续收口（CI 语料夹具与剩余结构项）
 
 - 完整典籍语料仍不入库，但新增 `data/validation-cases/classics-fixture/`（10 条原文片段，
   由 `scripts/build_classics_test_fixture.py` 重建）；`backend/tests/conftest.py` 在
@@ -1010,8 +1010,14 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
   八字流年/生平时间轴/皇极经世证据链在 CI 仍真实执行。
 - 只有「完整语料规模 ≥85 文档/≥4000 段」与「三个来源清单全部入库」两项断言条件跳过；
   完整语料存在时自动切回真实语料，不降低本地校验强度。
-- 新增 `test_frontend_labels.py::test_system_ids_and_labels_match_backend`，直接把前端
-  `SYSTEMS` 的 id/中文标签与后端 `SUPPORTED_SYSTEMS`/`SYSTEM_LABELS` 对齐，修掉
-  `daliuren`「大六壬神课」与前端「大六壬」的文案漂移。
-- 实测：完整语料环境 **864 passed / 10 skipped**；压缩夹具环境 **862 passed / 12 skipped**
+- 新增 `test_frontend_labels.py::test_system_ids_and_labels_match_backend` 与
+  `test_frontend_casting_methods_are_supported_by_backend`，把前端 `SYSTEMS` 的 id/中文标签、
+  `CASTING_METHOD_IDS_BY_SYSTEM` 与后端 `SUPPORTED_SYSTEMS`/`SYSTEM_LABELS`/`REQUEST_BUILDERS`
+  逐项对齐，修掉 `daliuren`「大六壬神课」与前端「大六壬」的文案漂移，并阻止前端再提供后端没有构造器的起盘方式。
+- 旧八字结果缺少 `input` 时，`LifelineView` 回退使用同一结果里历法模块的 `input`（时区/经度/真太阳时），
+  只有历法入参也缺失时才提示「按东八区重建」，避免把本来可还原的旧盘一律按东八区重算。
+- `app.core.db.ClickHouseRepository` 与 `app.corpus_api.ClickHouseClient` 改为共用
+  `app.core.clickhouse_http.ClickHouseHttpClient`，URL 参数、64 位整数输出、Basic Auth、
+  HTTP/网络/协议错误分类只保留一份实现；常量库仍按原策略降级，语料服务仍映射 502。
+- 实测：完整语料环境 **869 passed / 10 skipped**；压缩夹具环境 **867 passed / 12 skipped**
   （多出的 2 个 skip 即上述完整语料规模断言）。

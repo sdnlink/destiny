@@ -1,11 +1,11 @@
 import base64
-import json
 import logging
 import os
 import time
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+
+from app.core.clickhouse_http import ClickHouseHttpClient, ClickHouseRequestError
 
 
 logger = logging.getLogger("destiny.db")
@@ -29,6 +29,7 @@ class ClickHouseRepository:
         if not self.password:
             logger.warning("CLICKHOUSE_PASSWORD 未设置，数据库查询将被拒绝")
         self.timeout = timeout
+        self._http = ClickHouseHttpClient(self.url, self.user, self.password, timeout=timeout)
         self._availability = None
         self._availability_checked_at = 0.0
         # 查询失败后的冷却截止时间：期内不再尝试建连，直接走降级路径
@@ -84,33 +85,17 @@ class ClickHouseRepository:
             if cached is not None and time.monotonic() < cached[1]:
                 return cached[0]
 
-        request_parameters = {
-            "output_format_json_quote_64bit_integers": "0",
-        }
-        for key, value in (parameters or {}).items():
-            request_parameters[f"param_{key}"] = str(value)
-        url = self.url + "?" + urlencode(request_parameters)
-        req = Request(url, data=statement.encode("utf-8"), method="POST")
-        credentials = base64.b64encode(f"{self.user}:{self.password}".encode("utf-8")).decode("ascii")
-        req.add_header("Authorization", f"Basic {credentials}")
-        req.add_header("Content-Type", "text/plain; charset=utf-8")
         try:
-            with urlopen(req, timeout=self.timeout) as response:
-                payload = response.read().decode("utf-8")
-        except (HTTPError, URLError, OSError) as exc:
+            rows = self._http.query(statement, parameters)
+        except ClickHouseRequestError as exc:
+            if exc.kind == "protocol":
+                # 响应不是预期的 FORMAT JSON 结构：这属于代码/查询错误，必须留下痕迹
+                logger.error("clickhouse response is not FORMAT JSON: %s", exc)
+                return None
             # 网络/鉴权失败：记录原因再返回 None，调用方据此走降级路径；
             # 同时进入冷却期，冷却内不再重复等超时（见 QUERY_FAILURE_COOLDOWN_SECONDS）。
             logger.warning("clickhouse query failed: %s", exc)
             self._enter_cooldown()
-            return None
-        except ValueError as exc:
-            logger.warning("clickhouse response decode failed: %s", exc)
-            return None
-        try:
-            rows = json.loads(payload)["data"]
-        except (json.JSONDecodeError, KeyError, TypeError) as exc:
-            # 响应不是预期的 FORMAT JSON 结构：这属于代码/查询错误，必须留下痕迹
-            logger.error("clickhouse response is not FORMAT JSON: %s", exc)
             return None
         if cache_seconds > 0 and rows:
             self._query_cache[cache_key] = (rows, time.monotonic() + cache_seconds)

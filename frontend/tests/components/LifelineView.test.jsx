@@ -89,6 +89,30 @@ describe("LifelineView", () => {
     });
   });
 
+  it("旧八字结果缺少 input 时用历法模块回填入参", async () => {
+    const spy = vi.spyOn(api, "analyzeLifeline").mockResolvedValue(mockLifeline);
+    const legacyResult = { solar_datetime: "1984-02-10T10:00:00-05:00", gender: "女" };
+    const calendar = {
+      input: {
+        local_datetime: "1984-02-10 10:00:00",
+        timezone: "America/New_York",
+        longitude: -74,
+        use_true_solar_time: true,
+      },
+    };
+    render(<LifelineView result={legacyResult} calendar={calendar} />);
+    expect(screen.queryByText(/旧版本/)).toBeNull();
+    fireEvent.click(screen.getByText("生成时间轴"));
+    await waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+    expect(spy.mock.calls[0][0]).toMatchObject({
+      local_datetime: "1984-02-10 10:00:00",
+      timezone: "America/New_York",
+      gender: "女",
+      longitude: -74,
+      use_true_solar_time: true,
+    });
+  });
+
   it("旧结果缺少 input 时剥离 offset，不再直接触发 422", async () => {
     const spy = vi.spyOn(api, "analyzeLifeline").mockResolvedValue(mockLifeline);
     render(<LifelineView result={{ solar_datetime: "1984-02-10T10:00:00+08:00", gender: "男" }} />);

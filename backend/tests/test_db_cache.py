@@ -10,6 +10,7 @@ import unittest
 from unittest import mock
 from urllib.error import URLError
 
+from app.core import clickhouse_http
 from app.core import db as db_module
 
 
@@ -36,7 +37,7 @@ class QueryCacheTests(unittest.TestCase):
     def test_identical_queries_hit_network_once(self):
         rows = [{"number": 1, "name": "乾"}]
         payload = json.dumps({"data": rows}).encode("utf-8")
-        with mock.patch.object(db_module, "urlopen", return_value=_FakeResponse(payload)) as opener:
+        with mock.patch.object(clickhouse_http, "urlopen", return_value=_FakeResponse(payload)) as opener:
             first = self.repo.get_trigrams()
             second = self.repo.get_trigrams()
         self.assertEqual(opener.call_count, 1, "同一条只读查询不应重复建连接")
@@ -45,13 +46,13 @@ class QueryCacheTests(unittest.TestCase):
 
     def test_different_parameters_do_not_share_cache(self):
         payload = json.dumps({"data": [{"trigram_name": "乾"}]}).encode("utf-8")
-        with mock.patch.object(db_module, "urlopen", return_value=_FakeResponse(payload)) as opener:
+        with mock.patch.object(clickhouse_http, "urlopen", return_value=_FakeResponse(payload)) as opener:
             self.repo.get_trigram_imagery(trigram_name="乾")
             self.repo.get_trigram_imagery(trigram_name="坎")
         self.assertEqual(opener.call_count, 2)
 
     def test_failures_are_not_cached(self):
-        with mock.patch.object(db_module, "urlopen", side_effect=URLError("boom")) as opener:
+        with mock.patch.object(clickhouse_http, "urlopen", side_effect=URLError("boom")) as opener:
             self.assertIsNone(self.repo.get_trigrams())
             # 失败会进入 20 秒冷却，冷却期内重复查询不再建连（降级不重试）
             self.assertIsNone(self.repo.get_trigrams())
@@ -60,12 +61,12 @@ class QueryCacheTests(unittest.TestCase):
     def test_failed_query_does_not_cache_rows(self):
         self.repo._failure_until = 0.0
         payload = json.dumps({"data": [{"number": 1}]}).encode("utf-8")
-        with mock.patch.object(db_module, "urlopen", side_effect=URLError("boom")):
+        with mock.patch.object(clickhouse_http, "urlopen", side_effect=URLError("boom")):
             self.assertIsNone(self.repo.get_trigrams())
         self.assertEqual(self.repo._query_cache, {}, "失败的查询不能写进结果缓存")
         # 数据库恢复（探活成功）后必须立刻回到真实数据，而不是继续吃旧的失败结论
         self.repo._failure_until = 0.0
-        with mock.patch.object(db_module, "urlopen", return_value=_FakeResponse(payload)):
+        with mock.patch.object(clickhouse_http, "urlopen", return_value=_FakeResponse(payload)):
             self.assertEqual(self.repo.get_trigrams(), [{"number": 1}])
 
     def test_successful_ping_clears_cooldown(self):
@@ -82,14 +83,14 @@ class QueryCacheTests(unittest.TestCase):
 
     def test_stats_query_bypasses_cache(self):
         payload = json.dumps({"data": [{"table": "trigrams", "rows": 8}]}).encode("utf-8")
-        with mock.patch.object(db_module, "urlopen", return_value=_FakeResponse(payload)) as opener:
+        with mock.patch.object(clickhouse_http, "urlopen", return_value=_FakeResponse(payload)) as opener:
             self.repo.get_database_stats()
             self.repo.get_database_stats()
         self.assertEqual(opener.call_count, 2, "库表统计需要新鲜值，不应被缓存")
 
     def test_clear_cache_forces_refetch(self):
         payload = json.dumps({"data": [{"number": 1}]}).encode("utf-8")
-        with mock.patch.object(db_module, "urlopen", return_value=_FakeResponse(payload)) as opener:
+        with mock.patch.object(clickhouse_http, "urlopen", return_value=_FakeResponse(payload)) as opener:
             self.repo.get_five_elements()
             self.repo.clear_cache()
             self.repo.get_five_elements()
@@ -97,7 +98,7 @@ class QueryCacheTests(unittest.TestCase):
 
     def test_empty_result_is_not_cached(self):
         payload = json.dumps({"data": []}).encode("utf-8")
-        with mock.patch.object(db_module, "urlopen", return_value=_FakeResponse(payload)) as opener:
+        with mock.patch.object(clickhouse_http, "urlopen", return_value=_FakeResponse(payload)) as opener:
             self.repo.get_five_elements()
             self.repo.get_five_elements()
         self.assertEqual(opener.call_count, 2, "空表结果不缓存，避免把一次异常空响应当成稳态")

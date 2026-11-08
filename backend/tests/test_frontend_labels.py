@@ -11,7 +11,7 @@ import unittest
 from pathlib import Path
 
 from app.common.categories import CATEGORIES, CATEGORY_LABELS, LEGACY_CATEGORY_ALIASES, normalize_category
-from app.workflow.scheduler import SUPPORTED_SYSTEMS, SYSTEM_LABELS
+from app.workflow.scheduler import DEFAULT_METHOD, REQUEST_BUILDERS, SUPPORTED_SYSTEMS, SYSTEM_LABELS
 
 
 FRONTEND_LABELS = Path(__file__).resolve().parents[2] / "frontend" / "src" / "lib" / "labels.js"
@@ -52,6 +52,21 @@ class FrontendLabelConsistencyTests(unittest.TestCase):
         for system_id, label in entries:
             if system_id in SYSTEM_LABELS:
                 self.assertEqual(label, SYSTEM_LABELS[system_id], system_id)
+
+    def test_frontend_casting_methods_are_supported_by_backend(self):
+        # 前端下拉允许的每种「体系 × 起盘方式」都必须有后端构造器；
+        # 否则用户选中的方法会被 scheduler 静默退到 default，界面与实际盘面不符。
+        block = self.source.split("const CASTING_METHOD_IDS_BY_SYSTEM = {", 1)[1].split("};", 1)[0]
+        entries = dict(re.findall(r"([a-z_]+):\s*\[([^\]]*)\]", block))
+        for system_id, raw_ids in entries.items():
+            ids = re.findall(r'"([a-z_]+)"', raw_ids)
+            if system_id == "auto":
+                continue  # auto 是跨体系默认盘，不绑定单一构造器
+            self.assertIn(system_id, REQUEST_BUILDERS, system_id)
+            for method in ids:
+                if method == DEFAULT_METHOD:
+                    continue
+                self.assertIn(method, REQUEST_BUILDERS[system_id], f"{system_id}/{method}")
 
 
 if __name__ == "__main__":

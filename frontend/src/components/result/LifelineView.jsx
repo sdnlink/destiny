@@ -49,10 +49,12 @@ function parseRecordedEvents(text) {
 }
 
 /** 个人生平时间轴：按需向 /v1/bazi/lifeline 请求，只展示确定事实。 */
-export function LifelineView({ result }) {
+export function LifelineView({ result, calendar }) {
   const [state, setState] = useState({ status: "idle", data: null, error: null });
   const [eventsText, setEventsText] = useState("");
-  const natalInput = result?.input || {};
+  // 旧八字结果没有 input，但同一结果里的历法模块一直带着原始入参；
+  // 用它回填即可还原时区/经度，不必一律按东八区重建。
+  const natalInput = result?.input || calendar?.input || {};
   const hasSourceInput = Boolean(natalInput.local_datetime);
   const localDatetime = withoutTimezoneOffset(natalInput.local_datetime || result?.solar_datetime);
   const timezone = natalInput.timezone || "Asia/Shanghai";

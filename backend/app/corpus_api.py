@@ -2,7 +2,6 @@
 """Internal read-only HTTP API for the verified learning corpus."""
 
 import argparse
-import base64
 import hmac
 import json
 import logging
@@ -11,9 +10,9 @@ import re
 import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qs, urlencode, urlparse
-from urllib.request import Request, urlopen
+from urllib.parse import parse_qs, urlparse
+
+from app.core.clickhouse_http import ClickHouseHttpClient, ClickHouseRequestError
 
 
 logger = logging.getLogger("destiny.corpus_api")
@@ -79,31 +78,15 @@ def make_snippet(content, term, radius=100):
 
 class ClickHouseClient:
     def __init__(self, url, user, password, timeout=30):
-        self.url = url.rstrip("/") + "/"
-        self.user = user
-        self.password = password
-        self.timeout = timeout
+        self._http = ClickHouseHttpClient(url, user, password, timeout=timeout)
 
     def query(self, statement, parameters=None):
-        request_parameters = {
-            "output_format_json_quote_64bit_integers": "0",
-        }
-        for key, value in (parameters or {}).items():
-            request_parameters[f"param_{key}"] = str(value)
-        url = self.url + "?" + urlencode(request_parameters)
-        request = Request(url, data=statement.encode("utf-8"), method="POST")
-        credentials = base64.b64encode(f"{self.user}:{self.password}".encode("utf-8")).decode("ascii")
-        request.add_header("Authorization", f"Basic {credentials}")
-        request.add_header("Content-Type", "text/plain; charset=utf-8")
         try:
-            with urlopen(request, timeout=self.timeout) as response:
-                payload = response.read().decode("utf-8")
-        except HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace").strip()
-            raise ApiError(HTTPStatus.BAD_GATEWAY, "CLICKHOUSE_ERROR", detail or str(exc))
-        except (URLError, TimeoutError) as exc:
-            raise ApiError(HTTPStatus.BAD_GATEWAY, "CLICKHOUSE_UNAVAILABLE", str(exc))
-        return json.loads(payload)["data"]
+            return self._http.query(statement, parameters)
+        except ClickHouseRequestError as exc:
+            if exc.kind in ("http", "protocol"):
+                raise ApiError(HTTPStatus.BAD_GATEWAY, "CLICKHOUSE_ERROR", exc.detail or str(exc)) from exc
+            raise ApiError(HTTPStatus.BAD_GATEWAY, "CLICKHOUSE_UNAVAILABLE", str(exc)) from exc
 
 
 class CorpusRepository:
