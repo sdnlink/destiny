@@ -15,6 +15,7 @@ Web界面位于`frontend/`，使用React、Vite和Lucide图标，连接现有MVP
 - 计算前历法校验及四柱确认。
 - 总览、历法、各术数模块结果页（含六爻典籍依据面板、八字大运/流年展示）及对照分析结果页。
 - 命运专项工作区的本命盘、逐年流年与生平时间轴三个独立页签。
+- 阳宅风水工作区的单次坐向与多次测量共识两种模式。
 - 总览中的事项结论，以及独立“结论建议”页面。
 - 本卦、变卦、互卦、错卦、综卦及动爻可视化。
 - 体用和五行关系证据、规则编号、计算步骤及中间值。
@@ -89,6 +90,9 @@ npm run test:browser
 | `frontend/src/components/destiny/DestinyPanel.jsx` | 命运专项工作区（本命盘 / 流年 / 生平时间轴） |
 | `frontend/src/components/destiny/BirthProfileSection.jsx` | 命运专项共用出生信息表单 |
 | `frontend/src/components/destiny/LiunianView.jsx` | 流年逐年事实表 |
+| `frontend/src/components/fengshui/FengshuiPanel.jsx` | 阳宅风水工作区（单次坐向 / 多次共识） |
+| `frontend/src/components/workspace/WorkspaceShell.jsx` | 独立功能页共用的两栏外壳 |
+| `frontend/src/components/result/FengshuiView.jsx` | 阳宅坐向、二十四山罗盘与测量共识 |
 | `frontend/src/components/InputPanel.jsx` | 推演输入与历法预校验 |
 | `frontend/src/components/ResultWorkspace.jsx` | 全部结果视图和卦盘组件 |
 | `frontend/src/lib/api.js` | API请求与错误归一化 |

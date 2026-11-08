@@ -3,7 +3,7 @@
    复用经典推演的八字结果组件，只在外面提供独立入口与共用出生信息。
    ========================================================================== */
 
-.destiny-workspace {
+.standalone-workspace {
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
@@ -13,7 +13,7 @@
   background: #ecebe6;
 }
 
-.destiny-header {
+.standalone-header {
   flex: 0 0 auto;
   display: flex;
   align-items: flex-start;
@@ -24,14 +24,14 @@
   border-bottom: 1px solid var(--line);
 }
 
-.destiny-header h1 {
+.standalone-header h1 {
   margin: 3px 0 6px;
   font-family: "Noto Serif SC", "Songti SC", serif;
   font-size: 27px;
   color: var(--ink);
 }
 
-.destiny-header p {
+.standalone-header p {
   margin: 0;
   max-width: 720px;
   color: var(--muted);
@@ -39,7 +39,7 @@
   line-height: 1.75;
 }
 
-.destiny-mode-badge {
+.standalone-mode-badge {
   flex: 0 0 auto;
   padding: 7px 11px;
   border: 1px solid var(--line);
@@ -60,13 +60,13 @@
   font-size: 12px;
 }
 
-.destiny-layout {
+.standalone-layout {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
 }
 
-.destiny-input-column {
+.standalone-input-column {
   flex: 0 0 360px;
   width: 360px;
   height: 100%;
@@ -91,7 +91,7 @@
   margin-bottom: 7px;
 }
 
-.destiny-output {
+.standalone-output {
   flex: 1 1 auto;
   min-width: 0;
   height: 100%;
@@ -275,7 +275,7 @@
 }
 
 @media (max-width: 1180px) {
-  .destiny-input-column {
+  .standalone-input-column {
     flex-basis: 320px;
     width: 320px;
   }
@@ -286,40 +286,40 @@
 }
 
 @media print {
-  .destiny-workspace,
-  .destiny-layout,
-  .destiny-output {
+  .standalone-workspace,
+  .standalone-layout,
+  .standalone-output {
     height: auto;
     overflow: visible;
   }
 
-  .destiny-input-column,
+  .standalone-input-column,
   .destiny-tabs {
     display: none;
   }
 }
 
 @media (max-width: 860px) {
-  .destiny-workspace {
+  .standalone-workspace {
     height: auto;
     min-height: calc(100vh - 56px);
     overflow: visible;
   }
 
-  .destiny-header {
+  .standalone-header {
     padding: 18px 16px 14px;
   }
 
-  .destiny-mode-badge {
+  .standalone-mode-badge {
     display: none;
   }
 
-  .destiny-layout {
+  .standalone-layout {
     display: block;
     overflow: visible;
   }
 
-  .destiny-input-column {
+  .standalone-input-column {
     width: 100%;
     height: auto;
     overflow: visible;
@@ -327,7 +327,7 @@
     border-bottom: 1px solid var(--line-strong);
   }
 
-  .destiny-output {
+  .standalone-output {
     height: auto;
     overflow: visible;
     padding: 14px 16px 34px;

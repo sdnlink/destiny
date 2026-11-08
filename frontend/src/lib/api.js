@@ -61,6 +61,20 @@ export function analyzeLifeline(payload) {
   });
 }
 
+export function analyzeFengshuiDirection(payload) {
+  return request("/v1/fengshui/direction", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function analyzeFengshuiMeasurements(payload) {
+  return request("/v1/fengshui/measurements", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function loadYuanhuiCycle(year) {
   return request(`/v1/yuanhui/cycle?year=${encodeURIComponent(year)}`);
 }

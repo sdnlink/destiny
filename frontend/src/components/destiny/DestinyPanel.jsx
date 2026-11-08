@@ -5,6 +5,7 @@ import { BaziView } from "../result/BaziView";
 import { LifelineView } from "../result/LifelineView";
 import { BirthProfileSection, birthPayload } from "./BirthProfileSection";
 import { LiunianView } from "./LiunianView";
+import { WorkspaceShell } from "../workspace/WorkspaceShell";
 
 const TABS = [
   { id: "natal", label: "本命盘", icon: Sparkles, desc: "四柱、藏干十神与大运排盘" },
@@ -105,43 +106,34 @@ export default function DestinyPanel() {
   const active = TABS.find((tab) => tab.id === activeTab) || TABS[0];
 
   return (
-    <main className="destiny-workspace">
-      <header className="destiny-header">
-        <div>
-          <span className="section-kicker">DESTINY WORKSPACE</span>
-          <h1>命运专项</h1>
-          <p>以出生时刻为唯一输入，分别查看本命盘、逐年流年与生平时间轴；全部复用既有八字接口。</p>
-        </div>
-        <span className="destiny-mode-badge">本命 · 流年 · 时间轴</span>
-      </header>
+    <WorkspaceShell
+      kicker="DESTINY WORKSPACE"
+      title="命运专项"
+      description="以出生时刻为唯一输入，分别查看本命盘、逐年流年与生平时间轴；全部复用既有八字接口。"
+      badge="本命 · 流年 · 时间轴"
+      sidebar={<BirthProfileSection profile={profile} onChange={changeProfile} />}
+    >
+      <div className="destiny-tabs" role="tablist" aria-label="命运专项页签">
+        {TABS.map(({ id, label, icon: Icon, desc }) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === id}
+            className={activeTab === id ? "active" : ""}
+            onClick={() => {
+              setActiveTab(id);
+              setError("");
+            }}
+            title={desc}
+          >
+            <Icon size={16} />
+            <span>{label}</span>
+          </button>
+        ))}
+      </div>
 
-      <div className="destiny-layout">
-        <aside className="destiny-input-column">
-          <BirthProfileSection profile={profile} onChange={changeProfile} />
-        </aside>
-
-        <section className="destiny-output">
-          <div className="destiny-tabs" role="tablist" aria-label="命运专项页签">
-            {TABS.map(({ id, label, icon: Icon, desc }) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={activeTab === id}
-                className={activeTab === id ? "active" : ""}
-                onClick={() => {
-                  setActiveTab(id);
-                  setError("");
-                }}
-                title={desc}
-              >
-                <Icon size={16} />
-                <span>{label}</span>
-              </button>
-            ))}
-          </div>
-
-          <div className="destiny-tab-body" role="tabpanel" aria-label={active.label}>
+      <div className="destiny-tab-body" role="tabpanel" aria-label={active.label}>
             {error && (
               <div className="destiny-error" role="alert">
                 <CircleAlert size={16} />
@@ -242,9 +234,7 @@ export default function DestinyPanel() {
                 <EmptyState title="尚未录入出生信息" desc="填写出生信息后，在本页生成生平时间轴。" />
               )
             )}
-          </div>
-        </section>
       </div>
-    </main>
+    </WorkspaceShell>
   );
 }

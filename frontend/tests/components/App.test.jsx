@@ -8,6 +8,8 @@ vi.mock("../../src/lib/api.js", () => ({
   compareCalculations: vi.fn(),
   evaluateCalculation: vi.fn(),
   analyzeLiunian: vi.fn(),
+  analyzeFengshuiDirection: vi.fn(),
+  analyzeFengshuiMeasurements: vi.fn(),
 }));
 
 vi.mock("../../src/lib/sessionApi.js", () => ({
@@ -68,6 +70,15 @@ describe("App", () => {
     expect(screen.getByRole("tab", { name: /本命盘/ })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /流年/ })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /生平时间轴/ })).toBeInTheDocument();
+  });
+
+  it("切换到阳宅风水视图时懒加载独立工作区", async () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByTitle("阳宅风水：坐向、二十四山与多次测量共识"));
+
+    expect(await screen.findByRole("heading", { name: "阳宅风水" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /生成阳宅坐向/ })).toBeInTheDocument();
   });
 
   it("打开历史与案例抽屉时渲染提示区（图标导入缺失会整块白屏）", async () => {

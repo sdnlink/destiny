@@ -97,7 +97,9 @@
 
 导航新增「命运专项」工作区（`frontend/src/components/destiny/DestinyPanel.jsx`），把原先嵌在八字结果里的能力拆成三个页签：本命盘（`POST /v1/calculations/evaluate` 的 `bazi/time`）、流年（`POST /v1/bazi/liunian`）、生平时间轴（`POST /v1/bazi/lifeline`）。三个页签共用同一份出生信息（`BirthProfileSection.jsx`），避免出现第二套时间/时区/真太阳时口径；本命盘页签通过 `showLifeline={false}` 隐藏内嵌时间轴，时间轴只在独立页签生成。
 
-回归护栏见 `backend/tests/test_lifeline_and_systems.py` 与 `frontend/tests/components/LifelineView.test.jsx`。
+导航新增「阳宅风水」独立工作区（`frontend/src/components/fengshui/FengshuiPanel.jsx`），把原先只在经典推演「风水」场景里出现的坐向测量拆成独立入口：单次分析走 `POST /v1/fengshui/direction`，多次共识走 `POST /v1/fengshui/measurements`。读数、磁北/真北基准、磁偏角与测量误差仍由同一套 `FengshuiDirectionRequest` 约束，结果复用 `FengshuiView`，不新增前端计算逻辑，也不改变经典推演里「风水」场景的行为。两个独立工作区共用 `frontend/src/components/workspace/WorkspaceShell.jsx` 的两栏外壳。
+
+回归护栏见 `backend/tests/test_lifeline_and_systems.py`、`frontend/tests/components/LifelineView.test.jsx` 与 `frontend/tests/components/FengshuiPanel.test.jsx`。
 
 数据边界（非"未实现"，仅记录残余缺口）：典籍待补清单已清账，八宅明镜/阳宅十书/沈氏玄空学/紫微斗数全书/卜筮正宗均由公开来源补齐入库（详见 `/v1/classics/status` 的 `sourcing_backlog`）；《紫微斗數全書》卷四图说（站方仅 PDF 扫描）与《阳宅三要》暂缺。
 

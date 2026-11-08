@@ -39,7 +39,7 @@ await desktop.getByRole("button", { name: "真北测量", exact: true }).click()
 await desktop.getByLabel("测量误差 ±").fill("0.2");
 await desktop.getByRole("button", { name: /开始推演/ }).click();
 await desktop.getByText(/^compare_[a-f0-9]+$/).waitFor({ timeout: 15000 });
-await desktop.getByRole("button", { name: "阳宅风水", exact: true }).click();
+await desktop.locator(".result-tabs").getByRole("button", { name: "阳宅风水", exact: true }).click();
 await desktop.getByRole("heading", { name: "阳宅真北坐向" }).waitFor();
 await desktop.getByText("跨越分界", { exact: true }).waitFor();
 await desktop.getByText("子、癸", { exact: true }).waitFor();
@@ -56,7 +56,7 @@ await desktop.getByRole("button", { name: "真北测量", exact: true }).click()
 await desktop.getByLabel("测量误差 ±").fill("0.5");
 await desktop.getByRole("button", { name: /开始推演/ }).click();
 await desktop.getByText(/^compare_[a-f0-9]+$/).waitFor({ timeout: 15000 });
-await desktop.getByRole("button", { name: "阳宅风水", exact: true }).click();
+await desktop.locator(".result-tabs").getByRole("button", { name: "阳宅风水", exact: true }).click();
 await desktop.getByRole("heading", { name: "阳宅多次测量共识" }).waitFor();
 await desktop.getByText("一致", { exact: true }).waitFor();
 await desktop.getByText("1.5°", { exact: true }).waitFor();
@@ -194,6 +194,17 @@ await desktop.getByText(/月令提纲：/).waitFor({ timeout: 20000 });
 await assertNoOverflow(desktop, "desktop destiny");
 await desktop.screenshot({ path: shot("tianji-destiny-desktop.png"), fullPage: true });
 
+// 阳宅风水独立入口：单次坐向与多次共识都走真实后端，验证「拆出来的菜单」不是空壳。
+await desktop.locator(".app-navigation").getByRole("button", { name: "阳宅风水", exact: true }).click();
+await desktop.getByRole("heading", { name: "阳宅风水" }).waitFor();
+await desktop.getByRole("button", { name: "生成阳宅坐向" }).click();
+await desktop.getByRole("heading", { name: "阳宅真北坐向与二十四山" }).waitFor({ timeout: 20000 });
+await desktop.getByRole("button", { name: "多次共识" }).click();
+await desktop.getByRole("button", { name: "生成阳宅坐向" }).click();
+await desktop.getByRole("heading", { name: "阳宅多次测量共识" }).waitFor({ timeout: 20000 });
+await assertNoOverflow(desktop, "desktop fengshui workspace");
+await desktop.screenshot({ path: shot("tianji-fengshui-workspace-desktop.png"), fullPage: true });
+
 // 历史抽屉与后端会话（/v1/sessions）的联动：抽屉里必须能列出刚创建的会话，
 // 点一下就能在交互推演里恢复结果。两套存档不通的问题是审计 14 的核心。
 await desktop.getByRole("button", { name: "历史与案例" }).click();
@@ -258,9 +269,16 @@ await mobile.getByRole("heading", { name: "命运专项" }).waitFor();
 await assertNoOverflow(mobile, "mobile destiny");
 await mobile.screenshot({ path: shot("tianji-destiny-mobile.png"), fullPage: true });
 
+await mobile.getByLabel("切换工作模式").selectOption("fengshui");
+await mobile.getByRole("heading", { name: "阳宅风水" }).waitFor();
+await mobile.getByRole("button", { name: "生成阳宅坐向" }).click();
+await mobile.getByRole("heading", { name: "阳宅真北坐向与二十四山" }).waitFor({ timeout: 20000 });
+await assertNoOverflow(mobile, "mobile fengshui");
+await mobile.screenshot({ path: shot("tianji-fengshui-mobile.png"), fullPage: true });
+
 if (consoleErrors.length) {
   throw new Error(`browser console errors:\n${consoleErrors.join("\n")}`);
 }
 
 await browser.close();
-console.log("browser smoke passed: fengshui single/consensus, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), and mobile destiny entry");
+console.log("browser smoke passed: fengshui single/consensus, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, and standalone fengshui workspace (desktop/mobile)");
