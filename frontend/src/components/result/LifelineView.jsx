@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { CalendarRange, CircleAlert, Loader2 } from "lucide-react";
+import { CalendarRange, CircleAlert, Download, Loader2 } from "lucide-react";
 import { analyzeLifeline } from "../../lib/api";
+import { downloadMarkdownFile } from "../../lib/export";
+import { generateStandaloneReport } from "../../lib/moduleReport";
 import { Notice } from "./shared";
 
 const FLAG_LABELS = {
@@ -91,6 +93,17 @@ export function LifelineView({ result, calendar }) {
   const ziping = state.data?.ziping;
   const timeline = state.data?.timeline || [];
 
+  const handleExportReport = () => {
+    if (!state.data) return;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const markdown = generateStandaloneReport(state.data, {
+      module: "lifeline",
+      title: "命运专项 · 生平时间轴",
+      calculatedAt: new Date().toLocaleString("zh-CN", { hour12: false }),
+    });
+    downloadMarkdownFile(markdown, `天机演象_命运专项_生平时间轴_${dateStr}.md`);
+  };
+
   return (
     <section className="data-band">
       <div className="band-heading">
@@ -101,10 +114,18 @@ export function LifelineView({ result, calendar }) {
             <p>月令取格候选、大运流年组合事实与宏观周期背景对齐；不含吉凶断语</p>
           </div>
         </div>
-        <button type="button" className="ghost-action" onClick={load} disabled={state.status === "loading"}>
-          {state.status === "loading" ? <Loader2 size={14} className="spin" /> : null}
-          {state.status === "ready" ? "重新计算" : "生成时间轴"}
-        </button>
+        <div className="lifeline-heading-actions">
+          {state.status === "ready" && (
+            <button type="button" className="secondary-command" onClick={handleExportReport}>
+              <Download size={14} />
+              导出报告
+            </button>
+          )}
+          <button type="button" className="ghost-action" onClick={load} disabled={state.status === "loading"}>
+            {state.status === "loading" ? <Loader2 size={14} className="spin" /> : null}
+            {state.status === "ready" ? "重新计算" : "生成时间轴"}
+          </button>
+        </div>
       </div>
 
       {state.status === "idle" && (

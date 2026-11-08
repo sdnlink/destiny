@@ -198,6 +198,16 @@ await desktop.getByText("2026", { exact: true }).first().waitFor();
 await desktop.getByRole("tab", { name: /生平时间轴/ }).click();
 await desktop.getByRole("button", { name: "生成时间轴" }).click();
 await desktop.getByText(/月令提纲：/).waitFor({ timeout: 20000 });
+const [lifelineDownload] = await Promise.all([
+  desktop.waitForEvent("download"),
+  desktop.getByRole("button", { name: "导出报告" }).click(),
+]);
+const lifelinePath = await lifelineDownload.path();
+if (!lifelinePath) throw new Error("lifeline report download missing file");
+const lifelineReport = fs.readFileSync(lifelinePath, "utf8");
+if (!lifelineReport.includes("# 命运专项 · 生平时间轴") || !lifelineReport.includes("## 逐年事实")) {
+  throw new Error("lifeline report content is not the current timeline report");
+}
 await assertNoOverflow(desktop, "desktop destiny");
 await desktop.screenshot({ path: shot("tianji-destiny-desktop.png"), fullPage: true });
 

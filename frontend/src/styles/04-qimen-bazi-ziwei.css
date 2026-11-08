@@ -1277,10 +1277,17 @@
 /* ==========================================================================
    Lifeline timeline (子平/岁运/皇极经世)
    ========================================================================== */
+.lifeline-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .lifeline-ziping {
   margin: 10px 0 14px;
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 12px 14px;border-radius: 10px;
   background: var(--surface-soft, rgba(148, 163, 184, 0.08));
   font-size: 13px;
   line-height: 1.7;

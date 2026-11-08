@@ -85,4 +85,30 @@ describe("standalone report", () => {
 
     expect(markdown).toContain("| 2026 | 丙午 | 食神 | 天河水 | 42 | 庚午（2022–2031） | 六冲年柱 |");
   });
+
+  it("renders 生平时间轴 table and 岁运组合", () => {
+    const markdown = generateStandaloneReport({
+      birth_year: 1984,
+      start_year: 2026,
+      count: 1,
+      day_master: "甲",
+      ziping: { month_branch: "寅", month_element: "木", rule: "先看提纲为重" },
+      timeline: [{
+        year: 2026,
+        ganzhi: "丙午",
+        stem_ten_god: "食神",
+        nayin: "天河水",
+        age: 42,
+        luck_pillar: { ganzhi: "庚午", start_year: 2022, end_year: 2031 },
+        recorded_events: [{ label: "迁居" }],
+        suiyun: { true_taisui: false, note: "只列事实" },
+      }],
+      warnings: ["只做只读对齐。"],
+    }, { module: "lifeline", title: "命运专项 · 生平时间轴" });
+
+    expect(markdown).toContain("## 月令提纲");
+    expect(markdown).toContain("| 2026 | 丙午 | 食神 | 天河水 | 42 | 庚午（2022–2031） | 迁居 |");
+    expect(markdown).toContain("## 岁运组合事实");
+    expect(markdown).toContain("只做只读对齐。");
+  });
 });

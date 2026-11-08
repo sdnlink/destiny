@@ -228,6 +228,46 @@ function ziweiReport(result, context) {
   return lines.join("\n");
 }
 
+function lifelineReport(result, context) {
+  const lines = reportHead(context.title || "命运专项 · 生平时间轴", context);
+  lines.push(
+    "## 时间轴范围",
+    "",
+    `- **出生年**：${numberOr(result.birth_year)}`,
+    `- **起始年**：${numberOr(result.start_year)} · 共 ${numberOr(result.count)} 年`,
+    `- **日元**：${valueOr(result.day_master)}`,
+    `- **立春交接**：按立春划分流年，逐年只做事实对齐`,
+    "",
+  );
+  if (result.ziping) {
+    lines.push(
+      "## 月令提纲",
+      "",
+      `- **月支**：${valueOr(result.ziping.month_branch)} · ${valueOr(result.ziping.month_element)}`,
+      `- **取格规则**：${valueOr(result.ziping.rule)}`,
+      "",
+    );
+  }
+  const timeline = result.timeline || [];
+  if (timeline.length) {
+    lines.push("## 逐年事实", "", "| 年份 | 干支 | 十神 | 纳音 | 年龄 | 大运 | 已录事件 |", "| --- | --- | --- | --- | --- | --- | --- |");
+    timeline.forEach((row) => {
+      const luck = row.luck_pillar
+        ? `${row.luck_pillar.ganzhi}（${row.luck_pillar.start_year}–${row.luck_pillar.end_year}）`
+        : "—";
+      const events = (row.recorded_events || []).map((event) => event.label || "已录事件").join("、") || "—";
+      lines.push(`| ${numberOr(row.year)} | ${valueOr(row.ganzhi)} | ${valueOr(row.stem_ten_god)} | ${valueOr(row.nayin)} | ${numberOr(row.age)} | ${luck} | ${events} |`);
+    });
+    lines.push("");
+    const suiyun = timeline.map((row) => ({ year: row.year, suiyun: row.suiyun })).filter((row) => row.suiyun);
+    if (suiyun.length) {
+      lines.push("## 岁运组合事实", "", "```json", JSON.stringify(suiyun, null, 2), "```", "");
+    }
+  }
+  lines.push(...warningSection(result.warnings));
+  return lines.join("\n");
+}
+
 function liunianReport(result, context) {
   const lines = reportHead(context.title || "命运专项 · 流年", context);
   lines.push(
@@ -264,6 +304,8 @@ export function generateStandaloneReport(result, context = {}) {
       return ziweiReport(result, { ...context, title });
     case "liunian":
       return liunianReport(result, { ...context, title });
+    case "lifeline":
+      return lifelineReport(result, { ...context, title });
     case "fengshui-direction":
       return directionReport(result, { ...context, title });
     case "fengshui-measurements":
