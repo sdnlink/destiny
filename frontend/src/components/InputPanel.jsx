@@ -77,6 +77,81 @@ function NumberPair({ firstLabel, secondLabel, first, second, onFirst, onSecond 
   );
 }
 
+function NumberTriple({ values, onChange }) {
+  return (
+    <div className="number-pair number-triple">
+      {["第一数", "第二数", "第三数"].map((label, index) => (
+        <label key={label}>
+          <FieldLabel>{label}</FieldLabel>
+          <input
+            type="number"
+            value={values[index]}
+            onChange={(event) => onChange(index, event.target.value)}
+            required
+          />
+        </label>
+      ))}
+    </div>
+  );
+}
+
+function ManualLines({ lines, onChange }) {
+  return (
+    <div className="line-inputs">
+      {[...lines].reverse().map((value, reversedIndex) => {
+        const index = 5 - reversedIndex;
+        return (
+          <div className="line-input" key={index}>
+            <span>{LINE_NAMES[index]}</span>
+            <div className="line-options">
+              {LINE_OPTIONS.map((option) => (
+                <button
+                  type="button"
+                  key={option.value}
+                  className={value === option.value ? "active" : ""}
+                  onClick={() => onChange(index, option.value)}
+                  title={`${option.value} · ${option.label}`}
+                  aria-label={`${LINE_NAMES[index]} ${option.value} ${option.label}`}
+                >
+                  <b>{option.value}</b><span>{option.glyph}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CoinRounds({ rounds, onChange }) {
+  return (
+    <div className="coin-rounds">
+      {[...rounds].reverse().map((round, reversedIndex) => {
+        const index = 5 - reversedIndex;
+        return (
+          <div className="coin-round" key={index}>
+            <span>{LINE_NAMES[index]}</span>
+            <div className="coin-round-inputs">
+              {round.map((value, coinIndex) => (
+                <select
+                  key={coinIndex}
+                  value={value}
+                  aria-label={`${LINE_NAMES[index]} 第${coinIndex + 1}枚铜钱`}
+                  onChange={(event) => onChange(index, coinIndex, event.target.value)}
+                >
+                  <option value="2">2 · 阴面</option>
+                  <option value="3">3 · 阳面</option>
+                </select>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function InputPanel({
   form,
   setForm,
@@ -95,10 +170,20 @@ export default function InputPanel({
   submitLoadingLabel = "正在推演",
 }) {
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
-  const updateLine = (index, value) => {
-    const lines = [...form.lines];
+  const updateLine = (key, index, value) => {
+    const lines = [...form[key]];
     lines[index] = value;
-    update("lines", lines);
+    update(key, lines);
+  };
+  const updateTriple = (key, index, value) => {
+    const values = [...form[key]];
+    values[index] = value;
+    update(key, values);
+  };
+  const updateCoin = (index, coinIndex, value) => {
+    const rounds = form.lyCoins.map((round) => [...round]);
+    rounds[index][coinIndex] = Number(value);
+    update("lyCoins", rounds);
   };
   const updateMeasurement = (index, value) => {
     const measurements = [...form.fsMeasurements];
@@ -298,6 +383,7 @@ export default function InputPanel({
               <button type="button" className={form.yiMethod === "auto" ? "active" : ""} onClick={() => update("yiMethod", "auto")}>个体自动</button>
               <button type="button" className={form.yiMethod === "time" ? "active" : ""} onClick={() => update("yiMethod", "time")}>传统时间</button>
               <button type="button" className={form.yiMethod === "numbers" ? "active" : ""} onClick={() => update("yiMethod", "numbers")}>数字排盘</button>
+              <button type="button" className={form.yiMethod === "three_numbers" ? "active" : ""} onClick={() => update("yiMethod", "three_numbers")}>三数排盘</button>
               <button type="button" className={form.yiMethod === "manual" ? "active" : ""} onClick={() => update("yiMethod", "manual")}>手工排盘</button>
             </div>
             {form.yiMethod === "auto" ? (
@@ -311,30 +397,9 @@ export default function InputPanel({
                 <p>采用上方时间，按年支、农历月日及时支自动生成卦盘。</p>
               </div>
             ) : form.yiMethod === "manual" ? (
-              <div className="line-inputs">
-                {[...form.lines].reverse().map((value, reversedIndex) => {
-                  const index = 5 - reversedIndex;
-                  return (
-                    <div className="line-input" key={index}>
-                      <span>{LINE_NAMES[index]}</span>
-                      <div className="line-options">
-                        {LINE_OPTIONS.map((option) => (
-                          <button
-                            type="button"
-                            key={option.value}
-                            className={value === option.value ? "active" : ""}
-                            onClick={() => updateLine(index, option.value)}
-                            title={`${option.value} · ${option.label}`}
-                            aria-label={`${LINE_NAMES[index]} ${option.value} ${option.label}`}
-                          >
-                            <b>{option.value}</b><span>{option.glyph}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <ManualLines lines={form.lines} onChange={(index, value) => updateLine("lines", index, value)} />
+            ) : form.yiMethod === "three_numbers" ? (
+              <NumberTriple values={form.yiNumbers} onChange={(index, value) => updateTriple("yiNumbers", index, value)} />
             ) : (
               <NumberPair
                 firstLabel="下卦数"
@@ -355,6 +420,7 @@ export default function InputPanel({
               <button type="button" className={form.meihuaMethod === "auto" ? "active" : ""} onClick={() => update("meihuaMethod", "auto")}>个体自动</button>
               <button type="button" className={form.meihuaMethod === "time" ? "active" : ""} onClick={() => update("meihuaMethod", "time")}>传统时间</button>
               <button type="button" className={form.meihuaMethod === "numbers" ? "active" : ""} onClick={() => update("meihuaMethod", "numbers")}>数字排盘</button>
+              <button type="button" className={form.meihuaMethod === "three_numbers" ? "active" : ""} onClick={() => update("meihuaMethod", "three_numbers")}>三数排盘</button>
             </div>
             {form.meihuaMethod === "auto" ? (
               <div className="method-note">
@@ -366,6 +432,8 @@ export default function InputPanel({
                 <CalendarClock size={16} />
                 <p>采用上方已确认时间，按年支、农历月日及时支取数。</p>
               </div>
+            ) : form.meihuaMethod === "three_numbers" ? (
+              <NumberTriple values={form.mhNumbers} onChange={(index, value) => updateTriple("mhNumbers", index, value)} />
             ) : (
               <NumberPair
                 firstLabel="上卦数"
@@ -386,6 +454,8 @@ export default function InputPanel({
               <button type="button" className={form.liuyaoMethod === "auto" ? "active" : ""} onClick={() => update("liuyaoMethod", "auto")}>个体自动</button>
               <button type="button" className={form.liuyaoMethod === "time" ? "active" : ""} onClick={() => update("liuyaoMethod", "time")}>传统时间</button>
               <button type="button" className={form.liuyaoMethod === "numbers" ? "active" : ""} onClick={() => update("liuyaoMethod", "numbers")}>数字排盘</button>
+              <button type="button" className={form.liuyaoMethod === "lines" ? "active" : ""} onClick={() => update("liuyaoMethod", "lines")}>手工排盘</button>
+              <button type="button" className={form.liuyaoMethod === "coins" ? "active" : ""} onClick={() => update("liuyaoMethod", "coins")}>铜钱排盘</button>
             </div>
             {form.liuyaoMethod === "auto" ? (
               <div className="method-note">
@@ -397,6 +467,10 @@ export default function InputPanel({
                 <CalendarClock size={16} />
                 <p>按时间取卦，并自动生成八宫、世应、纳甲、六亲、六神与旬空。</p>
               </div>
+            ) : form.liuyaoMethod === "lines" ? (
+              <ManualLines lines={form.lyLines} onChange={(index, value) => updateLine("lyLines", index, value)} />
+            ) : form.liuyaoMethod === "coins" ? (
+              <CoinRounds rounds={form.lyCoins} onChange={updateCoin} />
             ) : (
               <NumberPair
                 firstLabel="下卦数"

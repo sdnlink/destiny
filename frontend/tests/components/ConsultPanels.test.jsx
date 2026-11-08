@@ -19,6 +19,12 @@ vi.mock("../../src/components/result/QimenView", () => ({
 vi.mock("../../src/components/result/LiurenView", () => ({
   LiurenView: ({ result }) => <div>六壬结果：{result.rule_id}</div>,
 }));
+vi.mock("../../src/components/result/ExplanationView", () => ({
+  ExplanationView: ({ advisory }) => <div>结论视图：{advisory?.conclusion?.headline}</div>,
+}));
+vi.mock("../../src/components/result/CalendarView", () => ({
+  CalendarView: () => <div>历法视图</div>,
+}));
 
 const advisory = {
   conclusion: { headline: "先定边界再谈推进", text: "盘面事实与所问事项分开陈述。" },
@@ -61,5 +67,28 @@ describe("卜筮与时空盘独立工作区", () => {
     const [calculations] = spy.mock.calls[0];
     expect(calculations.some((item) => item.module === "liuren")).toBe(true);
     expect(calculations.some((item) => item.module === "qimen")).toBe(false);
+  });
+
+  it("独立结果可切换盘面、结论建议与历法，并保留导出入口", async () => {
+    vi.spyOn(api, "compareCalculations").mockResolvedValue({
+      module_results: [
+        { module: "zhouyi", result: { rule_id: "ZY-002" } },
+        { module: "calendar", result: { input: { local_datetime: "2026-11-08T12:00" } } },
+      ],
+      advisory,
+      explanation: { summary: "确定性说明" },
+    });
+    render(<DivinationPanel />);
+
+    fireEvent.click(screen.getByText("开始起卦"));
+    await waitFor(() => expect(screen.getByText("周易结果：ZY-002")).toBeTruthy());
+
+    expect(screen.getByRole("tab", { name: "盘面" })).toHaveAttribute("aria-selected", "true");
+    fireEvent.click(screen.getByRole("tab", { name: "结论建议" }));
+    expect(screen.getByText("结论视图：先定边界再谈推进")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("tab", { name: "历法" }));
+    expect(screen.getByText("历法视图")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /导出报告/ })).toBeTruthy();
   });
 });

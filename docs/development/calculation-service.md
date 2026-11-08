@@ -99,7 +99,7 @@
 
 导航新增「阳宅风水」独立工作区（`frontend/src/components/fengshui/FengshuiPanel.jsx`），把原先只在经典推演「风水」场景里出现的坐向测量拆成独立入口：单次分析走 `POST /v1/fengshui/direction`，多次共识走 `POST /v1/fengshui/measurements`。读数、磁北/真北基准、磁偏角与测量误差仍由同一套 `FengshuiDirectionRequest` 约束，结果复用 `FengshuiView`，不新增前端计算逻辑，也不改变经典推演里「风水」场景的行为。独立工作区共用 `frontend/src/components/workspace/WorkspaceShell.jsx` 的两栏外壳。
 
-导航新增「卜筮专项」与「时空盘专项」两个工作区，共用 `frontend/src/components/consult/ConsultPanel.jsx` 的页签外壳与 `frontend/src/components/InputPanel.jsx` 的输入表单（`showSceneSwitch={false}` 时隐藏体系选择，把 `scene` 钉在当前页签）。卜筮专项含周易、梅花易数与六爻三个页签（`DivinationPanel.jsx`），时空盘专项含奇门遁甲与大六壬两个页签（`SpacetimePanel.jsx`）。提交时只把当前页签体系与历法基准送 `POST /v1/calculations/compare`，`context` 仍传 `category + question_summary`；响应里的 `module_results` 用 `findModule` 取当前模块，直接复用 `ZhouyiView` / `MeihuaView` / `LiuyaoView` / `QimenView` / `LiurenView`，并额外展示响应自带的 `advisory`。这样单体系也能拿到完整建议与解释，不再退化为只显示盘面。未新增后端接口，也没有为八个体系各设一个一级菜单。
+导航新增「卜筮专项」与「时空盘专项」两个工作区，共用 `frontend/src/components/consult/ConsultPanel.jsx` 的页签外壳与 `frontend/src/components/InputPanel.jsx` 的输入表单（`showSceneSwitch={false}` 时隐藏体系选择，把 `scene` 钉在当前页签）。卜筮专项含周易、梅花易数与六爻三个页签（`DivinationPanel.jsx`），时空盘专项含奇门遁甲与大六壬两个页签（`SpacetimePanel.jsx`）。提交时只把当前页签体系与历法基准送 `POST /v1/calculations/compare`，`context` 仍传 `category + question_summary`；响应里的 `module_results` 用 `findModule` 取当前模块，直接复用 `ZhouyiView` / `MeihuaView` / `LiuyaoView` / `QimenView` / `LiurenView`，并额外展示响应自带的 `advisory`。这样单体系也能拿到完整建议与解释，不再退化为只显示盘面。独立结果区另有“盘面 / 结论建议 / 历法”子页签，结论建议复用 `ExplanationView`，并可直接导出 Markdown 报告。未新增后端接口，也没有为八个体系各设一个一级菜单。
 
 回归护栏见 `backend/tests/test_lifeline_and_systems.py`、`frontend/tests/components/LifelineView.test.jsx`、`frontend/tests/components/FengshuiPanel.test.jsx` 与 `frontend/tests/components/ConsultPanels.test.jsx`。
 

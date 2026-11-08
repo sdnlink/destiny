@@ -10,13 +10,15 @@ Web界面位于`frontend/`，使用React、Vite和Lucide图标，连接现有MVP
 
 - 综合推演与 10 类单独模块场景（周易、梅花、六爻、大六壬、奇门、八字、紫微、风水方位等）。
 - 事项分类、会话内问题摘要、IANA时区和可选真太阳时输入。
-- 周易手工六爻与双数起卦。
-- 梅花时间起卦与双数起卦。
+- 周易手工六爻、双数、三数与时间起卦。
+- 梅花时间、双数与三数起卦。
+- 六爻时间、双数、手工爻与铜钱起卦。
 - 计算前历法校验及四柱确认。
 - 总览、历法、各术数模块结果页（含六爻典籍依据面板、八字大运/流年展示）及对照分析结果页。
 - 命运专项工作区的本命盘、紫微斗数、逐年流年与生平时间轴四个独立页签。
 - 卜筮专项工作区的周易、梅花易数与六爻三个独立页签，共用事项与时间基准。
 - 时空盘专项工作区的奇门遁甲与大六壬两个独立页签，共用起盘时刻与时区。
+- 独立工作区结果内提供“盘面 / 结论建议 / 历法”子页签与 Markdown 报告导出。
 - 阳宅风水工作区的单次坐向与多次测量共识两种模式。
 - 总览中的事项结论，以及独立“结论建议”页面。
 - 本卦、变卦、互卦、错卦、综卦及动爻可视化。
@@ -93,7 +95,7 @@ npm run test:browser
 | `frontend/src/components/destiny/BirthProfileSection.jsx` | 命运专项共用出生信息表单 |
 | `frontend/src/components/destiny/LiunianView.jsx` | 流年逐年事实表 |
 | `frontend/src/components/fengshui/FengshuiPanel.jsx` | 阳宅风水工作区（单次坐向 / 多次共识） |
-| `frontend/src/components/consult/ConsultPanel.jsx` | 卜筮/时空盘共用工作区壳（共享事项、时间基准与建议块） |
+| `frontend/src/components/consult/ConsultPanel.jsx` | 卜筮/时空盘共用工作区壳（共享事项、时间基准、结果子页签与导出） |
 | `frontend/src/components/consult/DivinationPanel.jsx` | 卜筮专项页签（周易 / 梅花易数 / 六爻） |
 | `frontend/src/components/consult/SpacetimePanel.jsx` | 时空盘专项页签（奇门遁甲 / 大六壬） |
 | `frontend/src/components/workspace/WorkspaceShell.jsx` | 独立功能页共用的两栏外壳 |

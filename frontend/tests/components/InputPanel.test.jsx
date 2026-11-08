@@ -17,12 +17,16 @@ function baseForm(overrides = {}) {
     lines: [7, 8, 7, 8, 7, 8],
     yiLower: "8",
     yiUpper: "8",
+    yiNumbers: ["1", "2", "3"],
     meihuaMethod: "auto",
     mhUpper: "8",
     mhLower: "8",
+    mhNumbers: ["1", "2", "3"],
     liuyaoMethod: "auto",
     lyLower: "8",
     lyUpper: "8",
+    lyLines: [7, 8, 7, 8, 7, 8],
+    lyCoins: [[2, 2, 3], [2, 3, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2], [2, 3, 2]],
     liurenMethod: "auto",
     lrNumber: "8",
     qimenMethod: "time",
@@ -132,7 +136,7 @@ describe("InputPanel", () => {
   it("手工排盘模式可以逐爻修改阴阳老少", () => {
     render(<Harness />);
 
-    fireEvent.click(screen.getByText("手工排盘"));
+    fireEvent.click(screen.getAllByText("手工排盘")[0]);
 
     const oldYang = screen.getByRole("button", { name: "初爻 9 老阳" });
     expect(oldYang).not.toHaveClass("active");
@@ -142,6 +146,29 @@ describe("InputPanel", () => {
 
     // 六个爻位各四个选项
     expect(screen.getAllByRole("button", { name: /^(初|二|三|四|五|上)爻 [6789] / })).toHaveLength(24);
+  });
+
+  it("六爻支持手工爻与铜钱两种排盘输入", () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("radio", { name: /六爻/ }));
+
+    fireEvent.click(screen.getByText("手工排盘"));
+    expect(screen.getAllByRole("button", { name: /^(初|二|三|四|五|上)爻 [6789] / })).toHaveLength(24);
+
+    fireEvent.click(screen.getByText("铜钱排盘"));
+    expect(screen.getByLabelText("初爻 第1枚铜钱")).toHaveValue("2");
+    expect(screen.getByLabelText("上爻 第3枚铜钱")).toHaveValue("2");
+  });
+
+  it("周易与梅花支持三数排盘", () => {
+    render(<Harness />);
+
+    fireEvent.click(within(screen.getByText("周易参数").closest("section")).getByText("三数排盘"));
+    expect(screen.getByDisplayValue("1")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("radio", { name: /梅花/ }));
+    fireEvent.click(screen.getByText("三数排盘"));
+    expect(screen.getAllByDisplayValue("1").length).toBeGreaterThan(0);
   });
 
   it("启用真太阳时后要求填写经度", () => {

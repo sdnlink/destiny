@@ -359,3 +359,35 @@
 .standalone-advisory {
   margin-bottom: 18px;
 }
+.standalone-result-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.standalone-result-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.standalone-result-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.standalone-result-tabs button.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}

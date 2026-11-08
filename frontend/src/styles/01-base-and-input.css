@@ -371,6 +371,44 @@ summary:focus-visible {
   gap: 12px;
 }
 
+.number-triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.coin-rounds {
+  display: grid;
+  gap: 6px;
+}
+
+.coin-round {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.coin-round > span {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.coin-round-inputs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.coin-round-inputs select {
+  width: 100%;
+  min-width: 0;
+  padding: 6px 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 11.5px;
+}
+
 .field-grid {
   margin-top: 14px;
 }

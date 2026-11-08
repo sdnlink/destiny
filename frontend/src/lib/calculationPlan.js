@@ -31,6 +31,8 @@ export function buildCalculations(form) {
         ? { module: "zhouyi", method: "time", input: calendar }
         : form.yiMethod === "manual"
         ? { module: "zhouyi", method: "manual", input: { lines: form.lines } }
+        : form.yiMethod === "three_numbers"
+        ? { module: "zhouyi", method: "three_numbers", input: { numbers: form.yiNumbers.map(Number) } }
         : {
             module: "zhouyi",
             method: "numbers",
@@ -44,6 +46,8 @@ export function buildCalculations(form) {
         ? { module: "meihua", method: "auto", input: auto }
         : form.meihuaMethod === "time"
         ? { module: "meihua", method: "time", input: calendar }
+        : form.meihuaMethod === "three_numbers"
+        ? { module: "meihua", method: "three_numbers", input: { numbers: form.mhNumbers.map(Number) } }
         : {
             module: "meihua",
             method: "numbers",
@@ -57,6 +61,10 @@ export function buildCalculations(form) {
         ? { module: "liuyao", method: "auto", input: auto }
         : form.liuyaoMethod === "time"
         ? { module: "liuyao", method: "time", input: calendar }
+        : form.liuyaoMethod === "lines"
+        ? { module: "liuyao", method: "lines", input: { ...calendar, lines: form.lyLines } }
+        : form.liuyaoMethod === "coins"
+        ? { module: "liuyao", method: "coins", input: { ...calendar, coins: form.lyCoins.map((round) => round.map(Number)) } }
         : {
             module: "liuyao",
             method: "numbers",

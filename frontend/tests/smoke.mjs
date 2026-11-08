@@ -201,9 +201,16 @@ await desktop.screenshot({ path: shot("tianji-destiny-desktop.png"), fullPage: t
 await desktop.locator(".app-navigation").getByRole("button", { name: "卜筮专项", exact: true }).click();
 await desktop.getByRole("heading", { name: "卜筮专项" }).waitFor();
 await desktop.getByRole("tab", { name: /周易/ }).click();
+await desktop.getByText("三数排盘").click();
 await desktop.getByRole("button", { name: "开始起卦" }).click();
 await desktop.getByRole("heading", { name: "周易本变卦象" }).waitFor({ timeout: 20000 });
+await desktop.getByRole("tab", { name: "结论建议" }).click();
+await desktop.getByRole("heading", { name: "综合推演研判与古籍引证" }).waitFor({ timeout: 20000 });
 await desktop.getByRole("tab", { name: /六爻/ }).click();
+await desktop.getByText("手工排盘").click();
+await desktop.getByRole("button", { name: "开始起卦" }).click();
+await desktop.getByRole("heading", { name: "六爻纳甲盘与伏神飞神" }).waitFor({ timeout: 20000 });
+await desktop.getByText("铜钱排盘").click();
 await desktop.getByRole("button", { name: "开始起卦" }).click();
 await desktop.getByRole("heading", { name: "六爻纳甲盘与伏神飞神" }).waitFor({ timeout: 20000 });
 await assertNoOverflow(desktop, "desktop divination workspace");
@@ -321,4 +328,4 @@ if (consoleErrors.length) {
 }
 
 await browser.close();
-console.log("browser smoke passed: fengshui single/consensus, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile)");
+console.log("browser smoke passed: fengshui single/consensus, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile, three-number + manual lines + coins + result tabs)");

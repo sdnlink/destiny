@@ -19,12 +19,16 @@ function baseForm(overrides = {}) {
     lines: [7, 8, 7, 8, 7, 8],
     yiLower: "8",
     yiUpper: "8",
+    yiNumbers: ["1", "2", "3"],
     meihuaMethod: "auto",
     mhUpper: "8",
     mhLower: "8",
+    mhNumbers: ["1", "2", "3"],
     liuyaoMethod: "auto",
     lyLower: "8",
     lyUpper: "8",
+    lyLines: [7, 8, 7, 8, 7, 8],
+    lyCoins: [[2, 2, 3], [2, 3, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2], [2, 3, 2]],
     liurenMethod: "auto",
     lrNumber: "8",
     qimenMethod: "time",
@@ -89,6 +93,37 @@ test("手工起卦只传六爻爻值，不夹带历法参数", () => {
   const request = calculations[1];
   assert.equal(request.method, "manual");
   assert.deepEqual(request.input, { lines: [7, 8, 7, 8, 7, 8] });
+});
+
+test("周易三数起卦传三个整数", () => {
+  const request = buildCalculations(
+    baseForm({ scene: "zhouyi", yiMethod: "three_numbers", yiNumbers: ["4", "5", "6"] }),
+  )[1];
+  assert.equal(request.method, "three_numbers");
+  assert.deepEqual(request.input, { numbers: [4, 5, 6] });
+});
+
+test("梅花三数起卦传三个整数", () => {
+  const request = buildCalculations(
+    baseForm({ scene: "meihua", meihuaMethod: "three_numbers", mhNumbers: ["1", "7", "9"] }),
+  )[1];
+  assert.equal(request.method, "three_numbers");
+  assert.deepEqual(request.input, { numbers: [1, 7, 9] });
+});
+
+test("六爻手工爻与铜钱分别映射 lines 与 coins，并带历法参数", () => {
+  const lines = buildCalculations(
+    baseForm({ scene: "liuyao", liuyaoMethod: "lines", lyLines: [6, 7, 8, 9, 7, 8] }),
+  )[1];
+  assert.equal(lines.method, "lines");
+  assert.deepEqual(lines.input.lines, [6, 7, 8, 9, 7, 8]);
+  assert.equal(lines.input.timezone, "Asia/Shanghai");
+
+  const coins = buildCalculations(
+    baseForm({ scene: "liuyao", liuyaoMethod: "coins" }),
+  )[1];
+  assert.equal(coins.method, "coins");
+  assert.deepEqual(coins.input.coins, [[2, 2, 3], [2, 3, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2], [2, 3, 2]]);
 });
 
 test("八字自动起盘需要 gender 与 cast_nonce", () => {
