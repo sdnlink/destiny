@@ -41,6 +41,7 @@ describe("App", () => {
     render(<App />);
 
     expect(screen.getByRole("heading", { name: "推演参数" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "综合推演" })).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument();
     // ResultWorkspace 是 React.lazy，等待 Suspense 落地
     expect(await screen.findByText("从一次可复核的推演开始", {}, { timeout: 5000 })).toBeInTheDocument();
