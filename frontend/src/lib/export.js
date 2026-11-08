@@ -187,15 +187,25 @@ export function generateMarkdownReport(result, context) {
       };
       return positions.map(map).join("、");
     };
+    const renderEmerge = (emerge) => {
+      if (!emerge || emerge.length === 0) return "";
+      return emerge
+        .map((e) => `伏神第${e.position}爻：${e.can_emerge ? "可出伏" : "暂不可出伏"}${(e.reasons || []).length ? `（${e.reasons.join("；")}）` : ""}`)
+        .join("；");
+    };
     md += `- **所取用神**：${(yongshen.targets || []).join("、") || "—"}\n`;
-    md += `- **原神**：${yongshen.yuan_shen?.relative || "—"} ${yongshen.yuan_shen?.element || ""} ${renderRelPositions(yongshen.yuan_shen?.positions)}\n`;
-    md += `- **忌神**：${yongshen.ji_shen?.relative || "—"} ${yongshen.ji_shen?.element || ""} ${renderRelPositions(yongshen.ji_shen?.positions)}\n`;
-    md += `- **仇神**：${yongshen.chou_shen?.relative || "—"} ${yongshen.chou_shen?.element || ""} ${renderRelPositions(yongshen.chou_shen?.positions)}\n`;
+    md += `- **原神**：${yongshen.yuan_shen?.relative || "—"} ${yongshen.yuan_shen?.element || ""} ${renderRelPositions(yongshen.yuan_shen?.positions)}${renderEmerge(yongshen.yuan_shen?.emerge) ? `；${renderEmerge(yongshen.yuan_shen?.emerge)}` : ""}\n`;
+    md += `- **忌神**：${yongshen.ji_shen?.relative || "—"} ${yongshen.ji_shen?.element || ""} ${renderRelPositions(yongshen.ji_shen?.positions)}${renderEmerge(yongshen.ji_shen?.emerge) ? `；${renderEmerge(yongshen.ji_shen?.emerge)}` : ""}\n`;
+    md += `- **仇神**：${yongshen.chou_shen?.relative || "—"} ${yongshen.chou_shen?.element || ""} ${renderRelPositions(yongshen.chou_shen?.positions)}${renderEmerge(yongshen.chou_shen?.emerge) ? `；${renderEmerge(yongshen.chou_shen?.emerge)}` : ""}\n`;
     if (yongshen.candidates?.length) {
-      md += `\n| 候选 | 来源 | 爻位 | 地支 | 五行 | 动静 | 旺衰 | 空破 | 排序 |\n`;
-      md += `| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n`;
+      md += `\n| 候选 | 来源 | 爻位 | 地支 | 五行 | 动静 | 旺衰 | 空破 | 排序 | 出伏 |\n`;
+      md += `| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n`;
       yongshen.candidates.forEach((candidate, index) => {
-        md += `| ${index + 1} | ${candidate.source} | 第 ${candidate.position} 爻 | ${candidate.branch} | ${candidate.element} | ${candidate.moving ? "动爻" : "静爻"} | ${candidate.month_strength || "—"} | ${candidate.void_state || "不空"} | ${candidate.rank_score} |\n`;
+        let emerge = "—";
+        if (candidate.source === "伏神" && candidate.can_emerge !== undefined) {
+          emerge = `${candidate.can_emerge ? "可出伏" : "暂不可出伏"}${(candidate.emerge_reasons || []).length ? `（${candidate.emerge_reasons.join("；")}）` : ""}`;
+        }
+        md += `| ${index + 1} | ${candidate.source} | 第 ${candidate.position} 爻 | ${candidate.branch} | ${candidate.element} | ${candidate.moving ? "动爻" : "静爻"} | ${candidate.month_strength || "—"} | ${candidate.void_state || "不空"} | ${candidate.rank_score} | ${emerge} |\n`;
       });
     }
     if (yongshen.selection_note) md += `\n> ${yongshen.selection_note}\n`;

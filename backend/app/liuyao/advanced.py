@@ -61,6 +61,17 @@ def _line_strength_rank(strength):
     return {"旺": 3, "相": 2, "休": 1, "囚": 0, "死": 0}.get(strength, 0)
 
 
+def _hidden_emerge(coverage, position):
+    """取某伏神爻位的出伏状态（《卜筮正宗·伏神正传》空破/日月克伤/飞伏生克口径）。"""
+    for hidden in (coverage or {}).get("hidden_spirits", []):
+        if hidden["position"] == position:
+            return {
+                "can_emerge": hidden.get("can_emerge", False),
+                "reasons": [item["reason"] for item in hidden.get("emerge_blockers", [])],
+            }
+    return None
+
+
 def analyze_yongshen(focus, lines, changed_lines, coverage, palace):
     """按所问事项给出用神候选、元神忌神仇神与取舍排序，不断吉凶。"""
     normalized = FOCUS_ALIASES.get(focus or "")
@@ -82,12 +93,15 @@ def analyze_yongshen(focus, lines, changed_lines, coverage, palace):
             candidates.append(cand)
     for hidden in coverage["hidden_spirits"]:
         if hidden["six_relative"] in targets:
+            emerge = _hidden_emerge(coverage, hidden["position"])
             candidates.append({
                 "source": "伏神", "position": hidden["position"],
                 "branch": hidden["najia_branch"], "element": hidden["element"],
                 "six_relative": hidden["six_relative"],
                 "moving": False, "month_strength": "", "void_state": "",
                 "is_month_break": False, "is_day_break": False, "roles": [],
+                "can_emerge": emerge["can_emerge"] if emerge else None,
+                "emerge_reasons": emerge["reasons"] if emerge else [],
             })
     for line, changed in zip(lines, changed_lines):
         if line["is_moving"] and changed["six_relative"] in targets:
@@ -162,13 +176,19 @@ def _meta_relatives(palace_element, target_element, lines, coverage=None, change
     for label, element in (("元神", generating), ("忌神", controlling), ("仇神", chou_element)):
         relative = _relative_for_element(palace_element, element)
         positions = [str(line["position"]) for line in lines if line["six_relative"] == relative]
+        emerge = []
         for hidden in (coverage or {}).get("hidden_spirits", []):
             if hidden["six_relative"] == relative:
                 positions.append("伏{}".format(hidden["position"]))
+                emerge.append({
+                    "position": hidden["position"],
+                    "can_emerge": hidden.get("can_emerge", False),
+                    "reasons": [item["reason"] for item in hidden.get("emerge_blockers", [])],
+                })
         for line, changed in zip(lines, changed_lines or []):
             if line["is_moving"] and changed.get("six_relative") == relative:
                 positions.append("变{}".format(line["position"]))
-        result[label] = {"relative": relative, "element": element, "positions": positions}
+        result[label] = {"relative": relative, "element": element, "positions": positions, "emerge": emerge}
     return result
 
 

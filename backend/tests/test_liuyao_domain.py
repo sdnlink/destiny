@@ -229,6 +229,33 @@ def test_yongshen_without_focus_is_none():
     assert facts["yongshen"] is None
 
 
+def test_yongshen_hidden_emerge_is_linked():
+    # 用神/三神的伏藏爻位必须联动「伏神出伏条件」（《卜筮正宗·伏神正传》），
+    # 让用神为伏神时用户直接看到能否出伏，而非仅定位到伏神爻位。
+    facts = coin_cast(
+        ((2, 3, 3), (3, 2, 2), (2, 3, 2), (3, 3, 2), (2, 2, 3), (3, 2, 3)),
+        "2026-04-05 12:00:00", "Asia/Shanghai", focus="求财买卖",
+    )["facts"]
+    yongshen = facts["yongshen"]
+    # 元神（子孙）伏神第4爻：伏克飞为出暴 → 可出伏
+    yuan = yongshen["yuan_shen"]
+    yuan_emerge = [e for e in yuan["emerge"] if e["position"] == 4]
+    assert yuan_emerge, "元神伏神第4爻应挂出伏状态"
+    assert yuan_emerge[0]["can_emerge"] is True
+    # 忌神（兄弟）伏神第2爻：值旬空受阻 → 暂不可出伏
+    ji = yongshen["ji_shen"]
+    ji_emerge = [e for e in ji["emerge"] if e["position"] == 2]
+    assert ji_emerge, "忌神伏神第2爻应挂出伏状态"
+    assert ji_emerge[0]["can_emerge"] is False
+    assert ji_emerge[0]["reasons"]
+    # 用神候选中的伏神（若存在）也要带 can_emerge / emerge_reasons；
+    # 本卦已现用神时无可伏候选，故仅对存在的伏神候选做校验。
+    hidden_cands = [c for c in yongshen["candidates"] if c["source"] == "伏神"]
+    for cand in hidden_cands:
+        assert cand["can_emerge"] is not None
+        assert isinstance(cand["emerge_reasons"], list)
+
+
 def test_trace_and_rules_are_complete_without_judgements():
     result = coin_cast([[3, 2, 2]] * 6, **CALENDAR)
     # 6 条投币 + 装卦 4 步 + 月破日破 1 步 + 变卦纳甲 1 步 + 合局 1 步 + 伏神 1 步

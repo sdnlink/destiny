@@ -102,6 +102,18 @@ function renderRelPositions(positions) {
   return positions.map(map).join("、");
 }
 
+// 伏神出伏状态（《卜筮正宗·伏神正传》空破/日月克伤/飞伏生克口径），返回可读文本或 null。
+function renderEmerge(emerge) {
+  if (!emerge || emerge.length === 0) return null;
+  return emerge
+    .map((e) => {
+      const status = e.can_emerge ? "可出伏" : "暂不可出伏";
+      const reasons = (e.reasons || []).join("；");
+      return `伏神第${e.position}爻：${status}${reasons ? `（${reasons}）` : ""}`;
+    })
+    .join("；");
+}
+
 function LiuyaoView({ result }) {
   if (!result) return <MissingModule name="六爻" />;
   const { facts } = result;
@@ -155,16 +167,25 @@ function LiuyaoView({ result }) {
               <span>原神</span>
               <strong>{facts.yongshen.yuan_shen?.relative || "—"}</strong>
               <small>{facts.yongshen.yuan_shen?.element || ""} {renderRelPositions(facts.yongshen.yuan_shen?.positions)}</small>
+              {renderEmerge(facts.yongshen.yuan_shen?.emerge) && (
+                <small className="emerge-note">{renderEmerge(facts.yongshen.yuan_shen?.emerge)}</small>
+              )}
             </div>
             <div>
               <span>忌神</span>
               <strong>{facts.yongshen.ji_shen?.relative || "—"}</strong>
               <small>{facts.yongshen.ji_shen?.element || ""} {renderRelPositions(facts.yongshen.ji_shen?.positions)}</small>
+              {renderEmerge(facts.yongshen.ji_shen?.emerge) && (
+                <small className="emerge-note">{renderEmerge(facts.yongshen.ji_shen?.emerge)}</small>
+              )}
             </div>
             <div>
               <span>仇神</span>
               <strong>{facts.yongshen.chou_shen?.relative || "—"}</strong>
               <small>{facts.yongshen.chou_shen?.element || ""} {renderRelPositions(facts.yongshen.chou_shen?.positions)}</small>
+              {renderEmerge(facts.yongshen.chou_shen?.emerge) && (
+                <small className="emerge-note">{renderEmerge(facts.yongshen.chou_shen?.emerge)}</small>
+              )}
             </div>
           </div>
           <div className="yongshen-candidates">
@@ -178,6 +199,13 @@ function LiuyaoView({ result }) {
                   {candidate.is_month_break ? " · 月破" : ""}
                   {candidate.is_day_break ? " · 日破" : ""}
                   {candidate.rank_score !== undefined ? ` · 排序 ${candidate.rank_score}` : ""}
+                  {candidate.source === "伏神" && candidate.can_emerge !== undefined ? (
+                    <>
+                      {" · "}
+                      {candidate.can_emerge ? "可出伏" : "暂不可出伏"}
+                      {candidate.emerge_reasons?.length ? `（${candidate.emerge_reasons.join("；")}）` : ""}
+                    </>
+                  ) : null}
                 </small>
               </div>
             )) : <p className="standalone-form-hint">本卦未见对应六亲，暂无用神候选。</p>}
