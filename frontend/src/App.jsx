@@ -69,7 +69,7 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGl
         {!collapsed && <div><strong>天机演象</strong><span>推演工作台</span></div>}
       </div>
       <div className="nav-items">
-        <button className={viewMode === "classic" ? "active" : ""} onClick={() => setViewMode("classic")} title="经典推演模式"><Plus size={18} /><span>经典推演</span></button>
+        <button className={viewMode === "classic" ? "active" : ""} onClick={() => setViewMode("classic")} title="综合推演：跨流派对照"><Plus size={18} /><span>综合推演</span></button>
         <button className={viewMode === "workflow" ? "active" : ""} onClick={() => setViewMode("workflow")} title="交互式推演工作流（7步标准化）"><Sparkles size={18} /><span>交互推演</span></button>
         <button className={viewMode === "destiny" ? "active" : ""} onClick={() => setViewMode("destiny")} title="命运专项：本命盘、紫微斗数、流年与生平时间轴"><CalendarRange size={18} /><span>命运专项</span></button>
         <button className={viewMode === "divination" ? "active" : ""} onClick={() => setViewMode("divination")} title="卜筮专项：周易、梅花易数与六爻"><ScrollText size={18} /><span>卜筮专项</span></button>
@@ -642,7 +642,7 @@ export default function App() {
           onChange={(event) => setViewMode(event.target.value)}
           aria-label="切换工作模式"
         >
-          <option value="classic">经典</option>
+          <option value="classic">综合</option>
           <option value="workflow">交互</option>
           <option value="destiny">命运</option>
           <option value="divination">卜筮</option>

@@ -19,7 +19,7 @@ Web界面位于`frontend/`，使用React、Vite和Lucide图标，连接现有MVP
 - 卜筮专项工作区的周易、梅花易数与六爻三个独立页签，共用事项与时间基准。
 - 时空盘专项工作区的奇门遁甲与大六壬两个独立页签，共用起盘时刻与时区。
 - 独立工作区结果内提供“盘面 / 结论建议 / 历法”子页签；卜筮、时空盘、命运（含生平时间轴）、阳宅均提供 Markdown 报告导出（单模块结果由 `moduleReport.js` 按体系落笔）。阳宅工作区另有「房屋档案」页签，读写 `/v1/fengshui/buildings`；导航栏「典籍检索」抽屉读取 `/v1/classics/status` 并检索 `/v1/classics/search` 原文段落。
-- 经典推演只保留「综合推演」一种输入：已拆分的周易、梅花、六爻、奇门、六壬、八字、紫微、阳宅风水不在该页保留单独入口或参数区块，统一走对应专项工作区；`lib/schools.js` 仅用于说明流派归属，不再渲染体系切换。
+- 综合推演只保留「综合推演」一种输入：已拆分的周易、梅花、六爻、奇门、六壬、八字、紫微、阳宅风水不在该页保留单独入口或参数区块，统一走对应专项工作区；`lib/schools.js` 仅用于说明流派归属，不再渲染体系切换。
 - 六爻用神焦点：请求带 `focus` 时在纳甲盘之外展示用神、原神、忌神、仇神与候选排序；下拉支持按事项或直接按六亲/世爻取用，未指定只排盘不取用神。
 - 阳宅风水工作区的坐向测量（单次 / 多次共识）、八宅与玄空三个页签。
 - 总览中的事项结论，以及独立“结论建议”页面。
@@ -109,7 +109,7 @@ npm run test:browser
 | `frontend/src/lib/api.js` | API请求与错误归一化 |
 | `frontend/src/lib/moduleReport.js` | 命运、阳宅等单体系结果的 Markdown 报告生成 |
 | `frontend/src/lib/export.js` | 综合推演报告生成、文件下载与剪贴板复制 |
-| `frontend/src/lib/formDefaults.js` | 经典推演与独立工作区共用的表单初值 |
+| `frontend/src/lib/formDefaults.js` | 综合推演与独立工作区共用的表单初值 |
 | `frontend/src/styles.css` | 视觉系统和响应式规则 |
 | `frontend/tests/smoke.mjs` | Chrome端到端冒烟测试 |
 

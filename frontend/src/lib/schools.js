@@ -9,7 +9,7 @@ export const SCHOOLS = [
     id: "combined",
     label: "综合",
     description: "跨流派对照",
-    menu: "经典推演",
+    menu: "综合推演",
     systems: ["combined"],
   },
   {

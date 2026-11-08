@@ -1,6 +1,6 @@
 import { localDateTimeValue, newCastNonce } from "./castingInput";
 
-/** 经典推演与独立工作区共用的表单初值，避免两套默认口径。 */
+/** 综合推演与独立工作区共用的表单初值，避免两套默认口径。 */
 export function initialForm() {
   return {
     scene: "combined",
