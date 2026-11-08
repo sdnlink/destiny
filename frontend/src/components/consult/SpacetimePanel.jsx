@@ -27,7 +27,7 @@ const VIEWS = { qimen: QimenView, liuren: LiurenView };
 export default function SpacetimePanel() {
   return (
     <ConsultPanel
-      kicker="SPACETIME WORKSPACE"
+      kicker="SPACETIME WORKSPACE · 三式"
       title="时空盘专项"
       description="把奇门遁甲与大六壬拆成独立页签；共用所问事项、起盘时刻与时区，盘面结果仍由既有引擎计算。"
       badge="奇门 · 大六壬"

@@ -19,6 +19,7 @@ import {
   Workflow,
 } from "lucide-react";
 import { CATEGORIES } from "../lib/labels";
+import { SCHOOLS } from "../lib/schools";
 import { buildCalculations } from "../lib/calculationPlan";
 
 const SCENES = [
@@ -256,20 +257,35 @@ export default function InputPanel({
 
       <form onSubmit={onSubmit}>
         <section className="form-section">
-          <div className="section-title"><Layers3 size={16} /><span>体系与事项</span></div>
+          <div className="section-title"><Layers3 size={16} /><span>流派与体系</span></div>
           {showSceneSwitch && (
-            <div className="segmented scene-switch" role="radiogroup" aria-label="推演体系">
-              {SCENES.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="radio"
-                  aria-checked={form.scene === id}
-                  className={form.scene === id ? "active" : ""}
-                  onClick={() => update("scene", id)}
-                >
-                  <Icon size={15} />{label}
-                </button>
+            <div className="scene-schools" aria-label="术数流派与体系">
+              {SCHOOLS.map((school) => (
+                <div className="scene-school" key={school.id}>
+                  <div className="scene-school-head">
+                    <strong>{school.label}</strong>
+                    <span>{school.description}</span>
+                  </div>
+                  <div className="segmented scene-switch" role="radiogroup" aria-label={`${school.label}流派体系`}>
+                    {school.systems.map((systemId) => {
+                      const scene = SCENES.find((item) => item.id === systemId);
+                      if (!scene) return null;
+                      const { id, label, icon: Icon } = scene;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          role="radio"
+                          aria-checked={form.scene === id}
+                          className={form.scene === id ? "active" : ""}
+                          onClick={() => update("scene", id)}
+                        >
+                          <Icon size={15} />{label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               ))}
             </div>
           )}

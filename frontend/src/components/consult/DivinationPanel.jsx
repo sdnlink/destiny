@@ -36,7 +36,7 @@ const VIEWS = { zhouyi: ZhouyiView, meihua: MeihuaView, liuyao: LiuyaoView };
 export default function DivinationPanel() {
   return (
     <ConsultPanel
-      kicker="DIVINATION WORKSPACE"
+      kicker="DIVINATION WORKSPACE · 易占"
       title="卜筮专项"
       description="把周易、梅花易数与六爻拆成独立页签；共用所问事项与时间基准，盘面结果仍由既有引擎计算。"
       badge="周易 · 梅花 · 六爻"

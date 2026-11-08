@@ -144,7 +144,7 @@ export default function DestinyPanel() {
 
   return (
     <WorkspaceShell
-      kicker="DESTINY WORKSPACE"
+      kicker="DESTINY WORKSPACE · 命理"
       title="命运专项"
       description="以出生时刻为唯一输入，分别查看本命盘、紫微斗数、逐年流年与生平时间轴；全部复用既有八字与紫微接口。"
       badge="本命 · 紫微 · 流年 · 时间轴"

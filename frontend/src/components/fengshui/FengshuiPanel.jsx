@@ -379,7 +379,7 @@ export default function FengshuiPanel() {
 
   return (
     <WorkspaceShell
-      kicker="FENGSHUI WORKSPACE"
+      kicker="FENGSHUI WORKSPACE · 堪舆"
       title="阳宅风水"
       description="独立录入坐向、八宅命卦或玄空运盘参数，计算真北坐向、二十四山、八宅九星与玄空挨星。"
       badge="坐向 · 八宅 · 玄空 · 档案"

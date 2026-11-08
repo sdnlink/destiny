@@ -77,6 +77,15 @@ describe("InputPanel", () => {
     expect(screen.getByRole("radio", { name: /综合推演/ })).toHaveAttribute("aria-checked", "true");
   });
 
+  it("体系选项按流派归并到同一组", () => {
+    render(<Harness />);
+
+    expect(within(screen.getByRole("radiogroup", { name: "易占流派体系" })).getAllByRole("radio")).toHaveLength(3);
+    expect(within(screen.getByRole("radiogroup", { name: "命理流派体系" })).getAllByRole("radio")).toHaveLength(2);
+    expect(within(screen.getByRole("radiogroup", { name: "三式流派体系" })).getAllByRole("radio")).toHaveLength(2);
+    expect(within(screen.getByRole("radiogroup", { name: "堪舆流派体系" })).getAllByRole("radio")).toHaveLength(1);
+  });
+
   it("模块数按真实请求列表显示，而不是写死的数字", () => {
     render(<Harness />);
     // 综合推演 = 日历 + 周易/梅花/六爻/六壬/奇门/八字/紫微 = 8

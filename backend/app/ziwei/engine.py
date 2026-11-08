@@ -205,8 +205,13 @@ def calculate_ziwei_chart(
 
     # 6. 定紫微星与天府星
     ziwei_branch_idx = _locate_ziwei_star(bureau_number, lunar_day)
-    # 天府星地支与紫微星地支对应: 寅(2) <-> 寅(2), 卯(3) <-> 丑(1), (4 - ziwei_pos) % 12
-    tianfu_branch_idx = (4 - ziwei_branch_idx) % 12
+    # 天府星与紫微星之关系（紫微斗數全書·卷二·安天府图）：
+    #   「天府惟寅、申二宫与紫微同宫，余宫俱各相对（如紫居丑则府居未）。」
+    #   即：紫微在寅(2)或申(8)时天府同宫；其余各宫天府恒在紫微之对宫（六冲，±6）。
+    if ziwei_branch_idx in (2, 8):  # 寅=2, 申=8
+        tianfu_branch_idx = ziwei_branch_idx
+    else:
+        tianfu_branch_idx = (ziwei_branch_idx + 6) % 12
 
     # 7. 安十四正曜
     # 紫微系六星 (逆时针)

@@ -62,6 +62,37 @@ class ZiweiTests(unittest.TestCase):
         self.assertIn("ZW-STARS-001", cast["rule_ids"])
         self.assertIn("palaces_by_branch", cast["facts"])
 
+    def test_ziwei_tianfu_opposite_or_yin_shen_same(self):
+        # 紫微斗數全書·卷二·安天府图：
+        #   「天府惟寅、申二宫与紫微同宫，余宫俱各相对（六冲）。」
+        # 紫府关系必须恒成立，与起紫微的绝对落宫无关。跨多年采样覆盖各落宫。
+        branch_index = {"子": 0, "丑": 1, "寅": 2, "卯": 3, "辰": 4,
+                        "巳": 5, "午": 6, "未": 7, "申": 8, "酉": 9, "戌": 10, "亥": 11}
+        from datetime import date, timedelta
+        d = date(2020, 1, 1)
+        end = date(2024, 1, 1)
+        step = timedelta(days=9)
+        checked = 0
+        same_count = 0
+        while d < end:
+            for gen in ("男", "女"):
+                result = calculate_ziwei_chart(d.isoformat() + "T10:00:00", gender=gen)
+                pb = result["palaces_by_branch"]
+                ziwei = next(p["earthly_branch"] for p in pb
+                             if any(s["name"] == "紫微" for s in p["main_stars"]))
+                tianfu = next(p["earthly_branch"] for p in pb
+                              if any(s["name"] == "天府" for s in p["main_stars"]))
+                zi, tf = branch_index[ziwei], branch_index[tianfu]
+                if (zi, tf) in ((2, 2), (8, 8)):
+                    same_count += 1  # 寅/申 同宫，合法
+                else:
+                    self.assertEqual((tf - zi) % 12, 6,
+                                     f"{d} {gen}: 紫微{ziwei} 天府{tianfu} 非对宫")
+                checked += 1
+            d += step
+        self.assertGreater(checked, 100)
+        self.assertGreater(same_count, 0)  # 必须覆盖到寅/申同宫分支
+
 
 if __name__ == "__main__":
     unittest.main()
