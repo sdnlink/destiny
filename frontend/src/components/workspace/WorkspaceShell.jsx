@@ -1,5 +1,5 @@
 /** 独立功能页共用的两栏外壳：左侧输入、右侧结果。 */
-export function WorkspaceShell({ kicker, title, description, badge, sidebar, children }) {
+export function WorkspaceShell({ kicker, title, description, badge, sidebar, tabs, children }) {
   return (
     <main className="standalone-workspace">
       <header className="standalone-header">
@@ -10,6 +10,7 @@ export function WorkspaceShell({ kicker, title, description, badge, sidebar, chi
         </div>
         {badge && <span className="standalone-mode-badge">{badge}</span>}
       </header>
+      {tabs}
       <div className="standalone-layout">
         <aside className="standalone-input-column">{sidebar}</aside>
         <section className="standalone-output">{children}</section>

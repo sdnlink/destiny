@@ -213,6 +213,9 @@ await desktop.getByRole("heading", { name: "六爻纳甲盘与伏神飞神" }).w
 await desktop.getByText("铜钱排盘").click();
 await desktop.getByRole("button", { name: "开始起卦" }).click();
 await desktop.getByRole("heading", { name: "六爻纳甲盘与伏神飞神" }).waitFor({ timeout: 20000 });
+await desktop.getByLabel(/用神焦点/).selectOption("求财买卖");
+await desktop.getByRole("button", { name: "开始起卦" }).click();
+await desktop.getByRole("heading", { name: /用神焦点 · 求财买卖/ }).waitFor({ timeout: 20000 });
 await assertNoOverflow(desktop, "desktop divination workspace");
 await desktop.screenshot({ path: shot("tianji-divination-workspace-desktop.png"), fullPage: true });
 
@@ -237,6 +240,21 @@ await desktop.getByRole("button", { name: "生成阳宅坐向" }).click();
 await desktop.getByRole("heading", { name: "阳宅多次测量共识" }).waitFor({ timeout: 20000 });
 await assertNoOverflow(desktop, "desktop fengshui workspace");
 await desktop.screenshot({ path: shot("tianji-fengshui-workspace-desktop.png"), fullPage: true });
+
+await desktop.getByRole("tab", { name: "八宅" }).click();
+await desktop.getByRole("button", { name: "排八宅盘" }).click();
+await desktop.getByRole("heading", { name: "八宅大游年盘" }).waitFor({ timeout: 20000 });
+await assertNoOverflow(desktop, "desktop bazhai workspace");
+await desktop.screenshot({ path: shot("tianji-fengshui-bazhai-desktop.png"), fullPage: true });
+
+await desktop.getByRole("tab", { name: "玄空" }).click();
+await desktop.getByRole("button", { name: "排玄空盘" }).click();
+await desktop.getByRole("heading", { name: "玄空挨星盘" }).waitFor({ timeout: 20000 });
+await desktop.getByLabel("附替卦起星盘").check();
+await desktop.getByRole("button", { name: "排玄空盘" }).click();
+await desktop.getByText("替卦起星盘（工程基线）").waitFor({ timeout: 20000 });
+await assertNoOverflow(desktop, "desktop xuankong workspace");
+await desktop.screenshot({ path: shot("tianji-fengshui-xuankong-desktop.png"), fullPage: true });
 
 // 历史抽屉与后端会话（/v1/sessions）的联动：抽屉里必须能列出刚创建的会话，
 // 点一下就能在交互推演里恢复结果。两套存档不通的问题是审计 14 的核心。
@@ -320,6 +338,9 @@ await mobile.getByLabel("切换工作模式").selectOption("fengshui");
 await mobile.getByRole("heading", { name: "阳宅风水" }).waitFor();
 await mobile.getByRole("button", { name: "生成阳宅坐向" }).click();
 await mobile.getByRole("heading", { name: "阳宅真北坐向与二十四山" }).waitFor({ timeout: 20000 });
+await mobile.getByRole("tab", { name: "八宅" }).click();
+await mobile.getByRole("button", { name: "排八宅盘" }).click();
+await mobile.getByRole("heading", { name: "八宅大游年盘" }).waitFor({ timeout: 20000 });
 await assertNoOverflow(mobile, "mobile fengshui");
 await mobile.screenshot({ path: shot("tianji-fengshui-mobile.png"), fullPage: true });
 
@@ -328,4 +349,4 @@ if (consoleErrors.length) {
 }
 
 await browser.close();
-console.log("browser smoke passed: fengshui single/consensus, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile, three-number + manual lines + coins + result tabs)");
+console.log("browser smoke passed: fengshui single/consensus/bazhai/xuankong, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile, three-number + manual lines + coins + result tabs)");

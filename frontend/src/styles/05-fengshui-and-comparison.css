@@ -160,8 +160,84 @@
   margin-top: 8px;
 }
 
+.yongshen-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.yongshen-grid > div {
+  padding: 10px 12px;
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 5px;
+  background: var(--paper, #fbfaf6);
+}
+
+.yongshen-grid span {
+  display: block;
+  color: var(--muted, #6d6a60);
+  font-size: 11px;
+}
+
+.yongshen-grid strong {
+  display: block;
+  margin: 3px 0 2px;
+  color: var(--ink, #252b28);
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 17px;
+}
+
+.yongshen-grid small {
+  display: block;
+  color: var(--muted, #6d6a60);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.yongshen-candidates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.yongshen-candidate {
+  padding: 9px 11px;
+  border: 1px solid var(--line, #d9d8d1);
+  border-left: 3px solid var(--amber, #a66d1e);
+  border-radius: 0 5px 5px 0;
+  background: var(--paper, #fbfaf6);
+}
+
+.yongshen-candidate span {
+  color: var(--muted, #6d6a60);
+  font-size: 11px;
+}
+
+.yongshen-candidate strong {
+  display: block;
+  margin: 2px 0;
+  color: var(--ink, #252b28);
+  font-size: 12px;
+}
+
+.yongshen-candidate small {
+  color: var(--muted, #6d6a60);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
 @media (max-width: 760px) {
   .hidden-spirits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .yongshen-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .yongshen-candidates {
     grid-template-columns: 1fr;
   }
 }

@@ -25,6 +25,7 @@ function baseForm(overrides = {}) {
     mhLower: "8",
     mhNumbers: ["1", "2", "3"],
     liuyaoMethod: "auto",
+    lyFocus: "",
     lyLower: "8",
     lyUpper: "8",
     lyLines: [7, 8, 7, 8, 7, 8],
@@ -124,6 +125,21 @@ test("六爻手工爻与铜钱分别映射 lines 与 coins，并带历法参数"
   )[1];
   assert.equal(coins.method, "coins");
   assert.deepEqual(coins.input.coins, [[2, 2, 3], [2, 3, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2], [2, 3, 2]]);
+});
+
+test("六爻指定用神后会随四种方式一起传 focus", () => {
+  for (const [method, extra] of [
+    ["auto", {}],
+    ["time", {}],
+    ["numbers", { lyLower: "3", lyUpper: "5" }],
+    ["lines", { lyLines: [7, 8, 7, 8, 7, 8] }],
+    ["coins", {}],
+  ]) {
+    const request = buildCalculations(
+      baseForm({ scene: "liuyao", liuyaoMethod: method, lyFocus: "求财买卖", ...extra }),
+    )[1];
+    assert.equal(request.input.focus, "求财买卖", method);
+  }
 });
 
 test("八字自动起盘需要 gender 与 cast_nonce", () => {

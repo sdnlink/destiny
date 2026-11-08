@@ -23,6 +23,7 @@ function baseForm(overrides = {}) {
     mhLower: "8",
     mhNumbers: ["1", "2", "3"],
     liuyaoMethod: "auto",
+    lyFocus: "",
     lyLower: "8",
     lyUpper: "8",
     lyLines: [7, 8, 7, 8, 7, 8],
@@ -89,7 +90,7 @@ describe("InputPanel", () => {
   it("事项分类下拉使用统一的 CATEGORIES 选项", () => {
     render(<Harness />);
 
-    const select = screen.getByRole("combobox");
+    const select = screen.getAllByRole("combobox")[0];
     expect(select).toHaveValue("career");
     const labels = within(select).getAllByRole("option").map((option) => option.textContent);
     expect(labels).toEqual([
@@ -116,7 +117,7 @@ describe("InputPanel", () => {
     fireEvent.click(screen.getByText("近期重大项目投资与资金布局可行性"));
 
     expect(questionInput).toHaveValue("近期重大项目投资与资金布局可行性");
-    expect(screen.getByRole("combobox")).toHaveValue("finance");
+    expect(screen.getAllByRole("combobox")[0]).toHaveValue("finance");
   });
 
   it("切到风水体系时只显示风水参数区块", () => {
@@ -169,6 +170,16 @@ describe("InputPanel", () => {
     fireEvent.click(screen.getByRole("radio", { name: /梅花/ }));
     fireEvent.click(screen.getByText("三数排盘"));
     expect(screen.getAllByDisplayValue("1").length).toBeGreaterThan(0);
+  });
+
+  it("六爻可选指定用神焦点", () => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("radio", { name: /六爻/ }));
+
+    const focus = screen.getByRole("combobox", { name: /用神焦点/ });
+    expect(focus).toHaveValue("");
+    fireEvent.change(focus, { target: { value: "求财买卖" } });
+    expect(focus).toHaveValue("求财买卖");
   });
 
   it("启用真太阳时后要求填写经度", () => {

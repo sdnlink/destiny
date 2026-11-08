@@ -75,6 +75,20 @@ export function analyzeFengshuiMeasurements(payload) {
   });
 }
 
+export function analyzeFengshuiBazhai(payload) {
+  return request("/v1/fengshui/bazhai", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function analyzeFengshuiXuankong(payload) {
+  return request("/v1/fengshui/xuankong", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function loadYuanhuiCycle(year) {
   return request(`/v1/yuanhui/cycle?year=${encodeURIComponent(year)}`);
 }

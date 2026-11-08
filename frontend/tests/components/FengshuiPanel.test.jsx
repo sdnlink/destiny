@@ -4,13 +4,28 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 vi.mock("../../src/lib/api.js", () => ({
   analyzeFengshuiDirection: vi.fn(),
   analyzeFengshuiMeasurements: vi.fn(),
+  analyzeFengshuiBazhai: vi.fn(),
+  analyzeFengshuiXuankong: vi.fn(),
 }));
 
 vi.mock("../../src/components/result/FengshuiView", () => ({
   FengshuiView: ({ result }) => <div data-testid="fengshui-view">{result.facts.mode}</div>,
 }));
 
-import { analyzeFengshuiDirection, analyzeFengshuiMeasurements } from "../../src/lib/api.js";
+vi.mock("../../src/components/result/BazhaiView", () => ({
+  BazhaiView: ({ result }) => <div data-testid="bazhai-view">{result.facts.house_group}</div>,
+}));
+
+vi.mock("../../src/components/result/XuankongView", () => ({
+  XuankongView: ({ result }) => <div data-testid="xuankong-view">{result.facts.period_label}</div>,
+}));
+
+import {
+  analyzeFengshuiBazhai,
+  analyzeFengshuiDirection,
+  analyzeFengshuiMeasurements,
+  analyzeFengshuiXuankong,
+} from "../../src/lib/api.js";
 import FengshuiPanel from "../../src/components/fengshui/FengshuiPanel";
 
 describe("FengshuiPanel", () => {
@@ -73,5 +88,49 @@ describe("FengshuiPanel", () => {
 
     expect(analyzeFengshuiMeasurements).not.toHaveBeenCalled();
     expect(screen.getByRole("alert")).toHaveTextContent("有效数字");
+  });
+
+  it("八宅按坐山与宅命信息提交", async () => {
+    analyzeFengshuiBazhai.mockResolvedValue({ facts: { house_group: "东四宅" } });
+    render(<FengshuiPanel />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "八宅" }));
+    fireEvent.click(screen.getByRole("button", { name: /排八宅盘/ }));
+
+    await waitFor(() => expect(analyzeFengshuiBazhai).toHaveBeenCalledTimes(1));
+    expect(analyzeFengshuiBazhai).toHaveBeenCalledWith({
+      sitting_mountain: "子",
+      gender: "男",
+      birth_year: 1984,
+    });
+    expect(await screen.findByTestId("bazhai-view")).toHaveTextContent("东四宅");
+  });
+
+  it("八宅出生年份越界时不发请求并提示", async () => {
+    render(<FengshuiPanel />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "八宅" }));
+    fireEvent.change(screen.getByLabelText("出生年份（选填）"), { target: { value: "1800" } });
+    fireEvent.click(screen.getByRole("button", { name: /排八宅盘/ }));
+
+    expect(analyzeFengshuiBazhai).not.toHaveBeenCalled();
+    expect(screen.getByRole("alert")).toHaveTextContent("1864–2100");
+  });
+
+  it("玄空按坐山、运与年份提交", async () => {
+    analyzeFengshuiXuankong.mockResolvedValue({ facts: { period_label: "下元9运" } });
+    render(<FengshuiPanel />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "玄空" }));
+    fireEvent.click(screen.getByRole("button", { name: /排玄空盘/ }));
+
+    await waitFor(() => expect(analyzeFengshuiXuankong).toHaveBeenCalledTimes(1));
+    expect(analyzeFengshuiXuankong).toHaveBeenCalledWith({
+      sitting_mountain: "子",
+      include_tihua_reference: false,
+      include_tihua_chart: false,
+      year: 2026,
+    });
+    expect(await screen.findByTestId("xuankong-view")).toHaveTextContent("下元9运");
   });
 });

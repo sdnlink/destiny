@@ -56,19 +56,20 @@ export function buildCalculations(form) {
     );
   }
   if (wants("liuyao")) {
+    const focus = form.lyFocus ? { focus: form.lyFocus } : {};
     calculations.push(
       form.liuyaoMethod === "auto"
-        ? { module: "liuyao", method: "auto", input: auto }
+        ? { module: "liuyao", method: "auto", input: { ...auto, ...focus } }
         : form.liuyaoMethod === "time"
-        ? { module: "liuyao", method: "time", input: calendar }
+        ? { module: "liuyao", method: "time", input: { ...calendar, ...focus } }
         : form.liuyaoMethod === "lines"
-        ? { module: "liuyao", method: "lines", input: { ...calendar, lines: form.lyLines } }
+        ? { module: "liuyao", method: "lines", input: { ...calendar, ...focus, lines: form.lyLines } }
         : form.liuyaoMethod === "coins"
-        ? { module: "liuyao", method: "coins", input: { ...calendar, coins: form.lyCoins.map((round) => round.map(Number)) } }
+        ? { module: "liuyao", method: "coins", input: { ...calendar, ...focus, coins: form.lyCoins.map((round) => round.map(Number)) } }
         : {
             module: "liuyao",
             method: "numbers",
-            input: { ...calendar, lower_number: Number(form.lyLower), upper_number: Number(form.lyUpper) },
+            input: { ...calendar, ...focus, lower_number: Number(form.lyLower), upper_number: Number(form.lyUpper) },
           },
     );
   }

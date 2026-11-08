@@ -53,6 +53,23 @@ const LINE_OPTIONS = [
 
 const LINE_NAMES = ["初爻", "二爻", "三爻", "四爻", "五爻", "上爻"];
 
+const LIUYAO_FOCUS_OPTIONS = [
+  { value: "", label: "不指定用神" },
+  { value: "自身", label: "自身" },
+  { value: "父母长辈", label: "父母长辈" },
+  { value: "文书契约", label: "文书契约" },
+  { value: "房屋宅舍", label: "房屋宅舍" },
+  { value: "子女晚辈", label: "子女晚辈" },
+  { value: "六畜医药", label: "六畜医药" },
+  { value: "婚姻男占", label: "婚姻（男占）" },
+  { value: "婚姻女占", label: "婚姻（女占）" },
+  { value: "求财买卖", label: "求财买卖" },
+  { value: "功名官职", label: "功名官职" },
+  { value: "官司词讼", label: "官司词讼" },
+  { value: "疾病鬼祟", label: "疾病鬼祟" },
+  { value: "兄弟朋友", label: "兄弟朋友" },
+];
+
 function FieldLabel({ children, optional }) {
   return (
     <span className="field-label">
@@ -457,6 +474,15 @@ export default function InputPanel({
               <button type="button" className={form.liuyaoMethod === "lines" ? "active" : ""} onClick={() => update("liuyaoMethod", "lines")}>手工排盘</button>
               <button type="button" className={form.liuyaoMethod === "coins" ? "active" : ""} onClick={() => update("liuyaoMethod", "coins")}>铜钱排盘</button>
             </div>
+            <label>
+              <FieldLabel optional>用神焦点</FieldLabel>
+              <select value={form.lyFocus || ""} onChange={(event) => update("lyFocus", event.target.value)}>
+                {LIUYAO_FOCUS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+              <small className="field-hint">指定后按《卜筮正宗》取用神候选，未指定只排盘不取用神。</small>
+            </label>
             {form.liuyaoMethod === "auto" ? (
               <div className="method-note">
                 <RefreshCw size={16} />

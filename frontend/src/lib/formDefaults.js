@@ -21,6 +21,7 @@ export function initialForm() {
     mhLower: "8",
     mhNumbers: ["1", "2", "3"],
     liuyaoMethod: "auto",
+    lyFocus: "",
     lyLower: "8",
     lyUpper: "8",
     lyLines: [7, 8, 7, 8, 7, 8],

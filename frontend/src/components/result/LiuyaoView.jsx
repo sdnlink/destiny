@@ -123,6 +123,58 @@ function LiuyaoView({ result }) {
 
       <CastingIdentity facts={facts} />
 
+      {facts.yongshen && (
+        <section className="data-band yongshen-band">
+          <div className="band-heading">
+            <div>
+              <span className="band-icon"><Info size={16} /></span>
+              <div>
+                <h3>用神焦点 · {facts.yongshen.focus}</h3>
+                <p>{facts.yongshen.note || "按所问事项列出用神候选，不直接断吉凶。"}</p>
+              </div>
+            </div>
+          </div>
+          <div className="yongshen-grid">
+            <div>
+              <span>用神</span>
+              <strong>{(facts.yongshen.targets || []).join("、") || "—"}</strong>
+              <small>{facts.yongshen.support ? `原神 ${facts.yongshen.support}` : "无指定原神"}</small>
+            </div>
+            <div>
+              <span>原神</span>
+              <strong>{facts.yongshen.yuan_shen?.relative || "—"}</strong>
+              <small>{facts.yongshen.yuan_shen?.element || ""} {facts.yongshen.yuan_shen?.positions?.length ? `第 ${facts.yongshen.yuan_shen.positions.join("、")} 爻` : "本卦不现"}</small>
+            </div>
+            <div>
+              <span>忌神</span>
+              <strong>{facts.yongshen.ji_shen?.relative || "—"}</strong>
+              <small>{facts.yongshen.ji_shen?.element || ""} {facts.yongshen.ji_shen?.positions?.length ? `第 ${facts.yongshen.ji_shen.positions.join("、")} 爻` : "本卦不现"}</small>
+            </div>
+            <div>
+              <span>仇神</span>
+              <strong>{facts.yongshen.chou_shen?.relative || "—"}</strong>
+              <small>{facts.yongshen.chou_shen?.element || ""} {facts.yongshen.chou_shen?.positions?.length ? `第 ${facts.yongshen.chou_shen.positions.join("、")} 爻` : "本卦不现"}</small>
+            </div>
+          </div>
+          <div className="yongshen-candidates">
+            {(facts.yongshen.candidates || []).length > 0 ? facts.yongshen.candidates.map((candidate, index) => (
+              <div className="yongshen-candidate" key={`${candidate.source}-${candidate.position}-${candidate.branch}`}>
+                <span>候选 {index + 1}</span>
+                <strong>{candidate.source}第 {candidate.position} 爻 · {candidate.branch}（{candidate.element}）</strong>
+                <small>
+                  {candidate.moving ? "动爻" : "静爻"} · {candidate.month_strength || "—"}
+                  {candidate.void_state ? ` · ${candidate.void_state}` : " · 不空"}
+                  {candidate.is_month_break ? " · 月破" : ""}
+                  {candidate.is_day_break ? " · 日破" : ""}
+                  {candidate.rank_score !== undefined ? ` · 排序 ${candidate.rank_score}` : ""}
+                </small>
+              </div>
+            )) : <p className="standalone-form-hint">本卦未见对应六亲，暂无用神候选。</p>}
+          </div>
+          <p className="standalone-form-hint">{facts.yongshen.selection_note}</p>
+        </section>
+      )}
+
       <section className="data-band">
         <div className="band-heading">
           <div>
