@@ -184,6 +184,8 @@ await desktop.getByRole("heading", { name: "八字四柱与大运排盘" }).wait
 await desktop.getByRole("tab", { name: /紫微斗数/ }).click();
 await desktop.getByRole("button", { name: "排紫微盘" }).click();
 await desktop.getByRole("heading", { name: "紫微斗数全景天盘" }).waitFor({ timeout: 20000 });
+await desktop.getByRole("heading", { name: "大限区间" }).waitFor();
+await desktop.screenshot({ path: shot("tianji-ziwei-desktop.png"), fullPage: true });
 await desktop.getByRole("tab", { name: /流年/ }).click();
 await desktop.getByLabel("起始年份").fill("2026");
 await desktop.getByLabel("年数").fill("5");

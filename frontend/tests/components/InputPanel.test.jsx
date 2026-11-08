@@ -180,6 +180,10 @@ describe("InputPanel", () => {
     expect(focus).toHaveValue("");
     fireEvent.change(focus, { target: { value: "求财买卖" } });
     expect(focus).toHaveValue("求财买卖");
+    const options = within(focus).getAllByRole("option").map((option) => option.textContent);
+    expect(options).toEqual(expect.arrayContaining(["父母", "兄弟", "子孙", "妻财", "官鬼", "世爻（自身）"]));
+    fireEvent.change(focus, { target: { value: "世爻" } });
+    expect(focus).toHaveValue("世爻");
   });
 
   it("启用真太阳时后要求填写经度", () => {

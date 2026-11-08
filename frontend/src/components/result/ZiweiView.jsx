@@ -92,6 +92,8 @@ function ZiweiPalaceCard({ palace, isSelected, isSanFang, onClick }) {
 const BRANCH_RING = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
 
 function ZiweiView({ result }) {
+  const [selectedBranch, setSelectedBranch] = useState("寅");
+
   if (!result) return <MissingModule name="紫微斗数" />;
   const facts = result.facts;
   const branchMap = {};
@@ -99,7 +101,9 @@ function ZiweiView({ result }) {
     branchMap[p.earthly_branch] = p;
   });
 
-  const [selectedBranch, setSelectedBranch] = useState("寅");
+  const limitPalaces = [...facts.palaces_by_branch]
+    .filter((palace) => Number.isFinite(Number(palace.major_limit_start)))
+    .sort((left, right) => Number(left.major_limit_start) - Number(right.major_limit_start));
 
   const currIdx = BRANCH_RING.indexOf(selectedBranch);
   const oppBranch = BRANCH_RING[(currIdx + 6) % 12];
@@ -161,6 +165,39 @@ function ZiweiView({ result }) {
           <div className="grid-cell p-hai"><ZiweiPalaceCard palace={branchMap["亥"]} isSelected={selectedBranch === "亥"} isSanFang={sanFangBranches.has("亥")} onClick={setSelectedBranch} /></div>
         </div>
       </section>
+
+      {limitPalaces.length > 0 && (
+        <section className="ziwei-limit-section">
+          <div className="band-heading">
+            <div>
+              <span className="band-icon"><ListTree size={16} /></span>
+              <div>
+                <h3>大限区间</h3>
+                <p>按起运年龄排序，点击区间可回到对应宫位；只列宫位与大限区间事实，不生成大限断语。</p>
+              </div>
+            </div>
+          </div>
+          <div className="ziwei-limit-grid">
+            {limitPalaces.map((palace) => (
+              <button
+                key={palace.earthly_branch}
+                type="button"
+                className={`ziwei-limit-item ${selectedBranch === palace.earthly_branch ? "is-selected" : ""}`}
+                onClick={() => setSelectedBranch(palace.earthly_branch)}
+              >
+                <span className="ziwei-limit-range">
+                  {palace.major_limit_start}–{palace.major_limit_end} 岁
+                </span>
+                <strong>{palace.name}</strong>
+                <span className="ziwei-limit-meta">
+                  {palace.heavenly_stem}{palace.earthly_branch}
+                  {palace.main_stars?.length ? ` · ${palace.main_stars.map((star) => star.name).join("、")}` : ""}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="data-band">
         <div className="band-heading"><div><span className="band-icon"><ListTree size={16} /></span><div><h3>推演步骤</h3><p>{result.engine_version}</p></div></div></div>

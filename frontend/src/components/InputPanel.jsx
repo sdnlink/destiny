@@ -70,6 +70,15 @@ const LIUYAO_FOCUS_OPTIONS = [
   { value: "兄弟朋友", label: "兄弟朋友" },
 ];
 
+const LIUYAO_FOCUS_RELATIVES = [
+  { value: "父母", label: "父母" },
+  { value: "兄弟", label: "兄弟" },
+  { value: "子孙", label: "子孙" },
+  { value: "妻财", label: "妻财" },
+  { value: "官鬼", label: "官鬼" },
+  { value: "世爻", label: "世爻（自身）" },
+];
+
 function FieldLabel({ children, optional }) {
   return (
     <span className="field-label">
@@ -477,11 +486,19 @@ export default function InputPanel({
             <label>
               <FieldLabel optional>用神焦点</FieldLabel>
               <select value={form.lyFocus || ""} onChange={(event) => update("lyFocus", event.target.value)}>
-                {LIUYAO_FOCUS_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
+                <option value="">不指定用神</option>
+                <optgroup label="按所问事项取用神">
+                  {LIUYAO_FOCUS_OPTIONS.filter((option) => option.value).map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="直接按六亲 / 世爻取用神">
+                  {LIUYAO_FOCUS_RELATIVES.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </optgroup>
               </select>
-              <small className="field-hint">指定后按《卜筮正宗》取用神候选，未指定只排盘不取用神。</small>
+              <small className="field-hint">指定后按《卜筮正宗》取用神候选；也可直接按六亲或世爻取用，未指定只排盘不取用神。</small>
             </label>
             {form.liuyaoMethod === "auto" ? (
               <div className="method-note">
