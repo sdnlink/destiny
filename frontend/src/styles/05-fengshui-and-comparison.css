@@ -1277,3 +1277,122 @@
   border-radius: 3px;
 }
 
+.classics-drawer {
+  width: min(780px, 94vw);
+}
+
+.classics-search-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line, #d9d8d1);
+  background: var(--paper, #fbfaf6);
+}
+
+.classics-search-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 4px;
+  background: var(--paper, #fbfaf6);
+  color: var(--ink, #202622);
+  font-size: 12.5px;
+  outline: none;
+}
+
+.classics-search-form input:focus {
+  border-color: var(--jade, #297267);
+}
+
+.classics-search-form .primary-button {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+}
+
+.classics-status {
+  padding: 9px 20px;
+  border-bottom: 1px solid var(--line, #d9d8d1);
+  color: var(--muted, #69716c);
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+.classics-status-warn {
+  color: var(--vermilion, #a33b2b);
+}
+
+.classics-hits-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 20px;
+}
+
+.classics-hits {
+  display: grid;
+  gap: 10px;
+}
+
+.classics-hit {
+  padding: 12px 14px;
+  border: 1px solid var(--line, #d9d8d1);
+  border-radius: 6px;
+  background: var(--paper, #fbfaf6);
+}
+
+.classics-hit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.classics-hit-head strong {
+  color: var(--ink, #202622);
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 14px;
+}
+
+.classics-hit-head span {
+  color: var(--muted, #69716c);
+  font-size: 11px;
+}
+
+.classics-hit p {
+  margin: 8px 0;
+  color: var(--ink, #202622);
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 12.5px;
+  line-height: 1.85;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.classics-hit-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted, #69716c);
+  font-size: 10.5px;
+}
+
+.classics-hit-foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--jade, #297267);
+  text-decoration: none;
+}
+
+.classics-hit-foot a:hover {
+  text-decoration: underline;
+}
+
+.classics-error {
+  color: var(--vermilion, #a33b2b);
+}
+

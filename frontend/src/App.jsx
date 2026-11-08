@@ -9,6 +9,7 @@ import {
   Database,
   Download,
   FileClock,
+  Library,
   Menu,
   Moon,
   Mountain,
@@ -28,6 +29,7 @@ import {
   X,
 } from "lucide-react";
 import InputPanel from "./components/InputPanel";
+import ClassicsDrawer from "./components/ClassicsDrawer";
 // 结果工作区与工作流面板体积大且只在切到对应视图时才需要，改为按需加载，
 // 首屏只下载输入面板与外壳，避免单包 389KB 全部前置下载。
 const ResultWorkspace = lazy(() => import("./components/ResultWorkspace"));
@@ -55,7 +57,7 @@ import {
 
 // 表单 → 计算请求的映射统一在 lib/calculationPlan.js，组件里不再维护第二份
 
-function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGlossary, serviceOnline, theme, setTheme, viewMode, setViewMode }) {
+function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGlossary, openClassics, serviceOnline, theme, setTheme, viewMode, setViewMode }) {
   const nextTheme = theme === "paper" ? "dark" : theme === "dark" ? "jade" : "paper";
   const themeLabel = theme === "paper" ? "宣纸素雅" : theme === "dark" ? "玄墨深邃" : "青铜古韵";
   const ThemeIcon = theme === "paper" ? Sun : theme === "dark" ? Moon : Palette;
@@ -76,6 +78,7 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGl
         <button onClick={openHistory} title="历史推演记录、案例库与 JSON 备份导入导出"><Archive size={18} /><span>历史与案例</span></button>
         <button onClick={openRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
         <button onClick={openGlossary} title="术数典籍与核心概念速查"><BookOpen size={18} /><span>概念速查</span></button>
+        <button onClick={openClassics} title="在本地典籍库检索原文段落与出处"><Library size={18} /><span>典籍检索</span></button>
       </div>
       <div className="nav-bottom">
         <button className="theme-toggle-btn" onClick={() => setTheme(nextTheme)} title={`切换主题（当前：${themeLabel}，点击切换）`}>
@@ -497,6 +500,7 @@ export default function App() {
   const [rulesOpen, setRulesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [glossaryOpen, setGlossaryOpen] = useState(false);
+  const [classicsOpen, setClassicsOpen] = useState(false);
   const [rules, setRules] = useState([]);
   const [rulesLoading, setRulesLoading] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("tianji_theme") || "paper");
@@ -622,6 +626,7 @@ export default function App() {
         openRules={openRules}
         openHistory={() => setHistoryOpen(true)}
         openGlossary={() => setGlossaryOpen(true)}
+        openClassics={() => setClassicsOpen(true)}
         serviceOnline={serviceOnline}
         theme={theme}
         setTheme={setTheme}
@@ -704,6 +709,7 @@ export default function App() {
         }}
       />
       <GlossaryDrawer open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
+      <ClassicsDrawer open={classicsOpen} onClose={() => setClassicsOpen(false)} />
     </div>
   );
 }

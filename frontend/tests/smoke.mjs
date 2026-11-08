@@ -125,6 +125,17 @@ await rulesDialog.getByText("CAL-NORMALIZE-001", { exact: true }).waitFor();
 await rulesDialog.getByText("LR-TRANSMISSION-001", { exact: true }).waitFor();
 await desktop.getByRole("button", { name: "关闭规则目录" }).click();
 
+// 典籍原文检索：本地语料库已收录全文，验证状态与真实检索都有前端入口。
+await desktop.getByTitle("在本地典籍库检索原文段落与出处").click();
+const classicsDialog = desktop.getByRole("dialog", { name: "典籍原文检索" });
+await classicsDialog.waitFor();
+await classicsDialog.getByText(/已收录 \d+ 部/).waitFor({ timeout: 20000 });
+await classicsDialog.getByLabel("典籍原文关键词").fill("月令");
+await classicsDialog.getByRole("button", { name: "检索", exact: true }).click();
+await classicsDialog.locator(".classics-hit").first().waitFor({ timeout: 20000 });
+await desktop.screenshot({ path: shot("tianji-classics-search-desktop.png"), fullPage: true });
+await classicsDialog.getByRole("button", { name: "关闭典籍检索" }).click();
+
 // 交互推演（7 步工作流）：这条路径此前既没有单测也没有烟测覆盖，
 // 组件里被删掉的常量（SYSTEMS / localDateTimeValue 等）构建阶段查不出来，
 // 只有真的点进来才会抛 ReferenceError。
@@ -384,4 +395,4 @@ if (consoleErrors.length) {
 }
 
 await browser.close();
-console.log("browser smoke passed: fengshui single/consensus/bazhai/xuankong/archive, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile, three-number + manual lines + coins + result tabs)");
+console.log("browser smoke passed: fengshui single/consensus/bazhai/xuankong/archive, classics search, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile, three-number + manual lines + coins + result tabs)");

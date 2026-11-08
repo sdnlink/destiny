@@ -117,3 +117,11 @@ export function loadYuanhuiCycle(year) {
 export function loadTiebanStatus() {
   return request("/v1/tieban/status");
 }
+
+export function loadClassicsStatus() {
+  return request("/v1/classics/status");
+}
+
+export function searchClassics(query, limit = 8) {
+  return request(`/v1/classics/search?q=${encodeURIComponent(query)}&limit=${encodeURIComponent(limit)}`);
+}
