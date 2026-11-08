@@ -172,8 +172,8 @@ await desktop.screenshot({ path: shot("tianji-workflow-interact.png"), fullPage:
 await assertNoOverflow(desktop, "desktop workflow result");
 await desktop.screenshot({ path: shot("tianji-workflow-desktop.png"), fullPage: true });
 
-// 命运专项：三个页签都走真实后端。这里覆盖「拆出来的独立入口」整条链路：
-// 共用出生信息 → 本命盘（/v1/calculations/evaluate）→ 流年（/v1/bazi/liunian）→ 时间轴（/v1/bazi/lifeline）。
+// 命运专项：四个页签都走真实后端。这里覆盖「拆出来的独立入口」整条链路：
+// 共用出生信息 → 本命盘（/v1/calculations/evaluate）→ 紫微斗数 → 流年（/v1/bazi/liunian）→ 时间轴（/v1/bazi/lifeline）。
 await desktop.goto(baseUrl, { waitUntil: "networkidle" });
 await desktop.getByRole("button", { name: "命运专项" }).click();
 await desktop.getByRole("heading", { name: "命运专项" }).waitFor();
@@ -181,6 +181,9 @@ await desktop.getByLabel("公历出生日期时间").fill("1984-02-10T10:00");
 await desktop.getByLabel("出生地时区").fill("Asia/Shanghai");
 await desktop.getByRole("button", { name: "排本命盘" }).click();
 await desktop.getByRole("heading", { name: "八字四柱与大运排盘" }).waitFor({ timeout: 20000 });
+await desktop.getByRole("tab", { name: /紫微斗数/ }).click();
+await desktop.getByRole("button", { name: "排紫微盘" }).click();
+await desktop.getByRole("heading", { name: "紫微斗数全景天盘" }).waitFor({ timeout: 20000 });
 await desktop.getByRole("tab", { name: /流年/ }).click();
 await desktop.getByLabel("起始年份").fill("2026");
 await desktop.getByLabel("年数").fill("5");
@@ -193,6 +196,29 @@ await desktop.getByRole("button", { name: "生成时间轴" }).click();
 await desktop.getByText(/月令提纲：/).waitFor({ timeout: 20000 });
 await assertNoOverflow(desktop, "desktop destiny");
 await desktop.screenshot({ path: shot("tianji-destiny-desktop.png"), fullPage: true });
+
+// 卜筮专项：周易与六爻页签各走一次真实后端，确认切换页签后提交的是当前体系。
+await desktop.locator(".app-navigation").getByRole("button", { name: "卜筮专项", exact: true }).click();
+await desktop.getByRole("heading", { name: "卜筮专项" }).waitFor();
+await desktop.getByRole("tab", { name: /周易/ }).click();
+await desktop.getByRole("button", { name: "开始起卦" }).click();
+await desktop.getByRole("heading", { name: "周易本变卦象" }).waitFor({ timeout: 20000 });
+await desktop.getByRole("tab", { name: /六爻/ }).click();
+await desktop.getByRole("button", { name: "开始起卦" }).click();
+await desktop.getByRole("heading", { name: "六爻纳甲盘与伏神飞神" }).waitFor({ timeout: 20000 });
+await assertNoOverflow(desktop, "desktop divination workspace");
+await desktop.screenshot({ path: shot("tianji-divination-workspace-desktop.png"), fullPage: true });
+
+// 时空盘专项：奇门与大六壬各走一次真实后端。
+await desktop.locator(".app-navigation").getByRole("button", { name: "时空盘专项", exact: true }).click();
+await desktop.getByRole("heading", { name: "时空盘专项" }).waitFor();
+await desktop.getByRole("button", { name: "开始排盘" }).click();
+await desktop.getByRole("heading", { name: "时家转盘奇门遁甲" }).waitFor({ timeout: 20000 });
+await desktop.getByRole("tab", { name: /大六壬/ }).click();
+await desktop.getByRole("button", { name: "开始排盘" }).click();
+await desktop.getByRole("heading", { name: "大六壬盘" }).waitFor({ timeout: 20000 });
+await assertNoOverflow(desktop, "desktop spacetime workspace");
+await desktop.screenshot({ path: shot("tianji-spacetime-workspace-desktop.png"), fullPage: true });
 
 // 阳宅风水独立入口：单次坐向与多次共识都走真实后端，验证「拆出来的菜单」不是空壳。
 await desktop.locator(".app-navigation").getByRole("button", { name: "阳宅风水", exact: true }).click();
@@ -269,6 +295,20 @@ await mobile.getByRole("heading", { name: "命运专项" }).waitFor();
 await assertNoOverflow(mobile, "mobile destiny");
 await mobile.screenshot({ path: shot("tianji-destiny-mobile.png"), fullPage: true });
 
+await mobile.getByLabel("切换工作模式").selectOption("divination");
+await mobile.getByRole("heading", { name: "卜筮专项" }).waitFor();
+await mobile.getByRole("button", { name: "开始起卦" }).click();
+await mobile.getByRole("heading", { name: "周易本变卦象" }).waitFor({ timeout: 20000 });
+await assertNoOverflow(mobile, "mobile divination");
+await mobile.screenshot({ path: shot("tianji-divination-mobile.png"), fullPage: true });
+
+await mobile.getByLabel("切换工作模式").selectOption("spacetime");
+await mobile.getByRole("heading", { name: "时空盘专项" }).waitFor();
+await mobile.getByRole("button", { name: "开始排盘" }).click();
+await mobile.getByRole("heading", { name: "时家转盘奇门遁甲" }).waitFor({ timeout: 20000 });
+await assertNoOverflow(mobile, "mobile spacetime");
+await mobile.screenshot({ path: shot("tianji-spacetime-mobile.png"), fullPage: true });
+
 await mobile.getByLabel("切换工作模式").selectOption("fengshui");
 await mobile.getByRole("heading", { name: "阳宅风水" }).waitFor();
 await mobile.getByRole("button", { name: "生成阳宅坐向" }).click();
@@ -281,4 +321,4 @@ if (consoleErrors.length) {
 }
 
 await browser.close();
-console.log("browser smoke passed: fengshui single/consensus, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, and standalone fengshui workspace (desktop/mobile)");
+console.log("browser smoke passed: fengshui single/consensus, desktop/mobile result, rules drawer, workflow 7-step result, history drawer ↔ backend sessions (both directions), mobile destiny entry, standalone fengshui workspace, and divination/spacetime workspaces (desktop/mobile)");

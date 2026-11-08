@@ -61,15 +61,37 @@ describe("App", () => {
     expect(await screen.findByRole("heading", { name: "交互式推演工作台" })).toBeInTheDocument();
   });
 
-  it("切换到命运专项视图时懒加载三个页签", async () => {
+  it("切换到命运专项视图时懒加载四个页签", async () => {
     render(<App />);
 
-    fireEvent.click(screen.getByTitle("命运专项：本命盘、流年与生平时间轴"));
+    fireEvent.click(screen.getByTitle("命运专项：本命盘、紫微斗数、流年与生平时间轴"));
 
     expect(await screen.findByRole("heading", { name: "命运专项" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /本命盘/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /紫微斗数/ })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /流年/ })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /生平时间轴/ })).toBeInTheDocument();
+  });
+
+  it("切换到卜筮专项视图时懒加载三个页签", async () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByTitle("卜筮专项：周易、梅花易数与六爻"));
+
+    expect(await screen.findByRole("heading", { name: "卜筮专项" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /周易/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /梅花易数/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /六爻/ })).toBeInTheDocument();
+  });
+
+  it("切换到时空盘专项视图时懒加载两个页签", async () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByTitle("时空盘专项：奇门遁甲与大六壬"));
+
+    expect(await screen.findByRole("heading", { name: "时空盘专项" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /奇门遁甲/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /大六壬/ })).toBeInTheDocument();
   });
 
   it("切换到阳宅风水视图时懒加载独立工作区", async () => {

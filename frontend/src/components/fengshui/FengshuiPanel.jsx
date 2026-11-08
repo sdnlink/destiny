@@ -6,7 +6,7 @@ import { WorkspaceShell } from "../workspace/WorkspaceShell";
 
 function EmptyState() {
   return (
-    <div className="destiny-empty" role="status">
+    <div className="standalone-empty" role="status">
       <Mountain size={22} />
       <strong>尚未生成阳宅坐向</strong>
       <p>在左侧录入向首读数、方位基准与测量误差，然后点击「生成阳宅坐向」。</p>
@@ -110,7 +110,7 @@ export default function FengshuiPanel() {
       sidebar={(
         <form className="form-section fengshui-entry-form" onSubmit={handleSubmit} noValidate>
           <div className="section-title"><Mountain size={16} /><span>阳宅坐向测量</span></div>
-          <p className="destiny-form-hint">正北为 0°，顺时针增加；读数应来自建筑向首的现场测量。</p>
+          <p className="standalone-form-hint">正北为 0°，顺时针增加；读数应来自建筑向首的现场测量。</p>
 
           <div className="segmented method-switch" role="radiogroup" aria-label="坐向测量模式">
             <button type="button" className={mode === "single" ? "active" : ""} onClick={() => edit(setMode)("single")}>单次分析</button>
@@ -203,7 +203,7 @@ export default function FengshuiPanel() {
       )}
     >
       {error && (
-        <div className="destiny-error" role="alert">
+        <div className="standalone-error" role="alert">
           <CircleAlert size={16} />
           <span>{error}</span>
         </div>

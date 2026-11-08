@@ -1,21 +1,23 @@
 import { useState } from "react";
-import { CalendarRange, CircleAlert, GitBranch, LoaderCircle, Sparkles } from "lucide-react";
+import { CalendarRange, CircleAlert, GitBranch, LoaderCircle, Orbit, Sparkles } from "lucide-react";
 import { analyzeLiunian, evaluateCalculation } from "../../lib/api";
 import { BaziView } from "../result/BaziView";
 import { LifelineView } from "../result/LifelineView";
+import { ZiweiView } from "../result/ZiweiView";
 import { BirthProfileSection, birthPayload } from "./BirthProfileSection";
 import { LiunianView } from "./LiunianView";
 import { WorkspaceShell } from "../workspace/WorkspaceShell";
 
 const TABS = [
   { id: "natal", label: "本命盘", icon: Sparkles, desc: "四柱、藏干十神与大运排盘" },
+  { id: "ziwei", label: "紫微斗数", icon: Orbit, desc: "十二宫、星曜、四化与命身主星" },
   { id: "liunian", label: "流年", icon: CalendarRange, desc: "逐年干支、十神、岁运组合事实" },
   { id: "lifeline", label: "生平时间轴", icon: GitBranch, desc: "起运后逐年事实与已发生事件对齐" },
 ];
 
 function EmptyState({ title, desc }) {
   return (
-    <div className="destiny-empty" role="status">
+    <div className="standalone-empty" role="status">
       <Sparkles size={22} />
       <strong>{title}</strong>
       <p>{desc}</p>
@@ -33,6 +35,7 @@ export default function DestinyPanel() {
   });
   const [activeTab, setActiveTab] = useState("natal");
   const [natal, setNatal] = useState(null);
+  const [ziwei, setZiwei] = useState(null);
   const [liunian, setLiunian] = useState(null);
   const [startYear, setStartYear] = useState(String(new Date().getFullYear()));
   const [count, setCount] = useState("10");
@@ -46,6 +49,7 @@ export default function DestinyPanel() {
     setProfile((current) => ({ ...current, [key]: value }));
     // 出生信息变了，旧的本命盘/流年结果不再对应当前输入，直接清空避免误读。
     setNatal(null);
+    setZiwei(null);
     setLiunian(null);
     setError("");
   };
@@ -69,6 +73,20 @@ export default function DestinyPanel() {
     try {
       const response = await evaluateCalculation("bazi", "time", payload);
       setNatal(response.result);
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleZiwei = async () => {
+    if (!validateProfile()) return;
+    setLoading("ziwei");
+    setError("");
+    try {
+      const response = await evaluateCalculation("ziwei", "time", payload);
+      setZiwei(response.result);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -109,11 +127,11 @@ export default function DestinyPanel() {
     <WorkspaceShell
       kicker="DESTINY WORKSPACE"
       title="命运专项"
-      description="以出生时刻为唯一输入，分别查看本命盘、逐年流年与生平时间轴；全部复用既有八字接口。"
-      badge="本命 · 流年 · 时间轴"
+      description="以出生时刻为唯一输入，分别查看本命盘、紫微斗数、逐年流年与生平时间轴；全部复用既有八字与紫微接口。"
+      badge="本命 · 紫微 · 流年 · 时间轴"
       sidebar={<BirthProfileSection profile={profile} onChange={changeProfile} />}
     >
-      <div className="destiny-tabs" role="tablist" aria-label="命运专项页签">
+      <div className="standalone-tabs" role="tablist" aria-label="命运专项页签">
         {TABS.map(({ id, label, icon: Icon, desc }) => (
           <button
             key={id}
@@ -133,9 +151,9 @@ export default function DestinyPanel() {
         ))}
       </div>
 
-      <div className="destiny-tab-body" role="tabpanel" aria-label={active.label}>
+      <div className="standalone-tab-body" role="tabpanel" aria-label={active.label}>
             {error && (
-              <div className="destiny-error" role="alert">
+              <div className="standalone-error" role="alert">
                 <CircleAlert size={16} />
                 <span>{error}</span>
               </div>
@@ -155,6 +173,24 @@ export default function DestinyPanel() {
                 >
                   {loading === "natal" ? <LoaderCircle size={16} className="spin" /> : <Sparkles size={16} />}
                   {natal ? "重新排盘" : "排本命盘"}
+                </button>
+              </div>
+            )}
+
+            {activeTab === "ziwei" && (
+              <div className="destiny-action-row">
+                <div>
+                  <h2>紫微斗数</h2>
+                  <p>十二宫、星曜、四化与命身主星；只用出生时刻与性别，不混入流年。</p>
+                </div>
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={handleZiwei}
+                  disabled={!profileReady || loading === "ziwei"}
+                >
+                  {loading === "ziwei" ? <LoaderCircle size={16} className="spin" /> : <Orbit size={16} />}
+                  {ziwei ? "重新排盘" : "排紫微盘"}
                 </button>
               </div>
             )}
@@ -213,6 +249,14 @@ export default function DestinyPanel() {
                 <BaziView result={natal} showLifeline={false} />
               ) : (
                 <EmptyState title="尚未排本命盘" desc="填写出生信息后，点击「排本命盘」。" />
+              )
+            )}
+
+            {activeTab === "ziwei" && (
+              ziwei ? (
+                <ZiweiView result={ziwei} />
+              ) : (
+                <EmptyState title="尚未排紫微盘" desc="填写出生信息后，点击「排紫微盘」。" />
               )
             )}
 

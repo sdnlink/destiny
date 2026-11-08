@@ -5,6 +5,7 @@ import {
   BookOpen,
   BookOpenCheck,
   CalendarRange,
+  Compass,
   Database,
   Download,
   FileClock,
@@ -17,6 +18,7 @@ import {
   Plus,
   RefreshCw,
   Search,
+  ScrollText,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -32,11 +34,14 @@ const ResultWorkspace = lazy(() => import("./components/ResultWorkspace"));
 const WorkflowPanel = lazy(() => import("./components/WorkflowPanel"));
 const DestinyPanel = lazy(() => import("./components/destiny/DestinyPanel"));
 const FengshuiPanel = lazy(() => import("./components/fengshui/FengshuiPanel"));
+const DivinationPanel = lazy(() => import("./components/consult/DivinationPanel"));
+const SpacetimePanel = lazy(() => import("./components/consult/SpacetimePanel"));
 import { analyzeCalendar, checkHealth, compareCalculations, loadRules } from "./lib/api";
 import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
 import { GLOSSARY_CATEGORIES, GLOSSARY_ITEMS } from "./lib/glossary";
 import { buildCalculations, calendarPayload } from "./lib/calculationPlan";
-import { localDateTimeValue, newCastNonce } from "./lib/castingInput";
+import { newCastNonce } from "./lib/castingInput";
+import { initialForm } from "./lib/formDefaults";
 import { listSessions } from "./lib/sessionApi";
 import { migrateHistoryItem } from "./lib/sessionMigration";
 import {
@@ -47,42 +52,6 @@ import {
   importHistoryJSON,
   saveDeductionHistory,
 } from "./lib/storage";
-
-function initialForm() {
-  return {
-    scene: "combined",
-    category: "career",
-    question: "近期事项推演",
-    localDatetime: localDateTimeValue(),
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Shanghai",
-    trueSolar: false,
-    longitude: "",
-    castNonce: newCastNonce(),
-    yiMethod: "auto",
-    lines: [7, 8, 7, 8, 7, 8],
-    yiLower: "8",
-    yiUpper: "8",
-    meihuaMethod: "auto",
-    mhUpper: "8",
-    mhLower: "8",
-    liuyaoMethod: "auto",
-    lyLower: "8",
-    lyUpper: "8",
-    liurenMethod: "auto",
-    lrNumber: "8",
-    qimenMethod: "time",
-    baziMethod: "time",
-    baziGender: "男",
-    ziweiMethod: "time",
-    ziweiGender: "男",
-    fsFacing: "180",
-    fsMode: "single",
-    fsMeasurements: ["179", "180", "181"],
-    fsReference: "magnetic",
-    fsDeclination: "0",
-    fsError: "1",
-  };
-}
 
 // 表单 → 计算请求的映射统一在 lib/calculationPlan.js，组件里不再维护第二份
 
@@ -100,7 +69,9 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGl
       <div className="nav-items">
         <button className={viewMode === "classic" ? "active" : ""} onClick={() => setViewMode("classic")} title="经典推演模式"><Plus size={18} /><span>经典推演</span></button>
         <button className={viewMode === "workflow" ? "active" : ""} onClick={() => setViewMode("workflow")} title="交互式推演工作流（7步标准化）"><Sparkles size={18} /><span>交互推演</span></button>
-        <button className={viewMode === "destiny" ? "active" : ""} onClick={() => setViewMode("destiny")} title="命运专项：本命盘、流年与生平时间轴"><CalendarRange size={18} /><span>命运专项</span></button>
+        <button className={viewMode === "destiny" ? "active" : ""} onClick={() => setViewMode("destiny")} title="命运专项：本命盘、紫微斗数、流年与生平时间轴"><CalendarRange size={18} /><span>命运专项</span></button>
+        <button className={viewMode === "divination" ? "active" : ""} onClick={() => setViewMode("divination")} title="卜筮专项：周易、梅花易数与六爻"><ScrollText size={18} /><span>卜筮专项</span></button>
+        <button className={viewMode === "spacetime" ? "active" : ""} onClick={() => setViewMode("spacetime")} title="时空盘专项：奇门遁甲与大六壬"><Compass size={18} /><span>时空盘专项</span></button>
         <button className={viewMode === "fengshui" ? "active" : ""} onClick={() => setViewMode("fengshui")} title="阳宅风水：坐向、二十四山与多次测量共识"><Mountain size={18} /><span>阳宅风水</span></button>
         <button onClick={openHistory} title="历史推演记录、案例库与 JSON 备份导入导出"><Archive size={18} /><span>历史与案例</span></button>
         <button onClick={openRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
@@ -529,7 +500,7 @@ export default function App() {
   const [rules, setRules] = useState([]);
   const [rulesLoading, setRulesLoading] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("tianji_theme") || "paper");
-  const [viewMode, setViewMode] = useState("classic"); // classic / workflow / destiny / fengshui
+  const [viewMode, setViewMode] = useState("classic"); // classic / workflow / destiny / divination / spacetime / fengshui
   const [pendingSessionId, setPendingSessionId] = useState(null);
 
   useEffect(() => {
@@ -669,6 +640,8 @@ export default function App() {
           <option value="classic">经典</option>
           <option value="workflow">交互</option>
           <option value="destiny">命运</option>
+          <option value="divination">卜筮</option>
+          <option value="spacetime">时空</option>
           <option value="fengshui">阳宅</option>
         </select>
         <button className="icon-button" onClick={() => setMobileInputOpen(!mobileInputOpen)} aria-label="切换输入面板"><Menu size={20} /></button>
@@ -689,6 +662,14 @@ export default function App() {
       ) : viewMode === "fengshui" ? (
         <Suspense fallback={<div className="loading-placeholder">正在加载阳宅风水…</div>}>
           <FengshuiPanel />
+        </Suspense>
+      ) : viewMode === "divination" ? (
+        <Suspense fallback={<div className="loading-placeholder">正在加载卜筮专项…</div>}>
+          <DivinationPanel />
+        </Suspense>
+      ) : viewMode === "spacetime" ? (
+        <Suspense fallback={<div className="loading-placeholder">正在加载时空盘专项…</div>}>
+          <SpacetimePanel />
         </Suspense>
       ) : (
         <>

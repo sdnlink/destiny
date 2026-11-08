@@ -11,6 +11,10 @@ vi.mock("../../src/components/result/LifelineView", () => ({
   LifelineView: ({ result }) => <div>时间轴入参：{result.input.local_datetime}</div>,
 }));
 
+vi.mock("../../src/components/result/ZiweiView", () => ({
+  ZiweiView: ({ result }) => <div>紫微结果：{result.rule_id}</div>,
+}));
+
 function fillBirthProfile() {
   fireEvent.change(screen.getByLabelText("公历出生日期时间"), { target: { value: "1984-02-10T10:00" } });
   fireEvent.change(screen.getByLabelText("出生地时区"), { target: { value: "Asia/Shanghai" } });
@@ -41,6 +45,22 @@ describe("DestinyPanel", () => {
     fireEvent.click(screen.getByText("排本命盘"));
     await waitFor(() => expect(screen.getByText("本命盘结果：BZ-BAZI-001")).toBeTruthy());
     expect(spy).toHaveBeenCalledWith("bazi", "time", {
+      local_datetime: "1984-02-10T10:00",
+      timezone: "Asia/Shanghai",
+      gender: "男",
+      longitude: null,
+      use_true_solar_time: false,
+    });
+  });
+
+  it("紫微斗数页签复用出生信息与性别", async () => {
+    const spy = vi.spyOn(api, "evaluateCalculation").mockResolvedValue({ result: { rule_id: "ZW-PAN-001" } });
+    render(<DestinyPanel />);
+    fillBirthProfile();
+    fireEvent.click(screen.getByRole("tab", { name: /紫微斗数/ }));
+    fireEvent.click(screen.getByText("排紫微盘"));
+    await waitFor(() => expect(screen.getByText("紫微结果：ZW-PAN-001")).toBeTruthy());
+    expect(spy).toHaveBeenCalledWith("ziwei", "time", {
       local_datetime: "1984-02-10T10:00",
       timezone: "Asia/Shanghai",
       gender: "男",

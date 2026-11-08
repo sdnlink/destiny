@@ -95,11 +95,13 @@
 
 前端 `BaziView` 新增按需加载的「个人生平时间轴」区块（`LifelineView.jsx`），展示月令提纲、逐年大运/流年、岁运组合、皇极经世背景与 `warnings`，不渲染吉凶结论；并提供可选的已发生事件录入（每行「年份 描述」，只做只读对齐）。
 
-导航新增「命运专项」工作区（`frontend/src/components/destiny/DestinyPanel.jsx`），把原先嵌在八字结果里的能力拆成三个页签：本命盘（`POST /v1/calculations/evaluate` 的 `bazi/time`）、流年（`POST /v1/bazi/liunian`）、生平时间轴（`POST /v1/bazi/lifeline`）。三个页签共用同一份出生信息（`BirthProfileSection.jsx`），避免出现第二套时间/时区/真太阳时口径；本命盘页签通过 `showLifeline={false}` 隐藏内嵌时间轴，时间轴只在独立页签生成。
+导航新增「命运专项」工作区（`frontend/src/components/destiny/DestinyPanel.jsx`），把原先嵌在八字结果里的能力拆成四个页签：本命盘（`POST /v1/calculations/evaluate` 的 `bazi/time`）、紫微斗数（同接口的 `ziwei/time`，复用出生信息里的性别）、流年（`POST /v1/bazi/liunian`）、生平时间轴（`POST /v1/bazi/lifeline`）。四个页签共用同一份出生信息（`BirthProfileSection.jsx`），避免出现第二套时间/时区/真太阳时口径；本命盘页签通过 `showLifeline={false}` 隐藏内嵌时间轴，时间轴只在独立页签生成。
 
-导航新增「阳宅风水」独立工作区（`frontend/src/components/fengshui/FengshuiPanel.jsx`），把原先只在经典推演「风水」场景里出现的坐向测量拆成独立入口：单次分析走 `POST /v1/fengshui/direction`，多次共识走 `POST /v1/fengshui/measurements`。读数、磁北/真北基准、磁偏角与测量误差仍由同一套 `FengshuiDirectionRequest` 约束，结果复用 `FengshuiView`，不新增前端计算逻辑，也不改变经典推演里「风水」场景的行为。两个独立工作区共用 `frontend/src/components/workspace/WorkspaceShell.jsx` 的两栏外壳。
+导航新增「阳宅风水」独立工作区（`frontend/src/components/fengshui/FengshuiPanel.jsx`），把原先只在经典推演「风水」场景里出现的坐向测量拆成独立入口：单次分析走 `POST /v1/fengshui/direction`，多次共识走 `POST /v1/fengshui/measurements`。读数、磁北/真北基准、磁偏角与测量误差仍由同一套 `FengshuiDirectionRequest` 约束，结果复用 `FengshuiView`，不新增前端计算逻辑，也不改变经典推演里「风水」场景的行为。独立工作区共用 `frontend/src/components/workspace/WorkspaceShell.jsx` 的两栏外壳。
 
-回归护栏见 `backend/tests/test_lifeline_and_systems.py`、`frontend/tests/components/LifelineView.test.jsx` 与 `frontend/tests/components/FengshuiPanel.test.jsx`。
+导航新增「卜筮专项」与「时空盘专项」两个工作区，共用 `frontend/src/components/consult/ConsultPanel.jsx` 的页签外壳与 `frontend/src/components/InputPanel.jsx` 的输入表单（`showSceneSwitch={false}` 时隐藏体系选择，把 `scene` 钉在当前页签）。卜筮专项含周易、梅花易数与六爻三个页签（`DivinationPanel.jsx`），时空盘专项含奇门遁甲与大六壬两个页签（`SpacetimePanel.jsx`）。提交时只把当前页签体系与历法基准送 `POST /v1/calculations/compare`，`context` 仍传 `category + question_summary`；响应里的 `module_results` 用 `findModule` 取当前模块，直接复用 `ZhouyiView` / `MeihuaView` / `LiuyaoView` / `QimenView` / `LiurenView`，并额外展示响应自带的 `advisory`。这样单体系也能拿到完整建议与解释，不再退化为只显示盘面。未新增后端接口，也没有为八个体系各设一个一级菜单。
+
+回归护栏见 `backend/tests/test_lifeline_and_systems.py`、`frontend/tests/components/LifelineView.test.jsx`、`frontend/tests/components/FengshuiPanel.test.jsx` 与 `frontend/tests/components/ConsultPanels.test.jsx`。
 
 数据边界（非"未实现"，仅记录残余缺口）：典籍待补清单已清账，八宅明镜/阳宅十书/沈氏玄空学/紫微斗数全书/卜筮正宗均由公开来源补齐入库（详见 `/v1/classics/status` 的 `sourcing_backlog`）；《紫微斗數全書》卷四图说（站方仅 PDF 扫描）与《阳宅三要》暂缺。
 

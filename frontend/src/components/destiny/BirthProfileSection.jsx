@@ -7,8 +7,8 @@ export function BirthProfileSection({ profile, onChange }) {
   return (
     <section className="form-section destiny-birth-section" aria-label="出生信息">
       <div className="section-title"><CalendarClock size={16} /><span>出生信息</span></div>
-      <p className="destiny-form-hint">
-        只用于本次命运分析，不写入经典推演存档；三个页签共用同一份出生时刻。
+      <p className="standalone-form-hint">
+        只用于本次命运分析，不写入经典推演存档；四个页签共用同一份出生时刻。
       </p>
 
       <label>
@@ -92,7 +92,7 @@ export function BirthProfileSection({ profile, onChange }) {
   );
 }
 
-/** 三个页签统一使用的出生时刻 payload。 */
+/** 四个页签统一使用的出生时刻 payload。 */
 export function birthPayload(profile) {
   return {
     local_datetime: profile.localDatetime,

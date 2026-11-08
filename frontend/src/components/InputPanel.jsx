@@ -88,6 +88,11 @@ export default function InputPanel({
   previewLoading,
   preview,
   error,
+  showSceneSwitch = true,
+  panelKicker = "新建推演",
+  panelTitle = "推演参数",
+  submitLabel = "开始推演",
+  submitLoadingLabel = "正在推演",
 }) {
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
   const updateLine = (index, value) => {
@@ -124,8 +129,8 @@ export default function InputPanel({
     <aside className="input-panel" aria-label="推演输入">
       <div className="panel-heading">
         <div>
-          <p className="section-kicker">新建推演</p>
-          <h1>推演参数</h1>
+          <p className="section-kicker">{panelKicker}</p>
+          <h1>{panelTitle}</h1>
         </div>
         <div className="panel-heading-actions">
           <span className="cast-token" title="本次起卦凭证">凭证 {form.castNonce.slice(0, 8)}</span>
@@ -141,20 +146,22 @@ export default function InputPanel({
       <form onSubmit={onSubmit}>
         <section className="form-section">
           <div className="section-title"><Layers3 size={16} /><span>体系与事项</span></div>
-          <div className="segmented scene-switch" role="radiogroup" aria-label="推演体系">
-            {SCENES.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                type="button"
-                role="radio"
-                aria-checked={form.scene === id}
-                className={form.scene === id ? "active" : ""}
-                onClick={() => update("scene", id)}
-              >
-                <Icon size={15} />{label}
-              </button>
-            ))}
-          </div>
+          {showSceneSwitch && (
+            <div className="segmented scene-switch" role="radiogroup" aria-label="推演体系">
+              {SCENES.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="radio"
+                  aria-checked={form.scene === id}
+                  className={form.scene === id ? "active" : ""}
+                  onClick={() => update("scene", id)}
+                >
+                  <Icon size={15} />{label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="field-grid">
             <label>
               <FieldLabel>事项分类</FieldLabel>
@@ -610,7 +617,7 @@ export default function InputPanel({
           </div>
           <button className="primary-button" type="submit" disabled={loading}>
             {loading ? <LoaderCircle className="spin" size={17} /> : <Play size={17} fill="currentColor" />}
-            {loading ? "正在推演" : "开始推演"}
+            {loading ? submitLoadingLabel : submitLabel}
             {!loading && <ChevronRight size={16} />}
           </button>
         </div>
