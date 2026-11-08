@@ -23,7 +23,9 @@ jobs:
       - name: Lint
         run: python -m ruff check app tests
       - name: Test
-        # CI 上没有 ClickHouse，依赖数据库的用例会条件跳过并打印原因，不会伪装成通过
+        # CI 上没有 ClickHouse，依赖数据库的用例会条件跳过并打印原因，不会伪装成通过。
+        # 20MB 典籍全文语料 data/generated/ 不入库，依赖全量语料的集成断言同样条件跳过；
+        # 玄空起星图已改为读取 data/validation-cases/ 派生样例，CI 可完整覆盖。
         run: python -m pytest tests -q
 
   frontend:
@@ -44,3 +46,5 @@ jobs:
         run: npm run build
       - name: Unit tests
         run: npm run test:unit
+      - name: Node module tests
+        run: npm run test:node

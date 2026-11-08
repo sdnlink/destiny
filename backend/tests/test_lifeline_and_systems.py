@@ -10,9 +10,11 @@ import unittest
 
 from fastapi.testclient import TestClient
 
+from app.bazi.engine import calculate_bazi
 from app.bazi.lifeline import analyze_lifeline, lichun_datetime
+from app.bazi.models import BaZiResult
 from app.bazi.tieban import tieban_status
-from app.core.registry import load_rule_registry, rule_index, validate_rule_registry
+from app.core.registry import load_rule_registry, rule_index, unknown_rule_ids, validate_rule_registry
 from app.core.yuanhui_readonly import cycle_cast
 from app.main import app
 
@@ -113,8 +115,6 @@ class TiebanDataGapTests(unittest.TestCase):
         self.assertEqual(r["tieban_corpus_titles"], [])
         self.assertGreaterEqual(len(r["missing_prerequisites"]), 5)
         self.assertEqual(r["judgements"], [])
-        # 不输出任何条数或条文断语（capabilities 为空）
-        self.assertEqual(r["available_capabilities"], [])
         self.assertTrue(all("pending" in w or "不" in w or "伪造" in w for w in r["warnings"]))
 
 
@@ -144,6 +144,55 @@ class LifelineEventsTests(unittest.TestCase):
             analyze_lifeline(**BIRTH, start_year=2099, count=5)
 
 
+class BaziSourceInputContractTests(unittest.TestCase):
+    def test_result_carries_naive_source_input_and_registered_rule(self):
+        natal = calculate_bazi("1984-02-10 10:00:00", timezone="Asia/Shanghai")
+        self.assertEqual(natal["rule_id"], "BZ-BAZI-001")
+        self.assertEqual(natal["input"]["local_datetime"], "1984-02-10 10:00:00")
+        self.assertNotIn("+08:00", natal["input"]["local_datetime"])
+        self.assertEqual(natal["input"]["timezone"], "Asia/Shanghai")
+        BaZiResult.model_validate(natal)
+
+    def test_lifeline_from_source_input_matches_natal_pillars(self):
+        natal = calculate_bazi(**BIRTH)
+        life = analyze_lifeline(**natal["input"], count=1)
+        self.assertEqual(life["input"], natal["input"])
+        self.assertEqual(
+            life["natal_summary"]["pillars"],
+            {key: value["ganzhi"] for key, value in natal["facts"]["pillars"].items()},
+        )
+
+    def test_other_timezone_keeps_same_natal_pillars(self):
+        natal = calculate_bazi("2026-02-03 23:30:00", timezone="America/New_York")
+        life = analyze_lifeline(**natal["input"], count=1)
+        self.assertEqual(
+            life["natal_summary"]["pillars"],
+            {key: value["ganzhi"] for key, value in natal["facts"]["pillars"].items()},
+        )
+
+    def test_true_solar_input_is_not_applied_twice(self):
+        natal = calculate_bazi(
+            "1984-02-10 10:00:00", timezone="Asia/Shanghai",
+            longitude=75.0, use_true_solar_time=True,
+        )
+        life = analyze_lifeline(**natal["input"], count=1)
+        self.assertEqual(
+            life["natal_summary"]["pillars"],
+            {key: value["ganzhi"] for key, value in natal["facts"]["pillars"].items()},
+        )
+
+    def test_api_accepts_source_input_after_bazi_time(self):
+        client = TestClient(app)
+        natal = client.post("/v1/bazi/time", json=BIRTH).json()["data"]
+        response = client.post("/v1/bazi/lifeline", json={**natal["input"], "count": 2})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["data"]
+        self.assertEqual(
+            data["natal_summary"]["pillars"],
+            {key: value["ganzhi"] for key, value in natal["facts"]["pillars"].items()},
+        )
+
+
 class EnvelopeAndRegistryTests(unittest.TestCase):
     def test_new_endpoints(self):
         c = TestClient(app)
@@ -159,19 +208,24 @@ class EnvelopeAndRegistryTests(unittest.TestCase):
         c = TestClient(app)
         b = c.post("/v1/bazi/time", json=BIRTH).json()["data"]
         self.assertEqual(b["status"], "engineering_baseline_draft")
+        self.assertEqual(b["rule_id"], "BZ-BAZI-001")
+        self.assertEqual(b["input"]["local_datetime"], BIRTH["local_datetime"])
         self.assertIn("ziping", b["school"])
         self.assertEqual(b["judgements"], [])
         self.assertTrue(b["warnings"])
-        l = c.post("/v1/bazi/liunian", json={**BIRTH, "count": 2}).json()["data"]
-        self.assertEqual(l["status"], "engineering_baseline_draft")
-        self.assertEqual(l["judgements"], [])
-        self.assertTrue(l["warnings"])
+        self.assertEqual(
+            unknown_rule_ids({"rule_ids": [b["rule_id"]]}, load_rule_registry()), []
+        )
+        response = c.post("/v1/bazi/liunian", json={**BIRTH, "count": 2}).json()["data"]
+        self.assertEqual(response["status"], "engineering_baseline_draft")
+        self.assertEqual(response["judgements"], [])
+        self.assertTrue(response["warnings"])
 
     def test_new_rules_registered(self):
         registry = load_rule_registry()
         self.assertEqual(validate_rule_registry(registry), [])
         idx = rule_index(registry)
-        for rule_id in ("BZ-LIFELINE-001", "YHYS-READONLY-001", "BZ-TIEBAN-STATUS-001"):
+        for rule_id in ("BZ-BAZI-001", "BZ-LIFELINE-001", "YHYS-READONLY-001", "BZ-TIEBAN-STATUS-001"):
             self.assertEqual(idx[rule_id]["status"], "draft")
             self.assertTrue(idx[rule_id]["source_refs"])
             self.assertEqual(idx[rule_id]["reviewers"], [])

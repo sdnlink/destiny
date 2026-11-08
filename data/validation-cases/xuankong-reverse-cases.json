@@ -1,0 +1,3882 @@
+{
+  "schema_version": "1.0",
+  "source_title": "沈氏玄空學",
+  "source_path": "data/generated/wikisource-corpus/corpus_chunks.jsonl",
+  "block_count": 216,
+  "case_count": 430,
+  "missing_block_count": 1,
+  "invalid_line_count": 1,
+  "ocr_corrected_count": 4,
+  "cases": [
+    {
+      "block": "一运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻，四正逆行，下同。"
+    },
+    {
+      "block": "一运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之天元即乾，挨武曲，仍六入中，乾阳故顺行。"
+    },
+    {
+      "block": "二运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之天元即乾，挨武曲，仍六入中，乾阳故顺行。"
+    },
+    {
+      "block": "二运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之天元即酉，挨破军，仍七入中，酉阴故逆行。"
+    },
+    {
+      "block": "三运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之天元即酉，挨破军，仍七入中，酉阴故逆行。"
+    },
+    {
+      "block": "三运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳故顺行。"
+    },
+    {
+      "block": "四运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之天元即艮，挨破军，故不用八而以七入中，艮阳故顺行。"
+    },
+    {
+      "block": "四运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之天元即午，挨弼星，仍九入中，午阴故逆行。"
+    },
+    {
+      "block": "五运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之天元即午，挨弼星，仍九入中，午阴故逆行。"
+    },
+    {
+      "block": "五运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之天元即子，挨贪狼，仍一入中，子阴故逆行。"
+    },
+    {
+      "block": "六运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之天元即子，挨贪狼，仍一入中，子阴故逆行。"
+    },
+    {
+      "block": "六运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之天元即坤，挨巨门，仍二入中，坤阳故顺行。"
+    },
+    {
+      "block": "七运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之天元即坤，挨巨门，仍二入中，坤阳故顺行。"
+    },
+    {
+      "block": "七运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之天元即卯，挨巨门，故不用三而以二入中，卯阴故逆行。"
+    },
+    {
+      "block": "八运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之天元即卯，挨巨门，故不用三而以二入中，卯阴故逆行。"
+    },
+    {
+      "block": "八运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之天元即巽，挨武曲，故不用四而以六入中，巽阳故顺行。"
+    },
+    {
+      "block": "九运子山午向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之天元即巽，挨武曲，故不用四而以六入中，巽阳故顺行。"
+    },
+    {
+      "block": "九运子山午向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "一运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之天元即乾，挨武曲，仍六入中，乾阳故顺行。"
+    },
+    {
+      "block": "一运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "二运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之天元即酉，挨破军，仍七入中，酉阴故逆行。"
+    },
+    {
+      "block": "二运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之天元即乾，挨武曲，仍六入中，乾阳故顺行。"
+    },
+    {
+      "block": "三运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "三运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "四运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "四运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "五运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "五运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "六运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "六运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "七运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "七运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "八运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之天元即巽，巽挨武曲，故不用四以六入中，巽阳顺行。"
+    },
+    {
+      "block": "八运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "九运午山子向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "九运午山子向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "一运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "一运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "二运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "二运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "三运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "三运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "四运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "四运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "五运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "五运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "六运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "六运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "七运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "七运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "八运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "八运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "九运卯山酉向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "九运卯山酉向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "一运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "一运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "二运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "二运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "三运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "三运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "四运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "四运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "五运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "五运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "六运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "六运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "七运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "七运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "八运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "八运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "九运酉山卯向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "九运酉山卯向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "一运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "一运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "二运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "二运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "三运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "三运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "四运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "四运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻，四维顺行，下同。"
+    },
+    {
+      "block": "五运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "五运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "六运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "六运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "七运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "七运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "八运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "八运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "九运乾山巽向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "九运乾山巽向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "一运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "一运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之天元即午，挨弼星，仍九入中，午阳逆行。"
+    },
+    {
+      "block": "二运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "二运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "三运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "三运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "四运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "四运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "五运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "五运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "六运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "六运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "七运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "七运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "八运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "八运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "九运巽山乾向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之天元即子，挨贪狼，仍一入中，子阳逆行。"
+    },
+    {
+      "block": "九运巽山乾向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "一运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "一运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "二运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "二运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "三运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之天元即午，挨弼星，仍九入中，午阳逆行。"
+    },
+    {
+      "block": "三运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "四运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "四运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "五运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "五运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "六运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "六运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "七运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "七运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "八运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "八运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "九运艮山坤向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "九运艮山坤向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "一运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "一运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "二运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "二运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "三运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之天之元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "三运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "四运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "酉",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之天元即酉，挨破军，仍七入中，酉阴逆行。"
+    },
+    {
+      "block": "四运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "五运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "艮",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之天元即艮，挨破军，故不用八而以七入中，艮阳顺行。"
+    },
+    {
+      "block": "五运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "六运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "午",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之天元即午，挨弼星，仍九入中，午阴逆行。"
+    },
+    {
+      "block": "六运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "七运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "子",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之天元即子，挨贪狼，仍一入中，子阴逆行。"
+    },
+    {
+      "block": "七运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巽",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之天元即巽，挨武曲，故不用四而以六入中，巽阳顺行。"
+    },
+    {
+      "block": "八运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "坤",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之天元即坤，挨巨门，仍二入中，坤阳顺行。"
+    },
+    {
+      "block": "八运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "九运坤山艮向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "卯",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之天元即卯，挨巨门，故不用三而以二入中，卯阴逆行。"
+    },
+    {
+      "block": "九运坤山艮向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "乾",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之天元即乾，挨武曲，仍六入中，乾阳顺行。"
+    },
+    {
+      "block": "一运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻，四正顺行，下同。"
+    },
+    {
+      "block": "一运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之地元即戌，挨武曲，仍六入中，戌阴故逆行。"
+    },
+    {
+      "block": "二运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "二运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "三运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "三运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之地元即丑，挨破军，故不用八而以七入中，五阴逆行。"
+    },
+    {
+      "block": "四运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "四运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "五运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "五运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "六运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "六运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "七运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "七运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "八运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "八运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "九运壬山丙向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "九运壬山丙向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "一运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "一运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "二运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "二运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "三运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "三运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之地元即庚，挨弼军，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "四运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "四运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "五运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "五运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "六运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "六运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "七运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "七运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "八运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "八运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "九运丙山壬向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "九运丙山壬向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "一运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "一运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "二运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "二运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "三运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "三运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "四运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "四运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "五运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "五运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "六运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "六运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之地元即辰，挨武曲，故不用四而六入中，辰阴逆行。"
+    },
+    {
+      "block": "七运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "七运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "八运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "八运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "九运甲山庚向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "九运甲山庚向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "一运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之地元即丑，挨破军，故不用八而七入中，丑阴逆行。"
+    },
+    {
+      "block": "一运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "二运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "二运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "三运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "三运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "四运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "四运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "五运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": true,
+      "original_line": "一、三到向，三之地元即甲，挨贪狼，故不用三而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "五运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "六运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "六运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "七运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "七运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之地元即丙，挨破军，故不用九而七入中，丙阳顺行。"
+    },
+    {
+      "block": "八运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "八运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "九运庚山甲向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "九运庚山甲向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "一运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "一运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "二运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "二运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "三运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "三运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "四运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "四运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻，四维逆行，下同。"
+    },
+    {
+      "block": "五运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "五运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "六运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "六运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之地元即庚，挨弼星，故不用七而九入中，庚阳顺行。"
+    },
+    {
+      "block": "七运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "七运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "八运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "八运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "九运戌山辰向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "九运戌山辰向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "一运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "一运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "二运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之地元即甲，挨贪狼，故为用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "二运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "三运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "三运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "四运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "四运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "五运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "五运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "六运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "六运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "七运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "七运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "八运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "八运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "九运辰山戌向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "九运辰山戌向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "一运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之地元即庚，挨弼星，故不用七而九入中，庚阳顺行"
+    },
+    {
+      "block": "一运丑山未向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "二运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "二运丑山未向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "三运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "三运丑山未向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "四运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "四运丑山未向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "五运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "五运丑山未向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "六运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "六运丑山未向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "七运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "八运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "八运丑山未向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "九运丑山未向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "九运丑山未向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "一运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "一运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之地元即庚，挨弼军，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "二运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "二运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之地元即丑，挨破军，故不用八而以七入中，丑阴逆行。"
+    },
+    {
+      "block": "三运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "三运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "四运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 9,
+      "source_mountain": "庚",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之地元即庚，挨弼星，故不用七而以九入中，庚阳顺行。"
+    },
+    {
+      "block": "四运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "五运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 7,
+      "source_mountain": "丑",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之地元即丑，挨破军，故不用八而七入中，丑阴逆行。"
+    },
+    {
+      "block": "五运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "六运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 7,
+      "source_mountain": "丙",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之地元即丙，挨破军，故不用九而以七入中，丙阳顺行。"
+    },
+    {
+      "block": "六运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "七运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 2,
+      "source_mountain": "壬",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之地元即壬，挨巨门，故不用一而以二入中，壬阳顺行。"
+    },
+    {
+      "block": "七运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "辰",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之地元即辰，挨武曲，故不用四而以六入中，辰阴逆行。"
+    },
+    {
+      "block": "八运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 2,
+      "source_mountain": "未",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之地元即未，挨巨门，仍二入中，未阴逆行。"
+    },
+    {
+      "block": "八运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻，地元四维逆行。"
+    },
+    {
+      "block": "九运未山丑向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 1,
+      "source_mountain": "甲",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之地元即甲，挨贪狼，故不用三而以一入中，甲阳顺行。"
+    },
+    {
+      "block": "九运未山丑向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "戌",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之地元即戌，挨武曲，仍六入中，戌阴逆行。"
+    },
+    {
+      "block": "一运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻，人元四正逆行，下同。"
+    },
+    {
+      "block": "一运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "二运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "二运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "三运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "三运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "四运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "四运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "五运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "五运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "六运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "六运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "七运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "七运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "八运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": true,
+      "original_line": "一、三到向，三之人元即乙，挨巨门，故不用三而以六入中，乙阴逆行。"
+    },
+    {
+      "block": "八运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "九运癸山丁向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "九运癸山丁向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "一运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "一运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻，人元四正逆行，下同。"
+    },
+    {
+      "block": "二运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "二运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "三运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "三运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "四运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "四运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "五运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "五运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "六运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "六运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "七运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "七运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "八运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "八运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "九运丁山癸向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "九运丁山癸向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "一运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "一运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "二运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "二运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "三运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻，人元四正逆行。"
+    },
+    {
+      "block": "三运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之人元即癸，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "四运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "四运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "五运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "五运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "六运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "六运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "七运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "七运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "八运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "八运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "九运乙山辛向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "九运乙山辛向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "一运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "一运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "二运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "二运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "三运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "三运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻，人元四正逆行，下同。"
+    },
+    {
+      "block": "四运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "四运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "五运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "五运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "六运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "六运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "七运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "七运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "八运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "八运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "九运辛山乙向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "九运辛山乙向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "一运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "一运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "二运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "二运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "三运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "三运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "四运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "四运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻，人元四维顺行，下同。"
+    },
+    {
+      "block": "五运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "五运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "六运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻。"
+    },
+    {
+      "block": "六运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "七运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "七运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "八运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "八运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "九运亥山巳向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "九运亥山巳向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "一运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "一运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "二运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "二运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "三运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "三运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "四运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻，人元四维顺行，下同。"
+    },
+    {
+      "block": "四运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "五运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "五运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "六运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "六运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "七运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "七运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "八运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "八运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "九运巳山亥向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "九运巳山亥向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "一运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之人元即辛巳，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "一运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": true,
+      "original_line": "二、四到山，四之人元即巳，挨武曲，故不用四而以七入中，巳阳顺行。"
+    },
+    {
+      "block": "二运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "二运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻，人元四维顺行，下同。"
+    },
+    {
+      "block": "三运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "三运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "二、六到山，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "四运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "四运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "五运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "五运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "二、八到山，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "六运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "六运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "七运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "七运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "八运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻，人元四维顺行。"
+    },
+    {
+      "block": "八运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "九运寅山申向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "九运寅山申向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "一运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "一、四到向，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "一运申山寅向兼 起星图",
+      "side": "山",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "二、七到山，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "二运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "一、五到向，无替可寻，人元四维顺行，下同。"
+    },
+    {
+      "block": "二运申山寅向兼 起星图",
+      "side": "山",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": true,
+      "original_line": "二、八到山，八之人元即寅，挨弼星，故不用八而以七入中，寅阳顺行。"
+    },
+    {
+      "block": "三运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 6,
+      "entering_star": 6,
+      "source_mountain": "亥",
+      "ocr_corrected": false,
+      "original_line": "一、六到向，六之人元即亥，挨武曲，仍六入中，亥阳顺行。"
+    },
+    {
+      "block": "三运申山寅向兼 起星图",
+      "side": "山",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "二、九到山，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "四运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 7,
+      "entering_star": 7,
+      "source_mountain": "辛",
+      "ocr_corrected": false,
+      "original_line": "一、七到向，七之人元即辛，挨破军，仍七入中，辛阴逆行。"
+    },
+    {
+      "block": "四运申山寅向兼 起星图",
+      "side": "山",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "二、一到山，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "五运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 8,
+      "entering_star": 9,
+      "source_mountain": "寅",
+      "ocr_corrected": false,
+      "original_line": "一、八到向，八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行。"
+    },
+    {
+      "block": "五运申山寅向兼 起星图",
+      "side": "山",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "二、二到山，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "六运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 9,
+      "entering_star": 9,
+      "source_mountain": "丁",
+      "ocr_corrected": false,
+      "original_line": "一、九到向，九之人元即丁，挨弼星，仍九入中，丁阴逆行。"
+    },
+    {
+      "block": "六运申山寅向兼 起星图",
+      "side": "山",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "二、三到山，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    },
+    {
+      "block": "七运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 1,
+      "entering_star": 1,
+      "source_mountain": "癸",
+      "ocr_corrected": false,
+      "original_line": "一、一到向，一之人元即癸，挨贪狼，仍一入中，癸阴逆行。"
+    },
+    {
+      "block": "七运申山寅向兼 起星图",
+      "side": "山",
+      "arriving_star": 4,
+      "entering_star": 6,
+      "source_mountain": "巳",
+      "ocr_corrected": false,
+      "original_line": "二、四到山，四之人元即巳，挨武曲，故不用四而以六入中，巳阳顺行。"
+    },
+    {
+      "block": "八运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 2,
+      "entering_star": 1,
+      "source_mountain": "申",
+      "ocr_corrected": false,
+      "original_line": "一、二到向，二之人元即申，挨贪狼，故不用二而以一入中，申阳顺行。"
+    },
+    {
+      "block": "八运申山寅向兼 起星图",
+      "side": "山",
+      "arriving_star": 5,
+      "entering_star": 5,
+      "source_mountain": "",
+      "ocr_corrected": false,
+      "original_line": "二、五到山，无替可寻。"
+    },
+    {
+      "block": "九运申山寅向兼 起星图",
+      "side": "向",
+      "arriving_star": 3,
+      "entering_star": 2,
+      "source_mountain": "乙",
+      "ocr_corrected": false,
+      "original_line": "一、三到向，三之人元即乙，挨巨门，故不用三而以二入中，乙阴逆行。"
+    }
+  ]
+}

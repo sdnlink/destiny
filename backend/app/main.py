@@ -854,7 +854,7 @@ def fengshui_xuankong(
     sitting_mountain: str,
     year: Optional[int] = Query(None, ge=1864, le=2100),
     period: Optional[int] = Query(None, ge=1, le=9),
-    sitting_degree: Optional[float] = None,
+    sitting_degree: Optional[float] = Query(None, ge=0, le=360),
     include_tihua_reference: bool = False,
     include_tihua_chart: bool = False,
 ):

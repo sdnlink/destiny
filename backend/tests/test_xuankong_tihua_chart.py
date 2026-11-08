@@ -11,9 +11,9 @@
 - 中宫五：「五到向，无替可寻，四正逆行」「五到山，无替可寻」；
   「若中宫五数戊阳己阴，此阴阳视山向为准」。
 
-替星表寅午庚丁由两套口诀 + 422 条起星图实例逆行计算裁定为弼星 9，
+替星表寅午庚丁由两套口诀 + 430 条可解析起星图实例逆行计算裁定为弼星 9，
 原工程草稿 8（左辅）已废弃；中宫五不替、仍 5 入中，顺逆视山向阴阳。
-产物仍为工程基线，不含吉凶断语。
+产物仍为工程基线，尚无专家签署（signed=false），不含吉凶断语。
 """
 import unittest
 
@@ -39,6 +39,8 @@ class XuankongTihuaChartTests(unittest.TestCase):
         t = self._chart("午", 4)
         self.assertEqual(t["status"], "completed")
         self.assertEqual(t["signed"], False)
+        self.assertEqual(t["signature_status"], "unsigned")
+        self.assertIs(t["requires_expert_signoff"], True)
         s, f = t["sitting"], t["facing"]
         self.assertEqual((s["arriving_star"], s["yuan_dragon"], s["substitute_mountain"],
                           s["tihua_star"], s["fly_direction"]), (8, "天", "艮", 7, "顺飞"))
@@ -70,6 +72,9 @@ class XuankongTihuaChartTests(unittest.TestCase):
         self.assertEqual(t["star_table_status"], "resolved_by_library_classics")
         d = t["resolution_record"]
         self.assertEqual(d["status"], "resolved_by_library_classics")
+        self.assertIs(d["signed"], False)
+        self.assertEqual(d["signature_status"], "unsigned")
+        self.assertIs(d["requires_expert_signoff"], True)
         self.assertEqual(d["resolved_value"]["star"], 9)
         self.assertEqual(d["superseded_value"]["star"], 8)
         self.assertEqual(set(d["mountains"]), {"寅", "午", "庚", "丁"})

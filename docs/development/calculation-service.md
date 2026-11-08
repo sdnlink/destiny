@@ -10,6 +10,21 @@
 
 设置`SERVE_WEB=1`后，服务会在所有API路由之后挂载`frontend/dist`。生产启动脚本负责设置该变量；计算内核本身不依赖前端代码。
 
+### 1.1 规则版本字段职责
+
+同一份规则结果里会出现三个版本概念，职责固定如下，不再混用：
+
+| 字段 | 职责 | 示例 |
+| --- | --- | --- |
+| `rule_id` | 稳定规则身份证；同一规则跨实现版本保持不变 | `BZ-BAZI-001` |
+| `rule_version` | 本次结果所用**实现版本**；可随算法修订变化 | `bazi-ziping-core-v2.0` |
+| 注册表 `version` | 注册表内该规则的**规则修订版本**；与 `(rule_id, version)` 组成注册身份 | `1.0.0` |
+
+注册表规则体可声明 `runtime_version`，显式映射「注册身份 → 当前实现版本」；八字三条规则
+（`BZ-BAZI-001` / `BZ-LIUNIAN-001` / `BZ-LIFELINE-001`）与奇门 `QM-QIMEN-001` 已声明
+`runtime_version`，并由 `test_rule_registry.py` 校验其与返回体 `rule_version` 一致。
+`rule_id` 始终是身份，不再承载版本号。
+
 已实现：
 
 - 显式IANA时区、公农历、节气、四柱和可选真太阳时。
@@ -45,7 +60,7 @@
 - 专业风水规则的专家签署与正式发布版本：八宅大游年、玄空下卦挨星已实现且规则状态仍为 `draft`，不生成吉凶断语；形势、择日等其他流派规则未实现。
 - 大六壬全部发传规则的专家签署与正式发布版本；当前均为工程草稿。
 - 六爻吉凶断语；用神候选、伏神出伏条件、三合成局条件已按库内《卜筮正宗》原文推导并挂典籍原文（请求带 `focus`），最终判断仍须人工复核。
-- 玄空替卦（起星盘）：《沈氏玄空學》原文已在库，起星盘已按库内「起星图 216 局」实例实现为工程基线，`include_tihua_chart=true` 显式请求才提供、默认关闭，不覆盖下卦挨星盘、不含吉凶断语；替星表「寅午庚丁」已由库内两套挨星口诀（弼星9）与 422 条起星图实例逆行计算裁定为 9，原工程草稿 8（左辅）废弃（裁定记录 `TIHUA_TABLE_DISCREPANCY`）；中宫五按原典「五到向，无替可寻」不替、仍 5 入中，顺逆视山向阴阳，全 216 组合恒 `completed`；产物仍属工程基线，专家签署与正式规则发布流程另行。
+- 玄空替卦（起星盘）：《沈氏玄空學》原文已在库，起星盘已按库内「起星图 216 局」实例实现为工程基线，`include_tihua_chart=true` 显式请求才提供、默认关闭，不覆盖下卦挨星盘、不含吉凶断语；替星表「寅午庚丁」已由库内两套挨星口诀（弼星9）与 430 条可解析起星图实例逆行计算裁定为 9，原工程草稿 8（左辅）废弃（裁定记录 `TIHUA_TABLE_DISCREPANCY`，`signed=false`、`signature_status=unsigned`）；中宫五按原典「五到向，无替可寻」不替、仍 5 入中，顺逆视山向阴阳，全 216 组合恒 `completed`；产物仍属工程基线，尚无专家签署与正式规则发布。
 - 铁板神数：条文底本、编号表、考刻/校时算法、四柱→条数映射、标准验证案例全部未入库（典籍库按书名精确核查无《铁板神数》类底本）；`/v1/tieban/status` 只声明数据缺口，不输出任何条数或条文断语。
 - 皇极经世：纪元锚点（公元前67017年）与运世配卦表待专家定位具体卷/版本原文；`/v1/yuanhui/cycle` 只做公历年粒度定位，不精确到月日时、不映射个人吉凶。
 - 子平格局/用神/调候定式与生平事件预测：月令取格只列藏干/透出/十神与格局候选，格局成败、清浊、喜忌待专家签署；生平事件仅对调用方录入的既成事实做只读时间对齐，不预测未来事件、不由事件反推生辰。
@@ -74,9 +89,11 @@
 | `POST /v1/bazi/lifeline` | 子平月令取格候选、八步大运/逐年流年、立春精确交接时刻、《三命通會》岁运组合事实、皇极经世背景、已录既成事件只读对齐 | 《淵海子平·宝法第二》「先看提纲为重，皆以月令为用，不可以年取格」；《三命通會·論太歲》真太岁/岁运并临/日年相并/征太岁；《皇極經世》卷一「以元經會」 |
 | `GET /v1/yuanhui/cycle?year=` | 元/会/运/世公历年粒度定位，原样保留 `epoch.pending_expert_review` | 《皇極經世》卷一「日甲一月丑二星甲三十一辰子三百六十一」 |
 | `GET /v1/tieban/status` | 铁板神数资料缺口声明（底本/编号表/考刻/映射/案例 5 项），不输出条数或断语 | 典籍库按书名精确核查：无《铁板神数》类条文底本 |
-| `POST /v1/bazi/time` / `liunian` | 补统一信封 `school/rule_version/status/judgements/warnings` | 规则注册表新增 `BZ-LIFELINE-001`、`YHYS-READONLY-001`、`BZ-TIEBAN-STATUS-001`（均 draft） |
+| `POST /v1/bazi/time` / `liunian` | 补统一信封 `school/rule_version/status/judgements/warnings`；八字结果新增 `input` 原始起盘入参 | 规则注册表新增 `BZ-BAZI-001`、`BZ-LIFELINE-001`、`YHYS-READONLY-001`、`BZ-TIEBAN-STATUS-001`（均 draft） |
 
-前端 `BaziView` 新增按需加载的「个人生平时间轴」区块（`LifelineView.jsx`），展示月令提纲、逐年大运/流年、岁运组合、皇极经世背景与 `warnings`，不渲染吉凶结论。
+八字 `/v1/bazi/time` 返回的 `solar_datetime` 是已经做真太阳时修正、带 offset 的**有效本地时刻**；`CalendarEngine` 明确拒绝带 offset 的 `local_datetime`。因此结果同时返回 `input.local_datetime/timezone/longitude/use_true_solar_time`，时间轴与流年必须复用这组原始入参，不能把 `solar_datetime` 反向作为下一次排盘的输入。
+
+前端 `BaziView` 新增按需加载的「个人生平时间轴」区块（`LifelineView.jsx`），展示月令提纲、逐年大运/流年、岁运组合、皇极经世背景与 `warnings`，不渲染吉凶结论；并提供可选的已发生事件录入（每行「年份 描述」，只做只读对齐）。
 
 回归护栏见 `backend/tests/test_lifeline_and_systems.py` 与 `frontend/tests/components/LifelineView.test.jsx`。
 
@@ -320,7 +337,7 @@ curl -X POST http://127.0.0.1:8090/v1/calculations/compare \
 - 只有一条判断进入`unpaired`。
 - 包含`indeterminate`进入`indeterminate`。
 
-当前登记的84条规则均为`draft`工程基线，各模块也没有解释性`judgements`，因此正常综合结果是保留模块事实，并提示没有可比较的已发布判断。两个`ADV-*`规则只产生未审核检查清单，不把五行关系转换为吉凶。
+当前登记的 89 条规则均为 `draft` 工程基线，各模块也没有解释性 `judgements`，因此正常综合结果是保留模块事实，并提示没有可比较的已发布判断。两个 `ADV-*` 规则只产生未审核检查清单，不把五行关系转换为吉凶。
 
 ## 5. 规则与案例
 

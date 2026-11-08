@@ -1218,6 +1218,26 @@
 .lifeline-ziping p { margin: 4px 0 0; }
 .lifeline-ziping strong { display: block; margin-bottom: 4px; }
 
+.lifeline-events {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0 14px;
+  font-size: 12.5px;
+}
+.lifeline-events label { color: var(--text-muted, #94a3b8); }
+.lifeline-events textarea {
+  width: 100%;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-soft, rgba(148, 163, 184, 0.28));
+  border-radius: 8px;
+  background: var(--surface-soft, rgba(148, 163, 184, 0.08));
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+.lifeline-events small { color: var(--text-muted, #94a3b8); }
+
 .lifeline-table-wrap { overflow-x: auto; }
 .lifeline-table {
   width: 100%;

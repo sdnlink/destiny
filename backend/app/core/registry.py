@@ -46,6 +46,11 @@ def validate_rule_registry(registry):
             errors.append("rule {} has invalid status".format(rule.get("rule_id")))
         if not rule.get("source_refs"):
             errors.append("rule {} has no source references".format(rule.get("rule_id")))
+        runtime_version = rule.get("runtime_version")
+        if runtime_version is not None and (
+            not isinstance(runtime_version, str) or not runtime_version.strip()
+        ):
+            errors.append("rule {} has invalid runtime_version".format(rule.get("rule_id")))
 
     rule_ids = {rule.get("rule_id") for rule in rules}
     for rule_set in registry.get("rule_sets", []):

@@ -134,6 +134,7 @@ destiny/
 - `data/generated/*.jsonl` 为**生成的结构化常量语料**（八卦、六十四卦、干支、五行、二十四节气、二十八宿、三垣、洛书九宫、河图数、风水二十四山、历史历法等），经 `scripts/build_*.py` 从权威来源生成，可装载进 ClickHouse。
 - `data/rules/*.json` 为**规则注册表**，每条规则含 `rule_id/version/system/school/status/title/purpose/preconditions/inputs/procedure/outputs/source_refs/limitations/owner/reviewers/implementation` 等字段，带 SHA-256 校验和。
 - `data/validation-cases/*.json` 为**工程回归案例**，含 `case_id/system/school/method/input/expected/tags/review_status/source_refs` 等字段。
+- `data/validation-cases/xuankong-reverse-cases.json` 为**从典籍原文派生的起星图样例**（216 局 / 430 条可解析实例），由 `scripts/build_xuankong_reverse_cases.py` 重建；原始 20MB 语料不入库，CI 直接读取该样例。
 - `cache/` 为抓取缓存（道人家、Wikisource 的 metadata/texts），供离线复现。
 
 ---
@@ -366,7 +367,7 @@ FastAPI 应用 `APP_VERSION = "0.2.0"`，提供以下能力：
 
 ## 8. 规则与验证体系
 
-- **规则注册表**：`data/rules/mvp-engineering-baseline.json`，当前 **84 条可追溯工程规则**（全部纳入 `rule_sets` 引用），状态均为 `draft`，待专家审核；每条规则独立编号（如 `YI-3NUM-INPUT-001`、`MH-THREE-NUMBER-001`），含来源引用、前置条件、输入、程序、输出、限制与责任人。
+- **规则注册表**：`data/rules/mvp-engineering-baseline.json`，当前 **89 条可追溯工程规则**（全部纳入 `rule_sets` 引用），状态均为 `draft`，待专家审核；每条规则独立编号（如 `YI-3NUM-INPUT-001`、`MH-THREE-NUMBER-001`），含来源引用、前置条件、输入、程序、输出、限制与责任人。
 - **工程回归案例**：`data/validation-cases/mvp-engineering-baseline.json`，当前 **31 个案例全部通过**，代表工程基线而非专家签署案例。
 - **校验链**：`POST /v1/validation-cases/run` 执行回归；`scripts/run_validation_cases.py` 命令行校验；`test_rule_registry.py` 校验注册表结构（必填字段、唯一性、引用完整性）。
 - **治理目标**：规则发布需审核、绑定来源、案例回归；历史结果通过 `rule_version` 引用还原，即使规则下线也不失真。
@@ -474,7 +475,7 @@ npm --prefix frontend run test:browser
 
 **计算基线**：
 
-- 84 条可追溯工程规则，状态均为 `draft`，待专家审核。
+- 89 条可追溯工程规则，状态均为 `draft`，待专家审核。
 - 31 个工程回归案例，当前全部通过（不代表专家签署案例）。
 - 健康、常量、规则、案例、计算、典籍检索与风水档案接口持续增补，机器契约以 `/openapi.json` 为准。
 - 多模块综合只比较引用已发布规则的结构化判断，不生成自动吉凶总分。

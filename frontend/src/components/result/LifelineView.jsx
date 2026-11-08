@@ -23,20 +23,62 @@ function summarizeSuiyun(suiyun) {
   return [...flags, ...relations].join(" · ") || "无显著冲合";
 }
 
+function withoutTimezoneOffset(value) {
+  if (typeof value !== "string") return "";
+  // 后端 CalendarEngine 只接受 naive local_datetime；旧结果没有 input 时，
+  // 至少把 solar_datetime 末尾的 Z/+08:00 剥掉，避免直接触发 422。
+  return value.replace(/(?:Z|[+-]\d{2}:?\d{2})$/, "");
+}
+
+function parseRecordedEvents(text) {
+  return text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const match = line.match(/^(\d{4})\s+([^ ].*)$/);
+      if (!match) {
+        throw new Error("事件格式应为「年份 描述」，例如：2030 迁居");
+      }
+      const year = Number(match[1]);
+      if (year < 1900 || year > 2100) {
+        throw new Error("事件年份需在 1900-2100 之间");
+      }
+      return { year, label: match[2].trim() };
+    });
+}
+
 /** 个人生平时间轴：按需向 /v1/bazi/lifeline 请求，只展示确定事实。 */
 export function LifelineView({ result }) {
   const [state, setState] = useState({ status: "idle", data: null, error: null });
-  const solarDatetime = result?.solar_datetime;
+  const [eventsText, setEventsText] = useState("");
+  const natalInput = result?.input || {};
+  const hasSourceInput = Boolean(natalInput.local_datetime);
+  const localDatetime = withoutTimezoneOffset(natalInput.local_datetime || result?.solar_datetime);
+  const timezone = natalInput.timezone || "Asia/Shanghai";
+  const gender = natalInput.gender || result?.gender || "男";
+  const longitude = natalInput.longitude ?? null;
+  const useTrueSolarTime = Boolean(natalInput.use_true_solar_time);
 
   async function load() {
-    if (!solarDatetime) return;
+    if (!localDatetime) return;
+    let events;
+    try {
+      events = parseRecordedEvents(eventsText);
+    } catch (error) {
+      setState({ status: "error", data: null, error: error.message });
+      return;
+    }
     setState({ status: "loading", data: null, error: null });
     try {
       const data = await analyzeLifeline({
-        local_datetime: solarDatetime,
-        timezone: "Asia/Shanghai",
-        gender: result.gender || "男",
+        local_datetime: localDatetime,
+        timezone,
+        gender,
+        longitude,
+        use_true_solar_time: useTrueSolarTime,
         count: 12,
+        events,
       });
       setState({ status: "ready", data, error: null });
     } catch (error) {
@@ -66,6 +108,22 @@ export function LifelineView({ result }) {
       {state.status === "idle" && (
         <p className="muted-copy">按需生成起运后 12 年的逐年事实序列（含立春交接时刻与皇极经世背景）。</p>
       )}
+      {!hasSourceInput && (
+        <Notice tone="warning" icon={CircleAlert}>
+          该结果来自旧版本，缺少原始时区与真太阳时入参；时间轴将按东八区重建，可能与原盘不一致。
+        </Notice>
+      )}
+      <div className="lifeline-events">
+        <label htmlFor="lifeline-events">已发生事件（可选，每行：年份 描述）</label>
+        <textarea
+          id="lifeline-events"
+          value={eventsText}
+          onChange={(event) => setEventsText(event.target.value)}
+          rows={2}
+          placeholder={"2030 迁居\n2031 入职"}
+        />
+        <small>只做时间对齐展示，不参与计算、不预测未来、不用于反推生辰。</small>
+      </div>
       {state.status === "error" && <Notice tone="warning" icon={CircleAlert}>{state.error}</Notice>}
       {state.status === "ready" && (
         <>

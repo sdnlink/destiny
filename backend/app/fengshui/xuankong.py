@@ -5,7 +5,7 @@
   及《沈氏玄空學》卷首至卷六）；
 - 替卦起星盘已按库内《沈氏玄空學》起星图 216 局实例实现为工程基线，
   经 `include_tihua_chart=true` 显式请求才提供、默认关闭，不覆盖下卦挨星盘；
-  替星表寅午庚丁由库内两套挨星口诀（弼星9）与 422 条起星图实例逆行计算裁定为 9，
+  替星表寅午庚丁由库内两套挨星口诀（弼星9）与 430 条可解析起星图实例逆行计算裁定为 9，
   原工程草稿 8（左辅）已废弃（裁定记录见 TIHUA_TABLE_DISCREPANCY）；
   中宫五按原典「五到向，无替可寻」不替、仍 5 入中，顺逆视山向阴阳；
   产物仍属工程基线，专家签署与正式规则发布流程另行，不含吉凶断语；
@@ -50,9 +50,9 @@ YUAN_LABELS = {1: "上元", 2: "上元", 3: "上元", 4: "中元", 5: "中元", 
 #     艮丙辛酉丑破军。若向寅午庚丁上，一律挨来是弼星。」
 #   蒋大鸿授姜汝皋挨星口诀「…寅午庚丁上，右弼四星临。」
 # 二者一致：寅午庚丁 = 9（右弼）。早先工程草稿误记为 8（左辅），现据典订正。
-# 逆行验证：库内起星图 216 局共 422 条「到星→入中星」实例中，
-#   到星7→入中9（庚，14例）、到星8→入中9（寅，15例）、到星9→入中9（午/丁，32例），
-#   入中结果从不出现 8，与原典弼星 9 完全吻合。
+# 逆行验证：库内起星图 216 局（432 条山/向，语料缺 1 行、1 行 OCR 不可解析，
+#   另 4 处单字 OCR 已按同句源山订正）共 430 条可解析「到星→入中星」实例中，
+#   到星7/8/9 用寅午庚丁时均入中9，入中结果从不出现 8，与原典弼星 9 吻合。
 TIHUA_STAR = {
     "子": 1, "癸": 1, "甲": 1, "申": 1,
     "坤": 2, "壬": 2, "乙": 2, "卯": 2, "未": 2,
@@ -69,6 +69,9 @@ TIHUA_STAR_LIBRARY_CLASSIC = TIHUA_STAR
 # 口径裁定的可复核记录（原工程草稿 8 → 据典 9），保留历史以便追溯。
 TIHUA_TABLE_DISCREPANCY = {
     "status": "resolved_by_library_classics",
+    "signed": False,
+    "signature_status": "unsigned",
+    "requires_expert_signoff": True,
     "mountains": ["寅", "午", "庚", "丁"],
     "resolved_value": {"star": 9, "name": "弼星（右弼）"},
     "superseded_value": {"star": 8, "name": "左辅", "table": "工程草稿（已废弃）"},
@@ -80,8 +83,8 @@ TIHUA_TABLE_DISCREPANCY = {
         "九之天元即午，挨弼星，仍九入中，午阴逆行",
         "八之人元即寅，挨弼星，故不用八而以九入中，寅阳顺行",
     ],
-    "reverse_computation": "库内起星图216局422条「到星→入中星」实例逆推：到星7/8/9 用寅午庚丁时均入中9，无一入中8",
-    "note": "口径已由库内原典明文 + 起星图标准案例逆行计算裁定为弼星9，不再是待签署冲突；产物仍为工程基线，不含吉凶断语。",
+    "reverse_computation": "库内起星图216局中430条可解析「到星→入中星」实例逆推：到星7/8/9 用寅午庚丁时均入中9，无一入中8",
+    "note": "口径已由库内原典明文 + 起星图标准案例逆行计算裁定为弼星9，但尚无专家签署；产物仍为工程基线，不含吉凶断语。",
 }
 
 # 洛书数 → 宫位：到山/到向的运星数，据此宫取与坐/向同元龙之山为替星山。
@@ -232,6 +235,8 @@ def _tihua_chart(period_chart, sitting_palace, facing_palace, sitting_yuan, faci
         "rule_id": TIHUA_CHART_RULE_ID,
         "status": overall,
         "signed": False,
+        "signature_status": "unsigned",
+        "requires_expert_signoff": True,
         "school": "沈氏玄空學起星图（库内原典口径，工程基线）",
         "star_table": "TIHUA_STAR",
         "star_table_status": "resolved_by_library_classics",
@@ -242,9 +247,9 @@ def _tihua_chart(period_chart, sitting_palace, facing_palace, sitting_yuan, faci
         "table_discrepancy": dict(TIHUA_TABLE_DISCREPANCY),
         "evidence": _classic_evidence(["起星", "替卦", "寅午庚丁", "挨弼星"], limit=4),
         "note": "替卦起星盘按库内《沈氏玄空學》起星图 216 局实例实现，属可查证排盘事实（不含吉凶断语）。"
-                "寅午庚丁替星口径已由库内两套挨星口诀（弼星9）与 422 条起星图实例逆行计算裁定，"
+                "寅午庚丁替星口径已由库内两套挨星口诀（弼星9）与 430 条可解析起星图实例逆行计算裁定，"
                 "原工程草稿8已废弃；中宫五按原典「无替可寻」不替、仍五入中，顺逆视山向阴阳。"
-                "产物仍为工程基线，专家签署与正式规则发布流程另行。",
+                "产物仍为工程基线，尚无专家签署与正式规则发布，signed=false。",
     }
 
 
@@ -382,13 +387,16 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
         result["facts"]["tihua_reference"] = {
             "rule_id": TIHUA_RULE_ID,
             "status": "resolved_by_library_classics",
+            "signed": False,
+            "signature_status": "unsigned",
+            "requires_expert_signoff": True,
             "sitting": {"mountain": mountain.name, "tihua_star": TIHUA_STAR.get(mountain.name)},
             "facing": {"mountain": facing_name, "tihua_star": TIHUA_STAR.get(facing_name)},
-            "note": "替卦挨星表已按库内《沈氏玄空學》两套口诀（寅午庚丁弼星9）与起星图216局逆行计算订正；"
-                    "裁定记录见 tihua_chart.resolution_record。产物仍为工程基线，不含吉凶断语。",
+            "note": "替卦挨星表已按库内《沈氏玄空學》两套口诀（寅午庚丁弼星9）与起星图216局中430条可解析实例逆行计算订正；"
+                    "裁定记录见 tihua_chart.resolution_record。产物仍为工程基线，尚无专家签署，signed=false，不含吉凶断语。",
         }
         result["warnings"].append(
-            "已附替卦挨星参考（据库内原典裁定），仅供复核，不作为生产结论。"
+            "已附替卦挨星参考（据库内原典裁定，但尚无专家签署），仅供复核，不作为生产结论。"
         )
 
     if include_tihua_chart:
@@ -399,8 +407,8 @@ def calculate_xuankong(sitting_mountain, year=None, period=None, sitting_degree=
             mountain.name, facing_name,
         )
         result["warnings"].append(
-            "已附替卦起星盘（据库内《沈氏玄空學》起星图216局实现）：替星表口径已由原典裁定，"
-            "中宫五按「无替可寻」不替；产物仍为工程基线，专家签署与正式规则发布另行。"
+            "已附替卦起星盘（据库内《沈氏玄空學》起星图216局实现）：替星表口径已由原典裁定但尚无专家签署，"
+            "中宫五按「无替可寻」不替；产物仍为工程基线，signed=false。"
         )
 
     return result

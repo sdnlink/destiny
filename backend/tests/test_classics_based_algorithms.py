@@ -128,7 +128,7 @@ class VoidFillProspectTests(unittest.TestCase):
 
     def test_no_fake_tianshi_state(self):
         r = line_cast([9, 7, 7, 7, 7, 7], "2026-02-19 12:00:00", "Asia/Shanghai")
-        self.assertFalse(any(l["void_state"] == "填实" for l in r["facts"]["line_chart"]))
+        self.assertFalse(any(line["void_state"] == "填实" for line in r["facts"]["line_chart"]))
         self.assertEqual(len(r["facts"]["void_fill_prospects"]), 2)
 
 

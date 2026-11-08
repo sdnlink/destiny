@@ -62,13 +62,20 @@ class LuckPillar(BaseModel):
 
 
 class BaZiResult(BaseModel):
+    schema_version: str
     rule_id: str
     system: str
+    school: str
+    rule_version: str
+    status: str
     gender: str
+    input: BaZiInput
     solar_datetime: str
     lunar_datetime: str
     day_master: str
-    pillars: Dict[str, PillarDetail]
+    # 对外结果按 facts 包裹排盘事实；旧 models.py 里的顶层 pillars 与实际响应不一致，
+    # 这里改为按实际信封校验，避免“声明了契约但从未接线”。
+    facts: Dict[str, Any]
     element_scores: Dict[str, float]
     element_distribution: List[ElementDistribution]
     day_master_strength: DayMasterStrength
@@ -76,3 +83,5 @@ class BaZiResult(BaseModel):
     luck_start_info: Dict[str, Any]
     luck_pillars: List[LuckPillar]
     advisory: Dict[str, str]
+    judgements: List[Any]
+    warnings: List[str]

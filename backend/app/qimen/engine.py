@@ -19,6 +19,7 @@ from .rules import (
     evaluate_qimen_patterns,
 )
 
+RULE_ID = "QM-QIMEN-001"
 RULE_VERSION = "qimen-chaibu-zhuanpan-v2.0"
 
 
@@ -264,7 +265,8 @@ def calculate_qimen_chart(
     }
 
     result = {
-        "rule_id": RULE_VERSION,
+        "rule_id": RULE_ID,
+        "rule_version": RULE_VERSION,
         "system": "qimen",
         "solar_datetime": cal_res["time"]["effective_local_datetime"],
         "lunar_datetime": f"{cal_res['lunar']['year']}年 {'(闰)' if cal_res['lunar']['is_leap_month'] else ''}{cal_res['lunar']['month_name']}月{cal_res['lunar']['day_name']}",

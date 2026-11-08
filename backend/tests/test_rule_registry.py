@@ -14,6 +14,7 @@ from app.liuyao import coin_cast as liuyao_coin_cast, line_cast as liuyao_line_c
 from app.core.meihua import auto_cast as meihua_auto_cast, time_cast
 from app.meihua import three_number_cast as meihua_three_number_cast
 from app.ziwei import time_cast as ziwei_time_cast, auto_cast as ziwei_auto_cast
+from app.qimen.engine import time_cast as qimen_time_cast, RULE_ID as QIMEN_RULE_ID, RULE_VERSION as QIMEN_RULE_VERSION
 from app.core.registry import load_rule_registry, load_validation_cases, unknown_rule_ids
 from app.core.validation import compare_subset, run_validation_cases
 
@@ -65,11 +66,35 @@ class RuleRegistryTests(unittest.TestCase):
             meihua_three_number_cast(25, 38, 5),
             liuyao_auto_cast("person-0000000000000001", "2026-08-15T16:00:00", "Asia/Shanghai"),
             liuren_auto_cast("person-0000000000000001", "2026-08-15T16:00:00", "Asia/Shanghai"),
+            qimen_time_cast("2026-08-15T16:00:00", "Asia/Shanghai"),
             ziwei_time_cast("2026-08-15T16:00:00", "Asia/Shanghai", "男"),
             ziwei_auto_cast("person-0000000000000001", "2026-08-15T16:00:00", "Asia/Shanghai", "女"),
         ]
         for result in results:
             self.assertEqual(unknown_rule_ids(result), [])
+
+    def test_bazi_runtime_versions_are_declared_in_registry(self):
+        """三套命名职责固定：rule_id=身份、registry.version=规则修订、runtime_version=实现版本。"""
+        from app.bazi.engine import RULE_VERSION as BAZI_VERSION
+        from app.bazi.lifeline import RULE_VERSION as LIFELINE_VERSION
+        from app.bazi.liunian import RULE_VERSION as LIUNIAN_VERSION
+
+        registry = load_rule_registry()
+        by_id = {rule["rule_id"]: rule for rule in registry["rules"]}
+        expected = {
+            "BZ-BAZI-001": BAZI_VERSION,
+            "BZ-LIUNIAN-001": LIUNIAN_VERSION,
+            "BZ-LIFELINE-001": LIFELINE_VERSION,
+        }
+        for rule_id, runtime_version in expected.items():
+            rule = by_id[rule_id]
+            self.assertEqual(rule["runtime_version"], runtime_version)
+            self.assertEqual(rule["status"], "draft")
+            self.assertEqual(rule["owner"], "unassigned")
+            self.assertEqual(rule["reviewers"], [])
+        self.assertEqual(len({value for value in expected.values()}), 1)
+        self.assertEqual(by_id[QIMEN_RULE_ID]["runtime_version"], QIMEN_RULE_VERSION)
+        self.assertEqual(qimen_time_cast("2026-08-15T16:00:00", "Asia/Shanghai")["rule_id"], QIMEN_RULE_ID)
 
     def test_validation_case_document_is_explicitly_unreviewed(self):
         document = load_validation_cases()

@@ -109,6 +109,11 @@ for (const [tab, heading] of [
   await desktop.getByRole("button", { name: tab }).last().click();
   await desktop.getByRole("heading", { name: heading }).waitFor({ timeout: 15000 });
 }
+// 时间轴必须能在真实结果上生成：之前组件测试 mock 了 API，掩盖了
+// solar_datetime 带 offset 时后端 422 的端到端缺陷。
+await desktop.getByRole("button", { name: "八字命理" }).last().click();
+await desktop.getByRole("button", { name: "生成时间轴" }).click();
+await desktop.getByText(/月令提纲：/).waitFor({ timeout: 20000 });
 await desktop.screenshot({ path: shot("tianji-tabs-desktop.png"), fullPage: true });
 
 

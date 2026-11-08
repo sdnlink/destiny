@@ -38,8 +38,24 @@ class ApiHardeningTests(unittest.TestCase):
         ref = resp.json()["data"]["facts"]["tihua_reference"]
         self.assertEqual(ref["rule_id"], "FS-XUANKONG-TIHUA-001")
         self.assertEqual(ref["status"], "resolved_by_library_classics")
+        self.assertIs(ref["signed"], False)
+        self.assertEqual(ref["signature_status"], "unsigned")
+        self.assertIs(ref["requires_expert_signoff"], True)
         self.assertEqual(ref["sitting"]["mountain"], "午")
         self.assertIsNotNone(ref["sitting"]["tihua_star"])
+
+    def test_xuankong_degree_range_consistent_for_get_and_post(self):
+        for degree in (-1, 361):
+            get_resp = self.client.get(
+                "/v1/fengshui/xuankong",
+                params={"sitting_mountain": "午", "sitting_degree": degree},
+            )
+            self.assertEqual(get_resp.status_code, 422)
+            post_resp = self.client.post(
+                "/v1/fengshui/xuankong",
+                json={"sitting_mountain": "午", "sitting_degree": degree},
+            )
+            self.assertEqual(post_resp.status_code, 422)
 
     def test_unsupported_system_is_rejected_at_create(self):
         # zhouyi/fengshui 不在七步排盘链路里，不能静默落成「梅花+六爻」默认盘

@@ -207,6 +207,10 @@
           "version": "1.0.0"
         },
         {
+          "rule_id": "BZ-BAZI-001",
+          "version": "1.0.0"
+        },
+        {
           "rule_id": "BZ-LIUNIAN-001",
           "version": "1.0.0"
         },
@@ -356,6 +360,10 @@
         },
         {
           "rule_id": "WF-TIMING-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "QM-QIMEN-001",
           "version": "1.0.0"
         }
       ]
@@ -3306,7 +3314,7 @@
         "《沈氏玄空學》二十四山配九星图吹齑子/蒋大鸿授姜汝皋两套挨星口诀、起星图二百一十六局（逆行计算见 test_xuankong_reverse_computation.py）"
       ],
       "limitations": [
-        "替星表寅午庚丁已据库内两套挨星口诀（弼星9）与422条起星图实例逆行计算裁定，原工程草稿8（左辅）废弃；裁定记录见 TIHUA_TABLE_DISCREPANCY",
+        "替星表寅午庚丁已据库内两套挨星口诀（弼星9）与430条可解析起星图实例逆行计算裁定，原工程草稿8（左辅）废弃；裁定记录见 TIHUA_TABLE_DISCREPANCY，signed=false、signature_status=unsigned",
         "中宫五按原典「五到向，无替可寻」不替、仍5入中，顺逆视山向阴阳",
         "替卦起星盘仍属工程基线，专家签署与正式规则发布流程另行",
         "格局条件为确定性判定，不含吉凶断语"
@@ -3353,6 +3361,47 @@
       "implementation": "app.common.classics:ClassicsLibrary"
     },
     {
+      "rule_id": "BZ-BAZI-001",
+      "version": "1.0.0",
+      "system": "bazi",
+      "school": "ziping-yueling-engineering-baseline-v1",
+      "status": "draft",
+      "title": "子平八字四柱排盘与旺衰工程基线",
+      "purpose": "按原始起盘入参生成四柱、藏干十神、神煞、五行旺衰、起运与大运序列，并把原始 local_datetime/timezone/真太阳时入参随结果返回，供流年与生平时间轴复用同一张命盘",
+      "preconditions": [
+        "CalendarEngine 可用并支持指定时区/经度/真太阳时",
+        "local_datetime 为不含时区偏移的本地时刻"
+      ],
+      "inputs": [
+        "local_datetime", "timezone", "gender", "longitude", "use_true_solar_time"
+      ],
+      "procedure": [
+        "调用 CalendarEngine 计算节气、四柱与有效本地时刻",
+        "按日干推十神、藏干、十二长生、纳音与神煞",
+        "按五行分数计算日主强弱与喜忌，并生成模板说明",
+        "按月柱与顺逆规则排八步大运，起运岁数按有效时刻计算",
+        "把原始 local_datetime/timezone/longitude/use_true_solar_time 放入 input，避免下游用已修正的 solar_datetime 反推"
+      ],
+      "outputs": [
+        "input", "facts", "element_scores", "day_master_strength", "luck_start_info",
+        "luck_pillars", "judgements", "warnings"
+      ],
+      "source_refs": [
+        "淵海子平（四柱/十神/月令）",
+        "三命通會（神煞/大運）",
+        "滴天髓闡微（旺衰）"
+      ],
+      "limitations": [
+        "日主强弱与喜用为工程打分，不是典籍定式",
+        "格局取法、用神喜忌与事项吉凶待专家签署",
+        "solar_datetime 是已修正后的有效本地时刻，不能作为下一次排盘的 local_datetime"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.bazi.engine:calculate_bazi",
+      "runtime_version": "bazi-ziping-core-v2.0"
+    },
+    {
       "rule_id": "BZ-LIUNIAN-001",
       "version": "1.0.0",
       "system": "bazi",
@@ -3397,7 +3446,8 @@
       ],
       "owner": "unassigned",
       "reviewers": [],
-      "implementation": "app.bazi.liunian:liunian_cast"
+      "implementation": "app.bazi.liunian:liunian_cast",
+      "runtime_version": "bazi-ziping-core-v2.0"
     },
     {
       "rule_id": "BZ-LIFELINE-001",
@@ -3442,7 +3492,8 @@
       ],
       "owner": "unassigned",
       "reviewers": [],
-      "implementation": "app.bazi.lifeline:lifeline_cast"
+      "implementation": "app.bazi.lifeline:lifeline_cast",
+      "runtime_version": "bazi-ziping-core-v2.0"
     },
     {
       "rule_id": "YHYS-READONLY-001",
@@ -3505,6 +3556,46 @@
       "owner": "unassigned",
       "reviewers": [],
       "implementation": "app.bazi.tieban:tieban_status"
+    },
+    {
+      "rule_id": "QM-QIMEN-001",
+      "version": "1.0.0",
+      "system": "qimen",
+      "school": "qimen-chaibu-zhuanpan-engineering-baseline",
+      "status": "draft",
+      "title": "时家转盘奇门遁甲拆补排局与九宫事实",
+      "purpose": "按节气、三元、阴阳遁与时辰旬首排九宫星门神仪，输出值符值使、旬空、驿马与宫位组合事实，不生成事项吉凶断语",
+      "preconditions": [
+        "CalendarEngine 可用并给出节气与干支",
+        "时家转盘拆补法口径可用"
+      ],
+      "inputs": [
+        "local_datetime", "timezone"
+      ],
+      "procedure": [
+        "按节气与日支确定上中下三元，查阴阳遁与局数表",
+        "按旬首与三奇六仪布地盘，按值符值使转天盘与人盘",
+        "排九星、八门、八神并标时旬空落宫与驿马落宫",
+        "汇总宫位星门神仪组合与可复核的吉方候选"
+      ],
+      "outputs": [
+        "facts", "rule_id", "rule_version", "system", "solar_datetime", "lunar_datetime",
+        "ganzhi", "solar_term", "dun_type", "ju_number", "yuan_type", "xun", "void",
+        "horse_star", "palaces", "favorable_directions", "advisory"
+      ],
+      "source_refs": [
+        "docs/development/calculation-service.md（奇门能力边界）",
+        "docs/development/audit-fixes-2026-11.md（时旬空/驿马落宫回归）"
+      ],
+      "limitations": [
+        "拆补转盘为工程基线，法窍/置闰等流派差异待专家签署",
+        "advisory 为模板化行动提示，不进入正式 judgements",
+        "不生成事项级吉凶总分或应期断语"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.qimen.engine:calculate_qimen_chart",
+      "runtime_version": "qimen-chaibu-zhuanpan-v2.0"
     }
   ]
 }

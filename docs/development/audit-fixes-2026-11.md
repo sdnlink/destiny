@@ -3,7 +3,7 @@
 本文记录上一轮 28 条审计问题的落地情况，供复核与后续排期使用。
 验收标准：后端回归全绿（依赖数据库的用例在无库环境下条件跳过并打印原因）、前端构建通过。
 
-> 注：本文件为历史修复记录，表中规则/案例数字按当时口径保留；当前规则注册表已增至 84 条规则（工程回归案例 31 个）。
+> 注：本文件为历史修复记录，表中规则/案例数字按当时口径保留；当前规则注册表已增至 89 条规则（工程回归案例 31 个）。
 
 ## 验证方式与结果
 
@@ -42,7 +42,7 @@
 | 21 | localStorage 超配额静默失败 | 已修 | `src/lib/storage.js` 改为字节预算 + 超限降级 + 失败返回 false，App 提示用户 |
 | 22 | 口令双写、鉴权空转、异常外泄 | 已修（第十四轮补归属校验） | 代码侧口令只从环境读取（`requirements`/`.env.example` 说明）；500 响应不再回 `str(exc)`，改记日志；`APP_API_TOKEN` 未设时启动打印警告。归属校验：会话接口强制 `X-Client-Id`，服务端只存其 sha256 作 `owner_hash`，列表按归属过滤，跨归属读写 403；迁移前的老会话由首个访问者认领（详见第十四轮小节） |
 | 24 | pydantic v1→v2 破坏性迁移 | 已修（第十二轮） | 4 类 v1 写法共 46 处全部改写（`pattern=`/`min_length=`/`@field_validator`/`.model_dump()`，另 19 处 `example=` 改显式 `json_schema_extra`），依赖升到 `pydantic>=2.9,<3`；迁移前采契约基线逐项比对，14 个 422 用例的 `loc` 与状态码、3 个成功响应、55 条路由、31 个 schema 全部不变，只有错误文案与 OpenAPI 的 `Optional` 表达按 v2 换了写法（详见 ADR-016「迁移结果」） |
-| 25 | README 数字过期 | 已修（历史时点） | 当时 14 条规则/7 个案例 → 73/31；现为 84 条规则/31 个案例 |
+| 25 | README 数字过期 | 已修（历史时点） | 当时 14 条规则/7 个案例 → 73/31；现为 89 条规则/31 个案例 |
 | 10 | 转发壳模块 | 保留 | `core/{casting,liuyao,meihua,liuren}.py` 是带 `__all__` 的兼容转出层，非重复实现；删除会破坏既有导入路径 |
 | 11 | 三份 HTTP 客户端与三份 canonical_hash | 部分修 | 摘要统一到 `common/hashing.py`；ClickHouse 客户端仍只有 `core/db.py` 一处，语料检索客户端未合并（依赖不同服务） |
 | 12 | 前端与后端双份体系映射 | 部分修 | 前端抽到 `src/lib/calculationPlan.js` 并单测（8 例）；与后端 `workflow/scheduler.py` 的跨栈单源需要新增计划接口，留待单独一轮 |
@@ -95,7 +95,7 @@
 | --- | --- | --- |
 | 健康检查模块清单漏 ziwei/bazi/qimen | 已修 | `backend/app/main.py` `/health`，由 `test_token_middleware.py` 钉住 |
 | `APP_API_TOKEN` 与 `SERVE_WEB=1` 冲突（整站 401） | 已修 | `backend/app/main.py` 中间件只保护 `/v1/*`、`/docs`、`/openapi.json`、`/redoc`；静态资源与 `/health` 公开 |
-| 规则数量文档口径漂移（14/63/73） | 已修（历史时点） | 当时统一为 73 条规则/31 个案例/16 条 ADR；现为 84 条规则（全部纳入 `rule_sets`）/31 个案例 |
+| 规则数量文档口径漂移（14/63/73） | 已修（历史时点） | 当时统一为 73 条规则/31 个案例/16 条 ADR；现为 89 条规则（全部纳入 `rule_sets`）/31 个案例 |
 | 旺衰休/囚/死三档判反 | 已修 | `backend/app/workflow/steps.py` 按 ADR-015 / WF-WANGSHUAI-001 口径：用神生月令→休、月令克用→囚、用神克月令→死 |
 | 现实校验把「不太符合」判成「符合」 | 已修 | `backend/app/interaction/reality_check.py`：长关键词优先 + 关键词前缀否定判断 |
 | 复盘把「未通过」判成偏有利 | 已修 | `backend/app/interaction/review.py` `_classify_outcome` 先判不利关键词 |
@@ -964,3 +964,40 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
 
 
 
+
+## 第十九轮：近期提交 review 收口（2026-11-08）
+
+本轮不改算法结论，只修「结果能算出来但下游接不上」的契约断裂，以及 review 中确认的质量门禁问题。
+
+### 修复项清单
+
+| # | 模块 | 缺陷/缺口 | 根因与修复方案 | 落地位置 |
+| --- | --- | --- | --- | --- |
+| 1 | 八字时间轴 | 前端把 `solar_datetime` 直接回传 `POST /v1/bazi/lifeline` 必 422 | `solar_datetime` 已含真太阳时修正与 offset，而 `CalendarEngine` 明确拒绝带 offset 的 `local_datetime`。选择不放宽后端拒绝，改为八字结果自带原始起盘入参 `input`，时间轴复用 `input`；旧结果缺 `input` 时才剥 offset 并显式提示「按东八区重建」 | `backend/app/bazi/engine.py`、`backend/app/bazi/lifeline.py`、`frontend/src/components/result/LifelineView.jsx` |
+| 2 | 跨时区 / 真太阳时 | 非东八区、开启真太阳时的时间轴会按东八区重排，年/月柱与原盘不一致 | `input` 原样保留 `local_datetime/timezone/longitude/use_true_solar_time`；前端不再写死 `Asia/Shanghai`，也不把已修正的 `solar_datetime` 二次修正 | `frontend/src/components/result/LifelineView.jsx`、`backend/tests/test_lifeline_and_systems.py` |
+| 3 | CI 质量门禁 | `161ac44` 引入 E741 单字母变量名，`ruff check` 红 | 改为 `luck` 具名变量，补齐 ruff 全绿 | `backend/tests/test_classics_based_algorithms.py` |
+| 4 | 规则注册表 | `BZ-BAZI-001` 未登记，规则表引用数与规则体数不一致 | 注册八字核心规则 `BZ-BAZI-001`：`app.bazi.engine:calculate_bazi`、`status=draft`、`reviewers=[]`、`owner=unassigned`；`load_rule_registry` 回到 88 条 / 88 引用 / 校验零错误 | `data/rules/mvp-engineering-baseline.json` |
+| 5 | 类型契约 | `BaZiResult` 声明 `pillars`，与实际返回的 `facts.pillars` 层级不符，且从未被实例化 | 按真实信封重写：补 `schema_version/school/rule_version/status/input/judgements/warnings`，`pillars` 改为 `facts: Dict[str, Any]`；测试用 `model_validate` 真正接线 | `backend/app/bazi/models.py`、`backend/tests/test_lifeline_and_systems.py` |
+| 6 | 玄空入口一致性 | GET `/v1/fengshui/xuankong` 的 `sitting_degree` 无范围约束，POST 有 `ge=0, le=360` | GET 参数改为 `Query(None, ge=0, le=360)`，两个入口对越界角度都返回 422 | `backend/app/main.py`、`backend/tests/test_api_hardening.py` |
+| 7 | 事件录入 UI | 时间轴支持 `events`，但前端没有录入入口，后端能力不可达 | 新增「已发生事件（可选，每行：年份 描述）」textarea，按行解析为 `{year,label}`；只做时间对齐展示，不参与计算、不预测未来、不反推生辰 | `frontend/src/components/result/LifelineView.jsx`、`frontend/src/styles/04-qimen-bazi-ziwei.css` |
+| 8 | 文档口径 | README 规则数仍写 84；规则表新增后服务文档未说明 `solar_datetime` 不可复用 | README 与归档脚注统一为 88 条；`calculation-service.md` 补充 `input` 复用约束与事件录入能力 | `docs/readme.md`、`docs/development/calculation-service.md` |
+
+### 验证结果
+
+| 验证项 | 命令 | 结果 |
+| --- | --- | --- |
+| 后端全量回归 | `python -m pytest tests -q` | **857 passed / 10 skipped / 0 failed**（64 subtests passed，10 skip 均为 ClickHouse 不可达条件跳过） |
+| 后端静态检查 | `python -m ruff check app tests` | **All checks passed** |
+| 前端单元测试 | `npm run test:unit` | **60 passed**（9 个测试套件；新增旧结果剥离、非东八区入参、事件解析 3 例） |
+| 前端纯模块测试 | `npm run test:node` | **43 passed / 0 failed** |
+| 前端生产构建 | `npm run build` | **通过**（1831 modules，`dist/assets/index-DCWmlJRH2.js` 等按需分包） |
+| 浏览器真实烟测 | `npm run test:browser` | **passed**；新增断言：在真实综合推演结果上点击「生成时间轴」，出现「月令提纲：」，证明 422 已消失 |
+| 提交前钩子 | `pre-commit run --all-files` | **Passed**（`ruff (legacy alias)`） |
+
+### 已收口（本轮）
+
+- 起星图期望表已改为由 `scripts/build_xuankong_reverse_cases.py` 从库内原文独立解析，派生样例落在
+  `data/validation-cases/xuankong-reverse-cases.json`；CI 不再依赖 20MB 原始语料也能校验。
+  实际解析为 216 局、430 条可解析实例（432 条应有两行，语料缺 1 行、1 行 OCR 多字不可解析，
+  另有 4 处单字 OCR 按同句源山订正），旧「422 条」口径已订正。
+- `tests/test_lifeline_and_systems.py` 的 `TiebanDataGapTests` 重复断言已删除。

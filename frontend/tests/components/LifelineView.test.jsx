@@ -6,6 +6,13 @@ import * as api from "../../src/lib/api";
 const mockResult = {
   solar_datetime: "1984-02-10T10:00:00+08:00",
   gender: "男",
+  input: {
+    local_datetime: "1984-02-10 10:00:00",
+    timezone: "Asia/Shanghai",
+    gender: "男",
+    longitude: null,
+    use_true_solar_time: false,
+  },
 };
 
 const mockLifeline = {
@@ -46,7 +53,67 @@ describe("LifelineView", () => {
     fireEvent.click(screen.getByText("生成时间轴"));
     await waitFor(() => expect(screen.getByText("月令提纲：寅（木）")).toBeTruthy());
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy.mock.calls[0][0]).toMatchObject({ local_datetime: mockResult.solar_datetime, count: 12 });
+    expect(spy.mock.calls[0][0]).toEqual({
+      local_datetime: "1984-02-10 10:00:00",
+      timezone: "Asia/Shanghai",
+      gender: "男",
+      longitude: null,
+      use_true_solar_time: false,
+      count: 12,
+      events: [],
+    });
+  });
+
+  it("保留非东八区与真太阳时入参", async () => {
+    const spy = vi.spyOn(api, "analyzeLifeline").mockResolvedValue(mockLifeline);
+    const resultWithTrueSolar = {
+      ...mockResult,
+      solar_datetime: "1984-02-10T10:00:00-05:00",
+      input: {
+        local_datetime: "1984-02-10 10:00:00",
+        timezone: "America/New_York",
+        gender: "女",
+        longitude: -74,
+        use_true_solar_time: true,
+      },
+    };
+    render(<LifelineView result={resultWithTrueSolar} />);
+    fireEvent.click(screen.getByText("生成时间轴"));
+    await waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+    expect(spy.mock.calls[0][0]).toMatchObject({
+      local_datetime: "1984-02-10 10:00:00",
+      timezone: "America/New_York",
+      gender: "女",
+      longitude: -74,
+      use_true_solar_time: true,
+    });
+  });
+
+  it("旧结果缺少 input 时剥离 offset，不再直接触发 422", async () => {
+    const spy = vi.spyOn(api, "analyzeLifeline").mockResolvedValue(mockLifeline);
+    render(<LifelineView result={{ solar_datetime: "1984-02-10T10:00:00+08:00", gender: "男" }} />);
+    expect(screen.getByText(/旧版本/)).toBeTruthy();
+    fireEvent.click(screen.getByText("生成时间轴"));
+    await waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+    expect(spy.mock.calls[0][0]).toMatchObject({
+      local_datetime: "1984-02-10T10:00:00",
+      timezone: "Asia/Shanghai",
+      use_true_solar_time: false,
+    });
+  });
+
+  it("把录入事件按年份解析后发送", async () => {
+    const spy = vi.spyOn(api, "analyzeLifeline").mockResolvedValue(mockLifeline);
+    render(<LifelineView result={mockResult} />);
+    fireEvent.change(screen.getByLabelText("已发生事件（可选，每行：年份 描述）"), {
+      target: { value: "2030 迁居\n2031 入职" },
+    });
+    fireEvent.click(screen.getByText("生成时间轴"));
+    await waitFor(() => expect(spy).toHaveBeenCalledTimes(1));
+    expect(spy.mock.calls[0][0].events).toEqual([
+      { year: 2030, label: "迁居" },
+      { year: 2031, label: "入职" },
+    ]);
   });
 
   it("展示岁运组合、皇极背景与已录事件，且列出警告", async () => {

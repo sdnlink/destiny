@@ -40,6 +40,7 @@ from .rules import (
     get_twelve_stage,
 )
 
+RULE_ID = "BZ-BAZI-001"
 RULE_VERSION = "bazi-ziping-core-v2.0"
 
 
@@ -462,12 +463,21 @@ def calculate_bazi(
 
     return {
         "schema_version": "1.0",
-        "rule_id": RULE_VERSION,
+        "rule_id": RULE_ID,
         "system": "bazi",
         "school": "ziping-yueling-engineering-baseline-v1",
         "rule_version": RULE_VERSION,
         "status": "engineering_baseline_draft",
         "gender": gender,
+        # 保留原始起盘入参：solar_datetime 已含真太阳时修正与 offset，
+        # 不能反过来作为下一次排盘的 local_datetime（CalendarEngine 会拒绝 offset）。
+        "input": {
+            "local_datetime": local_datetime,
+            "timezone": timezone,
+            "gender": gender,
+            "longitude": longitude,
+            "use_true_solar_time": use_true_solar_time,
+        },
         "solar_datetime": cal_result["time"]["effective_local_datetime"],
         "lunar_datetime": f"{cal_result['lunar']['year']}年 {'(闰)' if cal_result['lunar']['is_leap_month'] else ''}{cal_result['lunar']['month_name']}月{cal_result['lunar']['day_name']}",
         "day_master": day_stem,
