@@ -91,6 +91,17 @@ function buildHiddenSpirits(facts) {
     .filter((item) => missingRelatives.includes(item.relative));
 }
 
+// 元神/忌神/仇神爻位：本卦仅列数字，伏神/变爻以「伏N/变N」标注来源，转为可读文本。
+function renderRelPositions(positions) {
+  if (!positions || positions.length === 0) return "本卦不现";
+  const map = (p) => {
+    if (p.startsWith("伏")) return `伏神第${p.slice(1)}爻`;
+    if (p.startsWith("变")) return `变爻第${p.slice(1)}爻`;
+    return `本卦第${p}爻`;
+  };
+  return positions.map(map).join("、");
+}
+
 function LiuyaoView({ result }) {
   if (!result) return <MissingModule name="六爻" />;
   const { facts } = result;
@@ -143,17 +154,17 @@ function LiuyaoView({ result }) {
             <div>
               <span>原神</span>
               <strong>{facts.yongshen.yuan_shen?.relative || "—"}</strong>
-              <small>{facts.yongshen.yuan_shen?.element || ""} {facts.yongshen.yuan_shen?.positions?.length ? `第 ${facts.yongshen.yuan_shen.positions.join("、")} 爻` : "本卦不现"}</small>
+              <small>{facts.yongshen.yuan_shen?.element || ""} {renderRelPositions(facts.yongshen.yuan_shen?.positions)}</small>
             </div>
             <div>
               <span>忌神</span>
               <strong>{facts.yongshen.ji_shen?.relative || "—"}</strong>
-              <small>{facts.yongshen.ji_shen?.element || ""} {facts.yongshen.ji_shen?.positions?.length ? `第 ${facts.yongshen.ji_shen.positions.join("、")} 爻` : "本卦不现"}</small>
+              <small>{facts.yongshen.ji_shen?.element || ""} {renderRelPositions(facts.yongshen.ji_shen?.positions)}</small>
             </div>
             <div>
               <span>仇神</span>
               <strong>{facts.yongshen.chou_shen?.relative || "—"}</strong>
-              <small>{facts.yongshen.chou_shen?.element || ""} {facts.yongshen.chou_shen?.positions?.length ? `第 ${facts.yongshen.chou_shen.positions.join("、")} 爻` : "本卦不现"}</small>
+              <small>{facts.yongshen.chou_shen?.element || ""} {renderRelPositions(facts.yongshen.chou_shen?.positions)}</small>
             </div>
           </div>
           <div className="yongshen-candidates">

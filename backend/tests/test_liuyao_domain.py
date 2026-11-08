@@ -196,6 +196,39 @@ def test_personalized_auto_cast_is_replayable_and_uses_coin_rounds():
     assert nonce not in str(first)
 
 
+def test_yongshen_relatives_locate_hidden_and_changed_lines():
+    # 求财以妻财为用神、子孙为元神、兄弟为忌神、父母为仇神。
+    # 此卦子孙/兄弟伏藏，修复前 yuan_shen/ji_shen 的 positions 为空（误导为「本卦不现」）。
+    facts = coin_cast(
+        ((2, 3, 3), (3, 2, 2), (2, 3, 2), (3, 3, 2), (2, 2, 3), (3, 2, 3)),
+        "2026-04-05 12:00:00", "Asia/Shanghai", focus="求财买卖",
+    )["facts"]
+    yongshen = facts["yongshen"]
+    assert yongshen is not None
+    assert yongshen["targets"] == ["妻财"]
+    # 五行生克关系正确：元神生用神、忌神克用神、仇神克元神
+    assert yongshen["yuan_shen"]["relative"] == "子孙"
+    assert yongshen["ji_shen"]["relative"] == "兄弟"
+    assert yongshen["chou_shen"]["relative"] == "父母"
+    # 修复核心：伏藏的元神/忌神也必须定位到伏神爻位，不再为空
+    assert yongshen["yuan_shen"]["positions"], "元神伏藏时 positions 不应为空"
+    assert yongshen["ji_shen"]["positions"], "忌神伏藏时 positions 不应为空"
+    assert any(p.startswith("伏") for p in yongshen["yuan_shen"]["positions"])
+    assert any(p.startswith("伏") for p in yongshen["ji_shen"]["positions"])
+    # 候选必须自描述携带六亲
+    assert yongshen["candidates"]
+    for cand in yongshen["candidates"]:
+        assert cand["six_relative"] == "妻财"
+
+
+def test_yongshen_without_focus_is_none():
+    facts = coin_cast(
+        ((2, 3, 3), (3, 2, 2), (2, 3, 2), (3, 3, 2), (2, 2, 3), (3, 2, 3)),
+        "2026-04-05 12:00:00", "Asia/Shanghai",
+    )["facts"]
+    assert facts["yongshen"] is None
+
+
 def test_trace_and_rules_are_complete_without_judgements():
     result = coin_cast([[3, 2, 2]] * 6, **CALENDAR)
     # 6 条投币 + 装卦 4 步 + 月破日破 1 步 + 变卦纳甲 1 步 + 合局 1 步 + 伏神 1 步

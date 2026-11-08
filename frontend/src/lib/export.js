@@ -178,10 +178,19 @@ export function generateMarkdownReport(result, context) {
   if (liuyao?.facts?.yongshen) {
     const yongshen = liuyao.facts.yongshen;
     md += `### 4. 六爻用神焦点\n\n`;
+    const renderRelPositions = (positions) => {
+      if (!positions || positions.length === 0) return "本卦不现";
+      const map = (p) => {
+        if (p.startsWith("伏")) return `伏神第${p.slice(1)}爻`;
+        if (p.startsWith("变")) return `变爻第${p.slice(1)}爻`;
+        return `本卦第${p}爻`;
+      };
+      return positions.map(map).join("、");
+    };
     md += `- **所取用神**：${(yongshen.targets || []).join("、") || "—"}\n`;
-    md += `- **原神**：${yongshen.yuan_shen?.relative || "—"} ${yongshen.yuan_shen?.element || ""} ${yongshen.yuan_shen?.positions?.length ? `第 ${yongshen.yuan_shen.positions.join("、")} 爻` : "本卦不现"}\n`;
-    md += `- **忌神**：${yongshen.ji_shen?.relative || "—"} ${yongshen.ji_shen?.element || ""} ${yongshen.ji_shen?.positions?.length ? `第 ${yongshen.ji_shen.positions.join("、")} 爻` : "本卦不现"}\n`;
-    md += `- **仇神**：${yongshen.chou_shen?.relative || "—"} ${yongshen.chou_shen?.element || ""} ${yongshen.chou_shen?.positions?.length ? `第 ${yongshen.chou_shen.positions.join("、")} 爻` : "本卦不现"}\n`;
+    md += `- **原神**：${yongshen.yuan_shen?.relative || "—"} ${yongshen.yuan_shen?.element || ""} ${renderRelPositions(yongshen.yuan_shen?.positions)}\n`;
+    md += `- **忌神**：${yongshen.ji_shen?.relative || "—"} ${yongshen.ji_shen?.element || ""} ${renderRelPositions(yongshen.ji_shen?.positions)}\n`;
+    md += `- **仇神**：${yongshen.chou_shen?.relative || "—"} ${yongshen.chou_shen?.element || ""} ${renderRelPositions(yongshen.chou_shen?.positions)}\n`;
     if (yongshen.candidates?.length) {
       md += `\n| 候选 | 来源 | 爻位 | 地支 | 五行 | 动静 | 旺衰 | 空破 | 排序 |\n`;
       md += `| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n`;

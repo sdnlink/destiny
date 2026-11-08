@@ -77,12 +77,15 @@ def analyze_yongshen(focus, lines, changed_lines, coverage, palace):
             or line["six_relative"] in targets
         )
         if hit:
-            candidates.append(_candidate("本卦爻", line["position"], line))
+            cand = _candidate("本卦爻", line["position"], line)
+            cand["six_relative"] = line["six_relative"]
+            candidates.append(cand)
     for hidden in coverage["hidden_spirits"]:
         if hidden["six_relative"] in targets:
             candidates.append({
                 "source": "伏神", "position": hidden["position"],
                 "branch": hidden["najia_branch"], "element": hidden["element"],
+                "six_relative": hidden["six_relative"],
                 "moving": False, "month_strength": "", "void_state": "",
                 "is_month_break": False, "is_day_break": False, "roles": [],
             })
@@ -91,6 +94,7 @@ def analyze_yongshen(focus, lines, changed_lines, coverage, palace):
             candidates.append({
                 "source": "变爻", "position": line["position"],
                 "branch": changed["najia_branch"], "element": changed["element"],
+                "six_relative": changed["six_relative"],
                 "moving": True, "month_strength": line["month_strength"],
                 "void_state": "", "is_month_break": False, "is_day_break": False,
                 "roles": [],
@@ -113,7 +117,7 @@ def analyze_yongshen(focus, lines, changed_lines, coverage, palace):
     meta = []
     if target_elements:
         element = sorted(target_elements)[0]
-        meta = _meta_relatives(palace["element"], element, lines)
+        meta = _meta_relatives(palace["element"], element, lines, coverage, changed_lines)
 
     return {
         "focus": focus,
@@ -144,15 +148,26 @@ def _candidate(source, position, line):
     }
 
 
-def _meta_relatives(palace_element, target_element, lines):
-    """元神（生用神）、忌神（克用神）、仇神（克元神生忌神）所对应六亲与本卦爻位。"""
+def _meta_relatives(palace_element, target_element, lines, coverage=None, changed_lines=None):
+    """元神（生用神）、忌神（克用神）、仇神（克元神生忌神）所对应六亲与爻位。
+
+    《增删卜易·用神元神忌神仇神章》中元神/忌神/仇神不仅出现于本卦，亦可伏藏
+    （伏神）或显于变爻；仅在本卦查找会漏掉伏神/变爻，使「本卦不现」误导为不存在。
+    故三源合并，爻位以「伏N/变N」标注来源（本卦仅列数字），保持前端 join 兼容。
+    """
     generating = next(e for e, v in FIVE_ELEMENTS_GENERATES.items() if v == target_element)
     controlling = next(e for e, v in FIVE_ELEMENTS_CONTROLS.items() if v == target_element)
     chou_element = next(e for e, v in FIVE_ELEMENTS_CONTROLS.items() if v == generating)
     result = {}
     for label, element in (("元神", generating), ("忌神", controlling), ("仇神", chou_element)):
         relative = _relative_for_element(palace_element, element)
-        positions = [line["position"] for line in lines if line["six_relative"] == relative]
+        positions = [str(line["position"]) for line in lines if line["six_relative"] == relative]
+        for hidden in (coverage or {}).get("hidden_spirits", []):
+            if hidden["six_relative"] == relative:
+                positions.append("伏{}".format(hidden["position"]))
+        for line, changed in zip(lines, changed_lines or []):
+            if line["is_moving"] and changed.get("six_relative") == relative:
+                positions.append("变{}".format(line["position"]))
         result[label] = {"relative": relative, "element": element, "positions": positions}
     return result
 
