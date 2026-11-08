@@ -154,3 +154,10 @@ backend/tests/test_liuyao.py
 两个失败均为 `tests/test_iching.py` 的卦序断言（屯应为3、解为40）。失败来源是工作树里**并行会话的未提交改动** `backend/app/common/hexagrams.py`（同批还有 `backend/tests/test_liuyao.py`、`?? backend/tests/test_hexagrams.py`、`?? backend/verify_liuyao.py`），不是本轮 5 个算法文件。这些并行文件不在本提交内，提交前必须核对归属。
 
 本轮未跑前端单测/build/烟测；后端改动只涉及计算内核与测试，未改 API 路由或响应模型字段（奇门新增 `fu_tou`、八字新增 `start_actual_month` 均为附加字段）。
+
+## 六、覆盖边界
+
+- 完整阅读并核对：`common` 干支/卦象、`calendar` 历法与节气、`bazi`（含 `liunian`/`lifeline`）、`ziwei`、`liuyao`（含 `advanced`）、`meihua`、`daliuren`、`qimen`、`fengshui` 四模块。
+- 口径抽查、未逐行做算法结论：`workflow/steps.py`（吉凶汇总与步骤编排）、`core/explanation.py`、`core/advisory.py`、`core/interpretation.py`、`core/targeted_deduction.py`、`zhouyi/*`、`calendar/timezone.py`。这些层主要做解释、编排与展示，不改变排盘数值；其中与「自动吉凶」边界相关的问题已在第三节列出。
+- 未审前端计算/展示逻辑（本轮无前端改动）；`ZiweiView.jsx` 用浏览器当前时间算年龄等展示近似问题不在本次算法结论内。
+
