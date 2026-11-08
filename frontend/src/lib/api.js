@@ -39,3 +39,18 @@ export function compareCalculations(calculations, context) {
     body: JSON.stringify({ calculations, context }),
   });
 }
+
+export function analyzeLifeline(payload) {
+  return request("/v1/bazi/lifeline", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function loadYuanhuiCycle(year) {
+  return request(`/v1/yuanhui/cycle?year=${encodeURIComponent(year)}`);
+}
+
+export function loadTiebanStatus() {
+  return request("/v1/tieban/status");
+}

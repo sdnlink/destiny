@@ -6,7 +6,7 @@ import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
@@ -33,6 +33,9 @@ from app.core.registry import load_rule_registry, load_validation_cases
 from app.core.synthesis import synthesize
 from app.core.validation import run_validation_cases
 from app.core.yuanhui import analyze_yuan_hui_yun_shi
+from app.core.yuanhui_readonly import cycle_cast
+from app.bazi.lifeline import analyze_lifeline
+from app.bazi.tieban import tieban_status
 from app.session import create_session, get_store
 from app.session.ownership import HEADER_NAME as OWNER_HEADER_NAME
 from app.session.ownership import claim_or_match, client_id_from, owner_hash
@@ -145,6 +148,20 @@ class BaZiLiunianRequest(CalendarRequest):
     gender: str = Field("男", json_schema_extra={"example": "男"})
     start_year: Optional[int] = Field(None, ge=1900, le=2100, description="起始公历年，默认起运年")
     count: int = Field(10, ge=1, le=60, description="流年条数（1-60）")
+
+
+class BaZiLifelineRequest(CalendarRequest):
+    gender: str = Field("男", json_schema_extra={"example": "男"})
+    start_year: Optional[int] = Field(None, ge=1900, le=2100, description="起始公历年，默认起运年")
+    count: int = Field(12, ge=1, le=60, description="生平时间轴年数（1-60）")
+    events: List[Dict[str, Any]] = Field(
+        default_factory=list,
+        description="已发生事件（只读对齐，须含整数 year；不用于反推生辰或预测）",
+    )
+
+
+class YuanhuiCycleRequest(BaseModel):
+    year: int = Field(..., ge=1900, le=2100, json_schema_extra={"example": 2026})
 
 
 class FengshuiDirectionRequest(BaseModel):
@@ -760,6 +777,33 @@ def cast_bazi_liunian(request: BaZiLiunianRequest):
         return {"data": execute_calculation("bazi", "liunian", request.model_dump())}
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+
+
+@app.post("/v1/bazi/lifeline")
+def cast_bazi_lifeline(request: BaZiLifelineRequest):
+    """个人生平时间轴：子平月令事实 + 岁运 + 皇极经世背景 + 已录事件对齐。
+
+    不预测未来事件、不由事件反推生辰、不生成吉凶断语。
+    """
+    try:
+        return {"data": analyze_lifeline(**request.model_dump())}
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@app.get("/v1/yuanhui/cycle")
+def yuanhui_cycle(year: int = Query(2026, ge=1900, le=2100)):
+    """皇极经世元会运世定位（只读，纪元锚点待专家审核）。"""
+    try:
+        return {"data": cycle_cast(year)}
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@app.get("/v1/tieban/status")
+def tieban_capability_status():
+    """铁板神数能力状态：如实声明条文库/考刻/映射的数据缺口，不输出条数或断语。"""
+    return {"data": tieban_status()}
 
 
 @app.post("/v1/qimen/time")

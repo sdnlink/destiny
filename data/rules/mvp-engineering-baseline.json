@@ -211,6 +211,18 @@
           "version": "1.0.0"
         },
         {
+          "rule_id": "BZ-LIFELINE-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "YHYS-READONLY-001",
+          "version": "1.0.0"
+        },
+        {
+          "rule_id": "BZ-TIEBAN-STATUS-001",
+          "version": "1.0.0"
+        },
+        {
           "rule_id": "LR-MONTH-GENERAL-001",
           "version": "1.0.0"
         },
@@ -3386,6 +3398,113 @@
       "owner": "unassigned",
       "reviewers": [],
       "implementation": "app.bazi.liunian:liunian_cast"
+    },
+    {
+      "rule_id": "BZ-LIFELINE-001",
+      "version": "1.0.0",
+      "system": "bazi",
+      "school": "ziping-yueling-engineering-baseline-v1",
+      "status": "draft",
+      "title": "个人生平时间轴（子平月令事实/岁运/皇极经世对齐）",
+      "purpose": "按出生四柱生成逐年大运与流年事实、子平月令取格候选、《三命通會》岁运组合事实及皇极经世宏观周期背景，并对调用方已录入的既成事件做只读时间对齐",
+      "preconditions": [
+        "八字四柱排盘结果可用（calculate_bazi）",
+        "本地典籍库语料已生成",
+        "皇极经世纪元锚点仍为 pending_expert_review（只作背景）"
+      ],
+      "inputs": [
+        "local_datetime", "timezone", "gender", "longitude", "use_true_solar_time",
+        "start_year", "count", "events"
+      ],
+      "procedure": [
+        "按《淵海子平·宝法第二》「先看提纲为重，皆以月令为用，不可以年取格」列出月令藏干、本气、透出柱位与十神，给出格局候选",
+        "用 lunar-python 节气表取该年立春交接时刻，与公历通行纪年干支并列标注",
+        "按起运年与八步大运区间定位该年大运，给出流年干支、十神、纳音、太岁岁破",
+        "按《三命通會·論太歲》列出真太岁、岁运并临、日年相并、征太岁及流年与大运/四柱的冲合刑害组合事实",
+        "调用 app.core.yuanhui.cycle_position 给出元会运世宏观背景，保留纪元待审核状态",
+        "调用方录入的已发生事件仅按 year 对齐展示，不参与计算"
+      ],
+      "outputs": [
+        "ziping", "natal_summary", "timeline", "evidence", "judgements", "warnings"
+      ],
+      "source_refs": [
+        "淵海子平·宝法第二（月令提纲取格）",
+        "子平真詮評註（格局候选）",
+        "三命通會·論太歲（真太岁/岁运并临/征太岁）",
+        "皇極經世·卷一上 以元經會（元会运世换算层级）"
+      ],
+      "limitations": [
+        "只列月令藏干/透出/十神与格局候选，不判格局成败、清浊、喜忌，不生成吉凶断语",
+        "岁运组合只列可查证事实，不取吉凶结论；不生成应期或事件概率",
+        "皇极经世纪元锚点待专家审核，只计算到公历年粒度，不映射个人吉凶",
+        "生平事件仅对既成事实做时间对齐，不预测未来事件、不由事件反推生辰",
+        "铁板神数条文/考刻能力未纳入本端点，见 BZ-TIEBAN-STATUS-001"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.bazi.lifeline:lifeline_cast"
+    },
+    {
+      "rule_id": "YHYS-READONLY-001",
+      "version": "1.0.0",
+      "system": "yuanhui",
+      "school": "shaoyong-yuanhui-engineering-baseline",
+      "status": "draft",
+      "title": "皇极经世元会运世独立只读定位",
+      "purpose": "按公历年返回元/会/运/世定位与周期单位，供生平时间轴并列宏观背景，不映射个人吉凶",
+      "preconditions": [
+        "公历年份在 1900-2100",
+        "本地典籍库语料已生成"
+      ],
+      "inputs": ["year"],
+      "procedure": [
+        "复用 app.core.yuanhui.cycle_position 的公历年粒度定位",
+        "原样保留 epoch.status=pending_expert_review 与既有 warnings",
+        "从《皇極經世》卷一「以元經會」检索原文挂入 evidence"
+      ],
+      "outputs": ["facts", "cycle_units", "evidence", "judgements", "warnings"],
+      "source_refs": [
+        "皇極經世·卷一上 以元經會（日甲一月丑二星甲三十一辰子三百六十一）",
+        "docs/design/decisions/005-imagery-and-yuanhui-baseline.md"
+      ],
+      "limitations": [
+        "纪元锚点（公元前67017年）待专家定位具体卷/版本原文，保持 pending_expert_review",
+        "只计算到公历年粒度，不精确到月日时",
+        "运世配卦、声音唱和等卷中内容未工程化",
+        "宏观周期不表示个人吉凶、事件概率或应期"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.core.yuanhui_readonly:cycle_cast"
+    },
+    {
+      "rule_id": "BZ-TIEBAN-STATUS-001",
+      "version": "1.0.0",
+      "system": "tieban",
+      "school": "tieban-shenshu-not-implemented",
+      "status": "draft",
+      "title": "铁板神数能力状态与资料缺口声明",
+      "purpose": "如实声明铁板神数条文底本、编号表、考刻算法与四柱→条数映射的数据缺口，明确不输出任何条数或断语",
+      "preconditions": ["本地典籍库语料已生成"],
+      "inputs": [],
+      "procedure": [
+        "按书名精确核查典籍库中是否存在《铁板神数》类条文底本",
+        "列出实现所需资料清单与不可用能力，区分泛词命中的其他典籍",
+        "输出 judgements=[] 与明确 warnings，不产生任何条文推导"
+      ],
+      "outputs": ["missing_prerequisites", "tieban_corpus_titles", "related_but_not_tieban_titles", "judgements", "warnings"],
+      "source_refs": [
+        "data/generated/wikisource-corpus/corpus_documents.jsonl（书名精确核查：无铁板神数底本）",
+        "docs/development/calculation-service.md（流派实现状态边界）"
+      ],
+      "limitations": [
+        "条文库、编号表、考刻/校时算法、四柱→条数映射、标准验证案例全部缺失",
+        "在取得可追溯底本与专家签署案例前，不提供任何推算能力",
+        "任何「条数/条文」输出都应视为伪造"
+      ],
+      "owner": "unassigned",
+      "reviewers": [],
+      "implementation": "app.bazi.tieban:tieban_status"
     }
   ]
 }

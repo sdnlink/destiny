@@ -1203,3 +1203,47 @@
   align-items: center;
   gap: 8px;
 }
+
+/* ==========================================================================
+   Lifeline timeline (子平/岁运/皇极经世)
+   ========================================================================== */
+.lifeline-ziping {
+  margin: 10px 0 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-soft, rgba(148, 163, 184, 0.08));
+  font-size: 13px;
+  line-height: 1.7;
+}
+.lifeline-ziping p { margin: 4px 0 0; }
+.lifeline-ziping strong { display: block; margin-bottom: 4px; }
+
+.lifeline-table-wrap { overflow-x: auto; }
+.lifeline-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.lifeline-table th,
+.lifeline-table td {
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-soft, rgba(148, 163, 184, 0.18));
+  vertical-align: top;
+}
+.lifeline-table th {
+  font-weight: 600;
+  color: var(--text-muted, #94a3b8);
+  background: var(--surface-soft, rgba(148, 163, 184, 0.08));
+}
+.lifeline-table td small {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted, #94a3b8);
+  font-size: 11px;
+}
+.lifeline-table tbody tr:hover { background: var(--surface-hover, rgba(148, 163, 184, 0.06)); }
+.muted-copy { color: var(--text-muted, #94a3b8); font-size: 12.5px; line-height: 1.7; }
+.spin { animation: lifeline-spin 1s linear infinite; }
+@keyframes lifeline-spin { to { transform: rotate(360deg); } }

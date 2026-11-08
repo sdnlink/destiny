@@ -22,6 +22,8 @@ from .engine import calculate_bazi
 from .rules import BRANCH_ELEMENTS, NAYIN_TABLE, get_ten_god
 
 RULE_ID = "BZ-LIUNIAN-001"
+SCHOOL = "ziping-yueling-engineering-baseline-v1"
+RULE_VERSION = "bazi-ziping-core-v2.0"
 PILLAR_NAMES = (("year", "年柱"), ("month", "月柱"), ("day", "日柱"), ("hour", "时柱"))
 EVIDENCE_QUERIES = ("流年", "太歲", "大運", "行運")
 
@@ -127,14 +129,24 @@ def calculate_liunian(natal: Dict[str, Any], start_year: Optional[int] = None,
     library = get_library()
     evidence = library.evidence(EVIDENCE_QUERIES, category="mingli", per_query=1, limit=4)
     return {
+        "schema_version": "1.0",
         "rule_id": RULE_ID,
         "system": "bazi-liunian",
+        "school": SCHOOL,
+        "rule_version": RULE_VERSION,
+        "status": "engineering_baseline_draft",
         "day_master": day_stem,
         "birth_year": birth_year,
         "start_year": start_year,
         "count": count,
         "years": years,
         "evidence": evidence,
+        "judgements": [],
+        "warnings": [
+            "只列干支、十神、纳音与大运区间等可查证事实，不判断吉凶、不生成断语。",
+            "流年干支按公历通行纪年；立春精确交接时刻见 /v1/bazi/lifeline 的 lichun_datetime。",
+            "格局成败、喜忌与岁运应期待专家签署，产物仍为工程基线。",
+        ],
         "notes": [
             "干支纪年以公历 4 年甲子为锚的 60 甲子循环；流年以立春交节为界，本接口按公历年给出通行纪年干支，节令精确交接请结合 calendar 模块。",
             "branch_relations/stem_relations 只列可查证的组合事实（六冲/六合/六害/三刑/自刑/半合/天干五合），不含吉凶断语。",

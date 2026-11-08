@@ -461,8 +461,12 @@ def calculate_bazi(
     }
 
     return {
+        "schema_version": "1.0",
         "rule_id": RULE_VERSION,
         "system": "bazi",
+        "school": "ziping-yueling-engineering-baseline-v1",
+        "rule_version": RULE_VERSION,
+        "status": "engineering_baseline_draft",
         "gender": gender,
         "solar_datetime": cal_result["time"]["effective_local_datetime"],
         "lunar_datetime": f"{cal_result['lunar']['year']}年 {'(闰)' if cal_result['lunar']['is_leap_month'] else ''}{cal_result['lunar']['month_name']}月{cal_result['lunar']['day_name']}",
@@ -475,6 +479,12 @@ def calculate_bazi(
         "luck_start_info": facts["luck_start_info"],
         "luck_pillars": luck_pillars,
         "advisory": advisory,
+        "judgements": [],
+        "warnings": [
+            "四柱、藏干十神、神煞、大运为确定性排盘事实；日主强弱与喜用为工程打分，非典籍定式。",
+            "格局取法、用神喜忌、调候与事项吉凶待专家签署，产物仍为工程基线。",
+            "advisory 为模板说明文本，不构成专业意见或现实结论。",
+        ],
     }
 
 

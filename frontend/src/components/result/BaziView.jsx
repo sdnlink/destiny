@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { CATEGORY_LABELS, CAST_METHOD_LABELS, ELEMENT_COLORS, IMAGERY_MODULE_LABELS, IMAGERY_ROLE_LABELS, IMAGERY_STAGE_LABELS, PILLAR_LABELS, SCENE_LABELS } from "./labels";
 import { CastingIdentity, DataState, Evidence, HexagramLines, HexagramTile, MissingModule, Notice, Pillars, Steps, TargetedFindings, findModule } from "./shared";
+import { LifelineView } from "./LifelineView";
 
 function BaziPillarCard({ pillar, title }) {
   if (!pillar) return null;
@@ -208,6 +209,8 @@ function BaziView({ result }) {
           ))}
         </div>
       </section>
+
+      <LifelineView result={result} />
 
       {advisory && Object.keys(advisory).length > 0 && (
         <section className="data-band advisory-band">
