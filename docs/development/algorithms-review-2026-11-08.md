@@ -2,7 +2,7 @@
 
 审查对象：`backend/app` 下周易、梅花、六爻、大六壬、奇门、八字、紫微、阳宅风水各计算内核，以及历法、公共干支/卦象层。
 审查方式：逐模块读源码 + 项目内 ADR/开发文档反查口径 + 外部典籍或标准案例核对；不做风格审查。
-本轮已实际修改 5 个算法文件与 3 个测试文件；未改动前端。
+本轮已实际修改 5 个算法文件与 3 个测试文件；未改动前端。代码与本文已提交为 `5563858`。
 
 ## 一、结论速览
 
@@ -151,6 +151,6 @@ backend/tests/test_liuyao.py
 2 failed, 882 passed, 10 skipped, 64 subtests passed
 ```
 
-两个失败均为 `tests/test_iching.py` 的卦序断言（屯应为3、解为40）。失败来源是工作树里**并行会话的未提交改动** `backend/app/common/hexagrams.py`（同批还有 `backend/tests/test_liuyao.py`、`?? backend/tests/test_hexagrams.py`、`?? backend/verify_liuyao.py`），不是本轮 5 个算法文件。本轮未提交、未回滚这些并行文件，提交前必须核对归属。
+两个失败均为 `tests/test_iching.py` 的卦序断言（屯应为3、解为40）。失败来源是工作树里**并行会话的未提交改动** `backend/app/common/hexagrams.py`（同批还有 `backend/tests/test_liuyao.py`、`?? backend/tests/test_hexagrams.py`、`?? backend/verify_liuyao.py`），不是本轮 5 个算法文件。这些并行文件不在本提交内，提交前必须核对归属。
 
 本轮未跑前端单测/build/烟测；后端改动只涉及计算内核与测试，未改 API 路由或响应模型字段（奇门新增 `fu_tou`、八字新增 `start_actual_month` 均为附加字段）。
