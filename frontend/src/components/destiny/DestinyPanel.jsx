@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { CalendarRange, CircleAlert, GitBranch, LoaderCircle, Orbit, Sparkles } from "lucide-react";
+import { CalendarRange, CircleAlert, Download, GitBranch, LoaderCircle, Orbit, Sparkles } from "lucide-react";
 import { analyzeLiunian, evaluateCalculation } from "../../lib/api";
+import { downloadMarkdownFile } from "../../lib/export";
+import { generateStandaloneReport } from "../../lib/moduleReport";
 import { BaziView } from "../result/BaziView";
 import { LifelineView } from "../result/LifelineView";
 import { ZiweiView } from "../result/ZiweiView";
@@ -123,6 +125,23 @@ export default function DestinyPanel() {
 
   const active = TABS.find((tab) => tab.id === activeTab) || TABS[0];
 
+  const handleExportReport = () => {
+    const current = activeTab === "natal" ? natal : activeTab === "ziwei" ? ziwei : activeTab === "liunian" ? liunian : null;
+    if (!current) return;
+    const meta = {
+      natal: { module: "bazi", title: "命运专项 · 本命盘" },
+      ziwei: { module: "ziwei", title: "命运专项 · 紫微斗数" },
+      liunian: { module: "liunian", title: "命运专项 · 流年" },
+    }[activeTab];
+    if (!meta) return;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const markdown = generateStandaloneReport(current, {
+      ...meta,
+      calculatedAt: new Date().toLocaleString("zh-CN", { hour12: false }),
+    });
+    downloadMarkdownFile(markdown, `天机演象_${meta.title.replace(" · ", "_")}_${dateStr}.md`);
+  };
+
   return (
     <WorkspaceShell
       kicker="DESTINY WORKSPACE"
@@ -165,15 +184,23 @@ export default function DestinyPanel() {
                   <h2>本命盘</h2>
                   <p>四柱、藏干十神、五行旺衰与大运起运；不混入生平时间轴。</p>
                 </div>
-                <button
-                  type="button"
-                  className="primary-button"
-                  onClick={handleNatal}
-                  disabled={!profileReady || loading === "natal"}
-                >
-                  {loading === "natal" ? <LoaderCircle size={16} className="spin" /> : <Sparkles size={16} />}
-                  {natal ? "重新排盘" : "排本命盘"}
-                </button>
+                <div className="destiny-action-buttons">
+                  {natal && (
+                    <button type="button" className="secondary-command" onClick={handleExportReport}>
+                      <Download size={15} />
+                      导出报告
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="primary-button"
+                    onClick={handleNatal}
+                    disabled={!profileReady || loading === "natal"}
+                  >
+                    {loading === "natal" ? <LoaderCircle size={16} className="spin" /> : <Sparkles size={16} />}
+                    {natal ? "重新排盘" : "排本命盘"}
+                  </button>
+                </div>
               </div>
             )}
 
@@ -183,15 +210,23 @@ export default function DestinyPanel() {
                   <h2>紫微斗数</h2>
                   <p>十二宫、星曜、四化与命身主星；只用出生时刻与性别，不混入流年。</p>
                 </div>
-                <button
-                  type="button"
-                  className="primary-button"
-                  onClick={handleZiwei}
-                  disabled={!profileReady || loading === "ziwei"}
-                >
-                  {loading === "ziwei" ? <LoaderCircle size={16} className="spin" /> : <Orbit size={16} />}
-                  {ziwei ? "重新排盘" : "排紫微盘"}
-                </button>
+                <div className="destiny-action-buttons">
+                  {ziwei && (
+                    <button type="button" className="secondary-command" onClick={handleExportReport}>
+                      <Download size={15} />
+                      导出报告
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="primary-button"
+                    onClick={handleZiwei}
+                    disabled={!profileReady || loading === "ziwei"}
+                  >
+                    {loading === "ziwei" ? <LoaderCircle size={16} className="spin" /> : <Orbit size={16} />}
+                    {ziwei ? "重新排盘" : "排紫微盘"}
+                  </button>
+                </div>
               </div>
             )}
 
@@ -231,6 +266,12 @@ export default function DestinyPanel() {
                     {loading === "liunian" ? <LoaderCircle size={16} className="spin" /> : <CalendarRange size={16} />}
                     {liunian ? "重新生成" : "生成流年"}
                   </button>
+                  {liunian && (
+                    <button type="button" className="secondary-command" onClick={handleExportReport}>
+                      <Download size={15} />
+                      导出报告
+                    </button>
+                  )}
                 </div>
               </div>
             )}

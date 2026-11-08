@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { CircleAlert, Compass, Grid3X3, LoaderCircle, LocateFixed, Mountain, Plus, Trash2 } from "lucide-react";
+import { CircleAlert, Compass, Download, Grid3X3, LoaderCircle, LocateFixed, Mountain, Plus, Trash2 } from "lucide-react";
 import {
   analyzeFengshuiBazhai,
   analyzeFengshuiDirection,
   analyzeFengshuiMeasurements,
   analyzeFengshuiXuankong,
 } from "../../lib/api";
+import { downloadMarkdownFile } from "../../lib/export";
+import { generateStandaloneReport } from "../../lib/moduleReport";
 import { BazhaiView } from "../result/BazhaiView";
 import { FengshuiView } from "../result/FengshuiView";
 import { XuankongView } from "../result/XuankongView";
@@ -53,6 +55,18 @@ function ToolTabs({ active, onChange, disabled }) {
           <span>{label}</span>
         </button>
       ))}
+    </div>
+  );
+}
+
+function ResultBar({ label, onExport }) {
+  return (
+    <div className="standalone-result-bar">
+      <span className="standalone-result-label">{label}</span>
+      <button type="button" className="export-btn" onClick={onExport} title={`导出${label} Markdown 报告`}>
+        <Download size={14} />
+        <span>导出报告</span>
+      </button>
     </div>
   );
 }
@@ -236,6 +250,23 @@ export default function FengshuiPanel() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const activeResult = tool === "direction" ? result : tool === "bazhai" ? bazhaiResult : xuankongResult;
+  const activeLabel = TOOLS.find((item) => item.id === tool)?.label || "阳宅风水";
+  const reportModule = tool === "direction"
+    ? (result?.facts?.consensus ? "fengshui-measurements" : "fengshui-direction")
+    : tool === "bazhai" ? "fengshui-bazhai" : "fengshui-xuankong";
+
+  const handleExportReport = () => {
+    if (!activeResult) return;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const markdown = generateStandaloneReport(activeResult, {
+      module: reportModule,
+      title: `阳宅风水 · ${activeLabel}`,
+      calculatedAt: new Date().toLocaleString("zh-CN", { hour12: false }),
+    });
+    downloadMarkdownFile(markdown, `天机演象_阳宅${activeLabel}_${dateStr}.md`);
   };
 
   return (
@@ -473,7 +504,10 @@ export default function FengshuiPanel() {
       )}
 
       {tool === "direction" && (result ? (
-        <FengshuiView result={result} />
+        <>
+          <ResultBar label={`坐向测量 · ${result.facts?.consensus ? "多次共识" : "单次分析"}`} onExport={handleExportReport} />
+          <FengshuiView result={result} />
+        </>
       ) : (
         <EmptyState
           title="尚未生成阳宅坐向"
@@ -482,7 +516,10 @@ export default function FengshuiPanel() {
       ))}
 
       {tool === "bazhai" && (bazhaiResult ? (
-        <BazhaiView result={bazhaiResult} />
+        <>
+          <ResultBar label="八宅大游年" onExport={handleExportReport} />
+          <BazhaiView result={bazhaiResult} />
+        </>
       ) : (
         <EmptyState
           icon={Compass}
@@ -492,7 +529,10 @@ export default function FengshuiPanel() {
       ))}
 
       {tool === "xuankong" && (xuankongResult ? (
-        <XuankongView result={xuankongResult} />
+        <>
+          <ResultBar label="玄空挨星" onExport={handleExportReport} />
+          <XuankongView result={xuankongResult} />
+        </>
       ) : (
         <EmptyState
           icon={Grid3X3}

@@ -8,8 +8,9 @@ export function generateMarkdownReport(result, context) {
   const timeStr = new Date(result.calculated_at || Date.now()).toLocaleString("zh-CN", { hour12: false });
   const question = context?.question || "事项推演";
   const category = context?.category || "综合";
+  const reportTitle = context?.reportTitle || "天机演象 · 综合推演研判报告";
 
-  let md = `# 天机演象 · 综合推演研判报告\n\n`;
+  let md = `# ${reportTitle}\n\n`;
   md += `> **推演事项**：${question}  \n`;
   md += `> **事项领域**：${category}  \n`;
   md += `> **推演时间**：${timeStr}  \n`;
@@ -173,10 +174,29 @@ export function generateMarkdownReport(result, context) {
     md += `- 动爻：${zhouyi.facts?.moving_lines?.length ? zhouyi.facts.moving_lines.map((l) => `第${l}爻`).join("、") : "静卦无动爻"}\n\n`;
   }
 
+  const liuyao = result.module_results?.find((m) => m.module === "liuyao")?.result;
+  if (liuyao?.facts?.yongshen) {
+    const yongshen = liuyao.facts.yongshen;
+    md += `### 4. 六爻用神焦点\n\n`;
+    md += `- **所取用神**：${(yongshen.targets || []).join("、") || "—"}\n`;
+    md += `- **原神**：${yongshen.yuan_shen?.relative || "—"} ${yongshen.yuan_shen?.element || ""} ${yongshen.yuan_shen?.positions?.length ? `第 ${yongshen.yuan_shen.positions.join("、")} 爻` : "本卦不现"}\n`;
+    md += `- **忌神**：${yongshen.ji_shen?.relative || "—"} ${yongshen.ji_shen?.element || ""} ${yongshen.ji_shen?.positions?.length ? `第 ${yongshen.ji_shen.positions.join("、")} 爻` : "本卦不现"}\n`;
+    md += `- **仇神**：${yongshen.chou_shen?.relative || "—"} ${yongshen.chou_shen?.element || ""} ${yongshen.chou_shen?.positions?.length ? `第 ${yongshen.chou_shen.positions.join("、")} 爻` : "本卦不现"}\n`;
+    if (yongshen.candidates?.length) {
+      md += `\n| 候选 | 来源 | 爻位 | 地支 | 五行 | 动静 | 旺衰 | 空破 | 排序 |\n`;
+      md += `| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n`;
+      yongshen.candidates.forEach((candidate, index) => {
+        md += `| ${index + 1} | ${candidate.source} | 第 ${candidate.position} 爻 | ${candidate.branch} | ${candidate.element} | ${candidate.moving ? "动爻" : "静爻"} | ${candidate.month_strength || "—"} | ${candidate.void_state || "不空"} | ${candidate.rank_score} |\n`;
+      });
+    }
+    if (yongshen.selection_note) md += `\n> ${yongshen.selection_note}\n`;
+    md += `\n`;
+  }
+
   const liuren = result.module_results?.find((m) => m.module === "liuren")?.result;
   if (liuren) {
     const t = liuren.facts?.three_transmissions || {};
-    md += `### 4. 大六壬三传四课\n\n`;
+    md += `### 5. 大六壬三传四课\n\n`;
     md += `- 占日【${liuren.facts?.day_pillar}】 · 占时【${liuren.facts?.occupation_time?.branch}】 · 月将【${liuren.facts?.month_general?.name}】\n`;
     md += `- 三传：初传【${t.transmissions?.[0] || "—"}】 → 中传【${t.transmissions?.[1] || "—"}】 → 末传【${t.transmissions?.[2] || "—"}】 (${t.lesson_type || "课体"})\n\n`;
   }

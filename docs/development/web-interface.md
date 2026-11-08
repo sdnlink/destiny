@@ -18,7 +18,7 @@ Web界面位于`frontend/`，使用React、Vite和Lucide图标，连接现有MVP
 - 命运专项工作区的本命盘、紫微斗数、逐年流年与生平时间轴四个独立页签。
 - 卜筮专项工作区的周易、梅花易数与六爻三个独立页签，共用事项与时间基准。
 - 时空盘专项工作区的奇门遁甲与大六壬两个独立页签，共用起盘时刻与时区。
-- 独立工作区结果内提供“盘面 / 结论建议 / 历法”子页签与 Markdown 报告导出。
+- 独立工作区结果内提供“盘面 / 结论建议 / 历法”子页签；卜筮、时空盘、命运、阳宅均提供 Markdown 报告导出（单模块结果由 `moduleReport.js` 按体系落笔）。
 - 六爻用神焦点：请求带 `focus` 时在纳甲盘之外展示用神、原神、忌神、仇神与候选排序；未指定只排盘不取用神。
 - 阳宅风水工作区的坐向测量（单次 / 多次共识）、八宅与玄空三个页签。
 - 总览中的事项结论，以及独立“结论建议”页面。
@@ -106,6 +106,8 @@ npm run test:browser
 | `frontend/src/components/InputPanel.jsx` | 推演输入与历法预校验 |
 | `frontend/src/components/ResultWorkspace.jsx` | 全部结果视图和卦盘组件 |
 | `frontend/src/lib/api.js` | API请求与错误归一化 |
+| `frontend/src/lib/moduleReport.js` | 命运、阳宅等单体系结果的 Markdown 报告生成 |
+| `frontend/src/lib/export.js` | 综合推演报告生成、文件下载与剪贴板复制 |
 | `frontend/src/lib/formDefaults.js` | 经典推演与独立工作区共用的表单初值 |
 | `frontend/src/styles.css` | 视觉系统和响应式规则 |
 | `frontend/tests/smoke.mjs` | Chrome端到端冒烟测试 |
