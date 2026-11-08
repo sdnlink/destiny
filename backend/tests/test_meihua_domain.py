@@ -105,3 +105,23 @@ def test_three_number_trace_and_rule_steps_are_complete():
     assert result["steps"][0]["rule_ids"] == ["MH-THREE-NUMBER-001"]
     assert result["steps"][1]["rule_ids"] == ["MH-BODYUSE-001"]
     assert result["judgements"] == []
+
+
+def test_time_method_matches_shao_yong_canonical_chain():
+    # 邵雍梅花易数「按年月日时起例」逐爻核验：
+    #   上卦=(年支+月+日)%8，下卦=(年支+月+日+时)%8，动爻=(年支+月+日+时)%6；
+    #   互卦取二三四爻为下互、三四五爻为上互；变卦为动爻阴阳相替。
+    # 丙午年(午=7)七月(7)初三(3)申时(申=9)：上卦17%8=1→乾，下卦26%8=2→兑，
+    #   动爻26%6=2 → 本卦天泽履、互风火家人、变天雷无妄。
+    facts = time_cast("2026-08-15T16:00:00", "Asia/Shanghai")["facts"]
+    sn = facts["source_numbers"]
+    assert (sn["year_branch"], sn["lunar_month"], sn["lunar_day"], sn["hour_branch"]) == (7, 7, 3, 9)
+    assert facts["upper_trigram_number"] == 1 and facts["upper_trigram"]["name"] == "乾"
+    assert facts["lower_trigram_number"] == 2 and facts["lower_trigram"]["name"] == "兑"
+    assert facts["moving_line"] == 2
+    assert facts["original"]["name"] == "履"
+    assert facts["mutual"]["name"] == "家人"
+    assert facts["changed"]["name"] == "无妄"
+    # 动爻在二爻（下卦）→ 用卦为下卦、体卦为上卦
+    assert facts["body_use"]["body_position"] == "upper"
+    assert facts["body_use"]["use_position"] == "lower"
