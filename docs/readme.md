@@ -135,6 +135,7 @@ destiny/
 - `data/rules/*.json` 为**规则注册表**，每条规则含 `rule_id/version/system/school/status/title/purpose/preconditions/inputs/procedure/outputs/source_refs/limitations/owner/reviewers/implementation` 等字段，带 SHA-256 校验和。
 - `data/validation-cases/*.json` 为**工程回归案例**，含 `case_id/system/school/method/input/expected/tags/review_status/source_refs` 等字段。
 - `data/validation-cases/xuankong-reverse-cases.json` 为**从典籍原文派生的起星图样例**（216 局 / 430 条可解析实例），由 `scripts/build_xuankong_reverse_cases.py` 重建；原始 20MB 语料不入库，CI 直接读取该样例。
+- `data/validation-cases/classics-fixture/` 为**典籍检索压缩夹具**（10 条原文片段），由 `scripts/build_classics_test_fixture.py` 重建；完整语料不存在时测试自动改读该夹具，完整语料存在时仍校验真实规模与来源清单。
 - `cache/` 为抓取缓存（道人家、Wikisource 的 metadata/texts），供离线复现。
 
 ---

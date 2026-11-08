@@ -24,7 +24,7 @@ SYSTEM_LABELS = {
     "bazi": "八字命理",
     "ziwei": "紫微斗数",
     "qimen": "奇门遁甲",
-    "daliuren": "大六壬神课",
+    "daliuren": "大六壬",
     "fengshui": "阳宅风水",
 }
 

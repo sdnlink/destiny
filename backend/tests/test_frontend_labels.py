@@ -11,6 +11,7 @@ import unittest
 from pathlib import Path
 
 from app.common.categories import CATEGORIES, CATEGORY_LABELS, LEGACY_CATEGORY_ALIASES, normalize_category
+from app.workflow.scheduler import SUPPORTED_SYSTEMS, SYSTEM_LABELS
 
 
 FRONTEND_LABELS = Path(__file__).resolve().parents[2] / "frontend" / "src" / "lib" / "labels.js"
@@ -43,6 +44,14 @@ class FrontendLabelConsistencyTests(unittest.TestCase):
         # 前端 normalizeCategory 的兜底规则：未知键收敛到 other，与后端宽松模式一致
         for category_id in CATEGORIES:
             self.assertEqual(normalize_category(category_id), category_id)
+
+    def test_system_ids_and_labels_match_backend(self):
+        block = self.source.split("export const SYSTEMS = [", 1)[1].split("];", 1)[0]
+        entries = ENTRY_PATTERN.findall(block)
+        self.assertEqual([entry[0] for entry in entries], list(SUPPORTED_SYSTEMS))
+        for system_id, label in entries:
+            if system_id in SYSTEM_LABELS:
+                self.assertEqual(label, SYSTEM_LABELS[system_id], system_id)
 
 
 if __name__ == "__main__":

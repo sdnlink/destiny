@@ -1001,3 +1001,17 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
   实际解析为 216 局、430 条可解析实例（432 条应有两行，语料缺 1 行、1 行 OCR 多字不可解析，
   另有 4 处单字 OCR 按同句源山订正），旧「422 条」口径已订正。
 - `tests/test_lifeline_and_systems.py` 的 `TiebanDataGapTests` 重复断言已删除。
+
+### 继续收口（CI 语料夹具）
+
+- 完整典籍语料仍不入库，但新增 `data/validation-cases/classics-fixture/`（10 条原文片段，
+  由 `scripts/build_classics_test_fixture.py` 重建）；`backend/tests/conftest.py` 在
+  `data/generated/` 缺失时把 `CLASSICS_CORPUS_DIR` 指向该夹具，使检索、简繁变体、
+  八字流年/生平时间轴/皇极经世证据链在 CI 仍真实执行。
+- 只有「完整语料规模 ≥85 文档/≥4000 段」与「三个来源清单全部入库」两项断言条件跳过；
+  完整语料存在时自动切回真实语料，不降低本地校验强度。
+- 新增 `test_frontend_labels.py::test_system_ids_and_labels_match_backend`，直接把前端
+  `SYSTEMS` 的 id/中文标签与后端 `SUPPORTED_SYSTEMS`/`SYSTEM_LABELS` 对齐，修掉
+  `daliuren`「大六壬神课」与前端「大六壬」的文案漂移。
+- 实测：完整语料环境 **864 passed / 10 skipped**；压缩夹具环境 **862 passed / 12 skipped**
+  （多出的 2 个 skip 即上述完整语料规模断言）。

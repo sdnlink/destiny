@@ -24,7 +24,9 @@ jobs:
         run: python -m ruff check app tests
       - name: Test
         # CI 上没有 ClickHouse，依赖数据库的用例会条件跳过并打印原因，不会伪装成通过。
-        # 20MB 典籍全文语料 data/generated/ 不入库，依赖全量语料的集成断言同样条件跳过；
+        # 20MB 典籍全文语料 data/generated/ 不入库；测试在完整语料缺失时自动改用
+        # data/validation-cases/classics-fixture 的压缩原文片段，检索/证据链仍真实执行，
+        # 只有「完整语料规模/来源清单」断言条件跳过。
         # 玄空起星图已改为读取 data/validation-cases/ 派生样例，CI 可完整覆盖。
         run: python -m pytest tests -q
 
