@@ -257,10 +257,12 @@ def _relation_marks(first, second):
 def punishments_harms(lines, moving_branches, month_branch, day_branch):
     """动爻与月建、日辰之间的三刑、自刑、六害组合，不涉断语。"""
     pool = {}
-    for position, branch in enumerate(
-        (line["najia_branch"] for line in lines if line["is_moving"]), 1
-    ):
-        pool.setdefault(branch, []).append("动爻{}".format(position))
+    for line in lines:
+        if not line["is_moving"]:
+            continue
+        pool.setdefault(line["najia_branch"], []).append(
+            "动爻{}".format(line["position"])
+        )
     for branch, source in ((month_branch, "月建"), (day_branch, "日辰")):
         if branch in BRANCH_ELEMENTS:
             pool.setdefault(branch, []).append(source)

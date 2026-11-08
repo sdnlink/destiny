@@ -86,6 +86,25 @@ class BaZiTests(unittest.TestCase):
         female_res = calculate_bazi("2024-06-01T12:00:00", gender="女")
         self.assertEqual(female_res["luck_start_info"]["direction"], "逆行")
 
+    def test_luck_start_year_carries_start_month(self):
+        """起运是「X 岁 Y 个月」，跨年月份必须进位到实际交运年。"""
+        result = calculate_bazi("1984-12-20T10:00:00", gender="男")
+        info = result["luck_start_info"]
+        self.assertEqual(info["start_age"], 5)
+        self.assertEqual(info["start_month"], 5)
+        # 1984-12 + 5 岁 5 个月 = 1990-05，而不是只加 5 年的 1989。
+        self.assertEqual(info["start_year"], 1990)
+        self.assertEqual(info["start_actual_month"], 5)
+        self.assertEqual(result["luck_pillars"][0]["start_year"], 1990)
+        self.assertEqual(result["luck_pillars"][0]["end_year"], 1999)
+        self.assertEqual(result["luck_pillars"][1]["start_year"], 2000)
+
+    def test_bazi_accepts_male_alias(self):
+        """性别写 M/male 时不能按女性顺逆与 getYun 各算一套。"""
+        result = calculate_bazi("2024-06-01T12:00:00", gender="male")
+        self.assertEqual(result["facts"]["gender"], "男")
+        self.assertEqual(result["luck_start_info"]["direction"], "顺行")
+
     def test_bazi_api_endpoints(self):
         client = TestClient(app)
 

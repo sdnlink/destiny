@@ -305,6 +305,9 @@ def calculate_bazi(
     use_true_solar_time: bool = False,
 ) -> Dict[str, Any]:
     """执行子平八字四柱排盘、十神神煞、五行旺衰及大运推演。"""
+    # 统一性别口径：接口允许 M/male 等写法，若只认「男」会让顺逆与 getYun
+    # 同时按女性计算，得到方向相反的大运。
+    gender = "男" if str(gender).strip().lower() in ("男", "m", "male") else "女"
     cal_engine = CalendarEngine()
     cal_result = cal_engine.calculate(
         local_datetime=local_datetime,
@@ -419,7 +422,13 @@ def calculate_bazi(
         start_month_offset = 0
 
     birth_year = effective_dt.year
-    start_actual_year = birth_year + start_year_offset
+    # 起运是「出生后 X 岁 Y 个月」；只加 X 年会把跨年的月份丢掉。
+    # 例：1984-12-20 男命，5 岁 5 个月起运，实际交运在 1990-05，
+    # 而不是 1989 年。这里把月份进位并入交运年，后续 liunian/lifeline
+    # 的大运区间也随之一致。
+    start_total_month = effective_dt.month - 1 + start_month_offset
+    start_actual_year = birth_year + start_year_offset + start_total_month // 12
+    start_actual_month = start_total_month % 12 + 1
 
     dayun_ganzhis = _sexagenary_pillars_cycle(month_ganzhi, direction, count=8)
     luck_pillars = []
@@ -456,6 +465,7 @@ def calculate_bazi(
             "start_month": start_month_offset,
             "direction": "顺行" if is_forward else "逆行",
             "start_year": start_actual_year,
+            "start_actual_month": start_actual_month,
             "description": f"出生后 {start_year_offset} 岁 {start_month_offset} 个月起运，大运【{'顺行' if is_forward else '逆行'}】。",
         },
         "luck_pillars": luck_pillars,

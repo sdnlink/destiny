@@ -119,6 +119,34 @@ class QimenTests(unittest.TestCase):
         self.assertEqual(res_chunfen["dun_type"], "阳遁")
         self.assertIn(res_chunfen["ju_number"], [3, 9, 6])
 
+    def test_qimen_yuan_uses_fu_tou_not_day_branch(self):
+        """拆补法按符头定元：乙卯日符头甲寅，属中元，不是按日支卯的上元。
+
+        《开悟之门》标准例：2001-08-20 乙卯日甲申时，立秋中元阴遁五局，
+        值符天冲落三宫，值使伤门落三宫。
+        """
+        result = calculate_qimen_chart("2001-08-20T16:00:00")
+        self.assertEqual(result["ganzhi"]["day"], "乙卯")
+        self.assertEqual(result["ganzhi"]["hour"], "甲申")
+        self.assertEqual(result["solar_term"], "立秋")
+        self.assertEqual(result["fu_tou"], "甲寅")
+        self.assertEqual(result["yuan_type"], "中元")
+        self.assertEqual(result["dun_type"], "阴遁")
+        self.assertEqual(result["ju_number"], 5)
+        self.assertEqual(result["zhi_fu_star"], "天冲")
+        self.assertEqual(result["zhi_shi_gate"], "伤门")
+        self.assertEqual(result["zhi_fu_palace"], 3)
+        self.assertEqual(result["zhi_shi_palace"], 3)
+
+    def test_qimen_zhi_shi_gate_for_center_xun_head(self):
+        """旬首寄中五时，值使门应按坤二死门起例，不能回落默认休门。"""
+        result = calculate_qimen_chart("2026-01-01T12:00:00")
+        self.assertEqual(result["xun"]["start_pillar"], "甲戌")
+        self.assertEqual(result["zhi_fu_star"], "天禽")
+        self.assertEqual(result["zhi_shi_gate"], "死门")
+        # 天禽寄天芮：值符天禽所落之宫应与天芮同宫，而不是固定在中五。
+        self.assertTrue(result["palaces"][result["zhi_fu_palace"]]["is_tian_qin_present"])
+
 
 if __name__ == "__main__":
     unittest.main()

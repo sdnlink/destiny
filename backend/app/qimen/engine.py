@@ -3,7 +3,12 @@
 from typing import Any, Dict, List, Optional
 
 from app.calendar.engine import CalendarEngine
-from app.common.ganzhi import triple_group_of, xun_info
+from app.common.ganzhi import (
+    EARTHLY_BRANCHES,
+    HEAVENLY_STEMS,
+    triple_group_of,
+    xun_info,
+)
 
 from .rules import (
     EIGHT_GATES_ORIGIN,
@@ -23,11 +28,36 @@ RULE_ID = "QM-QIMEN-001"
 RULE_VERSION = "qimen-chaibu-zhuanpan-v2.0"
 
 
-def _determine_yuan(day_branch: str) -> str:
-    """根据日支确定上中下三元 (子午卯酉为上元，寅申巳亥为中元，辰戌丑未为下元)。"""
-    if day_branch in ("子", "午", "卯", "酉"):
+def _fu_tou_pillar(day_pillar: str) -> str:
+    """返回当日所属拆补法符头（最近一个甲/己日）。
+
+    拆补法以日干支的符头定三元，而不是直接看当日地支：
+    甲子/甲午/己卯/己酉为上元，甲寅/甲申/己巳/己亥为中元，
+    甲辰/甲戌/己丑/己未为下元。乙卯日符头为甲寅，属中元；
+    若只看日支卯会误判为上元。
+    """
+    stem, branch = day_pillar[0], day_pillar[1]
+    stem_idx = HEAVENLY_STEMS.index(stem)
+    branch_idx = EARTHLY_BRANCHES.index(branch)
+    # 甲/己同日干序每 5 日一组：回退到最近的甲或己
+    delta = stem_idx % 5
+    fu_tou_stem = HEAVENLY_STEMS[stem_idx - delta]
+    fu_tou_branch = EARTHLY_BRANCHES[(branch_idx - delta) % 12]
+    return fu_tou_stem + fu_tou_branch
+
+
+def _determine_yuan(day_pillar: str) -> str:
+    """按拆补法符头地支确定上中下三元。
+
+    子午卯酉为上元，寅申巳亥为中元，辰戌丑未为下元。
+    先由日干支回退到符头，再取符头地支；直接取当日地支会把
+    「乙卯（符头甲寅）」这类日期错判成上元。
+    """
+    fu_tou = _fu_tou_pillar(day_pillar)
+    fu_tou_branch = fu_tou[1]
+    if fu_tou_branch in ("子", "午", "卯", "酉"):
         return "上元"
-    if day_branch in ("寅", "申", "巳", "亥"):
+    if fu_tou_branch in ("寅", "申", "巳", "亥"):
         return "中元"
     return "下元"
 
@@ -69,7 +99,6 @@ def calculate_qimen_chart(
         "hour": cal_res["ganzhi"]["hour"]["text"],
     }
 
-    day_branch = ganzhi["day"][1]
     hour_stem, hour_branch = ganzhi["hour"][0], ganzhi["hour"][1]
 
     # 1. 拆补法定局
@@ -81,7 +110,8 @@ def calculate_qimen_chart(
         term_name = "立春"
 
     dun_type, shang_ju, zhong_ju, xia_ju = SOLAR_TERM_JU_TABLE[term_name]
-    yuan_type = _determine_yuan(day_branch)
+    yuan_type = _determine_yuan(ganzhi["day"])
+    fu_tou = _fu_tou_pillar(ganzhi["day"])
 
     if yuan_type == "上元":
         ju_number = shang_ju
@@ -151,6 +181,12 @@ def calculate_qimen_chart(
     # 中五宫地盘
     tian_pan_stars[5] = "天禽"
     tian_pan_stems[5] = di_pan[5]
+    # 转盘奇门：天禽星寄天芮星同宫，天芮落到哪一宫，天禽即与该宫同宫。
+    # 不能只在坤二宫写死「天禽」，否则值符为天禽时会出现
+    # 「值符天禽落八宫，但八宫九星写天芮」的语义断层。
+    tian_qin_palace = next(
+        p_num for p_num in RING_PALACE_ORDER if tian_pan_stars.get(p_num) == "天芮"
+    )
 
     # 5. 人盘八门排布 (飞宫或转盘)
     # 从旬首原宫出发，根据时辰与旬首的步数，按阳遁顺数/阴遁逆数九宫到当前时辰所落宫位
@@ -206,7 +242,7 @@ def calculate_qimen_chart(
         gate = ren_pan_gates.get(p_num, "")
         spirit = shen_pan_spirits.get(p_num, "")
 
-        is_tian_qin = (p_num == 2 and tian_pan_stars.get(2) == "天芮")
+        is_tian_qin = (p_num == tian_qin_palace)
         qin_stem = di_pan.get(5) if is_tian_qin else None
 
         patterns = evaluate_qimen_patterns(
@@ -275,6 +311,7 @@ def calculate_qimen_chart(
         "dun_type": dun_type,
         "ju_number": ju_number,
         "yuan_type": yuan_type,
+        "fu_tou": fu_tou,
         "xun_shou": f"{xun_start_pillar}（{xun_yi}）",
         "xun": {
             "name": hour_xun_data["name"],
@@ -306,7 +343,7 @@ def calculate_qimen_chart(
         key: result[key]
         for key in (
             "rule_id", "system", "solar_datetime", "lunar_datetime", "ganzhi", "solar_term",
-            "dun_type", "ju_number", "yuan_type", "xun_shou", "xun", "void", "horse_star",
+            "dun_type", "ju_number", "yuan_type", "fu_tou", "xun_shou", "xun", "void", "horse_star",
             "zhi_fu_star", "zhi_shi_gate", "zhi_fu_palace", "zhi_shi_palace",
             "palaces", "favorable_directions", "advisory",
         )
