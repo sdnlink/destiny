@@ -13,8 +13,8 @@ class IChingTests(unittest.TestCase):
         self.assertEqual(hexagram_from_bits((0, 0, 0, 0, 0, 0))["ordinal"], 2)
 
     def test_water_thunder_zhun_mapping(self):
-        # Lower Zhen, upper Kan.
-        result = hexagram_from_bits((1, 0, 0, 0, 1, 0))
+        # 水雷屯：坎(下) 震(上) -> bits 下坎(0,1,0)+上震(1,0,0)=(0,1,0,1,0,0)。
+        result = hexagram_from_bits((0, 1, 0, 1, 0, 0))
         self.assertEqual((result["ordinal"], result["name"]), (3, "屯"))
 
     def test_manual_old_yang_changes_to_yin(self):
@@ -24,10 +24,11 @@ class IChingTests(unittest.TestCase):
         self.assertEqual(result["facts"]["moving_lines"], [1])
 
     def test_related_hexagrams(self):
-        result = derive_hexagrams((1, 0, 0, 0, 1, 0), [1])
+        # 水雷屯 (0,1,0,1,0,0)：错卦(翻比特)=风火家人(37)，综卦(反序)=水山蹇(39)。
+        result = derive_hexagrams((0, 1, 0, 1, 0, 0), [1])
         self.assertEqual(result["original"]["ordinal"], 3)
-        self.assertEqual(result["opposite"]["ordinal"], 50)
-        self.assertEqual(result["reversed"]["ordinal"], 4)
+        self.assertEqual(result["opposite"]["ordinal"], 37)
+        self.assertEqual(result["reversed"]["ordinal"], 39)
 
     def test_number_cast_remainder_zero_rules(self):
         result = number_cast(8, 8)
