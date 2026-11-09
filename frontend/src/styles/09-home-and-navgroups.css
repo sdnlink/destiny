@@ -219,6 +219,186 @@
   color: #222824;
 }
 
+/* 首页「最近使用」快捷入口 */
+.home-recent {
+  max-width: 1180px;
+  margin: 0 auto 26px;
+}
+
+.home-recent h2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted, #6b736c);
+  margin: 0 0 10px;
+}
+
+.home-recent-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.home-recent-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong, #c9c7bc);
+  background: var(--paper, #ecebe6);
+  color: var(--ink, #222824);
+  font-size: 13px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.home-recent-chip:hover {
+  border-color: #327d72;
+  color: #327d72;
+}
+
+/* 首页模块搜索 */
+.home-search-row {
+  max-width: 1180px;
+  margin: 0 auto 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  height: 46px;
+  border: 1px solid var(--line-strong, #c9c7bc);
+  border-radius: 10px;
+  background: var(--paper, #ecebe6);
+  color: var(--muted, #6b736c);
+}
+
+.home-search-row:focus-within {
+  border-color: #327d72;
+  outline: 2px solid rgba(50, 125, 114, 0.18);
+}
+
+.home-search-row input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink, #222824);
+  font-size: 14px;
+}
+
+.home-search-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--muted, #6b736c);
+  cursor: pointer;
+}
+
+.home-no-result {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 34px 20px;
+  text-align: center;
+  color: var(--muted, #6b736c);
+  font-size: 14px;
+  border: 1px dashed var(--line-strong, #c9c7bc);
+  border-radius: 12px;
+}
+
+/* 404 友好页 */
+.not-found-page {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--paper, #ecebe6);
+  padding: 72px 24px;
+  text-align: center;
+}
+
+.not-found-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 78px;
+  height: 78px;
+  margin: 18px 0 8px;
+  border-radius: 50%;
+  background: rgba(50, 125, 114, 0.1);
+  color: #327d72;
+}
+
+.not-found-page h1 {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 32px;
+  margin: 0 0 12px;
+  color: var(--ink, #222824);
+}
+
+.not-found-page > p {
+  max-width: 520px;
+  margin: 0 auto 22px;
+  color: var(--muted, #6b736c);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.not-found-page code {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.not-found-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+}
+
+.not-found-quick {
+  max-width: 640px;
+  margin: 46px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--line, #d8d6cd);
+}
+
+.not-found-quick h2 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted, #6b736c);
+  margin: 0 0 14px;
+}
+
+.not-found-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.not-found-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--line-strong, #c9c7bc);
+  border-radius: 8px;
+  background: var(--paper, #ecebe6);
+  color: var(--ink, #222824);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.not-found-link:hover {
+  border-color: #327d72;
+  color: #327d72;
+}
+
 @media (max-width: 860px) {
   .home-page {
     padding: 24px 16px 56px;
@@ -226,5 +406,9 @@
 
   .home-hero h1 {
     font-size: 36px;
+  }
+
+  .not-found-page {
+    padding: 44px 16px;
   }
 }

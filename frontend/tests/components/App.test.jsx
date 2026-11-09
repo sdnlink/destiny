@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 vi.mock("../../src/lib/api.js", () => ({
   checkHealth: vi.fn().mockResolvedValue({ status: "ok" }),
@@ -116,6 +116,27 @@ describe("App", () => {
 
     expect(await screen.findByRole("heading", { name: "阳宅风水" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /生成阳宅坐向/ })).toBeInTheDocument();
+  });
+
+  it("路由切换时同步浏览器标签标题，并记录最近使用模块", async () => {
+    render(<App />);
+
+    expect(document.title).toBe("天机演象 · 推演工作台");
+    fireEvent.click(screen.getByRole("link", { name: "六爻" }));
+
+    await waitFor(() => expect(document.title).toBe("六爻 · 天机演象"));
+    const recent = JSON.parse(localStorage.getItem("tianji_recent_modules_v1") || "[]");
+    expect(recent[0]).toBe("/liuyao");
+  });
+
+  it("未知路径显示友好 404 页，而不是静默重定向", async () => {
+    window.history.replaceState({}, "", "/no-such-page");
+    render(<App />);
+
+    expect(await screen.findByRole("heading", { name: "没有这个页面" })).toBeInTheDocument();
+    expect(screen.getByText("/no-such-page")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /返回首页/ })).toBeInTheDocument();
+    expect(document.title).toBe("页面未找到 · 天机演象");
   });
 
   it("打开历史与案例抽屉时渲染提示区（图标导入缺失会整块白屏）", async () => {

@@ -6,20 +6,23 @@ import {
   CalendarRange,
   Check,
   CircleAlert,
+  Clock3,
   Compass,
   Grid3X3,
   Layers3,
   Mountain,
   Orbit,
+  Search,
   Sparkles,
   Workflow,
+  X,
 } from "lucide-react";
-import { MODULE_GROUPS } from "../lib/modules";
+import { MODULE_BY_PATH, MODULE_GROUPS, readRecentModules } from "../lib/modules";
 import { analyzeCalendar } from "../lib/api";
 
 const ICONS = {
   zhouyi: BookOpen,
-  meihua: Compass,
+  meihua: Sparkles,
   liuyao: Grid3X3,
   bazi: CalendarRange,
   ziwei: Orbit,
@@ -75,11 +78,11 @@ function CalendarQuickCheck() {
         <div className="calendar-confirmation" aria-live="polite">
           <div className="confirmation-title"><Check size={14} />时间已校验</div>
           <div className="pillar-row mini">
-            {Object.entries(preview.pillars).slice(0, 4).map(([key, value]) => (
+            {Object.entries(preview.pillars || {}).slice(0, 4).map(([key, value]) => (
               <span key={key}><small>{{ year: "年", month: "月", day: "日", time: "时" }[key]}</small>{value}</span>
             ))}
           </div>
-          <p>{preview.lunar.month_name}月{preview.lunar.day_name}</p>
+          <p>{preview.lunar?.month_name}月{preview.lunar?.day_name}</p>
         </div>
       )}
     </section>
@@ -87,6 +90,21 @@ function CalendarQuickCheck() {
 }
 
 export default function HomePage() {
+  const [query, setQuery] = useState("");
+  const recent = readRecentModules();
+  const keyword = query.trim().toLowerCase();
+
+  const groups = MODULE_GROUPS.map((group) => ({
+    ...group,
+    modules: group.modules.filter((module) =>
+      !keyword ||
+      module.label.toLowerCase().includes(keyword) ||
+      module.desc.toLowerCase().includes(keyword) ||
+      group.label.includes(keyword)
+    ),
+  })).filter((group) => group.modules.length > 0);
+  const total = groups.reduce((count, group) => count + group.modules.length, 0);
+
   return (
     <main className="home-page">
       <header className="home-hero">
@@ -99,30 +117,63 @@ export default function HomePage() {
         </p>
       </header>
 
-      <CalendarQuickCheck />
-
-      {MODULE_GROUPS.map((group) => (
-        <section className="home-module-group" key={group.id}>
-          <h2 className="home-group-title">{group.label}</h2>
-          <div className="home-module-grid">
-            {group.modules.map((module) => {
-              const Icon = ICONS[module.id] || Sparkles;
-              return (
-                <Link to={module.to} className="home-module-card" key={module.id}>
-                  <div className="home-module-card-head">
-                    <Icon size={20} />
-                    <strong>{module.label}</strong>
-                  </div>
-                  <p>{module.desc}</p>
-                  <span className="home-module-enter">
-                    进入 <ArrowRight size={14} />
-                  </span>
-                </Link>
-              );
-            })}
+      {recent.length > 0 && (
+        <section className="home-recent">
+          <h2><Clock3 size={15} />最近使用</h2>
+          <div className="home-recent-links">
+            {recent.map((path) => (
+              <Link key={path} to={path} className="home-recent-chip">
+                {MODULE_BY_PATH[path].label}
+              </Link>
+            ))}
           </div>
         </section>
-      ))}
+      )}
+
+      <div className="home-search-row">
+        <Search size={16} />
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="搜索功能模块，如「六爻」「纳甲」「紫微」…"
+          aria-label="搜索功能模块"
+        />
+        {query && (
+          <button type="button" onClick={() => setQuery("")} aria-label="清除搜索"><X size={14} /></button>
+        )}
+      </div>
+
+      <CalendarQuickCheck />
+
+      {total === 0 ? (
+        <div className="home-no-result" role="status">
+          没有匹配「{query.trim()}」的功能模块，试试「六爻」「八字」「风水」或清空搜索。
+        </div>
+      ) : (
+        groups.map((group) => (
+          <section className="home-module-group" key={group.id}>
+            <h2 className="home-group-title">{group.label}</h2>
+            <div className="home-module-grid">
+              {group.modules.map((module) => {
+                const Icon = ICONS[module.id] || Sparkles;
+                return (
+                  <Link to={module.to} className="home-module-card" key={module.id}>
+                    <div className="home-module-card-head">
+                      <Icon size={20} />
+                      <strong>{module.label}</strong>
+                    </div>
+                    <p>{module.desc}</p>
+                    <span className="home-module-enter">
+                      进入 <ArrowRight size={14} />
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        ))
+      )}
     </main>
   );
 }

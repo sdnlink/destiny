@@ -46,3 +46,43 @@ export const MODULE_GROUPS = [
 ];
 
 export const ALL_MODULES = MODULE_GROUPS.flatMap((group) => group.modules);
+
+export const MODULE_BY_PATH = Object.fromEntries(
+  ALL_MODULES.map((module) => [module.to, module])
+);
+
+/** 浏览器标签标题随路由同步，便于多页面间辨识与分享。 */
+export function pageTitleForPath(path) {
+  if (!path || path === "/") return "天机演象 · 推演工作台";
+  const module = MODULE_BY_PATH[path];
+  return module ? `${module.label} · 天机演象` : "页面未找到 · 天机演象";
+}
+
+// 首页「最近使用」：只记路径，重排去重，最多保留 4 个。
+export const RECENT_MODULES_KEY = "tianji_recent_modules_v1";
+export const RECENT_MODULES_LIMIT = 4;
+
+export function readRecentModules(storage = globalThis.localStorage) {
+  try {
+    const parsed = JSON.parse(storage?.getItem(RECENT_MODULES_KEY) || "[]");
+    if (!Array.isArray(parsed)) return [];
+    // 过滤掉已下线或手改过的路径，避免首页出现死链
+    return parsed.filter((path) => MODULE_BY_PATH[path]).slice(0, RECENT_MODULES_LIMIT);
+  } catch {
+    return [];
+  }
+}
+
+export function pushRecentModule(path, storage = globalThis.localStorage) {
+  if (!MODULE_BY_PATH[path]) return readRecentModules(storage);
+  const next = [
+    path,
+    ...readRecentModules(storage).filter((item) => item !== path),
+  ].slice(0, RECENT_MODULES_LIMIT);
+  try {
+    storage?.setItem(RECENT_MODULES_KEY, JSON.stringify(next));
+  } catch {
+    // 隐私模式 / 配额不足时不影响主流程
+  }
+  return next;
+}
