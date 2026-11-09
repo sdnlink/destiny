@@ -59,7 +59,7 @@ describe("standalone report", () => {
         ],
       },
       warnings: ["大限为宫位区间事实。"],
-    }, { module: "ziwei", title: "命运专项 · 紫微斗数" });
+    }, { module: "ziwei", title: "紫微斗数" });
 
     expect(markdown).toContain("## 十二宫");
     expect(markdown).toContain("| 命宫 | 丙子 | 天机 | — | 2–11 |");
@@ -81,7 +81,7 @@ describe("standalone report", () => {
         luck_pillar: { ganzhi: "庚午", start_year: 2022, end_year: 2031 },
         branch_relations: [{ type: "六冲", with: "年柱" }],
       }],
-    }, { module: "liunian", title: "命运专项 · 流年" });
+    }, { module: "liunian", title: "八字 · 流年" });
 
     expect(markdown).toContain("| 2026 | 丙午 | 食神 | 天河水 | 42 | 庚午（2022–2031） | 六冲年柱 |");
   });
@@ -104,7 +104,7 @@ describe("standalone report", () => {
         suiyun: { true_taisui: false, note: "只列事实" },
       }],
       warnings: ["只做只读对齐。"],
-    }, { module: "lifeline", title: "命运专项 · 生平时间轴" });
+    }, { module: "lifeline", title: "八字 · 生平时间轴" });
 
     expect(markdown).toContain("## 月令提纲");
     expect(markdown).toContain("| 2026 | 丙午 | 食神 | 天河水 | 42 | 庚午（2022–2031） | 迁居 |");

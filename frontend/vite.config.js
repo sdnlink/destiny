@@ -3,6 +3,10 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    // 保证只有一个 React 实例，避免 react-router 内部的 React.useRef 取到 null
+    dedupe: ["react", "react-dom"],
+  },
   build: {
     // 单包 389KB 全部前置下载：把第三方库单独切块，业务代码改动时这部分缓存不失效。
     // Vite 8（rolldown）只接受函数形式的 manualChunks。
@@ -25,6 +29,11 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./tests/setup.js"],
     include: ["tests/components/**/*.test.{js,jsx}"],
+    server: {
+      // react-router-dom 的 ESM 源码在 vitest 下直接转译时，其内部的 React.useRef
+      // 会取到 null（与测试的 React 实例不一致）。内联处理后即可复用同一 React。
+      deps: { inline: [/react-router/, /react-router-dom/] },
+    },
   },
   server: {
     port: 5173,

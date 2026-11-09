@@ -40,7 +40,7 @@ function ExplanationView({ explanation, advisory, literature, imagery, yuanHui, 
       <section className="view-heading">
         <div>
           <span className="section-kicker">ADVISORY & CORPUS INSIGHTS</span>
-          <h2>综合推演研判与古籍引证</h2>
+          <h2>综合研判与古籍引证</h2>
           <p>融合事项研判策略、卦象含义、3300万字经典古籍引证与多维决策清单。</p>
         </div>
         <span className="version-badge">{advisory?.schema_version || "2.0"}</span>

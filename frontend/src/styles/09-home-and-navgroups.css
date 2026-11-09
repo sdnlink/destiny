@@ -1,0 +1,230 @@
+/* ==========================================================================
+   首页引导页 + 导航按功能模块分组
+   2026-11 重构：每个术数独立成路由页面，导航按卜筮/命理/时空/堪舆/通用分组，
+   首页引导页作为「综合推演」的替代入口。
+   ========================================================================== */
+
+/* 导航分组：把分散的术数入口按流派归类 */
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.nav-group-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #8d9690;
+  padding: 9px 11px 1px;
+}
+
+.app-navigation.collapsed .nav-group-label {
+  display: none;
+}
+
+/* 首页引导页 */
+.home-page {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--paper, #ecebe6);
+  padding: 40px 30px 72px;
+}
+
+.home-hero {
+  max-width: 760px;
+  margin: 0 auto 36px;
+  text-align: center;
+}
+
+.home-hero .brand-mark {
+  display: inline-flex;
+  gap: 9px;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 6px;
+  color: var(--ink, #222824);
+}
+
+.home-hero .section-kicker {
+  display: block;
+  letter-spacing: 3px;
+  color: var(--muted, #6b736c);
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.home-hero h1 {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 46px;
+  line-height: 1.1;
+  margin: 0 0 14px;
+  color: var(--ink, #222824);
+}
+
+.home-hero-desc {
+  color: var(--muted, #6b736c);
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 auto;
+  max-width: 620px;
+}
+
+.home-calendar-card {
+  max-width: 760px;
+  margin: 0 auto 42px;
+  background: var(--paper, #ecebe6);
+  border: 1px solid var(--line, #d8d6cd);
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.home-calendar-card .section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  color: var(--ink, #222824);
+  margin-bottom: 8px;
+}
+
+.home-card-desc {
+  color: var(--muted, #6b736c);
+  font-size: 12.5px;
+  margin: 0 0 14px;
+}
+
+.home-calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.home-calendar-now {
+  color: var(--muted, #6b736c);
+  font-size: 13px;
+}
+
+.calendar-confirmation {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line, #d8d6cd);
+}
+
+.confirmation-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #327d72;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.pillar-row.mini {
+  display: flex;
+  gap: 16px;
+  margin: 8px 0;
+  font-size: 15px;
+  color: var(--ink, #222824);
+}
+
+.pillar-row.mini small {
+  color: var(--muted, #6b736c);
+  margin-right: 4px;
+  font-size: 11px;
+}
+
+.home-module-group {
+  max-width: 1180px;
+  margin: 0 auto 30px;
+}
+
+.home-group-title {
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 20px;
+  color: var(--ink, #222824);
+  margin: 0 0 14px;
+  padding-left: 10px;
+  border-left: 3px solid #327d72;
+}
+
+.home-module-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.home-module-card {
+  display: block;
+  text-decoration: none;
+  background: var(--paper, #ecebe6);
+  border: 1px solid var(--line, #d8d6cd);
+  border-radius: 12px;
+  padding: 18px 20px;
+  color: var(--ink, #222824);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.home-module-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border-color: #327d72;
+}
+
+.home-module-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #327d72;
+  margin-bottom: 10px;
+}
+
+.home-module-card-head strong {
+  font-size: 16px;
+  color: var(--ink, #222824);
+}
+
+.home-module-card p {
+  color: var(--muted, #6b736c);
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin: 0 0 12px;
+}
+
+.home-module-enter {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #327d72;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.mobile-topbar .mobile-view-select {
+  flex: 1;
+  height: 36px;
+  margin: 0 12px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.16);
+  color: white;
+  font-size: 14px;
+}
+
+.mobile-topbar .mobile-view-select option {
+  color: #222824;
+}
+
+@media (max-width: 860px) {
+  .home-page {
+    padding: 24px 16px 56px;
+  }
+
+  .home-hero h1 {
+    font-size: 36px;
+  }
+}

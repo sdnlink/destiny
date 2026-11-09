@@ -66,14 +66,14 @@ function Harness({ initialForm = baseForm(), onSubmit = vi.fn(), ...rest }) {
 }
 
 describe("InputPanel", () => {
-  it("综合推演只保留综合入口，不再列出已拆分的体系", () => {
+  it("综合场景仍汇总所有体系模块数，且已无跨流派对照提示", () => {
     render(<Harness />);
 
     expect(screen.getByRole("heading", { name: "推演参数" })).toBeInTheDocument();
     expect(screen.getByText("凭证 abcdef12")).toBeInTheDocument();
-    expect(screen.getByText("综合推演 · 跨流派对照")).toBeInTheDocument();
-    expect(screen.getByText(/不再在本页重复设入口/)).toBeInTheDocument();
-    expect(screen.queryAllByRole("radio")).toHaveLength(0);
+    expect(screen.queryByText("综合推演 · 跨流派对照")).not.toBeInTheDocument();
+    // 综合场景 = 日历 + 8 个体系 = 8
+    expect(screen.getByText("8 个计算模块")).toBeInTheDocument();
   });
 
   it("模块数按真实请求列表显示，而不是写死的数字", () => {

@@ -19,7 +19,6 @@ import {
   Workflow,
 } from "lucide-react";
 import { CATEGORIES } from "../lib/labels";
-import { SCHOOLS } from "../lib/schools";
 import { buildCalculations } from "../lib/calculationPlan";
 
 const QUESTION_PRESETS = [
@@ -244,21 +243,7 @@ export default function InputPanel({
 
       <form onSubmit={onSubmit}>
         <section className="form-section">
-          <div className="section-title"><Layers3 size={16} /><span>{form.scene === "combined" ? "综合范围" : "体系与事项"}</span></div>
-          {form.scene === "combined" && (
-            <div className="classic-scope-note">
-              <strong>综合推演 · 跨流派对照</strong>
-              <p>已拆分的体系不再在本页重复设入口，请到对应专项工作区录入参数。</p>
-              <ul className="classic-scope-list">
-                {SCHOOLS.filter((school) => school.id !== "combined").map((school) => (
-                  <li key={school.id}>
-                    <strong>{school.label}</strong>
-                    <span>→ {school.menu}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <div className="section-title"><Layers3 size={16} /><span>体系与事项</span></div>
           <div className="field-grid">
             <label>
               <FieldLabel>事项分类</FieldLabel>

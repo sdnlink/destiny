@@ -1,7 +1,7 @@
+import { MemoryRouter } from "react-router-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import DivinationPanel from "../../src/components/consult/DivinationPanel";
-import SpacetimePanel from "../../src/components/consult/SpacetimePanel";
+import ConsultModulePage from "../../src/pages/ConsultModulePage";
 import * as api from "../../src/lib/api";
 
 vi.mock("../../src/components/result/ZhouyiView", () => ({
@@ -38,14 +38,22 @@ function responseFor(module, ruleId) {
   };
 }
 
-describe("卜筮与时空盘独立工作区", () => {
+function renderModule(key) {
+  return render(
+    <MemoryRouter>
+      <ConsultModulePage moduleKey={key} />
+    </MemoryRouter>
+  );
+}
+
+describe("卜筮与时空盘独立模块页", () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it("卜筮专项只提交当前页签体系，并复用同一个事项上下文", async () => {
+  it("周易模块页只提交 zhouyi 体系，并复用同一个事项上下文", async () => {
     const spy = vi.spyOn(api, "compareCalculations").mockResolvedValue(responseFor("zhouyi", "ZY-001"));
-    render(<DivinationPanel />);
+    renderModule("zhouyi");
 
-    expect(screen.getByRole("heading", { name: "卜筮专项" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "周易" })).toBeTruthy();
     fireEvent.click(screen.getByText("开始起卦"));
 
     await waitFor(() => expect(screen.getByText("周易结果：ZY-001")).toBeTruthy());
@@ -56,11 +64,10 @@ describe("卜筮与时空盘独立工作区", () => {
     expect(screen.getByText("先定边界再谈推进")).toBeTruthy();
   });
 
-  it("时空盘专项切换到六壬页签后提交 liuren 模块", async () => {
+  it("六壬模块页提交 liuren 模块", async () => {
     const spy = vi.spyOn(api, "compareCalculations").mockResolvedValue(responseFor("liuren", "LR-001"));
-    render(<SpacetimePanel />);
+    renderModule("liuren");
 
-    fireEvent.click(screen.getByRole("tab", { name: /大六壬/ }));
     fireEvent.click(screen.getByText("开始排盘"));
 
     await waitFor(() => expect(screen.getByText("六壬结果：LR-001")).toBeTruthy());
@@ -78,7 +85,7 @@ describe("卜筮与时空盘独立工作区", () => {
       advisory,
       explanation: { summary: "确定性说明" },
     });
-    render(<DivinationPanel />);
+    renderModule("zhouyi");
 
     fireEvent.click(screen.getByText("开始起卦"));
     await waitFor(() => expect(screen.getByText("周易结果：ZY-002")).toBeTruthy());

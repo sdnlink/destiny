@@ -1,7 +1,7 @@
 /**
  * 独立工作区（命运 / 阳宅等）的 Markdown 报告生成。
  *
- * 与综合推演的 generateMarkdownReport 分开：这些接口只返回单个体系结果，
+ * 与历史存档导出的 generateMarkdownReport 分开：这些接口只返回单个体系结果，
  * 没有 module_results / advisory / literature 外壳，直接按各体系 facts 落笔。
  */
 import { generateMarkdownReport } from "./export";
@@ -198,7 +198,7 @@ function xuankongReport(result, context) {
 
 function ziweiReport(result, context) {
   const facts = result.facts || {};
-  const lines = reportHead(context.title || "命运专项 · 紫微斗数", context);
+  const lines = reportHead(context.title || "紫微斗数", context);
   lines.push(
     "## 命盘概要",
     "",
@@ -229,7 +229,7 @@ function ziweiReport(result, context) {
 }
 
 function lifelineReport(result, context) {
-  const lines = reportHead(context.title || "命运专项 · 生平时间轴", context);
+  const lines = reportHead(context.title || "八字 · 生平时间轴", context);
   lines.push(
     "## 时间轴范围",
     "",
@@ -269,7 +269,7 @@ function lifelineReport(result, context) {
 }
 
 function liunianReport(result, context) {
-  const lines = reportHead(context.title || "命运专项 · 流年", context);
+  const lines = reportHead(context.title || "八字 · 流年", context);
   lines.push(
     "## 流年范围",
     "",

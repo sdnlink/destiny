@@ -1,6 +1,6 @@
 import { localDateTimeValue, newCastNonce } from "./castingInput";
 
-/** 综合推演与独立工作区共用的表单初值，避免两套默认口径。 */
+/** 各模块独立工作区共用的表单初值；scene 由 systemForm(system) 覆盖为具体模块。 */
 export function initialForm() {
   return {
     scene: "combined",

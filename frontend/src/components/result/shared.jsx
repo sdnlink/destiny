@@ -228,7 +228,7 @@ function MissingModule({ name }) {
     <div className="empty-view">
       <FileSearch size={34} />
       <h2>本次未运行{name}</h2>
-      <p>在左侧将体系切换为综合推演或{name}后重新计算。</p>
+      <p>请在本模块重新发起推演，或补齐相应输入后重试。</p>
     </div>
   );
 }

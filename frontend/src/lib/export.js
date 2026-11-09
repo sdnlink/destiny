@@ -8,7 +8,7 @@ export function generateMarkdownReport(result, context) {
   const timeStr = new Date(result.calculated_at || Date.now()).toLocaleString("zh-CN", { hour12: false });
   const question = context?.question || "事项推演";
   const category = context?.category || "综合";
-  const reportTitle = context?.reportTitle || "天机演象 · 综合推演研判报告";
+  const reportTitle = context?.reportTitle || "天机演象 · 推演研判报告";
 
   let md = `# ${reportTitle}\n\n`;
   md += `> **推演事项**：${question}  \n`;

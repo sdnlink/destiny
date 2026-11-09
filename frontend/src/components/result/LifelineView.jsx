@@ -98,10 +98,10 @@ export function LifelineView({ result, calendar }) {
     const dateStr = new Date().toISOString().slice(0, 10);
     const markdown = generateStandaloneReport(state.data, {
       module: "lifeline",
-      title: "命运专项 · 生平时间轴",
+      title: "八字 · 生平时间轴",
       calculatedAt: new Date().toLocaleString("zh-CN", { hour12: false }),
     });
-    downloadMarkdownFile(markdown, `天机演象_命运专项_生平时间轴_${dateStr}.md`);
+    downloadMarkdownFile(markdown, `天机演象_八字_生平时间轴_${dateStr}.md`);
   };
 
   return (

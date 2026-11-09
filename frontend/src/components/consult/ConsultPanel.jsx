@@ -5,6 +5,7 @@ import { buildCalculations, calendarPayload } from "../../lib/calculationPlan";
 import { newCastNonce } from "../../lib/castingInput";
 import { downloadMarkdownFile, generateMarkdownReport } from "../../lib/export";
 import { systemForm } from "../../lib/formDefaults";
+import { saveDeductionHistory } from "../../lib/storage";
 import InputPanel from "../InputPanel";
 import { CalendarView } from "../result/CalendarView";
 import { ExplanationView } from "../result/ExplanationView";
@@ -127,6 +128,23 @@ export default function ConsultPanel({
       setResultQuestion(activeForm.question);
       setResultTab("board");
       setPreview(null);
+
+      // 各模块独立成页后，本地历史存档改由各模块提交时落盘，避免随「综合推演」一起消失
+      const ctx = {
+        scene: activeTab,
+        category: activeForm.category,
+        question: activeForm.question,
+        input: {
+          local_datetime: activeForm.localDatetime,
+          timezone: activeForm.timezone,
+          cast_nonce: activeForm.castNonce,
+          use_true_solar: activeForm.trueSolar,
+          longitude: activeForm.trueSolar ? Number(activeForm.longitude) : null,
+        },
+      };
+      if (!saveDeductionHistory(response.task_id, ctx, response)) {
+        setError("本地存档空间不足，本次结果未保存，请先导出或清理历史存档");
+      }
     } catch (requestError) {
       setError(requestError.message);
     } finally {

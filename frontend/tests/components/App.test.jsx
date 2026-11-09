@@ -27,6 +27,23 @@ vi.mock("../../src/lib/sessionApi.js", () => ({
   applyCompletion: vi.fn(),
 }));
 
+vi.mock("../../src/components/WorkflowPanel", () => ({
+  default: ({ onRecovered }) => (
+    <div>
+      <h2>交互式推演工作台</h2>
+      <button onClick={() => onRecovered?.()}>模拟恢复完成</button>
+    </div>
+  ),
+}));
+vi.mock("../../src/components/fengshui/FengshuiPanel", () => ({
+  default: () => (
+    <div>
+      <h2>阳宅风水</h2>
+      <button>生成阳宅坐向</button>
+    </div>
+  ),
+}));
+
 import { checkHealth } from "../../src/lib/api.js";
 import App from "../../src/App";
 
@@ -35,16 +52,24 @@ describe("App", () => {
     localStorage.clear();
     vi.clearAllMocks();
     checkHealth.mockResolvedValue({ status: "ok" });
+    // 每个用例都从首页开始，避免 BrowserRouter 沿用上个用例 pushState 后的 URL
+    window.history.replaceState({}, "", "/");
   });
 
-  it("启动后渲染导航、输入面板与空结果工作区（含懒加载）", async () => {
+  it("启动后渲染主导航与首页引导（含各术数入口）", async () => {
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "推演参数" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "综合推演" })).toBeInTheDocument();
     expect(screen.getByRole("navigation", { name: "主导航" })).toBeInTheDocument();
-    // ResultWorkspace 是 React.lazy，等待 Suspense 落地
-    expect(await screen.findByText("从一次可复核的推演开始", {}, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "天机演象" })).toBeInTheDocument();
+    // 导航按功能模块拆分，每个术数独立成链接
+    expect(screen.getByRole("link", { name: "周易" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "梅花易数" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "六爻" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "八字命理" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "紫微斗数" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "奇门遁甲" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "大六壬" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "阳宅风水" })).toBeInTheDocument();
   });
 
   it("健康检查成功后显示服务在线状态", async () => {
@@ -54,51 +79,40 @@ describe("App", () => {
     expect(checkHealth).toHaveBeenCalledTimes(1);
   });
 
-  it("切换到交互推演视图时懒加载 WorkflowPanel", async () => {
+  it("导航到八字命理页面会渲染本命盘页签", async () => {
     render(<App />);
 
-    fireEvent.click(screen.getByTitle("交互式推演工作流（7步标准化）"));
+    fireEvent.click(screen.getByRole("link", { name: "八字命理" }));
+
+    expect(await screen.findByRole("heading", { name: "八字命理" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /本命盘/ })).toBeInTheDocument();
+  });
+
+  it("导航到交互推演会懒加载 WorkflowPanel", async () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByRole("link", { name: "交互推演" }));
 
     expect(await screen.findByRole("heading", { name: "交互式推演工作台" })).toBeInTheDocument();
   });
 
-  it("切换到命运专项视图时懒加载四个页签", async () => {
+  it("恢复历史会话后仍留在 /workflow（onRecovered 只能清 state，不能导航离开）", async () => {
     render(<App />);
 
-    fireEvent.click(screen.getByTitle("命运专项：本命盘、紫微斗数、流年与生平时间轴"));
+    fireEvent.click(screen.getByRole("link", { name: "交互推演" }));
+    await screen.findByRole("heading", { name: "交互式推演工作台" });
+    expect(window.location.pathname).toBe("/workflow");
 
-    expect(await screen.findByRole("heading", { name: "命运专项" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /本命盘/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /紫微斗数/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /流年/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /生平时间轴/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "模拟恢复完成" }));
+
+    expect(window.location.pathname).toBe("/workflow");
+    expect(screen.getByRole("heading", { name: "交互式推演工作台" })).toBeInTheDocument();
   });
 
-  it("切换到卜筮专项视图时懒加载三个页签", async () => {
+  it("导航到阳宅风水会懒加载独立工作区", async () => {
     render(<App />);
 
-    fireEvent.click(screen.getByTitle("卜筮专项：周易、梅花易数与六爻"));
-
-    expect(await screen.findByRole("heading", { name: "卜筮专项" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /周易/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /梅花易数/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /六爻/ })).toBeInTheDocument();
-  });
-
-  it("切换到时空盘专项视图时懒加载两个页签", async () => {
-    render(<App />);
-
-    fireEvent.click(screen.getByTitle("时空盘专项：奇门遁甲与大六壬"));
-
-    expect(await screen.findByRole("heading", { name: "时空盘专项" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /奇门遁甲/ })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /大六壬/ })).toBeInTheDocument();
-  });
-
-  it("切换到阳宅风水视图时懒加载独立工作区", async () => {
-    render(<App />);
-
-    fireEvent.click(screen.getByTitle("阳宅风水：坐向、二十四山与多次测量共识"));
+    fireEvent.click(screen.getByRole("link", { name: "阳宅风水" }));
 
     expect(await screen.findByRole("heading", { name: "阳宅风水" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /生成阳宅坐向/ })).toBeInTheDocument();

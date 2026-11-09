@@ -1,18 +1,29 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import DestinyPanel from "../../src/components/destiny/DestinyPanel";
+import BaziPage from "../../src/pages/BaziPage";
+import ZiweiPage from "../../src/pages/ZiweiPage";
 import * as api from "../../src/lib/api";
 
 vi.mock("../../src/components/result/BaziView", () => ({
   BaziView: ({ result }) => <div>本命盘结果：{result.rule_id}</div>,
 }));
-
 vi.mock("../../src/components/result/LifelineView", () => ({
   LifelineView: ({ result }) => <div>时间轴入参：{result.input.local_datetime}</div>,
 }));
-
 vi.mock("../../src/components/result/ZiweiView", () => ({
   ZiweiView: ({ result }) => <div>紫微结果：{result.rule_id}</div>,
+}));
+vi.mock("../../src/components/destiny/LiunianView", () => ({
+  LiunianView: ({ data, result }) => {
+    const d = data || result;
+    return (
+      <div>
+        <span>流年结果：</span>
+        <span>{d.rule_id}</span>
+        <span>{d.years?.[0]?.year}</span>
+      </div>
+    );
+  },
 }));
 
 function fillBirthProfile() {
@@ -35,12 +46,12 @@ const liunianData = {
   warnings: ["只列可查证事实，不生成吉凶断句"],
 };
 
-describe("DestinyPanel", () => {
+describe("八字与紫微模块页", () => {
   afterEach(() => vi.restoreAllMocks());
 
   it("用同一份出生信息排本命盘", async () => {
     const spy = vi.spyOn(api, "evaluateCalculation").mockResolvedValue({ result: { rule_id: "BZ-BAZI-001" } });
-    render(<DestinyPanel />);
+    render(<BaziPage />);
     fillBirthProfile();
     fireEvent.click(screen.getByText("排本命盘"));
     await waitFor(() => expect(screen.getByText("本命盘结果：BZ-BAZI-001")).toBeTruthy());
@@ -53,11 +64,10 @@ describe("DestinyPanel", () => {
     });
   });
 
-  it("紫微斗数页签复用出生信息与性别", async () => {
+  it("紫微斗数页复用出生信息与性别", async () => {
     const spy = vi.spyOn(api, "evaluateCalculation").mockResolvedValue({ result: { rule_id: "ZW-PAN-001" } });
-    render(<DestinyPanel />);
+    render(<ZiweiPage />);
     fillBirthProfile();
-    fireEvent.click(screen.getByRole("tab", { name: /紫微斗数/ }));
     fireEvent.click(screen.getByText("排紫微盘"));
     await waitFor(() => expect(screen.getByText("紫微结果：ZW-PAN-001")).toBeTruthy());
     expect(spy).toHaveBeenCalledWith("ziwei", "time", {
@@ -71,7 +81,7 @@ describe("DestinyPanel", () => {
 
   it("流年页签复用出生信息并传起止年份", async () => {
     const spy = vi.spyOn(api, "analyzeLiunian").mockResolvedValue(liunianData);
-    render(<DestinyPanel />);
+    render(<BaziPage />);
     fillBirthProfile();
     fireEvent.click(screen.getByRole("tab", { name: /流年/ }));
     fireEvent.change(screen.getByLabelText("起始年份"), { target: { value: "2026" } });
@@ -91,14 +101,14 @@ describe("DestinyPanel", () => {
   });
 
   it("生平时间轴页签把出生信息交给现有时间轴组件", () => {
-    render(<DestinyPanel />);
+    render(<BaziPage />);
     fillBirthProfile();
     fireEvent.click(screen.getByRole("tab", { name: /生平时间轴/ }));
     expect(screen.getByText("时间轴入参：1984-02-10T10:00")).toBeTruthy();
   });
 
   it("出生时间未填时不发起计算", () => {
-    render(<DestinyPanel />);
+    render(<BaziPage />);
     expect(screen.getByText("排本命盘").closest("button").disabled).toBe(true);
     fireEvent.click(screen.getByRole("tab", { name: /流年/ }));
     expect(screen.getByText("生成流年").closest("button").disabled).toBe(true);

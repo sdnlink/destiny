@@ -1,6 +1,6 @@
 import { CalendarClock, LocateFixed } from "lucide-react";
 
-/** 命运专项共用的出生信息；本命盘、流年、生平时间轴都从这里取同一份入参。 */
+/** 八字模块页共用的出生信息；本命盘、流年、生平时间轴都从这里取同一份入参。 */
 export function BirthProfileSection({ profile, onChange }) {
   const update = (key, value) => onChange(key, value);
 

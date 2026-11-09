@@ -1,4 +1,10 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Archive,
   ArrowRight,
@@ -9,55 +15,82 @@ import {
   Database,
   Download,
   FileClock,
+  Grid3X3,
+  Layers3,
   Library,
   Menu,
   Moon,
   Mountain,
-  Palette,
+  Orbit,
   PanelLeftClose,
   PanelLeftOpen,
-  Plus,
-  RefreshCw,
+  Palette,
   Search,
-  ScrollText,
-  Settings,
   ShieldCheck,
   Sparkles,
   Sun,
   Trash2,
   Upload,
+  Workflow,
   X,
 } from "lucide-react";
-import InputPanel from "./components/InputPanel";
+import {
+  BrowserRouter,
+  Navigate,
+  NavLink,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import ClassicsDrawer from "./components/ClassicsDrawer";
-// 结果工作区与工作流面板体积大且只在切到对应视图时才需要，改为按需加载，
-// 首屏只下载输入面板与外壳，避免单包 389KB 全部前置下载。
-const ResultWorkspace = lazy(() => import("./components/ResultWorkspace"));
-const WorkflowPanel = lazy(() => import("./components/WorkflowPanel"));
-const DestinyPanel = lazy(() => import("./components/destiny/DestinyPanel"));
-const FengshuiPanel = lazy(() => import("./components/fengshui/FengshuiPanel"));
-const DivinationPanel = lazy(() => import("./components/consult/DivinationPanel"));
-const SpacetimePanel = lazy(() => import("./components/consult/SpacetimePanel"));
-import { analyzeCalendar, checkHealth, compareCalculations, loadRules } from "./lib/api";
-import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
+import { MODULE_GROUPS } from "./lib/modules";
 import { GLOSSARY_CATEGORIES, GLOSSARY_ITEMS } from "./lib/glossary";
-import { buildCalculations, calendarPayload } from "./lib/calculationPlan";
-import { newCastNonce } from "./lib/castingInput";
-import { initialForm } from "./lib/formDefaults";
-import { listSessions } from "./lib/sessionApi";
+import { checkHealth, loadRules } from "./lib/api";
+import { generateMarkdownReport, downloadMarkdownFile } from "./lib/export";
 import { migrateHistoryItem } from "./lib/sessionMigration";
+import { listSessions } from "./lib/sessionApi";
 import {
   clearDeductionHistory,
   deleteDeductionHistory,
   exportAllHistoryJSON,
   getDeductionHistory,
   importHistoryJSON,
-  saveDeductionHistory,
 } from "./lib/storage";
+import HomePage from "./pages/HomePage";
+import ConsultModulePage from "./pages/ConsultModulePage";
+import BaziPage from "./pages/BaziPage";
+import ZiweiPage from "./pages/ZiweiPage";
 
-// 表单 → 计算请求的映射统一在 lib/calculationPlan.js，组件里不再维护第二份
+const WorkflowPanel = lazy(() => import("./components/WorkflowPanel"));
+const FengshuiPanel = lazy(() => import("./components/fengshui/FengshuiPanel"));
 
-function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGlossary, openClassics, serviceOnline, theme, setTheme, viewMode, setViewMode }) {
+const NAV_ICONS = {
+  zhouyi: BookOpen,
+  meihua: Sparkles,
+  liuyao: Grid3X3,
+  bazi: CalendarRange,
+  ziwei: Orbit,
+  qimen: Compass,
+  liuren: Workflow,
+  fengshui: Mountain,
+  workflow: Layers3,
+};
+
+const SCENE_TO_ROUTE = {
+  zhouyi: "/zhouyi",
+  meihua: "/meihua",
+  liuyao: "/liuyao",
+  qimen: "/qimen",
+  liuren: "/liuren",
+  ziwei: "/ziwei",
+  natal: "/bazi",
+  liunian: "/bazi",
+  bazi: "/bazi",
+};
+
+function AppNavigation({ collapsed, setCollapsed, onOpenHistory, onOpenRules, onOpenGlossary, onOpenClassics, serviceOnline, theme, setTheme }) {
   const nextTheme = theme === "paper" ? "dark" : theme === "dark" ? "jade" : "paper";
   const themeLabel = theme === "paper" ? "宣纸素雅" : theme === "dark" ? "玄墨深邃" : "青铜古韵";
   const ThemeIcon = theme === "paper" ? Sun : theme === "dark" ? Moon : Palette;
@@ -69,16 +102,32 @@ function AppNavigation({ collapsed, setCollapsed, openRules, openHistory, openGl
         {!collapsed && <div><strong>天机演象</strong><span>推演工作台</span></div>}
       </div>
       <div className="nav-items">
-        <button className={viewMode === "classic" ? "active" : ""} onClick={() => setViewMode("classic")} title="综合推演：跨流派对照"><Plus size={18} /><span>综合推演</span></button>
-        <button className={viewMode === "workflow" ? "active" : ""} onClick={() => setViewMode("workflow")} title="交互式推演工作流（7步标准化）"><Sparkles size={18} /><span>交互推演</span></button>
-        <button className={viewMode === "destiny" ? "active" : ""} onClick={() => setViewMode("destiny")} title="命运专项：本命盘、紫微斗数、流年与生平时间轴"><CalendarRange size={18} /><span>命运专项</span></button>
-        <button className={viewMode === "divination" ? "active" : ""} onClick={() => setViewMode("divination")} title="卜筮专项：周易、梅花易数与六爻"><ScrollText size={18} /><span>卜筮专项</span></button>
-        <button className={viewMode === "spacetime" ? "active" : ""} onClick={() => setViewMode("spacetime")} title="时空盘专项：奇门遁甲与大六壬"><Compass size={18} /><span>时空盘专项</span></button>
-        <button className={viewMode === "fengshui" ? "active" : ""} onClick={() => setViewMode("fengshui")} title="阳宅风水：坐向、二十四山与多次测量共识"><Mountain size={18} /><span>阳宅风水</span></button>
-        <button onClick={openHistory} title="历史推演记录、案例库与 JSON 备份导入导出"><Archive size={18} /><span>历史与案例</span></button>
-        <button onClick={openRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
-        <button onClick={openGlossary} title="术数典籍与核心概念速查"><BookOpen size={18} /><span>概念速查</span></button>
-        <button onClick={openClassics} title="在本地典籍库检索原文段落与出处"><Library size={18} /><span>典籍检索</span></button>
+        {MODULE_GROUPS.map((group) => (
+          <div className="nav-group" key={group.id}>
+            {!collapsed && <span className="nav-group-label">{group.label}</span>}
+            {group.modules.map((module) => {
+              const Icon = NAV_ICONS[module.id] || Sparkles;
+              return (
+                <NavLink
+                  key={module.id}
+                  to={module.to}
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                  title={module.desc}
+                >
+                  <Icon size={18} />
+                  <span>{module.label}</span>
+                </NavLink>
+              );
+            })}
+          </div>
+        ))}
+        <div className="nav-group">
+          {!collapsed && <span className="nav-group-label">资料</span>}
+          <button onClick={onOpenHistory} title="历史推演记录、案例库与 JSON 备份导入导出"><Archive size={18} /><span>历史与案例</span></button>
+          <button onClick={onOpenRules} title="规则目录"><BookOpenCheck size={18} /><span>规则目录</span></button>
+          <button onClick={onOpenGlossary} title="术数典籍与核心概念速查"><BookOpen size={18} /><span>概念速查</span></button>
+          <button onClick={onOpenClassics} title="在本地典籍库检索原文段落与出处"><Library size={18} /><span>典籍检索</span></button>
+        </div>
       </div>
       <div className="nav-bottom">
         <button className="theme-toggle-btn" onClick={() => setTheme(nextTheme)} title={`切换主题（当前：${themeLabel}，点击切换）`}>
@@ -102,18 +151,16 @@ function GlossaryDrawer({ open, onClose }) {
   const [selectedCat, setSelectedCat] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredItems = useMemo(() => {
-    return GLOSSARY_ITEMS.filter((item) => {
-      const matchCat = selectedCat === "all" || item.category === selectedCat;
-      const matchQuery =
-        !searchQuery.trim() ||
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.tag.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchCat && matchQuery;
-    });
-  }, [selectedCat, searchQuery]);
+  const filteredItems = (GLOSSARY_ITEMS || []).filter((item) => {
+    const matchCat = selectedCat === "all" || item.category === selectedCat;
+    const matchQuery =
+      !searchQuery.trim() ||
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.source.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.tag.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCat && matchQuery;
+  });
 
   if (!open) return null;
 
@@ -142,14 +189,8 @@ function GlossaryDrawer({ open, onClose }) {
         </div>
 
         <div className="segmented drawer-filter">
-          {GLOSSARY_CATEGORIES.map(({ id, label }) => (
-            <button
-              key={id}
-              className={selectedCat === id ? "active" : ""}
-              onClick={() => setSelectedCat(id)}
-            >
-              {label}
-            </button>
+          {(GLOSSARY_CATEGORIES || []).map(({ id, label }) => (
+            <button key={id} className={selectedCat === id ? "active" : ""} onClick={() => setSelectedCat(id)}>{label}</button>
           ))}
         </div>
 
@@ -183,10 +224,7 @@ function GlossaryDrawer({ open, onClose }) {
 
 function RulesDrawer({ open, onClose, rules, loading }) {
   const [system, setSystem] = useState("all");
-  const filtered = useMemo(
-    () => (system === "all" ? rules : rules.filter((rule) => rule.system === system)),
-    [rules, system],
-  );
+  const filtered = (system === "all" ? rules : rules.filter((rule) => rule.system === system));
   if (!open) return null;
   return (
     <div className="drawer-layer" role="presentation" onMouseDown={onClose}>
@@ -241,29 +279,16 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
     }
   }, [open]);
 
-  // 后端会话是另一套持久化（/v1/sessions）：抽屉里同时列出，点一下即可在交互推演里打开。
-  // 后端不可达时只提示，不影响本地存档的读取。
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
     setBackendLoading(true);
     setBackendError("");
     listSessions(50)
-      .then((rows) => {
-        if (!cancelled) setBackendSessions(Array.isArray(rows) ? rows : []);
-      })
-      .catch((requestError) => {
-        if (!cancelled) {
-          setBackendSessions([]);
-          setBackendError(requestError.message);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setBackendLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
+      .then((rows) => { if (!cancelled) setBackendSessions(Array.isArray(rows) ? rows : []); })
+      .catch((requestError) => { if (!cancelled) { setBackendSessions([]); setBackendError(requestError.message); } })
+      .finally(() => { if (!cancelled) setBackendLoading(false); });
+    return () => { cancelled = true; };
   }, [open]);
 
   const handleDelete = (id, e) => {
@@ -288,15 +313,10 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
   };
 
   const handleExportAllJSON = () => {
-    if (history.length === 0) {
-      alert("当前暂无历史记录可导出。");
-      return;
-    }
+    if (history.length === 0) { alert("当前暂无历史记录可导出。"); return; }
     exportAllHistoryJSON();
   };
 
-  // 反向通道（审计 14）：本地存档 → 后端会话。用存档的事由与起盘时刻在后端重建，
-  // 重建后立刻在交互推演里打开；随机种子会重新生成，界面上已说明盘面可能与存档不同。
   const handleMigrate = async (item, e) => {
     e.stopPropagation();
     if (migratingId) return;
@@ -320,12 +340,8 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
       const content = event.target?.result;
       if (typeof content === "string") {
         const res = importHistoryJSON(content);
-        if (res.success) {
-          setHistory(getDeductionHistory());
-          setImportStatus(`成功导入 ${res.count} 条案例（总计 ${res.total} 条）`);
-        } else {
-          setImportStatus(`导入失败：${res.error}`);
-        }
+        if (res.success) { setHistory(getDeductionHistory()); setImportStatus(`成功导入 ${res.count} 条案例（总计 ${res.total} 条）`); }
+        else { setImportStatus(`导入失败：${res.error}`); }
       }
     };
     reader.readAsText(file);
@@ -343,26 +359,11 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
             <h2>历史推演与案例库</h2>
           </div>
           <div className="header-actions">
-            <button className="history-json-btn" onClick={handleExportAllJSON} title="导出全部案例为 JSON 备份包">
-              <Download size={14} />
-              <span>备份导出</span>
-            </button>
-            <button className="history-json-btn" onClick={() => fileInputRef.current?.click()} title="从 JSON 文件导入案例包">
-              <Upload size={14} />
-              <span>导入备份</span>
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept=".json"
-              style={{ display: "none" }}
-              onChange={handleFileImport}
-            />
+            <button className="history-json-btn" onClick={handleExportAllJSON} title="导出全部案例为 JSON 备份包"><Download size={14} /><span>备份导出</span></button>
+            <button className="history-json-btn" onClick={() => fileInputRef.current?.click()} title="从 JSON 文件导入案例包"><Upload size={14} /><span>导入备份</span></button>
+            <input type="file" ref={fileInputRef} accept=".json" style={{ display: "none" }} onChange={handleFileImport} />
             {history.length > 0 && (
-              <button className="clear-history-btn" onClick={handleClear} title="清空全部历史">
-                <Trash2 size={14} />
-                <span>清空</span>
-              </button>
+              <button className="clear-history-btn" onClick={handleClear} title="清空全部历史"><Trash2 size={14} /><span>清空</span></button>
             )}
             <button className="icon-button" onClick={onClose} aria-label="关闭历史抽屉"><X size={19} /></button>
           </div>
@@ -373,17 +374,8 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
           <span>本地保存最近 50 次推演记录，可复盘、导出 Markdown 或整包 JSON 备份；也可用「转到后端」按存档时刻重建为交互推演会话。</span>
         </div>
 
-        {importStatus && (
-          <div className="history-import-banner">
-            <span>{importStatus}</span>
-          </div>
-        )}
-
-        {migrationError && (
-          <div className="history-import-banner">
-            <span>转到后端会话失败：{migrationError}</span>
-          </div>
-        )}
+        {importStatus && (<div className="history-import-banner"><span>{importStatus}</span></div>)}
+        {migrationError && (<div className="history-import-banner"><span>转到后端会话失败：{migrationError}</span></div>)}
 
         <div className="history-list-wrap backend-sessions" role="region" aria-label="后端推演会话">
           <p className="section-kicker">SERVER SESSIONS</p>
@@ -396,28 +388,17 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
           ) : (
             <div className="history-items-list">
               {backendSessions.map((session) => (
-                <div
-                  key={session.session_id}
-                  className="history-item-card"
-                  onClick={() => onOpenWorkflowSession(session.session_id)}
-                >
+                <div key={session.session_id} className="history-item-card" onClick={() => onOpenWorkflowSession(session.session_id)}>
                   <div className="item-top">
                     <div className="item-badges">
                       <span className="cat-badge">{session.system || "auto"}</span>
                       <span className="scene-badge">{session.status || "draft"}</span>
                     </div>
-                    <time>
-                      {session.updated_at
-                        ? new Date(session.updated_at).toLocaleString("zh-CN", { hour12: false })
-                        : ""}
-                    </time>
+                    <time>{session.updated_at ? new Date(session.updated_at).toLocaleString("zh-CN", { hour12: false }) : ""}</time>
                   </div>
                   <strong className="item-question">{session.question || "（无题）"}</strong>
                   <div className="item-actions">
-                    <button className="btn-load-history">
-                      <ArrowRight size={13} />
-                      <span>在交互推演中打开</span>
-                    </button>
+                    <button className="btn-load-history"><ArrowRight size={13} /><span>在交互推演中打开</span></button>
                   </div>
                 </div>
               ))}
@@ -427,18 +408,11 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
 
         <div className="history-list-wrap">
           {history.length === 0 ? (
-            <div className="drawer-loading">暂无历史推演记录。从左侧发起一次推演即可自动保存。</div>
+            <div className="drawer-loading">暂无历史推演记录。从左侧进入某个功能模块发起一次推演即可自动保存。</div>
           ) : (
             <div className="history-items-list">
               {history.map((item) => (
-                <div
-                  key={item.id}
-                  className="history-item-card"
-                  onClick={() => {
-                    onLoadHistory(item);
-                    onClose();
-                  }}
-                >
+                <div key={item.id} className="history-item-card" onClick={() => onLoadHistory(item)}>
                   <div className="item-top">
                     <div className="item-badges">
                       <span className="cat-badge">{item.category}</span>
@@ -449,26 +423,12 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
                   <strong className="item-question">{item.question}</strong>
                   <p className="item-summary">{item.summary}</p>
                   <div className="item-actions">
-                    <button className="btn-load-history">
-                      <ArrowRight size={13} />
-                      <span>复盘载入</span>
+                    <button className="btn-load-history"><ArrowRight size={13} /><span>复盘载入</span></button>
+                    <button className="btn-export-history" onClick={(e) => handleExport(item, e)}><Download size={13} /><span>导出</span></button>
+                    <button className="btn-export-history" onClick={(e) => handleMigrate(item, e)} disabled={Boolean(migratingId)} title="用存档的事由与起盘时刻在后端重建一个交互推演会话">
+                      <ArrowRight size={13} /><span>{migratingId === item.id ? "重建中…" : "转到后端"}</span>
                     </button>
-                    <button className="btn-export-history" onClick={(e) => handleExport(item, e)}>
-                      <Download size={13} />
-                      <span>导出</span>
-                    </button>
-                    <button
-                      className="btn-export-history"
-                      onClick={(e) => handleMigrate(item, e)}
-                      disabled={Boolean(migratingId)}
-                      title="用存档的事由与起盘时刻在后端重建一个交互推演会话"
-                    >
-                      <ArrowRight size={13} />
-                      <span>{migratingId === item.id ? "重建中…" : "转到后端"}</span>
-                    </button>
-                    <button className="btn-delete-history" onClick={(e) => handleDelete(item.id, e)} title="删除记录">
-                      <Trash2 size={13} />
-                    </button>
+                    <button className="btn-delete-history" onClick={(e) => handleDelete(item.id, e)} title="删除记录"><Trash2 size={13} /></button>
                   </div>
                 </div>
               ))}
@@ -485,18 +445,35 @@ function HistoryDrawer({ open, onClose, onLoadHistory, onOpenWorkflowSession }) 
   );
 }
 
-export default function App() {
-  const [form, setForm] = useState(initialForm);
-  const [result, setResult] = useState(null);
-  const [resultContext, setResultContext] = useState(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [serviceOnline, setServiceOnline] = useState(false);
+function MobileTopbar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const options = MODULE_GROUPS.flatMap((group) => group.modules);
+  const current = options.find((module) => module.to === location.pathname);
+  return (
+    <div className="mobile-topbar">
+      <div className="brand-mark"><span>☰</span><span>☷</span></div>
+      <strong>天机演象</strong>
+      <select
+        className="mobile-view-select"
+        value={current ? current.to : "/"}
+        onChange={(event) => navigate(event.target.value)}
+        aria-label="切换功能模块"
+      >
+        <option value="/">首页</option>
+        {options.map((module) => (
+          <option key={module.id} value={module.to}>{module.label}</option>
+        ))}
+      </select>
+      <button className="icon-button" onClick={() => document.querySelector(".app-navigation")?.classList.toggle("mobile-open")} aria-label="切换导航">
+        <Menu size={20} />
+      </button>
+    </div>
+  );
+}
+
+function Layout() {
   const [navCollapsed, setNavCollapsed] = useState(false);
-  const [mobileInputOpen, setMobileInputOpen] = useState(true);
   const [rulesOpen, setRulesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [glossaryOpen, setGlossaryOpen] = useState(false);
@@ -504,8 +481,8 @@ export default function App() {
   const [rules, setRules] = useState([]);
   const [rulesLoading, setRulesLoading] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem("tianji_theme") || "paper");
-  const [viewMode, setViewMode] = useState("classic"); // classic / workflow / destiny / divination / spacetime / fengshui
-  const [pendingSessionId, setPendingSessionId] = useState(null);
+  const [serviceOnline, setServiceOnline] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -516,86 +493,6 @@ export default function App() {
     checkHealth().then(() => setServiceOnline(true)).catch(() => setServiceOnline(false));
   }, []);
 
-  const handlePreview = async () => {
-    setPreviewLoading(true);
-    setError("");
-    try {
-      setPreview(await analyzeCalendar(calendarPayload(form)));
-    } catch (requestError) {
-      setError(requestError.message);
-      setPreview(null);
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError("");
-
-    // Generate fresh castNonce for each submission so automatic casting yields a new random seed
-    const activeNonce = newCastNonce();
-    const activeForm = { ...form, castNonce: activeNonce };
-    setForm(activeForm);
-
-    try {
-      const response = await compareCalculations(buildCalculations(activeForm), {
-        category: activeForm.category,
-        question_summary: activeForm.question,
-      });
-      // 把起盘输入一并落盘：本地存档此前只存结果，导致「转到后端」无法还原起盘时刻
-      const ctx = {
-        scene: activeForm.scene,
-        category: activeForm.category,
-        question: activeForm.question,
-        input: {
-          local_datetime: activeForm.localDatetime,
-          timezone: activeForm.timezone,
-          cast_nonce: activeNonce,
-          use_true_solar_time: activeForm.trueSolar,
-          // 真太阳时必须有经度才谈得上还原：后端缺经度会直接拒绝这次起盘
-          longitude: activeForm.trueSolar ? Number(activeForm.longitude) : null,
-        },
-      };
-      setResult(response);
-      setResultContext(ctx);
-      setActiveTab("overview");
-      setServiceOnline(true);
-      setMobileInputOpen(false);
-
-      // Auto save to local history；配额不足时明确提示，而不是静默丢存档
-      if (!saveDeductionHistory(response.task_id, ctx, response)) {
-        setError("本地存档空间不足，本次结果未保存，请先导出或清理历史存档");
-      }
-
-      const calendar = response.module_results.find((item) => item.module === "calendar")?.result;
-      if (calendar) setPreview(calendar);
-    } catch (requestError) {
-      setError(requestError.message);
-      if (requestError instanceof TypeError) setServiceOnline(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReset = () => {
-    setForm(initialForm());
-    setResult(null);
-    setResultContext(null);
-    setPreview(null);
-    setError("");
-    setActiveTab("overview");
-  };
-
-  const handleRecast = () => {
-    setForm((current) => ({ ...current, castNonce: newCastNonce() }));
-    setResult(null);
-    setResultContext(null);
-    setError("");
-    setActiveTab("overview");
-  };
-
   const openRules = async () => {
     setRulesOpen(true);
     if (rules.length) return;
@@ -604,18 +501,20 @@ export default function App() {
       const response = await loadRules();
       setRules(response.data || response);
     } catch (requestError) {
-      setError(requestError.message);
+      setRules([]);
     } finally {
       setRulesLoading(false);
     }
   };
 
+  const openWorkflowSession = (sessionId) => {
+    setHistoryOpen(false);
+    navigate("/workflow", { state: { recoverSessionId: sessionId } });
+  };
+
   const handleLoadHistory = (item) => {
-    setResult(item.result);
-    setResultContext(item.context);
-    setActiveTab("overview");
-    const cal = item.result?.module_results?.find((m) => m.module === "calendar")?.result;
-    if (cal) setPreview(cal);
+    setHistoryOpen(false);
+    navigate(SCENE_TO_ROUTE[item.scene] || "/");
   };
 
   return (
@@ -623,93 +522,62 @@ export default function App() {
       <AppNavigation
         collapsed={navCollapsed}
         setCollapsed={setNavCollapsed}
-        openRules={openRules}
-        openHistory={() => setHistoryOpen(true)}
-        openGlossary={() => setGlossaryOpen(true)}
-        openClassics={() => setClassicsOpen(true)}
+        onOpenHistory={() => setHistoryOpen(true)}
+        onOpenRules={openRules}
+        onOpenGlossary={() => setGlossaryOpen(true)}
+        onOpenClassics={() => setClassicsOpen(true)}
         serviceOnline={serviceOnline}
         theme={theme}
         setTheme={setTheme}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
       />
-      <div className="mobile-topbar">
-        <div className="brand-mark"><span>☰</span><span>☷</span></div>
-        <strong>天机演象</strong>
-        <select
-          className="mobile-view-select"
-          value={viewMode}
-          onChange={(event) => setViewMode(event.target.value)}
-          aria-label="切换工作模式"
-        >
-          <option value="classic">综合</option>
-          <option value="workflow">交互</option>
-          <option value="destiny">命运</option>
-          <option value="divination">卜筮</option>
-          <option value="spacetime">时空</option>
-          <option value="fengshui">阳宅</option>
-        </select>
-        <button className="icon-button" onClick={() => setMobileInputOpen(!mobileInputOpen)} aria-label="切换输入面板"><Menu size={20} /></button>
-      </div>
-      {viewMode === "workflow" ? (
-        <div className="workflow-container">
-          <Suspense fallback={<div className="loading-placeholder">正在加载工作区…</div>}>
-            <WorkflowPanel
-              recoverSessionId={pendingSessionId}
-              onRecovered={() => setPendingSessionId(null)}
-            />
-          </Suspense>
-        </div>
-      ) : viewMode === "destiny" ? (
-        <Suspense fallback={<div className="loading-placeholder">正在加载命运专项…</div>}>
-          <DestinyPanel />
-        </Suspense>
-      ) : viewMode === "fengshui" ? (
-        <Suspense fallback={<div className="loading-placeholder">正在加载阳宅风水…</div>}>
-          <FengshuiPanel />
-        </Suspense>
-      ) : viewMode === "divination" ? (
-        <Suspense fallback={<div className="loading-placeholder">正在加载卜筮专项…</div>}>
-          <DivinationPanel />
-        </Suspense>
-      ) : viewMode === "spacetime" ? (
-        <Suspense fallback={<div className="loading-placeholder">正在加载时空盘专项…</div>}>
-          <SpacetimePanel />
-        </Suspense>
-      ) : (
-        <>
-          <div className={`input-column ${mobileInputOpen ? "mobile-open" : ""}`}>
-            <InputPanel
-              form={form}
-              setForm={setForm}
-              onSubmit={handleSubmit}
-              onPreview={handlePreview}
-              onReset={handleReset}
-              onRecast={handleRecast}
-              loading={loading}
-              previewLoading={previewLoading}
-              preview={preview}
-              error={error}
-            />
-          </div>
-          <Suspense fallback={<div className="loading-placeholder">正在加载结果面板…</div>}>
-            <ResultWorkspace result={result} context={resultContext} activeTab={activeTab} setActiveTab={setActiveTab} />
-          </Suspense>
-        </>
-      )}
+      <MobileTopbar />
+      <Suspense fallback={<div className="loading-placeholder">正在加载…</div>}>
+        <Outlet />
+      </Suspense>
       <RulesDrawer open={rulesOpen} onClose={() => setRulesOpen(false)} rules={rules} loading={rulesLoading} />
       <HistoryDrawer
         open={historyOpen}
         onClose={() => setHistoryOpen(false)}
         onLoadHistory={handleLoadHistory}
-        onOpenWorkflowSession={(sessionId) => {
-          setHistoryOpen(false);
-          setViewMode("workflow");
-          setPendingSessionId(sessionId);
-        }}
+        onOpenWorkflowSession={openWorkflowSession}
       />
       <GlossaryDrawer open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
       <ClassicsDrawer open={classicsOpen} onClose={() => setClassicsOpen(false)} />
     </div>
+  );
+}
+
+function WorkflowRoute() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const recoverSessionId = location.state?.recoverSessionId;
+  return (
+    <WorkflowPanel
+      recoverSessionId={recoverSessionId}
+      // 恢复完成后只清掉 location.state（防止再次进入时重复恢复），用户仍留在 /workflow
+      onRecovered={() => navigate("/workflow", { replace: true, state: null })}
+    />
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<HomePage />} />
+          <Route path="zhouyi" element={<ConsultModulePage moduleKey="zhouyi" />} />
+          <Route path="meihua" element={<ConsultModulePage moduleKey="meihua" />} />
+          <Route path="liuyao" element={<ConsultModulePage moduleKey="liuyao" />} />
+          <Route path="qimen" element={<ConsultModulePage moduleKey="qimen" />} />
+          <Route path="liuren" element={<ConsultModulePage moduleKey="liuren" />} />
+          <Route path="bazi" element={<BaziPage />} />
+          <Route path="ziwei" element={<ZiweiPage />} />
+          <Route path="fengshui" element={<FengshuiPanel />} />
+          <Route path="workflow" element={<WorkflowRoute />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
