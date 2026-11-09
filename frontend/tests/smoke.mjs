@@ -105,7 +105,9 @@ await desktop.screenshot({ path: shot("tianji-bazi-desktop.png"), fullPage: true
 
 // 紫微斗数：独立模块页
 await gotoModule(desktop, "紫微斗数");
-await desktop.getByRole("heading", { name: "紫微斗数" }).waitFor();
+await desktop.getByRole("heading", { name: "紫微斗数", level: 1 }).waitFor();
+await desktop.getByLabel("公历出生日期时间").fill("1984-02-10T10:00");
+await desktop.getByLabel("出生地时区").fill("Asia/Shanghai");
 await desktop.getByRole("button", { name: "排紫微盘" }).click();
 await desktop.getByRole("heading", { name: "紫微斗数全景天盘" }).waitFor({ timeout: 20000 });
 await desktop.getByRole("heading", { name: "大限区间" }).waitFor();
@@ -137,7 +139,7 @@ await desktop.getByText("子、癸", { exact: true }).waitFor();
 await assertNoOverflow(desktop, "desktop fengshui workspace");
 await desktop.screenshot({ path: shot("tianji-fengshui-desktop.png"), fullPage: true });
 
-await desktop.getByRole("tab", { name: "多次共识" }).click();
+await desktop.getByRole("button", { name: "多次共识" }).click();
 await desktop.getByLabel("第1次向首读数").fill("359");
 await desktop.getByLabel("第2次向首读数").fill("0");
 await desktop.getByLabel("第3次向首读数").fill("1");

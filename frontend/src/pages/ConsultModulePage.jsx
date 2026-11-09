@@ -124,6 +124,7 @@ export default function ConsultModulePage({ moduleKey }) {
   }
   return (
     <ConsultPanel
+      key={moduleKey}
       kicker={config.kicker}
       title={config.title}
       description={config.description}
