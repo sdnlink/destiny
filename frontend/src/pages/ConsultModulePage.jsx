@@ -5,9 +5,11 @@ import {
   Orbit,
   Workflow,
 } from "lucide-react";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { systemForm } from "../lib/formDefaults";
 import { applyUrlOverrides, syncFormToSearchParams } from "../lib/urlForm";
+import { getLatestHistoryByScene } from "../lib/storage";
 import { ZhouyiView } from "../components/result/ZhouyiView";
 import { MeihuaView } from "../components/result/MeihuaView";
 import { LiuyaoView } from "../components/result/LiuyaoView";
@@ -123,6 +125,12 @@ const MODULE_CONFIG = {
 export default function ConsultModulePage({ moduleKey }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const config = MODULE_CONFIG[moduleKey];
+  const scene = config?.tab.id;
+  // 刷新页面时恢复本模块最近一次推演结果；切换模块时 ConsultPanel 因 key 重挂载而重读
+  const restored = useMemo(
+    () => (scene ? getLatestHistoryByScene(scene) : null),
+    [scene],
+  );
   if (!config) {
     return null;
   }
@@ -148,6 +156,12 @@ export default function ConsultModulePage({ moduleKey }) {
       submitLabel={config.submitLabel}
       submitLoadingLabel={config.submitLoadingLabel}
       initialForm={initialForm}
+      initialResult={restored?.result ?? null}
+      restoredInfo={restored ? {
+        at: restored.timestamp,
+        question: restored.question,
+        trimmed: Boolean(restored.result_trimmed),
+      } : null}
       onSubmitted={handleSubmitted}
     />
   );

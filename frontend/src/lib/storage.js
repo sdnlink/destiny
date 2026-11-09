@@ -99,6 +99,22 @@ export function getDeductionHistory() {
   return items;
 }
 
+/**
+ * 取某个场景最近一次「可展示」的推演结果，用于模块页刷新后恢复。
+ * 只认 ConsultPanel 提交的比对结果（含 module_results），避免误把八字/紫微的
+ * 单体系结果、或被配额裁剪掉的残缺存档恢复成盘面。
+ */
+export function getLatestHistoryByScene(scene) {
+  if (!scene) return null;
+  const { items } = readRaw();
+  return items.find((item) =>
+    item.scene === scene
+    && item.result
+    && Array.isArray(item.result.module_results)
+    && item.result.module_results.length > 0
+  ) || null;
+}
+
 export function saveDeductionHistory(task_id, context, result) {
   if (!result || !task_id) return false;
   const { result: storedResult, trimmed } = compactResult(result);

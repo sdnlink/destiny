@@ -64,4 +64,60 @@ describe("URL 表单参数编解码", () => {
     expect(restored.timezone).toBe(form.timezone);
     expect(restored.category).toBe(form.category);
   });
+
+  it("起卦方式与三数可往返", () => {
+    const form = {
+      ...baseForm(),
+      yiMethod: "three_numbers",
+      yiNumbers: ["12", "34", "56"],
+    };
+    const params = syncFormToSearchParams(new URLSearchParams(), form);
+    expect(params.get("method")).toBe("three_numbers");
+    expect(params.get("n1")).toBe("12");
+    expect(params.get("n3")).toBe("56");
+
+    const restored = applyUrlOverrides(baseForm(), params);
+    expect(restored.yiMethod).toBe("three_numbers");
+    expect(restored.yiNumbers).toEqual(["12", "34", "56"]);
+  });
+
+  it("手工排盘爻线与六爻铜钱可往返", () => {
+    const liuyao = { ...baseForm(), scene: "liuyao", liuyaoMethod: "lines", lyLines: [6, 7, 8, 9, 7, 8] };
+    const lineParams = syncFormToSearchParams(new URLSearchParams(), liuyao);
+    expect(lineParams.get("lines")).toBe("6,7,8,9,7,8");
+    expect(applyUrlOverrides({ ...baseForm(), scene: "liuyao" }, lineParams).lyLines)
+      .toEqual([6, 7, 8, 9, 7, 8]);
+
+    const coins = [[2, 2, 3], [2, 3, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2], [2, 3, 2]];
+    const coinParams = syncFormToSearchParams(new URLSearchParams(), {
+      ...baseForm(), scene: "liuyao", liuyaoMethod: "coins", lyCoins: coins,
+    });
+    expect(coinParams.get("coins")).toBe("223,233,322,222,332,232");
+    expect(applyUrlOverrides({ ...baseForm(), scene: "liuyao" }, coinParams).lyCoins)
+      .toEqual(coins);
+  });
+
+  it("拒绝非法起卦方式/爻线/数字", () => {
+    const bad = new URLSearchParams("method=hacked&lines=1,2&n1=abc&p1=-5&coins=999,999");
+    const form = applyUrlOverrides(baseForm(), bad);
+    expect(form.yiMethod).toBeUndefined();
+    expect(form.yiNumbers).toBeUndefined();
+    expect(form.lines).toBeUndefined();
+  });
+
+  it("切换起卦方式后写回会清掉上一轮的配套参数", () => {
+    const oldParams = syncFormToSearchParams(new URLSearchParams(), {
+      ...baseForm(), yiMethod: "manual", lines: [7, 8, 7, 8, 7, 8],
+    });
+    expect(oldParams.get("lines")).toBe("7,8,7,8,7,8");
+
+    const next = syncFormToSearchParams(oldParams, { ...baseForm(), yiMethod: "time" });
+    expect(next.get("method")).toBe("time");
+    expect(next.get("lines")).toBeNull();
+  });
+
+  it("无起卦方式的体系不写入 method", () => {
+    const next = syncFormToSearchParams(new URLSearchParams(), { ...baseForm(), scene: "qimen" });
+    expect(next.get("method")).toBeNull();
+  });
 });

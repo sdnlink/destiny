@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDays, CircleAlert, Download, FileText, Layers3 } from "lucide-react";
+import { CalendarDays, CircleAlert, Download, FileText, History, Layers3, X } from "lucide-react";
 import { analyzeCalendar, compareCalculations } from "../../lib/api";
 import { buildCalculations, calendarPayload } from "../../lib/calculationPlan";
 import { newCastNonce } from "../../lib/castingInput";
@@ -61,12 +61,15 @@ export default function ConsultPanel({
   submitLabel,
   submitLoadingLabel,
   initialForm,
+  initialResult,
+  restoredInfo,
   onSubmitted,
 }) {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
   const [form, setForm] = useState(() => initialForm || systemForm(tabs[0].id));
-  const [result, setResult] = useState(null);
-  const [resultQuestion, setResultQuestion] = useState("");
+  const [result, setResult] = useState(() => initialResult || null);
+  const [resultQuestion, setResultQuestion] = useState(restoredInfo?.question || "");
+  const [showRestored, setShowRestored] = useState(Boolean(initialResult));
   const [resultTab, setResultTab] = useState("board");
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -131,6 +134,7 @@ export default function ConsultPanel({
       setResultTab("board");
       setPreview(null);
       onSubmitted?.(activeForm);
+      setShowRestored(false);
 
       // 各模块独立成页后，本地历史存档改由各模块提交时落盘，避免随「综合推演」一起消失
       const ctx = {
@@ -231,6 +235,19 @@ export default function ConsultPanel({
       <div className="standalone-tab-body" role="tabpanel" aria-label={active.label}>
         {result ? (
           <>
+            {showRestored && (
+              <div className="restored-notice" role="status">
+                <History size={15} />
+                <span>
+                  已恢复上次推演结果
+                  {restoredInfo?.at ? `（${new Date(restoredInfo.at).toLocaleString("zh-CN", { hour12: false })}）` : ""}
+                  {restoredInfo?.trimmed ? "；部分解释内容因本地空间限制已精简，重新起卦可查看完整结论" : ""}
+                </span>
+                <button type="button" onClick={() => setShowRestored(false)} aria-label="关闭恢复提示">
+                  <X size={14} />
+                </button>
+              </div>
+            )}
             <div className="standalone-result-bar">
               <div className="standalone-result-tabs" role="tablist" aria-label={`${active.label}结果视图`}>
                 {resultTabs.map(({ id, label, icon: Icon }) => (

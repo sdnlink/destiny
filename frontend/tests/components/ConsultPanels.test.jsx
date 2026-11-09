@@ -1,6 +1,6 @@
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ConsultModulePage from "../../src/pages/ConsultModulePage";
 import * as api from "../../src/lib/api";
 
@@ -53,6 +53,7 @@ function renderModule(key, initialEntries = ["/"]) {
 }
 
 describe("卜筮与时空盘独立模块页", () => {
+  beforeEach(() => localStorage.clear());
   afterEach(() => vi.restoreAllMocks());
 
   it("URL 查询参数预填表单，起卦后把输入写回地址栏", async () => {
