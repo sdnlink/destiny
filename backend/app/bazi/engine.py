@@ -88,23 +88,32 @@ def _calculate_shensha(
     }
     pillar_shensha: Dict[str, List[str]] = {k: [] for k in all_branches}
 
-    # 1. 天乙贵人 (以日干和年干查)
-    tian_yi_targets = set(TIAN_YI_GUI_REN.get(day_stem, ())) | set(TIAN_YI_GUI_REN.get(year_stem, ()))
-    for p_name, br in all_branches.items():
-        if br in tian_yi_targets:
-            pillar_shensha[p_name].append("天乙贵人")
+    # 1. 天乙贵人：日干查、年干查分别标注来源，不做并集混算
+    for source, stem in (("日干", day_stem), ("年干", year_stem)):
+        targets = TIAN_YI_GUI_REN.get(stem, ())
+        for p_name, br in all_branches.items():
+            if br in targets:
+                label = "天乙贵人（{}）".format(source)
+                if label not in pillar_shensha[p_name]:
+                    pillar_shensha[p_name].append(label)
 
-    # 2. 文昌贵人 (以日干和年干查)
-    wen_chang_targets = {WEN_CHANG_GUI_REN.get(day_stem), WEN_CHANG_GUI_REN.get(year_stem)} - {None}
-    for p_name, br in all_branches.items():
-        if br in wen_chang_targets:
-            pillar_shensha[p_name].append("文昌贵人")
+    # 2. 文昌贵人：日干查、年干查分别标注来源
+    for source, stem in (("日干", day_stem), ("年干", year_stem)):
+        target = WEN_CHANG_GUI_REN.get(stem)
+        if not target:
+            continue
+        for p_name, br in all_branches.items():
+            if br == target:
+                label = "文昌贵人（{}）".format(source)
+                if label not in pillar_shensha[p_name]:
+                    pillar_shensha[p_name].append(label)
 
-    # 3. 羊刃 (以日干查)
+    # 3. 羊刃：日干查；阴干按「阴刃」单独标注，避免与阳刃流派混算
     yang_ren_br = YANG_REN.get(day_stem)
+    yang_ren_label = "羊刃（阴刃）" if day_stem in ("乙", "丁", "己", "辛", "癸") else "羊刃"
     for p_name, br in all_branches.items():
         if br == yang_ren_br:
-            pillar_shensha[p_name].append("羊刃")
+            pillar_shensha[p_name].append(yang_ren_label)
 
     # 4. 禄神 (以日干查)
     lu_shen_br = LU_SHEN.get(day_stem)
@@ -191,7 +200,7 @@ def _evaluate_day_master_strength(
         elem = STEM_ELEMENTS[stem]
         element_scores[elem] += 10.0
 
-    # 地支藏干分值 (每个地支总权重 12 分，按权重分配，月令乘 1.5 倍权重系数)
+    # 地支藏干分值 (每个地支总权重 12 分，按权重分配；月令乘 1.6 倍权重系数)
     for idx, item in enumerate(all_hidden_stems):
         is_month_branch = (idx == 1)  # 第 2 个是月支
         branch_factor = 1.6 if is_month_branch else 1.0
@@ -213,11 +222,19 @@ def _evaluate_day_master_strength(
     de_ling = (month_elem == same_elem or month_elem == gen_elem)
 
     # 得地分析 (地支藏干中是否有比劫禄刃或强通根)
-    de_di = any(
-        h["stem"] == day_stem or STEM_ELEMENTS[h["stem"]] == same_elem
-        for item in all_hidden_stems
-        for h in item["hidden"]
-    )
+    de_di_hits = []
+    for item_index, item in enumerate(all_hidden_stems):
+        for h in item["hidden"]:
+            if h["stem"] == day_stem or STEM_ELEMENTS[h["stem"]] == same_elem:
+                de_di_hits.append({
+                    "pillar_index": item_index,
+                    "branch": item.get("branch", ""),
+                    "stem": h["stem"],
+                    "type": h.get("type", ""),
+                    "weight": h.get("weight", 0),
+                    "in_month_branch": item_index == 1,
+                })
+    de_di = bool(de_di_hits)
 
     # 判定强弱等级
     if support_ratio >= 0.65:
@@ -261,7 +278,14 @@ def _evaluate_day_master_strength(
             "analysis": {
                 "de_ling": de_ling,
                 "de_di": de_di,
+                "de_di_hits": de_di_hits,
                 "support_ratio": round(support_ratio, 4),
+                "method": {
+                    "branch_score_per_branch": 12.0,
+                    "month_branch_factor": 1.6,
+                    "thresholds": {"极旺": 0.65, "偏旺": 0.52, "中和": 0.45, "偏弱": 0.30},
+                    "note": "工程加权口径，不等同于任一传统旺衰流派；得地只列藏干命中，不区分本气/中气/余气权重。",
+                },
                 "summary": f"日主【{day_stem}{day_elem}】{level}。{'得令' if de_ling else '不得令'}，{'得地通根' if de_di else '根气较弱'}。喜用五行：{'、'.join(favorable)}；忌神五行：{'、'.join(unfavorable)}。",
             },
         },

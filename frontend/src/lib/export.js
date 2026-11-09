@@ -158,9 +158,9 @@ export function generateMarkdownReport(result, context) {
     md += `- **局象定局**：【${qimen.dun_type}${qimen.ju_number}局 · ${qimen.yuan_type}】 · 节气：${qimen.solar_term}\n`;
     md += `- **值符与值使**：值符【${qimen.zhi_fu_star}】落${qimen.zhi_fu_palace}宫 · 值使【${qimen.zhi_shi_gate}】落${qimen.zhi_shi_palace}宫\n`;
     if (qimen.favorable_directions?.length) {
-      md += `- **吉方研判**：\n`;
+      md += `- **三吉门落宫候选**：\n`;
       qimen.favorable_directions.forEach((fd) => {
-        md += `  - ${fd.direction} (${fd.palace_name})：临【${fd.gate}】+【${fd.star}】，八神【${fd.spirit}】护佑\n`;
+        md += `  - ${fd.direction} (${fd.palace_name})：临【${fd.gate}】+【${fd.star}】，八神【${fd.spirit}】\n`;
       });
     }
     md += `\n`;

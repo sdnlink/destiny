@@ -64,6 +64,29 @@ class QimenTests(unittest.TestCase):
         p3 = evaluate_qimen_patterns("丙", "丁", "生门", "天辅", "太阴")
         self.assertTrue(any(pat["name"] == "天遁" for pat in p3))
 
+    def test_qimen_nine_hides_conditions(self):
+        """九遁：神/鬼/风/云/龙/虎六遁按通行条件判定。"""
+        cases = [
+            (("丙", "丁", "生门", "天心", "九天", 8), "神遁"),
+            (("丁", "丙", "杜门", "天辅", "九地", 8), "鬼遁"),
+            (("乙", "戊", "开门", "天辅", "太阴", 4), "风遁"),
+            (("乙", "辛", "休门", "天辅", "太阴", 2), "云遁"),
+            (("乙", "戊", "生门", "天辅", "太阴", 1), "龙遁"),
+            (("乙", "辛", "休门", "天辅", "太阴", 8), "虎遁"),
+        ]
+        for args, name in cases:
+            with self.subTest(name=name):
+                patterns = evaluate_qimen_patterns(*args)
+                self.assertTrue(any(pat["name"] == name for pat in patterns), patterns)
+
+    def test_qimen_favorable_directions_are_not_scored(self):
+        """三吉门候选只列结构条件，不再输出「吉度」数值。"""
+        result = calculate_qimen_chart("2026-08-15T16:00:00")
+        for item in result["favorable_directions"]:
+            self.assertNotIn("score", item)
+            self.assertIn("conditions", item)
+            self.assertNotIn("吉凶", item["summary"])
+
     def test_qimen_api_endpoints(self):
         client = TestClient(app)
 

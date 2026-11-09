@@ -81,8 +81,19 @@ HORSE_STAR = MappingProxyType({
 
 
 # 经典奇门格局判定表
-def evaluate_qimen_patterns(t_stem: str, d_stem: str, gate: str, star: str, spirit: str) -> List[Dict[str, str]]:
-    """检测当前宫位的天盘干、地盘干、八门、九星与八神组合格局。"""
+def evaluate_qimen_patterns(
+    t_stem: str,
+    d_stem: str,
+    gate: str,
+    star: str,
+    spirit: str,
+    palace_number: int = 0,
+) -> List[Dict[str, str]]:
+    """检测当前宫位的天盘干、地盘干、八门、九星与八神组合格局。
+
+    ``palace_number`` 用于需要落宫条件的遁格（风遁巽四宫、龙遁坎一宫、
+    虎遁艮八宫）。缺省为 0 时只判定不依赖落宫条件的格局。
+    """
     patterns = []
     
     # 1. 天地干吉凶格
@@ -115,5 +126,22 @@ def evaluate_qimen_patterns(t_stem: str, d_stem: str, gate: str, star: str, spir
         patterns.append({"name": "地遁", "type": "大吉格", "desc": "地利厚重，宜设伏藏兵、安居置产。"})
     elif t_stem == "丁" and spirit == "太阴" and gate == "休门":
         patterns.append({"name": "人遁", "type": "大吉格", "desc": "人和同心，利谈判定盟、纳贤求和。"})
+
+    # 3.1 九遁其余六遁（《奇门法窍》《奇门旨归》通行条件；异文流派不混算）
+    if t_stem == "丙" and gate == "生门" and spirit == "九天":
+        patterns.append({"name": "神遁", "type": "大吉格", "desc": "丙奇、生门临九天；宜祭祀祈神、设坛布筹。"})
+    if t_stem == "丁" and gate == "杜门" and spirit == "九地":
+        patterns.append({"name": "鬼遁", "type": "大吉格", "desc": "丁奇、杜门临九地；宜探机设伏、隐迹藏形。"})
+    if t_stem == "乙" and gate in ("开门", "休门", "生门"):
+        if palace_number == 4:
+            patterns.append({"name": "风遁", "type": "大吉格", "desc": "乙奇合三吉门临巽四宫；宜借势、祷风。"})
+        if d_stem == "辛":
+            patterns.append({"name": "云遁", "type": "大吉格", "desc": "乙奇合三吉门临地盘六辛；宜藏形、掩袭。"})
+        if palace_number == 1 or d_stem == "癸":
+            patterns.append({"name": "龙遁", "type": "大吉格", "desc": "乙奇合三吉门临坎一宫或六癸；宜水战、祈雨。"})
+    if d_stem == "辛" and palace_number == 8 and (
+        (t_stem == "乙" and gate == "休门") or (t_stem == "丙" and gate == "生门")
+    ):
+        patterns.append({"name": "虎遁", "type": "大吉格", "desc": "乙奇休门或丙奇生门合六辛临艮八宫；宜守隘、设伏。"})
 
     return patterns

@@ -442,7 +442,12 @@ def _cast(local_datetime, timezone, occupation_branch=None, occupation_number=No
     transmissions = _three_transmissions(day_pillar, plate, lessons)
     xun = xun_info(day_pillar)
     hour = calendar["solar"]["hour"]
-    generals = _heavenly_generals(day_pillar[0], plate, hour, "day" if 6 <= hour < 18 else "night")
+    if occupation_branch:
+        # 报数/指定占时时，昼夜贵人随「占时支」切换，而不是随实际钟点。
+        period = "day" if selected_branch in ("卯", "辰", "巳", "午", "未", "申") else "night"
+    else:
+        period = "day" if 6 <= hour < 18 else "night"
+    generals = _heavenly_generals(day_pillar[0], plate, hour, period)
     method = "number_hour" if occupation_number is not None else "time"
     input_facts = {
         "local_datetime": local_datetime, "timezone": timezone, "longitude": longitude,

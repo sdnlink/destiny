@@ -1,8 +1,6 @@
 """Core computational engine for Zi Wei Dou Shu (紫微斗数)."""
 
-from datetime import datetime
 from typing import Any, Dict, Optional
-from lunar_python import Solar
 
 from app.calendar.engine import CalendarEngine
 from .rules import (
@@ -28,45 +26,6 @@ from .rules import (
 )
 
 
-def _get_lunar_info(dt: datetime):
-    solar = Solar.fromYmdHms(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
-    lunar = solar.getLunar()
-    eight_char = lunar.getEightChar()
-
-    year_gan = eight_char.getYearGan()
-    year_zhi = eight_char.getYearZhi()
-    month_gan = eight_char.getMonthGan()
-    month_zhi = eight_char.getMonthZhi()
-    day_gan = eight_char.getDayGan()
-    day_zhi = eight_char.getDayZhi()
-    time_gan = eight_char.getTimeGan()
-    time_zhi = eight_char.getTimeZhi()
-
-    lunar_year = lunar.getYear()
-    lunar_month = abs(lunar.getMonth())  # 绝对值处理闰月
-    lunar_day = lunar.getDay()
-    is_leap = lunar.getMonth() < 0
-
-    return {
-        "lunar_year": lunar_year,
-        "lunar_month": lunar_month,
-        "lunar_day": lunar_day,
-        "is_leap": is_leap,
-        "year_stem": year_gan,
-        "year_branch": year_zhi,
-        "month_stem": month_gan,
-        "month_branch": month_zhi,
-        "day_stem": day_gan,
-        "day_branch": day_zhi,
-        "hour_stem": time_gan,
-        "hour_branch": time_zhi,
-        "four_pillars": {
-            "year": f"{year_gan}{year_zhi}",
-            "month": f"{month_gan}{month_zhi}",
-            "day": f"{day_gan}{day_zhi}",
-            "hour": f"{time_gan}{time_zhi}",
-        },
-    }
 
 
 def _locate_ziwei_star(bureau_number: int, lunar_day: int) -> int:
@@ -340,6 +299,29 @@ def calculate_ziwei_chart(
     ming_zhu = MING_ZHU_TABLE.get(ming_branch, "贪狼")
     shen_zhu = SHEN_ZHU_TABLE.get(year_branch, "火星")
 
+    # 12. 历法口径标注：年界（立春/春节）与闰月都不是唯一流派口径
+    lunar_year = cal_res["lunar"]["year"]
+    lunar_year_branch = EARTHLY_BRANCHES[(lunar_year - 4) % 12]
+    is_leap_month = bool(cal_res["lunar"].get("is_leap", False))
+    calendar_warnings = []
+    if year_branch != lunar_year_branch:
+        calendar_warnings.append(
+            "出生日期落在立春与春节之间：年干支按历法基线的立春年柱取{}，农历年为{}年（{}）。"
+            "紫微年界存在立春/春节流派分歧，本盘未混算，按当前口径出盘。".format(
+                year_ganzhi, lunar_year, lunar_year_branch
+            )
+        )
+    if is_leap_month:
+        calendar_warnings.append(
+            "生月为闰{}月：命宫、身宫与天刑/天姚等按月序取数，未按闰月前半月/后半月拆分流派处理。".format(lunar_month)
+        )
+    calendar_policy = {
+        "year_boundary": "立春",
+        "lunar_year_branch": lunar_year_branch,
+        "year_boundary_split": year_branch != lunar_year_branch,
+        "leap_month_handling": "按月序取数，不拆分前半月/后半月",
+    }
+
     # 按照地支环状顺序 (子至亥) 整理供前端渲染
     branches_sorted_palaces = [branch_to_palace[b] for b in EARTHLY_BRANCHES]
 
@@ -357,6 +339,8 @@ def calculate_ziwei_chart(
             "lunar_day": cal_res["lunar"]["day"],
             "is_leap": cal_res["lunar"].get("is_leap", False),
         },
+        "calendar_policy": calendar_policy,
+        "calendar_warnings": calendar_warnings,
         "four_pillars": {
             "year": cal_res["ganzhi"]["year"]["text"],
             "month": cal_res["ganzhi"]["month"]["text"],
@@ -468,7 +452,7 @@ def time_cast(
         "warnings": [
             "紫微斗数排盘严格遵循经典星曜干支数理规则，不作现代确定性宿命推断。",
             "星曜吉凶状态需结合三方四正与生年四化综合考量。",
-        ],
+        ] + facts.get("calendar_warnings", []),
     }
 
 

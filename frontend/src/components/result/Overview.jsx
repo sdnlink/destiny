@@ -106,7 +106,7 @@ function Overview({ result, context, calendar, zhouyi, meihua, liuyao, liuren, q
               <strong>【{qimen.dun_type}{qimen.ju_number}局·{qimen.yuan_type}】</strong>
               <span>值符【{qimen.zhi_fu_star}】 · 值使【{qimen.zhi_shi_gate}】</span>
             </div>
-            <p>吉方：{qimen.favorable_directions?.[0]?.direction}（{qimen.favorable_directions?.[0]?.gate}）</p>
+            <p>三吉门落宫：{qimen.favorable_directions?.[0]?.direction}（{qimen.favorable_directions?.[0]?.gate}）</p>
           </button>
         )}
 

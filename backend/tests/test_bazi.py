@@ -78,6 +78,26 @@ class BaZiTests(unittest.TestCase):
         self.assertTrue(luck[0]["ganzhi"] != "")
         self.assertIn("stem_ten_god", luck[0])
 
+    def test_shensha_labels_keep_day_and_year_sources_separate(self):
+        """天乙/文昌按日干、年干分别标注，不再并成一个来源不明的列表。"""
+        result = calculate_bazi("2026-08-15T16:00:00", gender="男")
+        labels = [
+            label
+            for pillar in result["facts"]["pillars"].values()
+            for label in pillar["shensha"]
+        ]
+        self.assertIn("天乙贵人（日干）", labels)
+        self.assertIn("天乙贵人（年干）", labels)
+        self.assertIn("文昌贵人（年干）", labels)
+        self.assertNotIn("天乙贵人", labels)
+        self.assertNotIn("文昌贵人", labels)
+
+    def test_bazi_strength_method_is_explicit(self):
+        result = calculate_bazi("2026-08-15T16:00:00", gender="男")
+        method = result["day_master_strength"]["analysis"]["method"]
+        self.assertEqual(method["month_branch_factor"], 1.6)
+        self.assertIn("de_di_hits", result["day_master_strength"]["analysis"])
+
     def test_bazi_gender_polarity_luck_cycles(self):
         # 2024年甲辰 (阳干年)
         male_res = calculate_bazi("2024-06-01T12:00:00", gender="男")

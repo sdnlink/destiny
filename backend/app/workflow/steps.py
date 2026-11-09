@@ -789,7 +789,6 @@ def step6_synthesis_judgement(
             "trend": "未排梅花/六爻/周易，不作卦象吉凶与趋势推演；{}盘面的结构见步骤2盘面摘要，事项建议见顾问结论。".format(framework),
             "timing": None,
             "fortune_level": "未评级",
-            "fortune_score": None,
             "fortune_basis": [
                 "本次未排卦象体系（梅花/六爻/周易），按 WF-FORTUNE-001 的口径无法出具卦象吉凶等级",
                 "{}用神：{}".format(framework, domain["primary"]),
@@ -881,7 +880,6 @@ def step6_synthesis_judgement(
         "trend": trend,
         "timing": timing,
         "fortune_level": fortune_level,
-        "fortune_score": score,
         "fortune_basis": basis,
         "synthesis": synthesis_result,
         "advisory": advisory_result,

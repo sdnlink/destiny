@@ -28,7 +28,7 @@
 | 5 | 用神五行写死固定对照表 | 已修 | `workflow/steps.py` 改为 `_resolve_yongshen_element`，按纳甲/世应/体用推导并输出 `element_source` |
 | 7 | 体用关系只有两类 | 已修 | 五类齐全，判定统一走 `common/five_elements.element_relation` |
 | 9 | 地支/五行常量各写一份 | 已修 | `common/ganzhi.py`、`common/five_elements.py` 收为唯一真源，`meihua/engine.py`、`bazi/rules.py` 改为转出 |
-| 6 | 吉凶与应期不可追溯 | 已修 | 登记 `WF-YONGSHEN-001`/`WF-WANGSHUAI-001`/`WF-FORTUNE-001`/`WF-TIMING-001`，step4/step6 输出 `rule_ids`、`fortune_score`；口径见 ADR-015 |
+| 6 | 吉凶与应期不可追溯 | 已修 | 登记 `WF-YONGSHEN-001`/`WF-WANGSHUAI-001`/`WF-FORTUNE-001`/`WF-TIMING-001`，step4/step6 输出 `rule_ids`、`fortune_level` 与 `fortune_basis`；2026-11-09 起不再输出数值 `fortune_score`，口径见 ADR-015 |
 | 8 | 四套 module/method 分发 | 已修（第九轮） | 唯一分发表 `common/calculation_dispatch.py`（28 组）；`workflow/scheduler.py` 改 `REQUEST_BUILDERS` 查表；`main.py` 只留 `CALCULATION_MODELS`（27 条入参模型）、27 个计算端点统一走 `execute_calculation`；`test_scheduler_dispatch.py` / `test_main_dispatch.py` 钉住三张表键集一致 |
 | 23 | `requirements-dev` 缺 httpx | 已修 | `requirements-dev.txt` 改为 `-r requirements.txt` + `pytest` + `httpx<0.28`，并加 `tests/test_dependency_contract.py` |
 | 26 | 无 CI/无 lint 配置 | 已修（第九轮补钩子） | `.github/workflows/ci.yml`（lint + pytest + 前端构建与单测）、`pyproject.toml` 增加 `[tool.ruff]`、`.pre-commit-config.yaml`（ruff-pre-commit v0.17.3，已 install 并实跑 Passed） |
@@ -849,8 +849,9 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
 - `step3` 输出 `yongshen_framework`；`yongshen_by_system` 在无卦象时只放本体系一条。
 - `step4` 对这类盘面给 `level: "不适用"`，不再用月令去算卦象旺衰；体用/世应置空并写明理由，
   `rule_ids` 为空（没有适用规则就不挂规则号）。
-- `step6` 返回 `fortune_level: "未评级"`、`fortune_score: null`，依据写明「未排卦象体系，
+- `step6` 返回 `fortune_level: "未评级"`，依据写明「未排卦象体系，
   按 WF-FORTUNE-001 的口径无法出具等级」，不再伪造「平」；`timing` 置空。
+  （2026-11-09 更新：`fortune_score` 已从对外响应删除，未评级分支同样不再带该字段。）
 - `step7` 首条建议改为「未排卦象体系，以盘面事实与顾问结论为参考」，不再说「卦象有阻」。
 - `reference_library` / `reality_check` 两个附加模块同步更正：没有卦名时不再拼「本卦「」」，
   未评级时不再给「待用神得令」「吉凶参半」这类卦象口径文案；`reality_check` 的用神条目
@@ -861,7 +862,7 @@ v2 的 lax 模式不再把 `6.5` 截断成 `6`，也不再把数字自动转成�
   查表显示（未知值原样输出，不再一律当「上克下」）。
 
 实测（六体系逐个起盘）：梅花/六爻仍为 官鬼/父母 + 大吉/平；奇门、大六壬、八字、紫微均为
-各自的用神口径、旺衰「不适用」、吉凶「未评级」、`fortune_score` 为 `null`。
+各自的用神口径、旺衰「不适用」、吉凶「未评级」；2026-11-09 起对外结构不再含 `fortune_score`。
 
 ### 验证结果（追补后）
 

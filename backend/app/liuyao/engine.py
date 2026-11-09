@@ -410,6 +410,12 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
             **hexagrams,
             "day_pillar": day_pillar,
             "month_branch": calendar["month_branch"],
+            "month_strength_policy": {
+                "basis": "月建地支本气单五行生克",
+                "levels": ["旺", "相", "休", "囚", "死"],
+                "hidden_stems_weighting": False,
+                "note": "未按月令藏干本气/中气/余气加权；藏干加权属另一流派口径，本盘不混算。",
+            },
             "day_branch": {"name": day_pillar[1], "number": EARTHLY_BRANCHES.index(day_pillar[1]) + 1},
             "palace": palace,
             "xun": xun,
@@ -509,6 +515,7 @@ def _result(hexagrams, calendar, method, method_facts, method_step, calculation_
         "judgements": [],
         "warnings": [
             "六爻纳甲采用京房八宫工程基线；旺衰、空破、刑害、合局均为确定性推导，evidence 字段挂《增删卜易》等典籍原文。",
+            "月令旺衰按「月建地支本气单五行」判定，未按藏干本气/中气/余气加权；后者属另一流派口径，本盘不混算。",
             "伏神按本宫首卦（八纯卦）同位纳甲六亲补缺推导；出伏条件（空破、日月克伤）按《增删卜易》伏神章口径标注。",
             "用神候选与取舍排序仅为候选整理，吉凶判断须结合问事语境人工复核。",
         ],

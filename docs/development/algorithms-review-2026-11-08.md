@@ -3,6 +3,7 @@
 审查对象：`backend/app` 下周易、梅花、六爻、大六壬、奇门、八字、紫微、阳宅风水各计算内核，以及历法、公共干支/卦象层。
 审查方式：逐模块读源码 + 项目内 ADR/开发文档反查口径 + 外部典籍或标准案例核对；不做风格审查。
 本轮已实际修改 5 个算法文件与 3 个测试文件；未改动前端。代码与本文已提交为 `5563858`。
+2026-11-09 已按第三节处置口径问题：能确定的改代码，流派差异改为显式标注；见第三节。
 
 ## 一、结论速览
 
@@ -15,12 +16,12 @@
 | P1 | 奇门天禽只在坤二写死，值符为天禽时落宫与九星语义断层 | 已修 |
 | P2 | 六爻刑害「动爻N」用动爻序号而非真实爻位 | 已修 |
 | P2 | 八字性别只认「男」，`M/male` 会按女性算顺逆与起运 | 已修 |
-| P1/P2 | 奇门吉方数值评分与吉凶断语、工作流 `fortune_score` 与「不生成自动吉凶总分」边界冲突 | 待决策 |
-| P2 | 八字旺衰注释 1.5 与实现 1.6 不一致；阈值无出处；得地只看五行 | 待决策 |
-| P2 | 八字阴刃、天乙/文昌日干年干并查属流派混用未标注 | 待决策 |
-| P2 | 紫微闰月 `abs` 不拆分、年界用立春而非春节；梅花年支同源问题 | 待决策 |
-| P2 | 大六壬涉害只走顺时针一条路径；手动占时的昼夜贵人仍用实际钟点 | 待补验 |
-| P3 | `xun_info` 旬空两支顺序不统一（`亥戌`、`申酉`） | 待整理 |
+| P1/P2 | 奇门吉方数值评分与吉凶断语、工作流 `fortune_score` 与「不生成自动吉凶总分」边界冲突 | 已修：去评分/断语，删 `fortune_score` |
+| P2 | 八字旺衰注释 1.5 与实现 1.6 不一致；阈值无出处；得地只看五行 | 已标注：注释对齐、`de_di_hits`、`analysis.method` |
+| P2 | 八字阴刃、天乙/文昌日干年干并查属流派混用未标注 | 已修：分源标注、阴刃显式命名 |
+| P2 | 紫微闰月 `abs` 不拆分、年界用立春而非春节；梅花年支同源问题 | 已标注：`calendar_policy` + 动态 warning |
+| P2 | 大六壬涉害只走顺时针一条路径；手动占时的昼夜贵人仍用实际钟点 | 昼夜已修；涉害复核等价；变体覆盖不全 |
+| P3 | `xun_info` 旬空两支顺序不统一（`亥戌`、`申酉`） | 勘误：实测顺序一致，无需改 |
 
 ## 二、已确认并修复的确定性错误
 
@@ -78,48 +79,64 @@
 - 原实现：`enumerate(动爻子集, 1)`，得到的是「第几个动爻」，不是真实爻位；例如初爻、四爻动，会写成「动爻1、动爻2」。
 - 修复：遍历原爻表，用 `line["position"]` 生成「动爻N」，与 `assess_sanhe_conditions` 的来源字符串一致。
 
-## 三、待用户决策的口径问题
+## 三、口径问题与处置（2026-11-09 更新）
 
-1. **奇门吉方评分与断语**
-   - `qimen/engine.py` 生成 `score`（吉门80 +三奇15 +吉神10）、`summary`「吉神护佑，宜主动布局开拓」和 `advisory`「利取某方吉气」。
-   - 前端 `QimenView.jsx` 渲染「吉度 N 分」，`Overview.jsx` 显示「吉方」，`lib/export.js` 导出「吉方研判」。
-   - 与 `docs/development/calculation-service.md` 第 57 行「任何自动吉凶总分……」及 ADR-015「不生成自动吉凶总分」存在冲突。建议至少把 `score` 改名为结构性排序权重并去掉「吉度」，或保留但明确标注为「规则内排序，不是吉凶总分」。
+原则：能从典籍或项目既有 ADR 确定的，直接改代码；确属流派差异的，保留一种口径并在响应里显式标注 `warnings` / `analysis`，不沉默混算。
 
-2. **工作流 `fortune_score` 五档**
-   - `workflow/steps.py` 仍输出 `fortune_score` 与「大吉/小吉/平/小凶/大凶」，ADR-015 解释为「规则化等级，不是黑箱总分」。
-   - README 的「不生成自动吉凶总分」与数值字段并存，需要决定是否只保留等级与 `fortune_basis`、把数值降为内部依据。
+1. **奇门吉方评分与断语 — 已修（去评分）**
+   - `qimen/engine.py` 删除 `score`（原吉门80 + 三奇15 + 吉神10）与「吉神护佑，宜主动布局开拓」类断语。
+   - `favorable_directions` 每项改为 `conditions`（三吉门 / 天盘三奇 / 吉神），`summary` 只陈述盘面结构，例如「东（震三宫），临【伤门】、【天冲】、【六合】；条件：三吉门、天盘三奇、吉神」。
+   - 排序改为结构序：`gate_order(开0/休1/生2)` + 宫数，不再按分数排序。
+   - `advisory` 改为「局象结构 / 候选方位 / 读盘说明」，并明确「只是盘面结构条件，未计算吉凶总分」。
+   - 前端 `frontend/src/components/result/QimenView.jsx` 改为「三吉门落宫候选」「结构候选」；`Overview.jsx` 改「三吉门落宫：」；`lib/export.js` 去掉「吉方研判 / 八神护佑」。
 
-3. **八字旺衰工程基线**
-   - 注释写「月令乘 1.5 倍」，代码是 `branch_factor = 1.6`；天干10分、藏干12×weight、阈值0.65/0.52/0.45/0.30 均无典籍出处。
-   - `de_di` 只看藏干是否有同五行，不区分本气/中气/余气。
-   - 建议改注释对齐 1.6，或在规则文档中显式标为工程基线；若要按《渊海子平》月令本气加权，需要另立规则。
+2. **工作流 `fortune_score` 五档 — 已修（删数值）**
+   - `workflow/steps.py` 两处删除 `fortune_score`，保留 `fortune_level` 与 `fortune_basis`；`basis` 改为逐条收集，等级依据仍可复核。
+   - 对外只输出「大吉/小吉/平/小凶/大凶」规则等级，不再带任何数值总分。
+   - `workflow/steps.py` 内部仍用 `TIYONG_SCORE` 做等级映射，该数值不进入响应。
 
-4. **八字阴刃与天乙/文昌并查**
-   - `YANG_REN` 含乙辰、丁未、己未、辛戌、癸丑，属「阴刃」流派；主流只取阳干（甲卯、丙午、戊午、庚酉、壬子）。
-   - `_calculate_shensha` 用 `set(日干) | set(年干)` 合并天乙/文昌，同时挂两套目标支；属「日干为主」与「年干并查」混用。
-   - 建议在输出中分别标 `日干查`/`年干查`，或按流派开关收敛，不要混成一个列表。
+3. **八字旺衰工程基线 — 已标注（不改公式）**
+   - 注释与实现对齐为月令乘 `1.6` 倍。
+   - `de_di` 改为逐条输出 `de_di_hits`，含 `pillar_index/branch/stem/type/weight/in_month_branch`，不再只返回布尔值。
+   - `analysis.method` 显式记录 `branch_score_per_branch=12.0`、`month_branch_factor=1.6`、阈值 `0.65/0.52/0.45/0.30`，并注明「工程加权口径，不等同于任一传统旺衰流派；不区分本气/中气/余气权重」。
+   - 若要改用《渊海子平》月令本气加权，属于新增流派口径，不在本次修复内。
 
-5. **紫微闰月与年界**
-   - `lunar_month = abs(cal_res["lunar"]["month"])`，闰月整月按本月序处理，未做「前半月本月、后半月下月」拆分，也未给 warning。
-   - 年干支取 `calendar` 年柱（立春换年）；紫微多数流派用农历年（春节换年），立春与春节之间的生日会差一年，需明确采用哪一派并写入响应 warning。
+4. **八字阴刃与天乙/文昌并查 — 已修（分源标注）**
+   - 天乙、文昌按来源分别输出「天乙贵人（日干）/（年干）」「文昌贵人（日干）/（年干）」，不再合并成一个集合。
+   - 阴干羊刃保留但显式标为「羊刃（阴刃）」，与阳干羊刃区分。
 
-6. **梅花年支**
-   - 时间起卦用 `calendar["year_branch"]`（年柱、立春换年）；传统梅花时间起卦多以农历年支（春节）为准。若项目决定统一立春，应在 ADR 明确；否则立春到春节之间的卦会换错年支。
+5. **紫微闰月与年界 — 已标注**
+   - 保留「年柱按立春换年」的现状，新增 `calendar_policy`（`year_boundary="立春"`、`lunar_year_branch`、`leap_month_handling="按月序取数，不拆分前半月/后半月"`）。
+   - 立春与春节之间年干支不一致、或生月为闰月时，动态写入 `calendar_warnings` 并提示「按当前口径出盘、不混算」。
+   - 已删除未使用的 `_get_lunar_info` 死代码。
+   - 是否改为「紫微以春节换年」需产品口径决定；当前不混算。
 
-7. **大六壬涉害路径**
-   - `_path_between` 只按顺时针枚举「归本家」所历地盘，未同时比较逆时针路径；《六壬大全》涉害深浅以「从地盘历数归本家受克深者」为准，需要用标准课例逐条验等价。
-   - `_select_by_day_polarity` 只在同阴阳候选恰为 1 时取比用，其余直接转涉害；《六壬指南》「知一」等变体未实现，属覆盖不全而非公式错。
-   - `_heavenly_generals` 的昼夜用实际钟点 `calendar["solar"]["hour"]`；当用户手动指定占时（`occupation_branch`）时，昼夜贵人仍按实际钟点，未随占时切换。
+6. **梅花年支 — 已标注**
+   - `time_cast` 保留年柱（立春换年）取数，新增年支口径 warning：当农历年对应年支编号与年柱年支不一致时，提示「梅花年支存在立春/春节两种口径，本盘按立春口径取数，未混算」。
 
-8. **六爻月令旺衰**
-   - `_month_strength` 只用月支单五行，未按月建藏干/本气加权；旺相休囚死五档里「囚/死」在 `_line_strength_rank` 同为 0。
-   - 这是常见简化，但若要按《增删卜易》月建藏干断，需要补权重并标注流派。
+7. **大六壬昼夜贵人 — 已修；涉害与「知一」边界说明**
+   - `_cast` 在用户指定占时（`occupation_branch`，含报数起课）时，昼夜改按占时支判定（卯辰巳午未申为昼），不再按实际钟点；未指定占时仍按 `6<=hour<18`。
+   - 涉害顺行单路径已用《六壬大全》原例复核（「午加庚」历酉辛为2、「戌加子」历癸为1），原疑点撤销。
+   - 「知一」等三传变体仍未实现，属覆盖不全；当前按比用→涉害主路径，响应中不宣称支持全部变体。
 
-9. **奇门三遁覆盖**
-   - `evaluate_qimen_patterns` 只实现天遁（丙+丁+生门）、地遁（乙+己+开门）、人遁（丁+太阴+休门）；神遁/鬼遁/龙遁/虎遁/风遁/云遁未实现。若规则表声明支持九遁，应补测试或把覆盖范围写进 `status/coverage`。
+8. **六爻月令旺衰 — 已标注（不改权重）**
+   - 保留「月建地支本气单五行」判定旺相休囚死。
+   - `facts.month_strength_policy` 与顶层 `warnings` 显式声明「未按月令藏干本气/中气/余气加权；藏干加权属另一流派口径，本盘不混算」。
+   - `_line_strength_rank` 中囚/死同权仅用于候选排序，不据此推断吉凶。
 
-10. **旬空展示顺序**
-    - `common/ganzhi.xun_info` 甲子旬返回 `[亥, 戌]`、甲戌旬返回 `[申, 酉]`，顺序不统一；当前测试用 `set` 比较未暴露。属展示排序，不影响计算。
+9. **奇门九遁覆盖 — 已修（补六遁）**
+   - `evaluate_qimen_patterns` 增加 `palace_number` 落宫条件，在三遁之外补齐：
+     - 神遁：天盘丙 + 生门 + 九天；
+     - 鬼遁：天盘丁 + 杜门 + 九地；
+     - 风遁：天盘乙 + 开/休/生门 + 巽四宫；
+     - 云遁：天盘乙 + 开/休/生门 + 地盘辛；
+     - 龙遁：天盘乙 + 开/休/生门 + 坎一宫或地盘癸；
+     - 虎遁：地盘辛 + 艮八宫，且（天盘乙+休门）或（天盘丙+生门）。
+   - 条件按《奇门法窍》《奇门旨归》等通行本取交集写法；异文变体不混算，并在 `warnings` 说明。
+
+10. **旬空展示顺序 — 勘误：原报告判断有误，代码本身一致**
+    - 实测 `xun_info`：甲子 `['戌','亥']`、甲戌 `['申','酉']`、甲申 `['午','未']`、甲午 `['辰','巳']`、甲辰 `['寅','卯']`、甲寅 `['子','丑']`，顺序均为「先阳支后阴支」，无需改代码。
+    - 原报告「甲子返回 `[亥, 戌]`」系误读，特此勘误。
 
 ## 四、已核对为正确的部分（避免重复推导）
 
@@ -137,27 +154,35 @@
 本轮涉及模块：
 
 ```text
-backend/tests/test_ziwei.py
-backend/tests/test_qimen.py
-backend/tests/test_bazi.py
-backend/tests/test_liuyao.py
+backend/app/qimen/{engine,rules}.py
+backend/app/bazi/engine.py
+backend/app/daliuren/engine.py
+backend/app/meihua/engine.py
+backend/app/ziwei/engine.py
+backend/app/liuyao/{engine,advanced}.py
+backend/app/workflow/steps.py
+backend/tests/{test_qimen,test_bazi,test_daliuren_domain,test_workflow_steps,test_ziwei,test_meihua,test_liuyao_policy}.py
+frontend/src/components/result/{QimenView,Overview}.jsx
+frontend/src/lib/export.js
+data/rules/mvp-engineering-baseline.json
 ```
 
-结果：`25 passed`；`ruff check` 对所改 8 个文件全部通过。
-
+定向测试：`152 passed / 33 subtests passed`（奇门、八字、大六壬、工作流）。
+口径标注新增测试：`12 passed`（紫微、梅花、六爻月令）。
 后端全量：
 
 ```text
-2 failed, 882 passed, 10 skipped, 64 subtests passed
+2 failed, 890 passed, 10 skipped, 70 subtests passed
 ```
 
-两个失败均为 `tests/test_iching.py` 的卦序断言（屯应为3、解为40）。失败来源是工作树里**并行会话的未提交改动** `backend/app/common/hexagrams.py`（同批还有 `backend/tests/test_liuyao.py`、`?? backend/tests/test_hexagrams.py`、`?? backend/verify_liuyao.py`），不是本轮 5 个算法文件。这些并行文件不在本提交内，提交前必须核对归属。
+两个失败仍为 `tests/test_iching.py` 的卦序断言（屯应为3、解为40）。失败来源是工作树里**并行会话的未提交改动** `backend/app/common/hexagrams.py`（同批还有 `backend/tests/test_liuyao.py`、`?? backend/tests/test_hexagrams.py`、`?? backend/verify_liuyao.py`），不是本轮算法文件。这些并行文件不在本提交内，提交前必须核对归属。
 
-本轮未跑前端单测/build/烟测；后端改动只涉及计算内核与测试，未改 API 路由或响应模型字段（奇门新增 `fu_tou`、八字新增 `start_actual_month` 均为附加字段）。
+静态检查：`ruff check app tests` 通过。
+前端：`test:unit` 15 文件 / 97 用例通过；`test:node` 47 用例通过；`npm run build` 通过；`test:browser` 端到端烟测通过（桌面/移动端、工作流、奇门/六壬、风水、典籍检索）。
 
 ## 六、覆盖边界
 
 - 完整阅读并核对：`common` 干支/卦象、`calendar` 历法与节气、`bazi`（含 `liunian`/`lifeline`）、`ziwei`、`liuyao`（含 `advanced`）、`meihua`、`daliuren`、`qimen`、`fengshui` 四模块。
 - 口径抽查、未逐行做算法结论：`workflow/steps.py`（吉凶汇总与步骤编排）、`core/explanation.py`、`core/advisory.py`、`core/interpretation.py`、`core/targeted_deduction.py`、`zhouyi/*`、`calendar/timezone.py`。这些层主要做解释、编排与展示，不改变排盘数值；其中与「自动吉凶」边界相关的问题已在第三节列出。
-- 未审前端计算/展示逻辑（本轮无前端改动）；`ZiweiView.jsx` 用浏览器当前时间算年龄等展示近似问题不在本次算法结论内。
+- 未审前端计算/展示逻辑；本轮前端只同步奇门文案（「三吉门落宫候选」「结构候选」）；`ZiweiView.jsx` 用浏览器当前时间算年龄等展示近似问题不在本次算法结论内。
 

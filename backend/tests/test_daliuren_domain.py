@@ -96,6 +96,14 @@ def test_result_contains_versions_normalized_input_trace_and_rule_steps():
     assert result["judgements"] == []
 
 
+def test_number_occupation_branch_switches_day_night_generals():
+    """手动占时（报数法）的昼夜贵人应随占时支切换，而不是随实际钟点。"""
+    result = number_cast(5, "2026-01-01T00:00:00", TZ)
+    assert result["normalized_input"]["occupation_branch"] == "辰"
+    assert result["facts"]["heavenly_generals"]["period"] == "day"
+    assert result["facts"]["heavenly_generals"]["civil_hour"] == 0
+
+
 def test_personalized_report_number_is_replayable_and_private():
     nonce = "person-0000000000000001"
     first = auto_cast(nonce, "2026-08-15T16:00:00", TZ)

@@ -3036,11 +3036,10 @@
         "用神旺相加2，囚死减2，休或平不加不减",
         "用生体加2，体克用加1，比和加1，体生用减1，用克体减2",
         "合计≥3为大吉，1~2为小吉，0为平，-1为小凶，≤-2为大凶",
-        "每条加减分写入 fortune_basis"
+        "每条信号依据写入 fortune_basis，内部权重不进入对外响应"
       ],
       "outputs": [
         "fortune_level",
-        "fortune_score",
         "fortune_basis",
         "rule_ids"
       ],

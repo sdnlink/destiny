@@ -62,6 +62,18 @@ class ZiweiTests(unittest.TestCase):
         self.assertIn("ZW-STARS-001", cast["rule_ids"])
         self.assertIn("palaces_by_branch", cast["facts"])
 
+    def test_calendar_policy_and_year_boundary_warning(self):
+        # 2026-02-10 在立春之后、春节之前：年柱已换丙午，农历年仍是乙巳。
+        cast = time_cast("2026-02-10T10:00:00", gender="男")
+        policy = cast["facts"]["calendar_policy"]
+        self.assertEqual(policy["year_boundary"], "立春")
+        self.assertEqual(policy["lunar_year_branch"], "巳")
+        self.assertTrue(policy["year_boundary_split"])
+        self.assertTrue(
+            any("立春与春节之间" in item and "未混算" in item for item in cast["warnings"]),
+            cast["warnings"],
+        )
+
     def test_ziwei_tianfu_formula(self):
         # 紫微斗數全書·卷二·安天府图：「唯有寅申同一位，其余丑卯互安星。」
         # 以子=0 索引，天府 = (4 - 紫微) % 12；寅/申同宫是公式自然结果。

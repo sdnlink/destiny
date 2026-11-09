@@ -125,18 +125,18 @@ function QimenView({ result }) {
         </div>
       </section>
 
-      {/* 吉方研判 */}
+      {/* 三吉门结构候选 */}
       {favs.length > 0 && (
         <section className="data-band">
           <div className="band-heading">
-            <div><span className="band-icon"><Compass size={16} /></span><div><h3>奇门优选用事方位</h3><p>三吉门（开、休、生）结合三奇与吉神优选</p></div></div>
+            <div><span className="band-icon"><Compass size={16} /></span><div><h3>三吉门落宫候选</h3><p>只列开门、休门、生门及其同宫星神奇仪，不作吉度评分</p></div></div>
           </div>
           <div className="qimen-fav-grid">
             {favs.map((f) => (
               <div key={f.palace_number} className="qimen-fav-card">
                 <div className="fav-card-head">
                   <strong className="fav-dir">{f.direction}（{f.palace_name}）</strong>
-                  <span className="fav-score-badge">吉度 {f.score} 分</span>
+                  <span className="fav-score-badge">结构候选</span>
                 </div>
                 <div className="fav-elements-row">
                   <span className="fav-gate">{f.gate}</span>
@@ -150,23 +150,23 @@ function QimenView({ result }) {
         </section>
       )}
 
-      {/* 奇门决策策略 */}
+      {/* 奇门盘面结构提示 */}
       {advisory && (
         <section className="data-band advisory-band">
           <div className="band-heading">
-            <div><span className="band-icon"><BookOpen size={16} /></span><div><h3>奇门运筹与决策策略</h3><p>审机夺势，动静有常</p></div></div>
+            <div><span className="band-icon"><BookOpen size={16} /></span><div><h3>奇门盘面结构提示</h3><p>只描述盘面条件，不生成吉凶总分或行动结论</p></div></div>
           </div>
           <div className="bazi-advisory-cards">
             <div className="bazi-adv-card">
-              <strong>【局象综述】</strong>
+              <strong>【局象结构】</strong>
               <p>{advisory.general}</p>
             </div>
             <div className="bazi-adv-card">
-              <strong>【用事行动】</strong>
+              <strong>【候选方位】</strong>
               <p>{advisory.action}</p>
             </div>
             <div className="bazi-adv-card" style={{ gridColumn: "1 / -1" }}>
-              <strong>【运筹谋略】</strong>
+              <strong>【读盘说明】</strong>
               <p>{advisory.strategy}</p>
             </div>
           </div>

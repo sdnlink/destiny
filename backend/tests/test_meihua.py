@@ -48,6 +48,14 @@ class MeihuaTests(unittest.TestCase):
             result["facts"]["calendar"]["time"]["effective_local_datetime"],
         )
 
+    def test_year_branch_school_warning_between_lichun_and_spring_festival(self):
+        # 2026-02-10：立春后已取丙午年支，农历年仍是乙巳；两种口径必须显式标注。
+        result = time_cast("2026-02-10T10:00:00", "Asia/Shanghai")
+        self.assertTrue(
+            any("梅花年支" in item and "未混算" in item for item in result["warnings"]),
+            result["warnings"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -574,20 +574,17 @@ class TestStep4Wangshuai(unittest.TestCase):
             ["yongshen_wangshuai"]["level"].startswith("死")
         )
 
-    def test_five_grades_drive_fortune_score(self):
-        """step4 档位直接决定 step6 打分：旺/相 +2、休 0、囚/死 -2。
-
-        同时校验 reason 文案与档位一致（旧实现里理由和档位互相矛盾）。
-        """
+    def test_five_grades_drive_fortune_level(self):
+        """step4 档位与体用关系共同决定 step6 等级；对外不再输出数值总分。"""
         session = self._session()
         cases = [
-            ("寅", "木", "旺", "同气", 2),
-            ("子", "木", "相", "生用神", 2),
-            ("午", "木", "休", "生月令", 0),
-            ("寅", "土", "囚", "克用神", -2),
-            ("辰", "木", "死", "克月令", -2),
+            ("寅", "木", "旺", "同气", "小吉"),
+            ("子", "木", "相", "生用神", "小吉"),
+            ("午", "木", "休", "生月令", "平"),
+            ("寅", "土", "囚", "克用神", "大凶"),
+            ("辰", "木", "死", "克月令", "大凶"),
         ]
-        for month, element, prefix, reason_keyword, expected_score in cases:
+        for month, element, prefix, reason_keyword, expected_level in cases:
             with self.subTest(month=month, element=element):
                 plate = _plate(calendar=_calendar(month, "卯"),
                                lines=[_line(1, "官鬼", element, "寅")])
@@ -599,7 +596,8 @@ class TestStep4Wangshuai(unittest.TestCase):
 
                 step6 = wf.step6_synthesis_judgement(
                     session, [], plate, {"primary_yongshen": "官鬼"}, step4, {})
-                self.assertEqual(step6["fortune_score"], expected_score)
+                self.assertEqual(step6["fortune_level"], expected_level)
+                self.assertNotIn("fortune_score", step6)
 
     def test_missing_yongshen_element_reports_source(self):
         result = self._analyze("寅", "卯", [], primary="")
@@ -754,31 +752,30 @@ class TestStep6Synthesis(unittest.TestCase):
         result = self._judge()
         self.assertEqual(result["step"], 6)
         self.assertEqual(result["fortune_level"], "平")
-        self.assertEqual(result["fortune_score"], 0)
+        self.assertNotIn("fortune_score", result)
         self.assertTrue(any("力量中等" in item for item in result["fortune_basis"]))
 
     def test_wang_plus_use_generates_body_is_daji(self):
         result = self._judge("旺（得令）", "use_generates_body")
         self.assertEqual(result["fortune_level"], "大吉")
-        self.assertEqual(result["fortune_score"], 4)
         self.assertTrue(any("外部条件滋养自身" in item for item in result["fortune_basis"]))
         self.assertTrue(any("用神旺相" in item for item in result["favorable"]))
         self.assertTrue(any("体用关系有利" in item for item in result["favorable"]))
 
     def test_same_element_scores_xiaoji(self):
         result = self._judge("平", "same_element")
-        self.assertEqual(result["fortune_score"], 1)
+        self.assertNotIn("fortune_score", result)
         self.assertEqual(result["fortune_level"], "小吉")
 
     def test_body_generates_use_scores_xiaoxiong(self):
         result = self._judge("平", "body_generates_use")
-        self.assertEqual(result["fortune_score"], -1)
+        self.assertNotIn("fortune_score", result)
         self.assertEqual(result["fortune_level"], "小凶")
         self.assertTrue(any("体生用" in item for item in result["obstacles"]))
 
     def test_use_controls_body_scores_daxiong(self):
         result = self._judge("囚（月令克用）", "use_controls_body")
-        self.assertEqual(result["fortune_score"], -4)
+        self.assertNotIn("fortune_score", result)
         self.assertEqual(result["fortune_level"], "大凶")
         self.assertTrue(any("用克体" in item for item in result["obstacles"]))
         self.assertTrue(any("休囚死" in item for item in result["obstacles"]))
@@ -790,13 +787,13 @@ class TestStep6Synthesis(unittest.TestCase):
 
     def test_body_controls_use_counts_as_favorable(self):
         result = self._judge("相（月令生用）", "body_controls_use")
-        self.assertEqual(result["fortune_score"], 3)
+        self.assertNotIn("fortune_score", result)
         self.assertEqual(result["fortune_level"], "大吉")
         self.assertTrue(any("体克用" in item for item in result["fortune_basis"]))
 
     def test_unknown_tiyong_code_contributes_nothing(self):
         result = self._judge("平", "unknown_code")
-        self.assertEqual(result["fortune_score"], 0)
+        self.assertNotIn("fortune_score", result)
         self.assertFalse(any("体用" in item and "比和" in item for item in result["fortune_basis"]))
 
     def test_output_contains_trend_timing_and_rule_ids(self):
@@ -1069,7 +1066,7 @@ class TestNonHexagramYongshen(unittest.TestCase):
             {},
         )
         self.assertEqual(result["fortune_level"], "未评级")
-        self.assertIsNone(result["fortune_score"])
+        self.assertNotIn("fortune_score", result)
         self.assertIsNone(result["timing"])
         self.assertEqual(result["favorable"], [])
         self.assertTrue(any("未排卦象体系" in item for item in result["fortune_basis"]))

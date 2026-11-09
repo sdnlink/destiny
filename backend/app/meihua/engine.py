@@ -250,6 +250,14 @@ def time_cast(local_datetime, timezone, longitude=None, use_true_solar_time=Fals
     )
     if calendar["lunar"]["is_leap_month"]:
         result["warnings"].append("当前日期位于闰月，工程基线按月份绝对值取数。")
+    lunar_year_branch_number = ((calendar["lunar"]["year"] - 4) % 12) + 1
+    if lunar_year_branch_number != year_number:
+        result["warnings"].append(
+            "年支取立春年柱（{}），农历年为 {}（对应年支编号 {}）；"
+            "梅花年支存在立春/春节两种口径，本盘按立春口径取数，未混算。".format(
+                calendar["year_branch"]["name"], calendar["lunar"]["year"], lunar_year_branch_number,
+            )
+        )
     return result
 
 

@@ -251,15 +251,16 @@ def calculate_qimen_chart(
             gate=gate,
             star=star,
             spirit=spirit,
+            palace_number=p_num,
         )
 
-        # 判定吉方 (三吉门 + 吉神/三奇)
+        # 三吉门候选：只列结构条件，不计算「吉度」总分，也不写吉凶断语。
         if gate in ("开门", "休门", "生门") and p_num != 5:
-            score = 80
+            conditions = ["三吉门"]
             if t_stem in ("乙", "丙", "丁"):
-                score += 15
+                conditions.append("天盘三奇")
             if spirit in ("值符", "九天", "太阴", "六合"):
-                score += 10
+                conditions.append("吉神")
             favorable_directions.append({
                 "palace_number": p_num,
                 "palace_name": p_meta["name"],
@@ -267,8 +268,11 @@ def calculate_qimen_chart(
                 "gate": gate,
                 "star": star,
                 "spirit": spirit,
-                "score": score,
-                "summary": f"{p_meta['direction']}（{p_meta['name']}），临【{gate}】与【{star}】，吉神【{spirit}】护佑，宜主动布局开拓。",
+                "conditions": conditions,
+                "summary": "{}（{}），临【{}】、【{}】、【{}】；命中条件：{}。".format(
+                    p_meta["direction"], p_meta["name"], gate, star, spirit,
+                    "、".join(conditions),
+                ),
             })
 
         palaces_output[p_num] = {
@@ -289,15 +293,25 @@ def calculate_qimen_chart(
             "patterns": patterns,
         }
 
-    favorable_directions.sort(key=lambda x: -x["score"])
+    # 按三吉门本身的门序与宫序排列，不引入数值吉凶总分。
+    gate_order = {"开门": 0, "休门": 1, "生门": 2}
+    favorable_directions.sort(
+        key=lambda x: (gate_order.get(x["gate"], 99), x["palace_number"])
+    )
 
-    # 8. 奇门综合建议
-    top_dir = favorable_directions[0]["direction"] if favorable_directions else "正北"
-    top_gate = favorable_directions[0]["gate"] if favorable_directions else "吉门"
+    # 8. 奇门盘面结构提示（只描述盘面，不生成吉凶断语或行动结论）
+    gate_candidates = "、".join(
+        "{}（{}）".format(item["gate"], item["direction"])
+        for item in favorable_directions
+    ) or "无三吉门落宫"
     advisory = {
-        "general": f"本局为【{dun_type}{ju_number}局·{yuan_type}】，值符【{zhi_fu_origin_star}】落{PALACE_NAMES[target_star_palace]['name']}，值使【{zhi_shi_origin_gate}】落{PALACE_NAMES[gate_target_palace]['name']}。乘时借势，利取【{top_dir}】方吉气。",
-        "action": f"重要决策、商务出行或商务谈判，优先选用【{top_gate}】所在方位推进，避开死门与凶煞冲克。",
-        "strategy": "奇门重在审机夺势，动静有常。天盘奇仪与九星指示天时良机，人盘八门指示人事进退，神盘指引心境定力。",
+        "general": "本局为【{}{}局·{}】，值符【{}】落{}，值使【{}】落{}。".format(
+            dun_type, ju_number, yuan_type, zhi_fu_origin_star,
+            PALACE_NAMES[target_star_palace]["name"], zhi_shi_origin_gate,
+            PALACE_NAMES[gate_target_palace]["name"],
+        ),
+        "action": "三吉门候选：{}。以上只是盘面结构条件，未计算吉凶总分，也不构成现实行动结论。".format(gate_candidates),
+        "strategy": "奇门盘面按天地人神四盘逐层展开；本输出只列星、门、神、奇仪与格局条件，吉凶判断由使用者在具体事项中自行权衡。",
     }
 
     result = {
@@ -336,6 +350,11 @@ def calculate_qimen_chart(
         "palaces": palaces_output,
         "favorable_directions": favorable_directions,
         "advisory": advisory,
+        "warnings": [
+            "定局采用拆补法（以甲/己符头分上中下三元），未实现超神接气、置闰的流派分歧处理；"
+            "同一交节前后日期在其他流派可能得到不同局数。",
+            "九遁按《奇门法窍》《奇门旨归》通行条件判定；神/鬼/龙/虎等遁存在异文变体，本盘不混算变体。",
+        ],
     }
     # 与其余体系保持一致：盘面事实放进 facts。缺这一层时，冻结快照的
     # plate_facts、工作量表 step2 的 plates 都拿不到奇门任何内容（静默空白）。
@@ -345,7 +364,7 @@ def calculate_qimen_chart(
             "rule_id", "system", "solar_datetime", "lunar_datetime", "ganzhi", "solar_term",
             "dun_type", "ju_number", "yuan_type", "fu_tou", "xun_shou", "xun", "void", "horse_star",
             "zhi_fu_star", "zhi_shi_gate", "zhi_fu_palace", "zhi_shi_palace",
-            "palaces", "favorable_directions", "advisory",
+            "palaces", "favorable_directions", "advisory", "warnings",
         )
     }
     return result

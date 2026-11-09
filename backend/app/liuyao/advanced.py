@@ -58,6 +58,7 @@ def _relative_for_element(palace_element, element):
 
 
 def _line_strength_rank(strength):
+    # 仅用于候选排序：囚/死同权，不据此推断吉凶强弱。
     return {"旺": 3, "相": 2, "休": 1, "囚": 0, "死": 0}.get(strength, 0)
 
 
