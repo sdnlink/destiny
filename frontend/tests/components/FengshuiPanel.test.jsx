@@ -31,16 +31,42 @@ import {
   listFengshuiBuildings,
   saveFengshuiBuilding,
 } from "../../src/lib/api.js";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import FengshuiPanel from "../../src/components/fengshui/FengshuiPanel";
+
+function LocationProbe() {
+  const location = useLocation();
+  return <div data-testid="location">{location.search}</div>;
+}
+
+function renderPage(ui, initialEntries = ["/"]) {
+  return render(
+    <MemoryRouter initialEntries={initialEntries}>
+      {ui}
+      <LocationProbe />
+    </MemoryRouter>
+  );
+}
 
 describe("FengshuiPanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
+  it("URL 中的 tool 参数决定初始子工具，切换后同步地址栏", () => {
+    listFengshuiBuildings.mockResolvedValue([]);
+    renderPage(<FengshuiPanel />, ["/fengshui?tool=bazhai"]);
+
+    expect(screen.getByRole("tab", { name: /八宅/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("location").textContent).toContain("tool=bazhai");
+
+    fireEvent.click(screen.getByRole("tab", { name: /坐向测量/ }));
+    expect(screen.getByTestId("location").textContent).toBe("");
+  });
+
   it("单次分析提交向首角度、基准与误差", async () => {
     analyzeFengshuiDirection.mockResolvedValue({ facts: { mode: "single_direction" } });
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("button", { name: /生成阳宅坐向/ }));
 
@@ -57,7 +83,7 @@ describe("FengshuiPanel", () => {
 
   it("多次共识按每条读数提交测量数组", async () => {
     analyzeFengshuiMeasurements.mockResolvedValue({ facts: { mode: "multiple_measurements" } });
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("button", { name: "多次共识" }));
     fireEvent.click(screen.getByRole("button", { name: /生成阳宅坐向/ }));
@@ -73,7 +99,7 @@ describe("FengshuiPanel", () => {
   });
 
   it("多次共识增加与删除读数时保持 3–12 次边界", async () => {
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("button", { name: "多次共识" }));
     fireEvent.click(screen.getByRole("button", { name: /增加读数/ }));
@@ -85,7 +111,7 @@ describe("FengshuiPanel", () => {
   });
 
   it("逐次读数为空时不发请求并提示", async () => {
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("button", { name: "多次共识" }));
     fireEvent.change(screen.getByLabelText("第1次向首读数"), { target: { value: "" } });
@@ -97,7 +123,7 @@ describe("FengshuiPanel", () => {
 
   it("八宅按坐山与宅命信息提交", async () => {
     analyzeFengshuiBazhai.mockResolvedValue({ facts: { house_group: "东四宅" } });
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("tab", { name: "八宅" }));
     fireEvent.click(screen.getByRole("button", { name: /排八宅盘/ }));
@@ -112,7 +138,7 @@ describe("FengshuiPanel", () => {
   });
 
   it("八宅出生年份越界时不发请求并提示", async () => {
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("tab", { name: "八宅" }));
     fireEvent.change(screen.getByLabelText("出生年份（选填）"), { target: { value: "1800" } });
@@ -124,7 +150,7 @@ describe("FengshuiPanel", () => {
 
   it("玄空按坐山、运与年份提交", async () => {
     analyzeFengshuiXuankong.mockResolvedValue({ facts: { period_label: "下元9运" } });
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("tab", { name: "玄空" }));
     fireEvent.click(screen.getByRole("button", { name: /排玄空盘/ }));
@@ -147,7 +173,7 @@ describe("FengshuiPanel", () => {
         profile: { name: "自宅 · 主卧", measurements: [{ facing_degree: 180 }], note: "三层" },
       },
     ]);
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("tab", { name: "房屋档案" }));
 
@@ -159,7 +185,7 @@ describe("FengshuiPanel", () => {
   it("保存档案须先勾选知情同意并提交当前坐向", async () => {
     listFengshuiBuildings.mockResolvedValue([]);
     saveFengshuiBuilding.mockResolvedValue({ building_id: "building-new" });
-    render(<FengshuiPanel />);
+    renderPage(<FengshuiPanel />);
 
     fireEvent.click(screen.getByRole("tab", { name: "房屋档案" }));
     await waitFor(() => expect(listFengshuiBuildings).toHaveBeenCalled());

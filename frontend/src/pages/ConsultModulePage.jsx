@@ -5,6 +5,9 @@ import {
   Orbit,
   Workflow,
 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { systemForm } from "../lib/formDefaults";
+import { applyUrlOverrides, syncFormToSearchParams } from "../lib/urlForm";
 import { ZhouyiView } from "../components/result/ZhouyiView";
 import { MeihuaView } from "../components/result/MeihuaView";
 import { LiuyaoView } from "../components/result/LiuyaoView";
@@ -118,10 +121,19 @@ const MODULE_CONFIG = {
 };
 
 export default function ConsultModulePage({ moduleKey }) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const config = MODULE_CONFIG[moduleKey];
   if (!config) {
     return null;
   }
+
+  // 打开链接时按 query 预填表单；起卦成功后把关键输入写回 URL（replace，不新增历史），
+  // 这样地址栏本身就是一条可复制分享的完整推演链接。
+  const initialForm = applyUrlOverrides(systemForm(config.tab.id), searchParams);
+  const handleSubmitted = (activeForm) => {
+    setSearchParams(syncFormToSearchParams(searchParams, activeForm), { replace: true });
+  };
+
   return (
     <ConsultPanel
       key={moduleKey}
@@ -135,6 +147,8 @@ export default function ConsultModulePage({ moduleKey }) {
       panelTitle={config.panelTitle}
       submitLabel={config.submitLabel}
       submitLoadingLabel={config.submitLoadingLabel}
+      initialForm={initialForm}
+      onSubmitted={handleSubmitted}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ConsultModulePage from "../../src/pages/ConsultModulePage";
@@ -38,16 +38,36 @@ function responseFor(module, ruleId) {
   };
 }
 
-function renderModule(key) {
+function LocationProbe() {
+  const location = useLocation();
+  return <div data-testid="location">{location.search}</div>;
+}
+
+function renderModule(key, initialEntries = ["/"]) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={initialEntries}>
       <ConsultModulePage moduleKey={key} />
+      <LocationProbe />
     </MemoryRouter>
   );
 }
 
 describe("卜筮与时空盘独立模块页", () => {
   afterEach(() => vi.restoreAllMocks());
+
+  it("URL 查询参数预填表单，起卦后把输入写回地址栏", async () => {
+    vi.spyOn(api, "compareCalculations").mockResolvedValue(responseFor("zhouyi", "ZY-URL"));
+    renderModule("zhouyi", ["/zhouyi?q=项目是否可行&at=2026-11-09T10:00&cat=decision"]);
+
+    expect(screen.getByDisplayValue("项目是否可行")).toBeTruthy();
+    fireEvent.click(screen.getByText("开始起卦"));
+    await waitFor(() => expect(screen.getByText("周易结果：ZY-URL")).toBeTruthy());
+
+    const search = screen.getByTestId("location").textContent;
+    expect(search).toContain("q=");
+    expect(search).toContain("cat=decision");
+    expect(search).toContain("2026-11-09T10");
+  });
 
   it("周易模块页只提交 zhouyi 体系，并复用同一个事项上下文", async () => {
     const spy = vi.spyOn(api, "compareCalculations").mockResolvedValue(responseFor("zhouyi", "ZY-001"));

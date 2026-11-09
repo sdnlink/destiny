@@ -60,9 +60,11 @@ export default function ConsultPanel({
   panelTitle,
   submitLabel,
   submitLoadingLabel,
+  initialForm,
+  onSubmitted,
 }) {
   const [activeTab, setActiveTab] = useState(tabs[0].id);
-  const [form, setForm] = useState(() => systemForm(tabs[0].id));
+  const [form, setForm] = useState(() => initialForm || systemForm(tabs[0].id));
   const [result, setResult] = useState(null);
   const [resultQuestion, setResultQuestion] = useState("");
   const [resultTab, setResultTab] = useState("board");
@@ -128,6 +130,7 @@ export default function ConsultPanel({
       setResultQuestion(activeForm.question);
       setResultTab("board");
       setPreview(null);
+      onSubmitted?.(activeForm);
 
       // 各模块独立成页后，本地历史存档改由各模块提交时落盘，避免随「综合推演」一起消失
       const ctx = {
@@ -153,7 +156,7 @@ export default function ConsultPanel({
   };
 
   const handleReset = () => {
-    setForm(systemForm(activeTab));
+    setForm(initialForm || systemForm(activeTab));
     setResult(null);
     setResultQuestion("");
     setResultTab("board");

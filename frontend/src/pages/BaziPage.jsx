@@ -9,6 +9,7 @@ import { LifelineView } from "../components/result/LifelineView";
 import { BirthProfileSection, birthPayload } from "../components/destiny/BirthProfileSection";
 import { LiunianView } from "../components/destiny/LiunianView";
 import { WorkspaceShell } from "../components/workspace/WorkspaceShell";
+import { useTabSearchParam } from "../hooks/useTabSearchParam";
 
 const TABS = [
   { id: "natal", label: "本命盘", icon: Sparkles, desc: "四柱、藏干十神与大运排盘" },
@@ -45,7 +46,11 @@ export default function BaziPage() {
     trueSolar: false,
     longitude: "",
   });
-  const [activeTab, setActiveTab] = useState("natal");
+  const [activeTab, setActiveTab] = useTabSearchParam(
+    "tab",
+    TABS.map((tab) => tab.id),
+    "natal",
+  );
   const [natal, setNatal] = useState(null);
   const [liunian, setLiunian] = useState(null);
   const [startYear, setStartYear] = useState(String(new Date().getFullYear()));

@@ -1,8 +1,23 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import BaziPage from "../../src/pages/BaziPage";
 import ZiweiPage from "../../src/pages/ZiweiPage";
 import * as api from "../../src/lib/api";
+
+function LocationProbe() {
+  const location = useLocation();
+  return <div data-testid="location">{location.search}</div>;
+}
+
+function renderPage(ui, initialEntries = ["/"]) {
+  return render(
+    <MemoryRouter initialEntries={initialEntries}>
+      {ui}
+      <LocationProbe />
+    </MemoryRouter>
+  );
+}
 
 vi.mock("../../src/components/result/BaziView", () => ({
   BaziView: ({ result }) => <div>本命盘结果：{result.rule_id}</div>,
@@ -49,9 +64,25 @@ const liunianData = {
 describe("八字与紫微模块页", () => {
   afterEach(() => vi.restoreAllMocks());
 
+  it("URL 中的 tab 参数决定初始子页，切换后同步地址栏", () => {
+    renderPage(<BaziPage />, ["/bazi?tab=liunian"]);
+
+    expect(screen.getByRole("tab", { name: /流年/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("location").textContent).toContain("tab=liunian");
+
+    fireEvent.click(screen.getByRole("tab", { name: /本命盘/ }));
+    expect(screen.getByRole("tab", { name: /本命盘/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("location").textContent).toBe("");
+  });
+
+  it("非法 tab 参数回落到默认子页", () => {
+    renderPage(<BaziPage />, ["/bazi?tab=unknown"]);
+    expect(screen.getByRole("tab", { name: /本命盘/ })).toHaveAttribute("aria-selected", "true");
+  });
+
   it("用同一份出生信息排本命盘", async () => {
     const spy = vi.spyOn(api, "evaluateCalculation").mockResolvedValue({ result: { rule_id: "BZ-BAZI-001" } });
-    render(<BaziPage />);
+    renderPage(<BaziPage />);
     fillBirthProfile();
     fireEvent.click(screen.getByText("排本命盘"));
     await waitFor(() => expect(screen.getByText("本命盘结果：BZ-BAZI-001")).toBeTruthy());
@@ -66,7 +97,7 @@ describe("八字与紫微模块页", () => {
 
   it("紫微斗数页复用出生信息与性别", async () => {
     const spy = vi.spyOn(api, "evaluateCalculation").mockResolvedValue({ result: { rule_id: "ZW-PAN-001" } });
-    render(<ZiweiPage />);
+    renderPage(<ZiweiPage />);
     fillBirthProfile();
     fireEvent.click(screen.getByText("排紫微盘"));
     await waitFor(() => expect(screen.getByText("紫微结果：ZW-PAN-001")).toBeTruthy());
@@ -81,7 +112,7 @@ describe("八字与紫微模块页", () => {
 
   it("流年页签复用出生信息并传起止年份", async () => {
     const spy = vi.spyOn(api, "analyzeLiunian").mockResolvedValue(liunianData);
-    render(<BaziPage />);
+    renderPage(<BaziPage />);
     fillBirthProfile();
     fireEvent.click(screen.getByRole("tab", { name: /流年/ }));
     fireEvent.change(screen.getByLabelText("起始年份"), { target: { value: "2026" } });
@@ -101,14 +132,14 @@ describe("八字与紫微模块页", () => {
   });
 
   it("生平时间轴页签把出生信息交给现有时间轴组件", () => {
-    render(<BaziPage />);
+    renderPage(<BaziPage />);
     fillBirthProfile();
     fireEvent.click(screen.getByRole("tab", { name: /生平时间轴/ }));
     expect(screen.getByText("时间轴入参：1984-02-10T10:00")).toBeTruthy();
   });
 
   it("出生时间未填时不发起计算", () => {
-    render(<BaziPage />);
+    renderPage(<BaziPage />);
     expect(screen.getByText("排本命盘").closest("button").disabled).toBe(true);
     fireEvent.click(screen.getByRole("tab", { name: /流年/ }));
     expect(screen.getByText("生成流年").closest("button").disabled).toBe(true);

@@ -15,6 +15,7 @@ import { BazhaiView } from "../result/BazhaiView";
 import { FengshuiView } from "../result/FengshuiView";
 import { XuankongView } from "../result/XuankongView";
 import { WorkspaceShell } from "../workspace/WorkspaceShell";
+import { useTabSearchParam } from "../../hooks/useTabSearchParam";
 
 const MOUNTAINS = [
   "子", "癸", "丑", "艮", "寅", "甲", "卯", "乙", "辰", "巽", "巳", "丙",
@@ -83,7 +84,11 @@ function ResultBar({ label, onExport }) {
 }
 
 export default function FengshuiPanel() {
-  const [tool, setTool] = useState("direction");
+  const [tool, setTool] = useTabSearchParam(
+    "tool",
+    TOOLS.map((item) => item.id),
+    "direction",
+  );
   const [mode, setMode] = useState("single");
   const [facing, setFacing] = useState("180");
   const [measurements, setMeasurements] = useState(["179", "180", "181"]);
